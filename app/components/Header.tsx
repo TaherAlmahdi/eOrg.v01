@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
-import { Menu, X, BookOpen, Users, Info, Feather, History, Mail, Library } from 'lucide-react';
+import { Menu, X, BookOpen, Users, Info, Feather, History, Mail, Library, Archive } from 'lucide-react';
 import Image from 'next/image';
 
 import publicLogo from '../../public/elogo.png'; 
@@ -158,10 +158,25 @@ const Header = () => {
                      <Mail size={22} />
                   </div>
                   <div>
-                     <h3 className="text-lg font-bold text-gray-800">পত্রাবলী ও বিবিধ</h3>
-                     <p className="text-xs text-gray-500">চিঠিপত্র ও অপ্রকাশিত রচনাসংগ্রহ</p>
+                     <h3 className="text-lg font-bold text-gray-800">পত্রাবলী</h3>
+                     <p className="text-xs text-gray-500">চিঠিপত্র ও দলিলাদি</p>
                   </div>
                 </Link>
+
+                {/* ৫. বিবিধ - Archive */}
+                <Link 
+                  href="/others" 
+                  onClick={() => setIsMenuOpen(false)}
+                  className="flex items-center gap-5 p-4 bg-white rounded border border-gray-100 hover:border-[#008080] transition-all group shadow-sm"
+                >
+                  <div className="p-3 bg-pink-50 rounded-xl text-pink-600 group-hover:bg-pink-600 group-hover:text-white transition-colors">
+                     <Archive size={22} />
+                  </div>
+                  <div>
+                     <h3 className="text-lg font-bold text-gray-800">বিবিধ রচনা</h3>
+                     <p className="text-xs text-gray-500">অগ্রন্থিত ও অপ্রকাশিত রচনাসংগ্রহ</p>
+                  </div>
+                </Link>                
 
                 {/* ৬. প্রকল্প পরিচয় - Info */}
                 <Link 

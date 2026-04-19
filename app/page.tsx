@@ -13,7 +13,8 @@ import {
   Feather, 
   Library, 
   History, 
-  Mail 
+  Mail,
+  Archive
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -52,7 +53,7 @@ export default function Home() {
             </div>            
 
             {/* গ্রিড লেআউট */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3">
               
               {/* ১. উপন্যাস সমগ্র */}
               <Link 
@@ -110,7 +111,7 @@ export default function Home() {
                 </div>
               </Link>
 
-              {/* ৫. পত্রাবলী ও অন্যান্য */}
+              {/* ৫. পত্রাবলী */}
               <Link 
                 href="/letters" 
                 className="flex items-center gap-5 p-4 bg-white rounded border border-gray-100 hover:border-[#008080] transition-all group shadow-sm"
@@ -119,10 +120,26 @@ export default function Home() {
                   <Mail size={22} />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-gray-800">পত্রাবলী ও বিবিধ</h3>
-                  <p className="text-xs text-gray-500">চিঠিপত্র ও অপ্রকাশিত রচনাসংগ্রহ</p>
+                  <h3 className="text-lg font-bold text-gray-800">পত্রাবলী</h3>
+                  <p className="text-xs text-gray-500">বঙ্কিম লিখিত চিঠিপত্র ও দলিলাদি</p>
                 </div>
               </Link>
+
+
+
+              {/* ৬. অন্যান্য / বিবিধ */}
+              <Link 
+                href="/others" // আপনার জেনার স্লাগ অনুযায়ী এটি /others হওয়া উচিত
+                className="flex items-center gap-5 p-4 bg-white rounded border border-gray-100 hover:border-[#008080] transition-all group shadow-sm"
+              >
+                <div className="p-3 bg-pink-50 rounded-xl text-pink-600 group-hover:bg-pink-600 group-hover:text-white transition-colors">
+                  <Archive size={22} /> {/* Archive আইকনটি বিবিধ সংগ্রহ বা আর্কাইভের জন্য উপযুক্ত */}
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-800">বিবিধ</h3>
+                  <p className="text-xs text-gray-500">অপ্রকাশিত ও পরিত্যাক্ত রচনাসংগ্রহ</p>
+                </div>
+              </Link>           
             </div>
           </div>
         </section>
