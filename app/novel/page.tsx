@@ -1,18 +1,17 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-// পেজটিকে ডাইনামিক রেন্ডারিং নিশ্চিত করা হলো
 export const dynamic = 'force-dynamic';
 
 async function getBankimNovels() {
+  // কুয়েরি থেকে অপ্রয়োজনীয় ফিল্ড সরিয়ে শুধু প্রয়োজনীয় ডেটা রাখা হয়েছে
   const query = `
     query GetAllBankimBooks {
       allSeries(where: { slug: ["bankim-rachanabali"] }) {
         nodes {
-          name  # এখানে 'title' এর পরিবর্তে 'name' হবে
           eBooks(first: 100, where: { orderby: { field: DATE, order: ASC } }) {
             nodes {
-              title # এটি ঠিক আছে, কারণ eBook একটি পোস্ট টাইপ
+              title
               slug
               featuredImage {
                 node {
@@ -36,18 +35,11 @@ async function getBankimNovels() {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
-        // লাইভ সার্ভারে অনেক সময় ইউজার এজেন্ট না থাকলে রিকোয়েস্ট ব্লক হয়
-        'User-Agent': 'Mozilla/5.0' 
+        'User-Agent': 'Mozilla/5.0'
       },
       body: JSON.stringify({ query }),
       cache: 'no-store',
     });
-
-    // রেসপন্স স্ট্যাটাস চেক করা (যদি ২০৩ বা ৪-০-৪ আসে)
-    if (!res.ok) {
-      console.error(`HTTP Error: ${res.status}`);
-      return [];
-    }
 
     const json = await res.json();
 
@@ -56,14 +48,16 @@ async function getBankimNovels() {
       return [];
     }
 
-    // ডাটা পাথ আরও সুরক্ষিত করা হলো (Safe Extraction)
-    const seriesNodes = json.data?.allSeries?.nodes || [];
-    if (seriesNodes.length === 0) {
-      console.warn('No series found with slug bankim-rachanabali');
+    // ডাটা এক্সট্রাকশন আরও সেফ করা হয়েছে
+    const series = json.data?.allSeries?.nodes;
+    
+    // যদি সিরিজ খুঁজে না পায়
+    if (!series || series.length === 0) {
+      console.warn("Series 'bankim-rachanabali' not found or empty.");
       return [];
     }
 
-    const allBooks = seriesNodes[0]?.eBooks?.nodes || [];
+    const allBooks = series[0]?.eBooks?.nodes || [];
 
     // 'novel' স্লাগ ফিল্টার
     return allBooks.filter((book: any) => 
@@ -82,14 +76,12 @@ export default async function NovelsPage() {
   return (
     <>
       <main className="min-h-screen bg-[#fdfdf7] py-2 px-3">
-        {/* হেডার অংশ */}
         <div className="bg-[#669999] p-2 border border-[#669999] mb-3">
           <h1 className="text-2xl md:text-2xl font-bold text-yellow-400 text-center">
             উপন্যাস সমগ্র
           </h1>
         </div>
 
-        {/* উপন্যাস গ্রিড */}
         <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-5">
           {novels && novels.length > 0 ? (
             novels.map((novel: any) => {
@@ -104,7 +96,6 @@ export default async function NovelsPage() {
                       fill
                       sizes="(max-width: 768px) 50vw, 20vw"
                       className="object-cover transition-transform duration-500 group-hover:scale-110"
-                      priority={false}
                     />
                   </div>
                   <h3 className="mt-6 p-2 text-center text-lg font-bold group-hover:text-yellow-400 transition-colors line-clamp-2 rounded-md">
