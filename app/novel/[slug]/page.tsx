@@ -81,7 +81,7 @@ async function getNovelData(slug: string) {
     return null;
   }
 }
-
+export const dynamic = 'force-dynamic';
 export default async function NovelDetailsPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const novel = await getNovelData(slug);
