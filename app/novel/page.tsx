@@ -9,9 +9,10 @@ async function getBankimNovels() {
     query GetAllBankimBooks {
       allSeries(where: { slug: ["bankim-rachanabali"] }) {
         nodes {
+          name  # এখানে 'title' এর পরিবর্তে 'name' হবে
           eBooks(first: 100, where: { orderby: { field: DATE, order: ASC } }) {
             nodes {
-              title
+              title # এটি ঠিক আছে, কারণ eBook একটি পোস্ট টাইপ
               slug
               featuredImage {
                 node {
