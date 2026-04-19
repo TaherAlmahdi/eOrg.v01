@@ -24,3 +24,180 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+p {
+  margin: 4px 0;
+
+}
+
+.first {
+  margin: 6px 0;
+  text-align: justify;
+}
+
+.first::first-letter {
+  color: #a7373d;
+}
+
+.dcap::first-letter {
+  float: left;
+  line-height: 35px;
+  font-size: 35px;
+  color: #7D3C98;
+  border: 1px solid #D5C5EC;
+  background: #D5C5EC;
+  padding: 5px;
+  margin-right: 5px;
+  margin-bottom: -10px;
+}
+.dcap{
+  text-align: justify;
+}
+
+.quran,
+.normal,
+span.normal
+p.normal {
+  margin: 6px 0;
+  text-indent: 30px;
+  text-align: justify;
+}
+
+p.center {
+  margin: 2px 0;
+  text-align: center;
+}
+
+p.right {
+  margin-bottom: 2px;
+  margin-top: 2px;
+  text-align: right;
+}
+
+.pc {
+  text-align: center;
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+.easy-footnote-to-top:visited{color: blue;}
+.efn-to-top {
+	display: inline-block;
+	margin-right: 5px;
+}
+
+.easy-foot note-to-top:after,
+.efn-to-top:before {
+    content: "\f342";
+    font-family: 'dashicons';
+    line-height: 1;
+    font-size: .8em;
+    font-stretch: condensed;
+}
+
+
+ul.ednref {
+  margin: 0;
+  list-style-type: none;
+  text-align: justify;
+}
+
+ul.ednref li {
+	margin-left: 20px;
+  text-decoration: none;
+}
+
+ul.ednref li::first-letter {
+  margin-left: -20px;
+  color: #8A2BE2;
+}
+
+ul.ednref li:before {
+    content: "\f342";
+    font-family: 'dashicons'; font-size: .9em; padding-right: 5px;
+}
+
+.easy-footnote-title h4 {
+  font-size: 1.15em;
+  font-weight: normal;
+}
+
+ol.easy-footnotes-wrapper {
+  background: #F8F6F6;
+  list-style-type: bengali;
+  list-style-position: inside;
+}
+
+li.easy-footnote-single {
+  padding: 2px 5px;
+  font-size: 1.0rem;
+  margin: 0;
+  text-align: justify;
+  border-bottom: 3px solid white;
+}
+
+li.easy-footnote-single .center {
+  text-align: center;
+}
+
+li.easy-footnote-single .normal {
+  text-indent: 20px;
+}
+
+h3.bname, h3.book-name, h3.wname, h3.vname, h3.btitle {  margin: 0; border-bottom: none;}
+
+.bname {
+		text-align: center;
+		line-height: normal;
+		font-weight: normal; 
+		letter-spacing: 5px;
+		font-size: 1.5em;
+		color: #666600;
+		margin:0px; padding: 0px;
+}
+
+.bname  a {
+		color: #666600;
+}
+
+.bname a:hover,
+.bname:hover{
+		color: #cc66ff;}
+
+.wname {
+  text-align: center;
+  color: #2d6db3;
+  line-height: normal;
+  font-weight: normal; letter-spacing: 5px;
+  margin: 0;   font-size: 20px;
+}
+
+.wname a {  color: #2d6db3;}
+
+.subtitle {
+  color: #2596be;
+  line-height: normal;
+  text-align: center;
+  font-weight: bold;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  font-size: 24px;
+  width: 65%; 		letter-spacing: 5px;
+  margin: auto;
+}
+
+b, strong {
+  color: #008080;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+}
+
+.end,
+.theend {
+		content: url(https://eduliture.com/wp-content/uploads/theend.png);
+		width: 20%;
+		margin-left: 40%;
+		margin-right: 40%;
+		margin-top: 20px;
+		margin-bottom: 20px;
+		opacity: 0.4;
+}
