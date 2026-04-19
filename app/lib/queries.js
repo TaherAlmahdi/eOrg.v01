@@ -3,13 +3,15 @@ export const GET_BANKIM_BOOKS = `
     allSeries(where: { slug: ["bankim-rachanabali"] }) {
       nodes {
         name
-        eBooks {
+        contentNodes(first: 50) {
           nodes {
-            title
-            slug
-            featuredImage {
-              node {
-                sourceUrl
+            ... on EBook {
+              title
+              slug
+              featuredImage {
+                node {
+                  sourceUrl
+                }
               }
             }
           }
