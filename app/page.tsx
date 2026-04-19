@@ -2,6 +2,7 @@
 
 import WelcomeBadge from './components/Welcome';
 import FeatureContent from './components/FeatureContent';
+import Omnibus from './components/Omnibus';
 // সব প্রয়োজনীয় আইকন ইম্পোর্ট করা হয়েছে
 import { 
   BookOpen, 
@@ -143,6 +144,11 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* রচনাবলী সেকশন */}
+
+            <Omnibus />
+      
       </main>
 
     </div>

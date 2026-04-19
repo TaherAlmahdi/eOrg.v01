@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { Menu, X, BookOpen, Users, Info, Feather, History, Mail, Library, Archive } from 'lucide-react';
 import Image from 'next/image';
 
-import publicLogo from '../../public/elogo.png'; 
 import siteLogo from '../../public/logo.png'; 
 
 const Header = () => {
@@ -14,28 +13,7 @@ const Header = () => {
     <header className="bg-[#ffffff] border-b border-gray-200 py-2 px-3 sticky top-0 z-50 shadow-sm font-sans">
       <div className="max-w-[1440px] mx-auto flex items-center justify-between gap-4">
         
-        {/* বামপাশ: এডুলিচার লোগো ও নাম */}
-        <div className="flex items-center gap-3">
-          <Link href="https://eduliture.org" target="_blank" className="flex-shrink-0">
-            <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center border border-gray-100 shadow-sm hover:opacity-80 transition-opacity bg-white">
-              <Image 
-                src={publicLogo} 
-                alt="এডুলিচার" 
-                width={40} 
-                height={40}
-                className="object-cover"
-                unoptimized
-              />
-            </div>
-          </Link>
-
-          <div className="flex flex-col justify-center">
-            <Link href="https://eduliture.org" target="_blank" className="group">
-            </Link>
-          </div>
-        </div>
-
-        {/* মাঝখানে: সাইটলোগো ও বঙ্কিম রচনাবলী */}
+        {/* লোগো ও নাম এখন বাম পাশে */}
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center gap-3 group">
             <div className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
@@ -70,7 +48,7 @@ const Header = () => {
           <Menu size={28} />
         </button>
 
-        {/* মোডাল মেনু */}
+        {/* মোডাল মেনু (অপরিবর্তিত) */}
         {isMenuOpen && (
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex justify-end">
             <div className="absolute inset-0" onClick={() => setIsMenuOpen(false)}></div>
@@ -88,9 +66,8 @@ const Header = () => {
               </div>
 
               <nav className="space-y-2">
-                {/* ১. উপন্যাস সমগ্র - BookOpen */}
                 <Link 
-                  href="/novels" 
+                  href="/novel" 
                   onClick={() => setIsMenuOpen(false)}
                   className="flex items-center gap-5 p-4 bg-white rounded border border-gray-100 hover:border-[#008080] transition-all group shadow-sm"
                 >
@@ -99,11 +76,10 @@ const Header = () => {
                   </div>
                   <div>
                      <h3 className="text-lg font-bold text-gray-800">উপন্যাস সমগ্র</h3>
-                     <p className="text-xs text-gray-500">বঙ্কিমচন্দ্রের কালজয়ী উপন্যাসসমূহ</p>
+                     <p className="text-xs text-gray-500">বঙ্কিমচন্দ্রের কালজয়ী উপন্যাসসমূহ</p>
                   </div>
                 </Link>
 
-                {/* ২. রম্য সাহিত্য - Feather */}
                 <Link 
                   href="/humor" 
                   onClick={() => setIsMenuOpen(false)}
@@ -118,7 +94,6 @@ const Header = () => {
                   </div>
                 </Link>
 
-                {/* ৩. ধর্মীয় সাহিত্য - Library (পুঁথি বা শাস্ত্রের প্রতীক) */}
                 <Link 
                   href="/religious" 
                   onClick={() => setIsMenuOpen(false)}
@@ -129,11 +104,10 @@ const Header = () => {
                   </div>
                   <div>
                      <h3 className="text-lg font-bold text-gray-800">ধর্মীয় সাহিত্য</h3>
-                     <p className="text-xs text-gray-500">ধর্মতত্ত্ব ও কৃষ্ণচরিত্র বিষয়ক আলোচনা</p>
+                     <p className="text-xs text-gray-500">ধর্মতত্ত্ব ও কৃষ্ণচরিত্র বিষয়ক আলোচনা</p>
                   </div>
                 </Link>
 
-                {/* ৪. ইতিহাস ও প্রবন্ধ - History */}
                 <Link 
                   href="/essays" 
                   onClick={() => setIsMenuOpen(false)}
@@ -148,7 +122,6 @@ const Header = () => {
                   </div>
                 </Link>
 
-                {/* ৫. পত্রাবলী ও অন্যান্য - Mail */}
                 <Link 
                   href="/letters" 
                   onClick={() => setIsMenuOpen(false)}
@@ -163,7 +136,6 @@ const Header = () => {
                   </div>
                 </Link>
 
-                {/* ৫. বিবিধ - Archive */}
                 <Link 
                   href="/others" 
                   onClick={() => setIsMenuOpen(false)}
@@ -176,9 +148,8 @@ const Header = () => {
                      <h3 className="text-lg font-bold text-gray-800">বিবিধ রচনা</h3>
                      <p className="text-xs text-gray-500">অগ্রন্থিত ও অপ্রকাশিত রচনাসংগ্রহ</p>
                   </div>
-                </Link>                
+                </Link>
 
-                {/* ৬. প্রকল্প পরিচয় - Info */}
                 <Link 
                   href="/about" 
                   onClick={() => setIsMenuOpen(false)}
