@@ -1,6 +1,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+// ১. পেজটিকে ডাইনামিক রেন্ডারিং করার নির্দেশ
+export const dynamic = 'force-dynamic';
+
 async function getBankimNovels() {
   const query = `
     query GetAllBankimBooks {
@@ -32,6 +35,7 @@ async function getBankimNovels() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query }),
+      // cache: 'no-store' ব্যবহার করা হয়েছে যাতে বিল্ড টাইমে স্ট্যাটিক এরর না আসে
       cache: 'no-store',
     });
 
@@ -42,10 +46,9 @@ async function getBankimNovels() {
       return [];
     }
 
-    // ডাটা পাথ নিশ্চিত করা
     const allBooks = json.data?.allSeries?.nodes?.[0]?.eBooks?.nodes || [];
 
-    // শুধুমাত্র 'novel' স্লাগযুক্ত বইগুলো ফিল্টার করা
+    // শুধুমাত্র 'letters' স্লাগযুক্ত বইগুলো ফিল্টার করা
     return allBooks.filter((book: any) => 
       book.genres?.nodes?.some((genre: any) => genre.slug === 'letters')
     );
@@ -63,13 +66,13 @@ export default async function NovelsPage() {
     <>
       <main className="min-h-screen bg-[#fdfdf7] py-2 px-3">
         {/* হেডার অংশ */}
-      <div className="bg-[#669999] p-2 border border-[#669999] mb-3">
-        <h1 className="text-2xl md:text-2xl font-bold text-yellow-400 text-center">
+        <div className="bg-[#669999] p-2 border border-[#669999] mb-3">
+          <h1 className="text-2xl md:text-2xl font-bold text-yellow-400 text-center">
             পত্রাবলী ও বিবিধ
           </h1>
         </div>
 
-        {/* উপন্যাস গ্রিড */}
+        {/* কন্টেন্ট গ্রিড */}
         <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-5">
           {novels && novels.length > 0 ? (
             novels.map((novel: any) => {

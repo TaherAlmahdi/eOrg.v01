@@ -1,6 +1,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+// ১. পেজটিকে ডাইনামিক রেন্ডারিং করার জন্য কনফিগার করা হলো
+export const dynamic = 'force-dynamic';
+
 async function getBankimNovels() {
   const query = `
     query GetAllBankimBooks {
@@ -32,6 +35,7 @@ async function getBankimNovels() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query }),
+      // cache: 'no-store' নিশ্চিত করে যে ডাটা সবসময় ফ্রেশ আসবে এবং বিল্ড এরর হবে না
       cache: 'no-store',
     });
 
@@ -42,10 +46,9 @@ async function getBankimNovels() {
       return [];
     }
 
-    // ডাটা পাথ নিশ্চিত করা
     const allBooks = json.data?.allSeries?.nodes?.[0]?.eBooks?.nodes || [];
 
-    // শুধুমাত্র 'novel' স্লাগযুক্ত বইগুলো ফিল্টার করা
+    // শুধুমাত্র 'religious' স্লাগযুক্ত বইগুলো ফিল্টার করা
     return allBooks.filter((book: any) => 
       book.genres?.nodes?.some((genre: any) => genre.slug === 'religious')
     );
@@ -63,13 +66,13 @@ export default async function NovelsPage() {
     <>
       <main className="min-h-screen bg-[#fdfdf7] py-2 px-3">
         {/* হেডার অংশ */}
-      <div className="bg-[#669999] p-2 border border-[#669999] mb-3">
-        <h1 className="text-2xl md:text-2xl font-bold text-yellow-400 text-center">
-           ধর্মীয় সাহিত্য
+        <div className="bg-[#669999] p-2 border border-[#669999] mb-3">
+          <h1 className="text-2xl md:text-2xl font-bold text-yellow-400 text-center">
+            ধর্মীয় সাহিত্য
           </h1>
         </div>
 
-        {/* উপন্যাস গ্রিড */}
+        {/* কন্টেন্ট গ্রিড */}
         <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-5">
           {novels && novels.length > 0 ? (
             novels.map((novel: any) => {
@@ -95,7 +98,7 @@ export default async function NovelsPage() {
           ) : (
             <div className="col-span-full text-center py-20">
               <div className="text-4xl mb-4 text-gray-300">📚</div>
-              <p className="text-gray-500 text-lg">বর্তমানে কোনো উপন্যাস পাওয়া যায়নি।</p>
+              <p className="text-gray-500 text-lg">বর্তমানে কোনো ধর্মীয় সাহিত্য পাওয়া যায়নি।</p>
             </div>
           )}
         </div>

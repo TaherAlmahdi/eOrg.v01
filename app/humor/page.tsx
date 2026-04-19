@@ -1,6 +1,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+// ১. পেজটিকে ডাইনামিক রেন্ডারিং করার জন্য কনফিগার করা হলো
+export const dynamic = 'force-dynamic';
+
 async function getBankimHumor() {
   const query = `
     query GetAllBankimBooks {
@@ -32,7 +35,8 @@ async function getBankimHumor() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query }),
-      next: { revalidate: 60 }, // ভার্সেলে বিল্ড সমস্যা এড়াতে revalidate ব্যবহার করা হলো
+      // cache: 'no-store' ব্যবহার করা হয়েছে ডাইনামিক ডাটা নিশ্চিত করতে
+      cache: 'no-store',
     });
 
     const json = await res.json();
@@ -44,7 +48,7 @@ async function getBankimHumor() {
 
     const allBooks = json.data?.allSeries?.nodes?.[0]?.eBooks?.nodes || [];
 
-    // এখানে novel এর পরিবর্তে humor ফিল্টার করা হয়েছে
+    // এখানে 'humor' স্লাগ ফিল্টার রাখা হয়েছে
     return allBooks.filter((book: any) => 
       book.genres?.nodes?.some((genre: any) => genre.slug === 'humor')
     );
@@ -75,7 +79,6 @@ export default async function HumorPage() {
               const featuredImgUrl = book.featuredImage?.node?.sourceUrl;
 
               return (
-                // এখানে লিঙ্ক স্লাগ /novel/ থেকে সরিয়ে আপনার প্রয়োজনমতো সেট করতে পারেন
                 <Link href={`/novel/${book.slug}`} key={book.slug} className="group">
                   <div className="relative aspect-[2/3] w-full overflow-hidden rounded shadow-lg border bg-white transition-all duration-300 group-hover:-translate-y-2">
                     <Image

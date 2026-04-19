@@ -1,6 +1,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+// ১. পেজটিকে স্পষ্টভাবে ডাইনামিক রেন্ডারিংয়ের জন্য কনফিগার করা হলো
+export const dynamic = 'force-dynamic';
+
 async function getBankimNovels() {
   const query = `
     query GetAllBankimBooks {
@@ -32,6 +35,7 @@ async function getBankimNovels() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query }),
+      // cache: 'no-store' ডাইনামিক রেন্ডারিং নিশ্চিত করে
       cache: 'no-store',
     });
 
@@ -42,10 +46,8 @@ async function getBankimNovels() {
       return [];
     }
 
-    // ডাটা পাথ নিশ্চিত করা
     const allBooks = json.data?.allSeries?.nodes?.[0]?.eBooks?.nodes || [];
 
-    // শুধুমাত্র 'novel' স্লাগযুক্ত বইগুলো ফিল্টার করা
     return allBooks.filter((book: any) => 
       book.genres?.nodes?.some((genre: any) => genre.slug === 'novel')
     );
@@ -63,8 +65,8 @@ export default async function NovelsPage() {
     <>
       <main className="min-h-screen bg-[#fdfdf7] py-2 px-3">
         {/* হেডার অংশ */}
-      <div className="bg-[#669999] p-2 border border-[#669999] mb-3">
-        <h1 className="text-2xl md:text-2xl font-bold text-yellow-400 text-center">
+        <div className="bg-[#669999] p-2 border border-[#669999] mb-3">
+          <h1 className="text-2xl md:text-2xl font-bold text-yellow-400 text-center">
             উপন্যাস সমগ্র
           </h1>
         </div>
@@ -95,7 +97,7 @@ export default async function NovelsPage() {
           ) : (
             <div className="col-span-full text-center py-20">
               <div className="text-4xl mb-4 text-gray-300">📚</div>
-              <p className="text-gray-500 text-lg">বর্তমানে কোনো উপন্যাস পাওয়া যায়নি।</p>
+              <p className="text-gray-500 text-lg">বর্তমানে কোনো উপন্যাস পাওয়া যায়নি।</p>
             </div>
           )}
         </div>
