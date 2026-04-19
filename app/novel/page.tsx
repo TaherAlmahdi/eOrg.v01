@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-// ১. পেজটিকে স্পষ্টভাবে ডাইনামিক রেন্ডারিংয়ের জন্য কনফিগার করা হলো
+// পেজটিকে ডাইনামিক রেন্ডারিং নিশ্চিত করা হলো
 export const dynamic = 'force-dynamic';
 
 async function getBankimNovels() {
@@ -33,11 +33,20 @@ async function getBankimNovels() {
   try {
     const res = await fetch('https://eduliture.com/graphql', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        // লাইভ সার্ভারে অনেক সময় ইউজার এজেন্ট না থাকলে রিকোয়েস্ট ব্লক হয়
+        'User-Agent': 'Mozilla/5.0' 
+      },
       body: JSON.stringify({ query }),
-      // cache: 'no-store' ডাইনামিক রেন্ডারিং নিশ্চিত করে
       cache: 'no-store',
     });
+
+    // রেসপন্স স্ট্যাটাস চেক করা (যদি ২০৩ বা ৪-০-৪ আসে)
+    if (!res.ok) {
+      console.error(`HTTP Error: ${res.status}`);
+      return [];
+    }
 
     const json = await res.json();
 
@@ -46,8 +55,16 @@ async function getBankimNovels() {
       return [];
     }
 
-    const allBooks = json.data?.allSeries?.nodes?.[0]?.eBooks?.nodes || [];
+    // ডাটা পাথ আরও সুরক্ষিত করা হলো (Safe Extraction)
+    const seriesNodes = json.data?.allSeries?.nodes || [];
+    if (seriesNodes.length === 0) {
+      console.warn('No series found with slug bankim-rachanabali');
+      return [];
+    }
 
+    const allBooks = seriesNodes[0]?.eBooks?.nodes || [];
+
+    // 'novel' স্লাগ ফিল্টার
     return allBooks.filter((book: any) => 
       book.genres?.nodes?.some((genre: any) => genre.slug === 'novel')
     );
@@ -86,6 +103,7 @@ export default async function NovelsPage() {
                       fill
                       sizes="(max-width: 768px) 50vw, 20vw"
                       className="object-cover transition-transform duration-500 group-hover:scale-110"
+                      priority={false}
                     />
                   </div>
                   <h3 className="mt-6 p-2 text-center text-lg font-bold group-hover:text-yellow-400 transition-colors line-clamp-2 rounded-md">
