@@ -25,7 +25,7 @@ const Footer = () => {
       <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         
         {/* ১. প্রথম কলাম (২৫%) */}
-        <div className="lg:col-span-3 flex flex-col items-start order-1">
+        <div className="lg:col-span-3 flex flex-col items-start order-1 not-prose">
           <Link href="/" className="flex items-center gap-3 group">
             <div className="w-12 h-12 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
               <Image 
@@ -41,13 +41,13 @@ const Footer = () => {
                 <span className="text-[#008080]">বঙ্কিম</span>
                 <span className="text-[#cc7a00]"> রচনাবলী</span>
               </h1>
-              <p className="text-[11px] text-gray-500 mt-1 font-normal tracking-[1.5px]">
-                একটি এডুলিচার বিশুদ্ধজ্ঞান প্রকল্প
+              <p className="!text-[12px] text-gray-500 mt-1 font-normal tracking-[1.5px]">
+                এডুলিচার বিশুদ্ধজ্ঞান প্রকল্প
               </p>
             </div>
           </Link>
           
-          <p className="text-sm text-gray-500 leading-relaxed mt-1 text-justify">
+          <p className="!text-sm text-gray-500 leading-relaxed mt-1 text-justify">
             সাহিত্যসম্রাট বঙ্কিমচন্দ্র চট্টোপাধ্যায় রচিত উপন্যাস, রম্যরচনা, প্রবন্ধ, ধর্মীয় সাহিত্যের অনলাইন সংগ্রহ।
           </p>
         </div>
