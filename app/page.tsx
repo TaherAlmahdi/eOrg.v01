@@ -2,7 +2,6 @@
 
 import WelcomeBadge from './components/Welcome';
 import FeatureContent from './components/FeatureContent';
-import Omnibus from './components/Omnibus';
 // সব প্রয়োজনীয় আইকন ইম্পোর্ট করা হয়েছে
 import { 
   BookOpen, 
@@ -98,7 +97,7 @@ export default function Home() {
                 </div>
               </Link>
 
-              {/* ৪. ইতিহাস ও প্রবন্ধ */}
+              {/* ৪. প্রবন্ধাবলী */}
               <Link 
                 href="/essays" 
                 className="flex items-center gap-5 p-4 bg-white rounded border border-gray-100 hover:border-[#008080] transition-all group shadow-sm"
@@ -107,7 +106,7 @@ export default function Home() {
                   <History size={22} />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-gray-800">ইতিহাস ও প্রবন্ধ</h3>
+                  <h3 className="text-lg font-bold text-gray-800">প্রবন্ধাবলী</h3>
                   <p className="text-xs text-gray-500">ঐতিহাসিক ও গবেষণামূলক প্রবন্ধ</p>
                 </div>
               </Link>
@@ -143,14 +142,8 @@ export default function Home() {
               </Link>           
             </div>
           </div>
-        </section>
-
-        {/* রচনাবলী সেকশন */}
-
-            <Omnibus />
-      
+        </section>     
       </main>
-
     </div>
   );
 }

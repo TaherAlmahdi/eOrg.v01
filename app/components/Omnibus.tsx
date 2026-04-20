@@ -1,11 +1,12 @@
+'use client';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
 const GET_BANKIM_BOOKS = `
-  query GetBankimBySeries {
-    allSeries(where: { slug: ["bankim-rachanabali"] }) {
+  query GetBankimBySeries($slug: [String]!) {
+    allSeries(where: { slug: $slug }) {
       nodes {
-        name
         contentNodes(first: 50) {
           nodes {
             ... on EBook {
@@ -24,73 +25,59 @@ const GET_BANKIM_BOOKS = `
   }
 `;
 
-async function getBankimOmnibus() {
-  // ভ্যারিয়েবল থেকে এন্ডপয়েন্ট নেওয়া
-  const API_URL = process.env.NEXT_PUBLIC_WORDPRESS_API_URL || "https://eduliture.com/graphql";
+export default function Omnibus() {
+  const [books, setBooks] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  try {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        // সাবডোমেন রিকোয়েস্ট নিশ্চিত করতে কিছু জেনেরিক হেডার
-        'Accept': 'application/json',
-      },
-      body: JSON.stringify({ query: GET_BANKIM_BOOKS }),
-      cache: 'no-store', 
-    });
-
-    // রেসপন্সটি টেক্সট হিসেবে চেক করা (HTML এরর এড়াতে)
-    const responseText = await res.text();
-    
-    try {
-      const json = JSON.parse(responseText);
-      if (json.errors) {
-        console.error('GraphQL Error:', json.errors);
-        return [];
+  useEffect(() => {
+    const fetchData = async () => {
+      // সরাসরি ডোমেইন না দিয়ে আমাদের তৈরি করা প্রক্সি URL ব্যবহার করছি
+      const API_URL = "/api/graphql"; 
+      
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            query: GET_BANKIM_BOOKS,
+            variables: { slug: ["bankim-rachanabali"] }
+          }),
+        });
+        
+        const json = await res.json();
+        const nodes = json.data?.allSeries?.nodes?.[0]?.contentNodes?.nodes || [];
+        setBooks(nodes);
+      } catch (error) {
+        console.error('Fetch Failed:', error);
+      } finally {
+        setLoading(false);
       }
-      return json.data?.allSeries?.nodes[0]?.contentNodes?.nodes || [];
-    } catch (parseError) {
-      console.error("Server returned non-JSON response. Check if CORS is enabled on eduliture.com");
-      return [];
-    }
-  } catch (error) {
-    console.error('Fetch Failed:', error);
-    return [];
-  }
-}
+    };
 
-export default async function Omnibus() {
-  const books = await getBankimOmnibus();
+    fetchData();
+  }, []);
 
-  if (!books || books.length === 0) return null;
+  if (loading) return <div className="py-10 text-center">লোড হচ্ছে...</div>;
+  if (!books.length) return null;
 
   return (
     <section className="py-12 bg-[#fdfdf7]">
       <div className="max-w-[1440px] mx-auto px-6">
-        <div className="flex items-center gap-4 mb-10 border-b-2 border-[#008080]/10 pb-4">
-          <h2 className="text-3xl font-bold text-[#008080]">অমনিবাস</h2>
-          <div className="h-8 w-[1px] bg-gray-300 hidden md:block"></div>
-          <span className="text-gray-500 italic text-lg leading-none">বঙ্কিম রচনাবলী সংগ্রহ</span>
-        </div>
-
+        <h2 className="text-3xl font-bold text-[#008080] mb-10">অমনিবাস</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-8">
-          {books.map((book: any) => (
-            <Link 
-              href={`/novel/${book.slug}`} 
-              key={book.slug} 
-              className="group flex flex-col"
-            >
-              <div className="relative aspect-[2/3] w-full overflow-hidden rounded-sm shadow-md transition-all duration-500 group-hover:-translate-y-2 group-hover:shadow-2xl border border-gray-100 bg-white">
+          {books.map((book) => (
+            <Link href={`/novel/${book.slug}`} key={book.slug} className="group flex flex-col">
+              <div className="relative aspect-[2/3] w-full overflow-hidden rounded-sm shadow-md transition-all group-hover:-translate-y-2 bg-gray-100">
                 <Image
                   src={book.featuredImage?.node?.sourceUrl || '/placeholder.jpg'}
                   alt={book.title}
                   fill
-                  sizes="(max-width: 768px) 50vw, 15vw"
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 15vw"
                   className="object-cover"
+                  priority={false}
                 />
               </div>
-              <h3 className="mt-4 text-[16px] font-bold text-gray-800 group-hover:text-[#cc7a00] transition-colors line-clamp-2 leading-tight">
+              <h3 className="mt-4 text-[16px] font-bold text-gray-800 group-hover:text-[#cc7a00]">
                 {book.title}
               </h3>
             </Link>

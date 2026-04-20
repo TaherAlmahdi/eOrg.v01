@@ -7,11 +7,18 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'eduliture.com',
         port: '',
-        pathname: '/wp-content/uploads/**',
+        pathname: '/**', 
       },
     ],
   },
-  /* এখানে আপনার অন্য কোনো কনফিগ অপশন থাকলে যুক্ত করতে পারেন */
+  async rewrites() {
+    return [
+      {
+        source: '/api/graphql',
+        destination: 'https://eduliture.com/graphql',
+      },
+    ];
+  },
 };
 
 export default nextConfig;
