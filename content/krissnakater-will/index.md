@@ -1,8 +1,8 @@
 ---
-title: "দুর্গেশনন্দিনী"
+title: "কৃষ্ণকান্তের উইল"
 author: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়"
 type: "book_index"
-slug: "durgeshnandini"
+slug: "krissnakanter will"
 first_published: "১৮৬৫"
 genre: ["ঐতিহাসিক উপন্যাস", "উপন্যাস"]
 genre_links: 

@@ -1,5 +1,5 @@
 ---
-title: "দুর্গেশনন্দিনী"
+title: "দেবী চৌধুরাণী"
 author: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়"
 type: "book_index"
 slug: "durgeshnandini"

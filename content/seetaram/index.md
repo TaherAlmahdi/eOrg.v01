@@ -1,8 +1,8 @@
 ---
-title: "দুর্গেশনন্দিনী"
+title: "সীতারাম"
 author: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়"
 type: "book_index"
-slug: "durgeshnandini"
+slug: "seetaram"
 first_published: "১৮৬৫"
 genre: ["ঐতিহাসিক উপন্যাস", "উপন্যাস"]
 genre_links: 

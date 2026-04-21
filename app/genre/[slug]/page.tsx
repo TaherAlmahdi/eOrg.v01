@@ -17,7 +17,7 @@ const toBengaliNumber = (num: number | string) => {
 const genreMap: Record<string, string> = {
   "novel": "উপন্যাস",
   "humor" : "রম্য সাহিত্য",
-  "religious" : "ধর্মীয় সাহিত্য",
+  "religious" : "ধর্মীয় সাহিত্য",
   "essays" : "প্রবন্ধাবলী",
   "poetry": "কবিতা",
   "classic": "ধ্রুপদী সাহিত্য",
@@ -38,7 +38,7 @@ export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const bengaliTitle = genreMap[slug.toLowerCase()] || slug;
   return {
-    title: `${bengaliTitle} | লাইব্রেরি`,
+    title: `${bengaliTitle} | গ্রন্থাগার`,
   };
 }
 
@@ -73,20 +73,24 @@ export default async function GenrePage({ params }: Props) {
           slug: bookSlug,
           title: data.title || bookSlug,
           cover: data.cover_image || '/default-cover.jpg',
-          author: data.author || 'অজানা লেখক'
+          author: data.author || 'অজানা লেখক',
+          first_published: data.first_published || Infinity // প্রকাশের সাল না থাকলে শেষে পাঠাবে
         };
       }
     }
     return null;
-  }).filter(Boolean);
+  }).filter((book): book is any => book !== null);
+
+  // first_published অনুযায়ী ASC (ছোট থেকে বড়) সাজানো
+  filteredBooks.sort((a, b) => a.first_published - b.first_published);
 
   return (
     <main className="bg-[#fdfcf8] min-h-screen font-tarunima">
-      <nav className="w-full bg-[#7575a3] py-4 px-6 text-white shadow-md">
-        <div className="max-w-7xl mx-auto flex items-center gap-3">
+      <nav className="w-full bg-[#7575a3] py-2 px-3 text-white shadow-md">
+        <div className="max-w-8xl mx-auto flex items-center gap-3">
           <Link href="/" className="hover:text-orange-200"><Home size={18} /></Link>
           <span className="text-white/50">/</span>
-          <Link href="/books" className="hover:text-orange-200">লাইব্রেরি</Link>
+          <Link href="/books" className="hover:text-orange-200">গ্রন্থাগার</Link>
           <span className="text-white/50">/</span>
           <span className="flex items-center gap-2 font-medium">
             <Tag size={16} /> {targetBengaliGenre || slug}
@@ -94,23 +98,23 @@ export default async function GenrePage({ params }: Props) {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto py-12 px-6">
-        <header className="mb-10 border-b border-orange-200 pb-6">
-          <h2 className="text-3xl md:text-4xl font-bold font-sabrina text-gray-800">
-            বিভাগ: {targetBengaliGenre || slug}
+      <div className="max-w-8xl mx-auto py-2 px-3">
+        <header className="mb-2 border-b border-orange-200 pb-3">
+          <h2 className="text-2xl text-center md:text-2xl font-bold font-sabrina text-gray-800">
+            ঘরানা: {targetBengaliGenre || slug}
           </h2>
-          <p className="text-gray-500 mt-2 italic">
+          <p className="text-gray-500 text-center mt-2 italic">
             {filteredBooks.length > 0 
-              ? `এই বিভাগে মোট ${toBengaliNumber(filteredBooks.length)}টি বই পাওয়া গেছে` 
-              : "এই বিভাগে বর্তমানে কোনো বই নেই"}
+              ? `এই ঘরানায় মোট ${toBengaliNumber(filteredBooks.length)}টি বই রয়েছে` 
+              : "এই ঘরানায় বর্তমানে কোনো বই নেই"}
           </p>
         </header>
 
         {filteredBooks.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
             {filteredBooks.map((book: any) => (
               <Link key={book.slug} href={`/book/${book.slug}`} className="group flex flex-col h-full">
-                <div className="relative aspect-[3/4] overflow-hidden rounded-lg shadow-lg bg-white border border-gray-100 transition-transform duration-300 group-hover:-translate-y-2 group-hover:shadow-2xl">
+                <div className="relative aspect-[2/3] overflow-hidden rounded-lg shadow-lg bg-white border border-gray-100 transition-transform duration-300 group-hover:-translate-y-2 group-hover:shadow-2xl">
                   <img 
                     src={book.cover} 
                     alt={book.title} 
@@ -120,10 +124,10 @@ export default async function GenrePage({ params }: Props) {
                 </div>
                 
                 <div className="mt-4">
-                  <h3 className="text-lg font-bold text-gray-900 group-hover:text-red-900 transition-colors line-clamp-2">
+                  <h3 className="text-lg font-bold text-center text-gray-900 group-hover:text-red-900 transition-colors line-clamp-2">
                     {book.title}
                   </h3>
-                  <p className="text-sm text-gray-500 mt-1 uppercase tracking-tight font-sans">
+                  <p className="text-sm text-center text-gray-500 mt-1 uppercase tracking-tight font-sans">
                     {book.author}
                   </p>
                 </div>

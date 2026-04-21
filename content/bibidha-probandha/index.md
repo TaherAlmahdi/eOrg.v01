@@ -1,10 +1,10 @@
 ---
-title: "রজনী"
+title: "বিবিধ প্রবন্ধ"
 author: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়"
 type: "book_index"
-slug: "rajani"
+slug: "bibidha-probandha"
 first_published: "১৮৬৫"
-genre: ["ঐতিহাসিক উপন্যাস", "উপন্যাস"]
+genre: ["প্রবন্ধাবলী", "প্রবন্ধ"]
 genre_links: 
   - { name: "ঐতিহাসিক উপন্যাস", link: "/genre/historical-novel" }
   - { name: "উপন্যাস", link: "/genre/novel" }
