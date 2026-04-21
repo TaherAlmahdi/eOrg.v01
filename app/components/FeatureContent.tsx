@@ -9,17 +9,17 @@ const FeatureContent = () => {
     <div className="w-full text-justify flow-root">
       
       {/* ইমেজ কন্টেইনার: বামে ফ্লট, নির্দিষ্ট উইডথ এবং মার্জিন */}
-      <div className="float-left w-[300px] h-auto mr-[15px] mb-[10px]">
+      <div className="float-left w-[300px] h-auto mr-[15px] mb-[3px]">
         <div className="text-center">
           <Hero />
-          <span className="text-sm text-gray-400 italic font-sans block mt-2">
+          <span className="text-sm text-gray-400 italic font-tarunima block mt-2">
             বঙ্কিমচন্দ্র চট্টোপাধ্যায়
           </span>
         </div>
       </div>
 
       {/* ডেসক্রিপশন টেক্সট: এটি ইমেজের চারপাশে প্রবাহিত হবে */}
-      <div className="space-y-1.25 text-gray-700 text-base md:text-lg leading-relaxed font-normal">
+      <div className="space-y-1 text-gray-700 text-base md:text-lg leading-relaxed font-normal">
         <p>
           ঊনবিংশ শতাব্দীর বাঙালি রেনেসাঁসের অন্যতম শ্রেষ্ঠ সারথি এবং আধুনিক বাংলা উপন্যাসের পথপ্রদর্শক হলেন বঙ্কিমচন্দ্র চট্টোপাধ্যায়। তিনি কেবল একজন দক্ষ প্রশাসনিক কর্মকর্তা ছিলেন না, বরং ছিলেন বাংলা সাহিত্যের ‘সাহিত্য সম্রাট’। তাঁর হাত ধরেই বাংলা কথাসাহিত্য মধ্যযুগীয় আখ্যানধর্মী গণ্ডি পেরিয়ে আধুনিক ও শিল্পসম্মত রূপ পরিগ্রহ করে।
         </p>

@@ -3,7 +3,7 @@ title: "বিষবৃক্ষ"
 author: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়"
 type: "book_index"
 slug: "bissbrikssa"
-first_published: "1865"
+first_published: 1872
 genre: ["সামাজিক উপন্যাস", "উপন্যাস"]
 genre_links: 
   - { name: "সামাজিক উপন্যাস", link: "/genre/social-novel" }

@@ -36,18 +36,18 @@ const Footer = () => {
             </Link>
             <div className="flex flex-col justify-center items-start">
               <Link href="https://eduliture.org" target="_blank" className="group">
-                <span className="text-xl font-bold text-[#008080] group-hover:text-[#006666] transition-colors leading-none">
+                <span className="text-xl font-bold font-tarunima text-[#008080] group-hover:text-[#006666] transition-colors leading-none">
                   এডুলিচার
                 </span>
               </Link>
-              <p className="text-[10px] text-gray-500 font-bold mt-1 uppercase tracking-widest leading-none">
+              <p className="text-[10px] font-tarunima text-gray-500 font-bold mt-1 uppercase tracking-widest leading-none">
                 বিশুদ্ধজ্ঞানের শিক্ষা বিষয়ক প্রতিষ্ঠান
               </p>
             </div>
           </div>
 
           {/* ডানপাশ: কপিরাইট (বড় স্ক্রিনে ডানে, মোবাইলে নিচে) */}
-          <div className="md:text-right border-t md:border-t-0 border-gray-300 pt-4 md:pt-0 w-full md:w-auto">
+          <div className="md:text-right font-tarunima border-t md:border-t-0 border-gray-300 pt-4 md:pt-0 w-full md:w-auto">
             <p className="text-sm text-gray-600 leading-relaxed">
               © ১৯৯৯ - {getBengaliYear()} এডুলিচার কর্তৃক সমস্ত অধিকার সংরক্ষিত।
             </p>

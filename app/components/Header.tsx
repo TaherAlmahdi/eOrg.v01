@@ -36,7 +36,7 @@ const Header = () => {
             </div>
 
             <div className="flex flex-col justify-center">
-              <h1 className="text-lg md:text-2xl font-black leading-none tracking-normal md:tracking-[1px]">
+              <h1 className="text-lg md:text-2xl font-black font-tarunima leading-none tracking-normal md:tracking-[1px]">
                 <span className="text-[#008080]">বঙ্কিম</span>
                 <span className="text-[#cc7a00]"> রচনাবলী</span>
               </h1>
@@ -69,7 +69,7 @@ const Header = () => {
             <div className="relative w-full max-w-sm bg-[#fdfdf7] h-full overflow-y-auto p-6 md:p-10 shadow-2xl animate-in slide-in-from-right duration-300 font-tarunima">
               
               <div className="flex justify-between items-center mb-6 border-b border-gray-200 pb-4">
-                <h2 className="text-xl font-bold text-[#008080]">বঙ্কিম রচনাবলী</h2>
+                <h2 className="text-xl font-tarunima font-bold text-[#008080]">বঙ্কিম রচনাবলী</h2>
                 <button 
                   onClick={() => setIsMenuOpen(false)} 
                   className="p-2 hover:bg-red-50 rounded-full text-red-500 transition-colors"
@@ -78,7 +78,7 @@ const Header = () => {
                 </button>
               </div>
 
-              <nav className="space-y-3">
+              <nav className="space-y-3 font-tarunima">
                 {/* লিংকগুলোতে /genre/ যুক্ত করা হয়েছে */}
                 <MenuLink href="/genre/novel" icon={<BookOpen size={22} />} title="উপন্যাস সমগ্র" desc="বঙ্কিমচন্দ্রের কালজয়ী উপন্যাসসমূহ" color="blue" close={() => setIsMenuOpen(false)} />
                 <MenuLink href="/genre/humor" icon={<Feather size={22} />} title="রম্য সাহিত্য" desc="কমলাকান্তের দপ্তর ও রম্য রচনা" color="teal" close={() => setIsMenuOpen(false)} />
@@ -112,8 +112,8 @@ const MenuLink = ({ href, icon, title, desc, color, close }: any) => (
       {icon}
     </div>
     <div>
-      <h3 className="text-md font-bold text-gray-800">{title}</h3>
-      <p className="text-xs text-gray-500 leading-tight">{desc}</p>
+      <h3 className="text-md font-tarunima font-bold text-gray-800">{title}</h3>
+      <p className="text-xs font-tarunima text-gray-500 leading-tight">{desc}</p>
     </div>
   </Link>
 );

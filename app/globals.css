@@ -110,8 +110,8 @@
   
   /* ট্যাবলেট ও মোবাইল */
   @media (max-width: 768px) {
-    .first, .dcap, .normal {
-      font-size: 1.125rem;
+    .first, .dcap, .normal, .pc, .center, .right {
+      font-size: 1.0rem;
       line-height: 1.7;
       padding: 0 5px;
     }
@@ -121,7 +121,7 @@
     }
 
     .dcap::first-letter {
-      font-size: 3.5rem;
+      font-size: 2.0rem;
       margin-right: 10px;
     }
   }

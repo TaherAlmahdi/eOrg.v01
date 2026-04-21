@@ -33,7 +33,7 @@ export default function Home() {
 
         {/* ফিচার কন্টেন্ট সেকশন */}
         <section className="relative bg-white pb-[15px]">
-          <div className="max-w-[1440px] mx-auto px-3 md:px-6">
+          <div className="max-w-[1440px] mx-auto px-3 md:px-3">
             <FeatureContent />
           </div>
         </section>
@@ -46,7 +46,7 @@ export default function Home() {
             <div className="flex justify-center">
               <div className="inline-flex items-center justify-center gap-4 px-5 py-2 rounded bg-teal-50 text-[#008080] mb-8 animate-pulse border border-teal-100 shadow-sm text-center">
                 <Sparkles size={28} className="flex-shrink-0" />
-                <h1 className="text-2xl md:text-[32px] font-black text-gray-900 leading-none tracking-tight">
+                <h1 className="text-xl md:text-2xl font-tarunima font-black text-gray-900 leading-none tracking-tight">
                   <span className="text-[#008080]">বঙ্কিম</span> রচনা <span className="text-[#cc7a00]">বিন্যাস</span>
                 </h1>
               </div>

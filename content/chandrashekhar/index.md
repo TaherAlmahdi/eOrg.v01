@@ -3,7 +3,7 @@ title: "চন্দ্রশেখর"
 author: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়"
 type: "book_index"
 slug: "chandrashekhar"
-first_published: "১৮৬৫"
+first_published: 1875
 genre: ["ঐতিহাসিক উপন্যাস", "উপন্যাস"]
 genre_links: 
   - { name: "ঐতিহাসিক উপন্যাস", link: "/genre/historical-novel" }
