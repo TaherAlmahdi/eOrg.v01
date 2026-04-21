@@ -74,15 +74,20 @@ export default async function GenrePage({ params }: Props) {
           title: data.title || bookSlug,
           cover: data.cover_image || '/default-cover.jpg',
           author: data.author || 'অজানা লেখক',
-          first_published: data.first_published || Infinity // প্রকাশের সাল না থাকলে শেষে পাঠাবে
+          first_published: data.first_published || Infinity
         };
       }
     }
     return null;
   }).filter((book): book is any => book !== null);
 
-  // first_published অনুযায়ী ASC (ছোট থেকে বড়) সাজানো
-  filteredBooks.sort((a, b) => a.first_published - b.first_published);
+  // সর্টিং লজিক: প্রথমে সাল অনুযায়ী, সাল মিলে গেলে নাম অনুযায়ী (বাংলা বর্ণমালা)
+  filteredBooks.sort((a, b) => {
+    if (a.first_published !== b.first_published) {
+      return a.first_published - b.first_published;
+    }
+    return a.title.localeCompare(b.title, 'bn');
+  });
 
   return (
     <main className="bg-[#fdfcf8] min-h-screen font-tarunima">
@@ -105,8 +110,8 @@ export default async function GenrePage({ params }: Props) {
           </h2>
           <p className="text-gray-500 text-center mt-2 italic">
             {filteredBooks.length > 0 
-              ? `এই ঘরানায় মোট ${toBengaliNumber(filteredBooks.length)}টি বই রয়েছে` 
-              : "এই ঘরানায় বর্তমানে কোনো বই নেই"}
+              ? `এই ঘরানায় মোট ${toBengaliNumber(filteredBooks.length)}টি বই রয়েছে` 
+              : "এই ঘরানায় বর্তমানে কোনো বই নেই"}
           </p>
         </header>
 

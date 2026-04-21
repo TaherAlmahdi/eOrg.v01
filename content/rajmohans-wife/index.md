@@ -3,14 +3,14 @@ title: "Rajmohan's Wife"
 author: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়"
 type: "book_index"
 slug: "rajmohans-wife"
-first_published: "১৮৬৫"
-genre: ["ঐতিহাসিক উপন্যাস", "উপন্যাস"]
+first_published: "১৮৬৪"
+genre: ["সামাজিক উপন্যাস", "উপন্যাস"]
 genre_links: 
-  - { name: "ঐতিহাসিক উপন্যাস", link: "/genre/historical-novel" }
+  - { name: "সামাজিক উপন্যাস", link: "/genre/social-novel" }
   - { name: "উপন্যাস", link: "/genre/novel" }
-cover_image: "/cover/durgeshnandini-cover.webp"
-meta_title: "দুর্গেশনন্দিনী - বঙ্কিমচন্দ্র চট্টোপাধ্যায় | প্রথম সার্থক বাংলা উপন্যাস"
-meta_description: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়ের প্রথম বাংলা উপন্যাস 'দুর্গেশনন্দিনী'। মোগল-পাঠান যুদ্ধের পটভূমিতে আয়েষা, তিলোত্তমা ও জগৎসিংহের অমর প্রেমকাহিনীর বিস্তারিত আখ্যান ও রচনার ইতিহাস।"
+cover_image: "/cover/rajmohans-wife.webp"
+meta_title: "Rajmohan's Wife | বঙ্কিমচন্দ্র চট্টোপাধ্যায়"
+meta_description: "বঙ্কিমচন্দ্রের প্রথম উপন্যাস। এটি ১৮৬৪ সালে 'Indian Field' নামে একটি সাপ্তাহিক পত্রিকায় ধারাবাহিকভাবে প্রকাশিত হয়।"
 tags: ["বঙ্কিমচন্দ্র", "দুর্গেশনন্দিনী", "আয়েষা", "তিলোত্তমা", "বাংলা উপন্যাস", "ঐতিহাসিক উপন্যাস"]
 ---
 
