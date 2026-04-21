@@ -2,31 +2,78 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import Link from 'next/link';
-import { Home, Tag } from "lucide-react";
+import { Home, Tag, BookOpen } from "lucide-react";
 
-export default async function GenrePage({ params }: { params: Promise<{ slug: string }> }) {
+// ইংরেজি সংখ্যাকে বাংলায় রূপান্তর করার ফাংশন
+const toBengaliNumber = (num: number | string) => {
+  const englishToBengali: any = {
+    '0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪',
+    '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯'
+  };
+  return num.toString().replace(/\d/g, (digit) => englishToBengali[digit]);
+};
+
+// ইংরেজি স্লাগ থেকে বাংলা শব্দের ম্যাপিং
+const genreMap: Record<string, string> = {
+  "novel": "উপন্যাস",
+  "humor" : "রম্য সাহিত্য",
+  "religious" : "ধর্মীয় সাহিত্য",
+  "essays" : "প্রবন্ধাবলী",
+  "poetry": "কবিতা",
+  "classic": "ধ্রুপদী সাহিত্য",
+  "folklore": "লোকগাথা",
+  "history": "ইতিহাস",
+  "story": "ছোটগল্প",
+  "essay": "প্রবন্ধ",
+  "drama": "নাটক",
+  "letters": "পত্রাবলী",
+  "others": "বিবিধ"
+};
+
+type Props = {
+  params: Promise<{ slug: string }>;
+};
+
+export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
+  const bengaliTitle = genreMap[slug.toLowerCase()] || slug;
+  return {
+    title: `${bengaliTitle} | লাইব্রেরি`,
+  };
+}
+
+export default async function GenrePage({ params }: Props) {
+  const { slug } = await params;
+  const decodedSlug = slug.toLowerCase();
+  
+  const targetBengaliGenre = genreMap[decodedSlug];
   const contentDir = path.join(process.cwd(), 'content');
   
-  // সব বইয়ের ফোল্ডার রিড করা
+  if (!fs.existsSync(contentDir)) {
+    return <div className="text-center py-20">Content directory not found.</div>;
+  }
+
   const bookSlugs = fs.readdirSync(contentDir).filter(file => 
     fs.statSync(path.join(contentDir, file)).isDirectory()
   );
 
-  // জনরা অনুযায়ী বই ফিল্টার করা
   const filteredBooks = bookSlugs.map(bookSlug => {
     const indexPath = path.join(contentDir, bookSlug, 'index.md');
     if (fs.existsSync(indexPath)) {
       const fileContent = fs.readFileSync(indexPath, 'utf8');
       const { data } = matter(fileContent);
-      
-      // বইয়ের জনরা যদি ইউআরএল স্লাগের সাথে মেলে
-      if (data.genre && data.genre.toLowerCase() === slug.toLowerCase()) {
+      const bookGenre = data.genre;
+
+      const isMatch = Array.isArray(bookGenre)
+        ? bookGenre.includes(targetBengaliGenre)
+        : typeof bookGenre === 'string' && bookGenre === targetBengaliGenre;
+
+      if (isMatch) {
         return {
           slug: bookSlug,
           title: data.title || bookSlug,
-          cover: data.cover_image,
-          author: data.author
+          cover: data.cover_image || '/default-cover.jpg',
+          author: data.author || 'অজানা লেখক'
         };
       }
     }
@@ -34,45 +81,60 @@ export default async function GenrePage({ params }: { params: Promise<{ slug: st
   }).filter(Boolean);
 
   return (
-    <main className="bg-[#fdfcf8] min-h-screen">
+    <main className="bg-[#fdfcf8] min-h-screen font-tarunima">
       <nav className="w-full bg-[#7575a3] py-4 px-6 text-white shadow-md">
-        <div className="max-w-7xl mx-auto flex items-center gap-3 font-tarunima">
-          <Link href="/"><Home size={18} /></Link>
+        <div className="max-w-7xl mx-auto flex items-center gap-3">
+          <Link href="/" className="hover:text-orange-200"><Home size={18} /></Link>
           <span className="text-white/50">/</span>
-          <Link href="/books">লাইব্রেরি</Link>
+          <Link href="/books" className="hover:text-orange-200">লাইব্রেরি</Link>
           <span className="text-white/50">/</span>
-          <span className="capitalize flex items-center gap-2">
-            <Tag size={16} /> {slug}
+          <span className="flex items-center gap-2 font-medium">
+            <Tag size={16} /> {targetBengaliGenre || slug}
           </span>
         </div>
       </nav>
 
       <div className="max-w-7xl mx-auto py-12 px-6">
-        <header className="mb-10 border-b border-orange-200 pb-4">
-          <h2 className="text-3xl font-bold font-sabrina text-gray-800 capitalize">
-            বিভাগ: {slug}
+        <header className="mb-10 border-b border-orange-200 pb-6">
+          <h2 className="text-3xl md:text-4xl font-bold font-sabrina text-gray-800">
+            বিভাগ: {targetBengaliGenre || slug}
           </h2>
-          <p className="text-gray-500 font-tarunima mt-1">
-            এই বিভাগে মোট {filteredBooks.length}টি বই পাওয়া গেছে
+          <p className="text-gray-500 mt-2 italic">
+            {filteredBooks.length > 0 
+              ? `এই বিভাগে মোট ${toBengaliNumber(filteredBooks.length)}টি বই পাওয়া গেছে` 
+              : "এই বিভাগে বর্তমানে কোনো বই নেই"}
           </p>
         </header>
 
         {filteredBooks.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
             {filteredBooks.map((book: any) => (
-              <Link key={book.slug} href={`/book/${book.slug}`} className="group">
-                <div className="aspect-[3/4] overflow-hidden rounded-lg shadow-md transition-transform group-hover:-translate-y-2">
-                  <img src={book.cover} alt={book.title} className="w-full h-full object-cover" />
+              <Link key={book.slug} href={`/book/${book.slug}`} className="group flex flex-col h-full">
+                <div className="relative aspect-[3/4] overflow-hidden rounded-lg shadow-lg bg-white border border-gray-100 transition-transform duration-300 group-hover:-translate-y-2 group-hover:shadow-2xl">
+                  <img 
+                    src={book.cover} 
+                    alt={book.title} 
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
-                <h3 className="mt-3 font-tarunima font-bold text-gray-900 group-hover:text-red-900 line-clamp-1">
-                  {book.title}
-                </h3>
+                
+                <div className="mt-4">
+                  <h3 className="text-lg font-bold text-gray-900 group-hover:text-red-900 transition-colors line-clamp-2">
+                    {book.title}
+                  </h3>
+                  <p className="text-sm text-gray-500 mt-1 uppercase tracking-tight font-sans">
+                    {book.author}
+                  </p>
+                </div>
               </Link>
             ))}
           </div>
         ) : (
-          <div className="text-center py-20 font-tarunima text-gray-400">
-            এই বিভাগে আপাতত কোনো বই নেই।
+          <div className="text-center py-24 border-2 border-dashed border-orange-100 rounded-2xl">
+            <BookOpen size={48} className="mx-auto text-orange-200 mb-4" />
+            <p className="text-gray-400 text-lg italic">দুঃখিত, এই বিভাগে কোনো বই খুঁজে পাওয়া যায়নি।</p>
+            <Link href="/books" className="mt-6 inline-block text-blue-600 underline">সকল বই দেখুন</Link>
           </div>
         )}
       </div>

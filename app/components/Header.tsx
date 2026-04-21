@@ -8,7 +8,7 @@ import siteLogo from '../../public/logo.png';
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // মেনু ওপেন থাকলে স্ক্রল লক করার জন্য (ঐচ্ছিক কিন্তু ভালো প্র্যাকটিস)
+  // মেনু ওপেন থাকলে স্ক্রল লক করার জন্য
   useEffect(() => {
     if (isMenuOpen) {
       document.body.style.overflow = 'hidden';
@@ -59,14 +59,14 @@ const Header = () => {
         {/* মোডাল মেনু ওভারলে */}
         {isMenuOpen && (
           <div className="fixed inset-0 z-[100] flex justify-end">
-            {/* ব্যাকড্রপ (কালো আবছা অংশ) */}
+            {/* ব্যাকড্রপ */}
             <div 
               className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300"
               onClick={() => setIsMenuOpen(false)}
             ></div>
             
             {/* মেনু কন্টেন্ট প্যানেল */}
-            <div className="relative w-full max-w-sm bg-[#fdfdf7] h-full overflow-y-auto p-6 md:p-10 shadow-2xl animate-in slide-in-from-right duration-300">
+            <div className="relative w-full max-w-sm bg-[#fdfdf7] h-full overflow-y-auto p-6 md:p-10 shadow-2xl animate-in slide-in-from-right duration-300 font-tarunima">
               
               <div className="flex justify-between items-center mb-6 border-b border-gray-200 pb-4">
                 <h2 className="text-xl font-bold text-[#008080]">বঙ্কিম রচনাবলী</h2>
@@ -79,17 +79,18 @@ const Header = () => {
               </div>
 
               <nav className="space-y-3">
-                <MenuLink href="/novel" icon={<BookOpen size={22} />} title="উপন্যাস সমগ্র" desc="বঙ্কিমচন্দ্রের কালজয়ী উপন্যাসসমূহ" color="blue" close={() => setIsMenuOpen(false)} />
-                <MenuLink href="/humor" icon={<Feather size={22} />} title="রম্য সাহিত্য" desc="কমলাকান্তের দপ্তর ও রম্য রচনা" color="teal" close={() => setIsMenuOpen(false)} />
-                <MenuLink href="/religious" icon={<Library size={22} />} title="ধর্মীয় সাহিত্য" desc="ধর্মতত্ত্ব ও কৃষ্ণচরিত্র বিষয়ক আলোচনা" color="orange" close={() => setIsMenuOpen(false)} />
-                <MenuLink href="/essays" icon={<History size={22} />} title="ইতিহাস ও প্রবন্ধ" desc="ঐতিহাসিক ও বিবিধ গবেষণামূলক প্রবন্ধ" color="purple" close={() => setIsMenuOpen(false)} />
-                <MenuLink href="/letters" icon={<Mail size={22} />} title="পত্রাবলী" desc="চিঠিপত্র ও দলিলাদি" color="pink" close={() => setIsMenuOpen(false)} />
-                <MenuLink href="/others" icon={<Archive size={22} />} title="বিবিধ রচনা" desc="অগ্রন্থিত ও অপ্রকাশিত রচনাসংগ্রহ" color="pink" close={() => setIsMenuOpen(false)} />
+                {/* লিংকগুলোতে /genre/ যুক্ত করা হয়েছে */}
+                <MenuLink href="/genre/novel" icon={<BookOpen size={22} />} title="উপন্যাস সমগ্র" desc="বঙ্কিমচন্দ্রের কালজয়ী উপন্যাসসমূহ" color="blue" close={() => setIsMenuOpen(false)} />
+                <MenuLink href="/genre/humor" icon={<Feather size={22} />} title="রম্য সাহিত্য" desc="কমলাকান্তের দপ্তর ও রম্য রচনা" color="teal" close={() => setIsMenuOpen(false)} />
+                <MenuLink href="/genre/religious" icon={<Library size={22} />} title="ধর্মীয় সাহিত্য" desc="ধর্মতত্ত্ব ও কৃষ্ণচরিত্র বিষয়ক আলোচনা" color="orange" close={() => setIsMenuOpen(false)} />
+                <MenuLink href="/genre/essays" icon={<History size={22} />} title="ইতিহাস ও প্রবন্ধ" desc="ঐতিহাসিক ও বিবিধ গবেষণামূলক প্রবন্ধ" color="purple" close={() => setIsMenuOpen(false)} />
+                <MenuLink href="/genre/letters" icon={<Mail size={22} />} title="পত্রাবলী" desc="চিঠিপত্র ও দলিলাদি" color="pink" close={() => setIsMenuOpen(false)} />
+                <MenuLink href="/genre/others" icon={<Archive size={22} />} title="বিবিধ রচনা" desc="অগ্রন্থিত ও অপ্রকাশিত রচনাসংগ্রহ" color="indigo" close={() => setIsMenuOpen(false)} />
                 <MenuLink href="/about" icon={<Info size={22} />} title="প্রকল্প পরিচয়" desc="বিশুদ্ধজ্ঞান প্রকল্পের লক্ষ্য ও উদ্দেশ্য" color="gray" close={() => setIsMenuOpen(false)} />
               </nav>
 
               <div className="mt-8 pt-4 text-center border-t border-gray-100">
-                <p className="text-[10px] text-gray-400 uppercase tracking-widest">
+                <p className="text-[10px] text-gray-400 uppercase tracking-widest font-sans">
                   Eduliture Pure Knowledge Project
                 </p>
               </div>
@@ -101,19 +102,18 @@ const Header = () => {
   );
 };
 
-// মেনু আইটেমের জন্য একটি ছোট সাব-কম্পোনেন্ট (কোড ক্লিন রাখার জন্য)
 const MenuLink = ({ href, icon, title, desc, color, close }: any) => (
   <Link 
     href={href} 
     onClick={close}
     className="flex items-center gap-5 p-4 bg-white rounded-xl border border-gray-100 hover:border-[#008080] hover:shadow-md transition-all group"
   >
-    <div className={`p-3 bg-${color}-50 rounded-xl text-${color}-600 group-hover:bg-[#008080] group-hover:text-white transition-colors`}>
+    <div className={`p-3 rounded-xl transition-colors bg-gray-50 text-gray-600 group-hover:bg-[#008080] group-hover:text-white`}>
       {icon}
     </div>
     <div>
       <h3 className="text-md font-bold text-gray-800">{title}</h3>
-      <p className="text-xs text-gray-500">{desc}</p>
+      <p className="text-xs text-gray-500 leading-tight">{desc}</p>
     </div>
   </Link>
 );
