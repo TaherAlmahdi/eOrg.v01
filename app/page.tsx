@@ -57,7 +57,7 @@ export default function Home() {
               
               {/* ১. উপন্যাস সমগ্র */}
               <Link 
-                href="/novel" 
+                href="/genre/novel" 
                 className="flex items-center gap-5 p-4 bg-white rounded border border-gray-100 hover:border-[#008080] transition-all group shadow-sm"
               >
                 <div className="p-3 bg-blue-50 rounded-xl text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
@@ -71,7 +71,7 @@ export default function Home() {
 
               {/* ২. রম্য সাহিত্য */}
               <Link 
-                href="/humor" 
+                href="/genre/humor" 
                 className="flex items-center gap-5 p-4 bg-white rounded border border-gray-100 hover:border-[#008080] transition-all group shadow-sm"
               >
                 <div className="p-3 bg-teal-50 rounded-xl text-teal-600 group-hover:bg-teal-600 group-hover:text-white transition-colors">
@@ -85,7 +85,7 @@ export default function Home() {
 
               {/* ৩. ধর্মীয় সাহিত্য */}
               <Link 
-                href="/religious" 
+                href="/genre/religious" 
                 className="flex items-center gap-5 p-4 bg-white rounded border border-gray-100 hover:border-[#008080] transition-all group shadow-sm"
               >
                 <div className="p-3 bg-orange-50 rounded-xl text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition-colors">
@@ -99,7 +99,7 @@ export default function Home() {
 
               {/* ৪. প্রবন্ধাবলী */}
               <Link 
-                href="/essays" 
+                href="/genre/essays" 
                 className="flex items-center gap-5 p-4 bg-white rounded border border-gray-100 hover:border-[#008080] transition-all group shadow-sm"
               >
                 <div className="p-3 bg-purple-50 rounded-xl text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors">
@@ -113,7 +113,7 @@ export default function Home() {
 
               {/* ৫. পত্রাবলী */}
               <Link 
-                href="/letters" 
+                href="/genre/letters" 
                 className="flex items-center gap-5 p-4 bg-white rounded border border-gray-100 hover:border-[#008080] transition-all group shadow-sm"
               >
                 <div className="p-3 bg-pink-50 rounded-xl text-pink-600 group-hover:bg-pink-600 group-hover:text-white transition-colors">
@@ -129,7 +129,7 @@ export default function Home() {
 
               {/* ৬. অন্যান্য / বিবিধ */}
               <Link 
-                href="/others" // আপনার জেনার স্লাগ অনুযায়ী এটি /others হওয়া উচিত
+                href="/genre/others" // আপনার জেনার স্লাগ অনুযায়ী এটি /others হওয়া উচিত
                 className="flex items-center gap-5 p-4 bg-white rounded border border-gray-100 hover:border-[#008080] transition-all group shadow-sm"
               >
                 <div className="p-3 bg-pink-50 rounded-xl text-pink-600 group-hover:bg-pink-600 group-hover:text-white transition-colors">
