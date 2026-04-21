@@ -1,203 +1,144 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+/* ১. রুট ভেরিয়েবল এবং বেস স্টাইল */
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #fdfdf7;
+    --foreground: #171717;
+    --accent-purple: #7D3C98;
+    --accent-red: #8b0000;
+    --accent-gold: #666600;
+    --bg-purple-light: #f3ebf7;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --background: #1a1a15;
+      --foreground: #e5e5e5;
+      --bg-purple-light: #2d1b36;
+    }
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-tarunima), serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
-p {
-  margin: 4px 0;
+/* ২. কম্পোনেন্ট লেয়ার - রিডেবিলিটি এবং অপ্টিমাইজেশন */
+@layer components {
 
-}
+  /* কমন টেক্সট স্টাইল (মল্লিকা ফন্ট ডিফল্ট হিসেবে রাখা হলো আপনার চাহিদা অনুযায়ী) */
+  .first, .dcap, .normal, .pc, .center {
+    text-align: justify;
+    margin-bottom: 0.8rem;
+    color: #1a1a1a;
+    line-height: 1.6;
+    font-size: 1.2rem; /* ডেস্কটপ সাইজ */
+  }
 
-.first {
-  margin: 6px 0;
-  text-align: justify;
-}
+  .pc, .center {
+    text-align: center;
+    margin-bottom: 0.8rem;
+    color: #1a1a1a;
+    line-height: 1.6;
+    font-size: 1.2rem; /* ডেস্কটপ সাইজ */
+  }
 
-.first::first-letter {
-  color: #a7373d;
-}
+   .right {
+    text-align: right;
+    margin-bottom: 0.8rem;
+    color: #1a1a1a;
+    line-height: 1.6;
+    font-size: 1.2rem; /* ডেস্কটপ সাইজ */
+  }
 
-.dcap::first-letter {
-  float: left;
-  line-height: 35px;
-  font-size: 35px;
-  color: #7D3C98;
-  border: 1px solid #D5C5EC;
-  background: #D5C5EC;
-  padding: 5px;
-  margin-right: 5px;
-  margin-bottom: -10px;
-}
-.dcap{
-  text-align: justify;
-}
+  .normal {
+    text-indent: 30px;
+  }
 
-.quran,
-.normal,
-span.normal
-p.normal {
-  margin: 6px 0;
-  text-indent: 30px;
-  text-align: justify;
-}
-
-p.center {
-  margin: 2px 0;
-  text-align: center;
-}
-
-p.right {
-  margin-bottom: 2px;
-  margin-top: 2px;
-  text-align: right;
-}
-
-.pc {
-  text-align: center;
-  margin-top: 0px;
-  margin-bottom: 0px;
-}
-
-.easy-footnote-to-top:visited{color: blue;}
-.efn-to-top {
-	display: inline-block;
-	margin-right: 5px;
-}
-
-.easy-foot note-to-top:after,
-.efn-to-top:before {
-    content: "\f342";
-    font-family: 'dashicons';
+ 
+  .dcap::first-letter {
+    float: left;
     line-height: 1;
-    font-size: .8em;
-    font-stretch: condensed;
-}
+    font-size: 2.8rem;
+    color: var(--accent-purple);
+    font-family: var(--font-mallika); 
+    padding: 6px 10px;
+    margin-right: 5px;
+    background: var(--bg-purple-light);
+    border-radius: 4px;
+  }
 
+  /* টাইটেল এবং সাবটাইটেল (সাবরিনা ফন্ট) */
+  .bname, .wname, .subtitle {
+    font-family: var(--font-sabrina) !important;
+    text-align: center;
+    display: block;
+    clear: both;
+  }
 
-ul.ednref {
-  margin: 0;
-  list-style-type: none;
-  text-align: justify;
-}
+  .bname {
+    font-size: 2.2rem;
+    color: var(--accent-gold);
+    letter-spacing: 2px;
+    margin: 1.5rem 0;
+  }
 
-ul.ednref li {
-	margin-left: 20px;
-  text-decoration: none;
-}
+  .subtitle {
+    color: var(--accent-red);
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-top: .5rem;
+    margin-bottom: .7rem;
+    border-bottom: 1px solid #eee;
+  }
 
-ul.ednref li::first-letter {
-  margin-left: -20px;
-  color: #8A2BE2;
-}
+  .first::first-letter {
+    color: #a7373d;
+    font-weight: bold;
+  }
 
-ul.ednref li:before {
-    content: "\f342";
-    font-family: 'dashicons'; font-size: .9em; padding-right: 5px;
-}
+  .normal strong {
+    color: #b3b300;
+  }
 
-.easy-footnote-title h4 {
-  font-size: 1.15em;
-  font-weight: normal;
-}
+  /* রেসপনসিভ ব্রেকপয়েন্টসমূহ */
+  
+  /* ট্যাবলেট ও মোবাইল */
+  @media (max-width: 768px) {
+    .first, .dcap, .normal {
+      font-size: 1.125rem;
+      line-height: 1.7;
+      padding: 0 5px;
+    }
+    
+    .normal {
+      text-indent: 30px; /* মোবাইলেও ইনডেন্ট বজায় রাখা হলো */
+    }
 
-ol.easy-footnotes-wrapper {
-  background: #F8F6F6;
-  list-style-type: bengali;
-  list-style-position: inside;
-}
+    .dcap::first-letter {
+      font-size: 3.5rem;
+      margin-right: 10px;
+    }
+  }
 
-li.easy-footnote-single {
-  padding: 2px 5px;
-  font-size: 1.0rem;
-  margin: 0;
-  text-align: justify;
-  border-bottom: 3px solid white;
-}
+  /* বড় স্ক্রিন (Large Desktop) */
+  @media (min-width: 1440px) {
+    .first, .dcap, .normal {
+      font-size: 1.25rem;
+    }
+  }
 
-li.easy-footnote-single .center {
-  text-align: center;
-}
-
-li.easy-footnote-single .normal {
-  text-indent: 20px;
-}
-
-h3.bname, h3.book-name, h3.wname, h3.vname, h3.btitle {  margin: 0; border-bottom: none;}
-
-.bname {
-		text-align: center;
-		line-height: normal;
-		font-weight: normal; 
-		letter-spacing: 5px;
-		font-size: 1.5em;
-		color: #666600;
-		margin:0px; padding: 0px;
-}
-
-.bname  a {
-		color: #666600;
-}
-
-.bname a:hover,
-.bname:hover{
-		color: #cc66ff;}
-
-.wname {
-  text-align: center;
-  color: #2d6db3;
-  line-height: normal;
-  font-weight: normal; letter-spacing: 5px;
-  margin: 0;   font-size: 20px;
-}
-
-.wname a {  color: #2d6db3;}
-
-.subtitle {
-  color: #2596be;
-  line-height: normal;
-  text-align: center;
-  font-weight: bold;
-  padding-top: 2px;
-  padding-bottom: 2px;
-  font-size: 24px;
-  width: 65%; 		letter-spacing: 5px;
-  margin: auto;
-}
-
-b, strong {
-  color: #008080;
-  letter-spacing: 0.5px;
-  font-weight: 700;
-}
-
-.end,
-.theend {
-		content: url(https://eduliture.com/wp-content/uploads/theend.png);
-		width: 20%;
-		margin-left: 40%;
-		margin-right: 40%;
-		margin-top: 20px;
-		margin-bottom: 20px;
-		opacity: 0.4;
+  /* সমাপ্তি চিহ্ন */
+  .theend, .end {
+    display: block;
+    width: 200px;
+    margin: 60px auto;
+    opacity: 0.6;
+    content: url('/theend.png');
+  }
 }
