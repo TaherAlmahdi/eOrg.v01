@@ -116,7 +116,7 @@ export default async function GenrePage({ params }: Props) {
         </header>
 
         {filteredBooks.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 mb-3 gap-3">
             {filteredBooks.map((book: any) => (
               <Link key={book.slug} href={`/book/${book.slug}`} className="group flex flex-col h-full">
                 <div className="relative aspect-[2/3] overflow-hidden rounded shadow-lg bg-white border border-gray-100 transition-transform duration-300 group-hover:-translate-y-2 group-hover:shadow-2xl">
