@@ -76,7 +76,7 @@ export default async function VolumePage({ params }: Props) {
         <div className="max-w-[1440px] mx-auto text-sm font-tarunima flex items-center">
           <Link href="/" className="hover:text-red-100 flex items-center gap-1"><Home size={16} /></Link> 
           <span className="mx-2 text-white/50">/</span>
-          <Link href="/books" className="hover:text-red-100">লাইব্রেরি</Link> 
+          <Link href="/books" className="hover:text-red-100">গ্রন্থাগার</Link> 
           <span className="mx-2 text-white/50">/</span>
           <Link href={`/book/${slug}`} className="hover:text-red-100">{bookData.title}</Link>
           <span className="mx-2 text-white/50">/</span>
@@ -124,27 +124,32 @@ export default async function VolumePage({ params }: Props) {
             </article>
           )}
 
-          {/* অধ্যায় তালিকা */}
-          <div className="mt-10">
-            <h2 className="text-xl font-bold text-red-900 font-tarunima mb-6 flex items-center gap-2 border-b pb-2">
-              <BookOpen size={20} /> এই খণ্ডের অধ্যায়সমূহ
+          {/* অধ্যায় তালিকা */}
+          <div className="mt-3">
+            <h2 className="text-xl font-normal text-red-900 font-tarunima mb-3 flex items-center gap-2 border-b pb-2">
+              <BookOpen size={20} /> সূচিপত্র
             </h2>
-            <div className="grid gap-3">
-              {chapters.map((chap, index) => (
+
+            {/* Flex-wrap এবং Gap ব্যবহার করে কলাম লেআউট তৈরি */}
+            <div className="flex flex-wrap gap-3">
+              {chapters.map((chap) => (
                 <Link 
                   key={chap.slug}
                   href={`/book/${slug}/${volume}/${chap.slug}`}
-                  className="group bg-white p-4 border border-gray-100 shadow-sm flex items-center justify-between hover:border-red-200 transition-all rounded-sm"
+                  className="group bg-white p-4 border border-gray-100 shadow-sm flex items-center justify-between hover:border-red-200 transition-all rounded-sm flex-auto min-w-[300px] max-w-full"
                 >
-                  <div className="flex items-center gap-4">
-                    <span className="text-xl font-serif text-gray-200 group-hover:text-red-100 transition-colors">
-                      {String(index + 1).padStart(2, '0')}
+                  <div className="flex items-center gap-3">
+                    {/* Unicode ❀ আইকন */}
+                    <span className="text-red-400 group-hover:text-red-600 transition-colors text-xl">
+                      &#10048; 
                     </span>
-                    <span className="text-lg font-bold text-gray-800 group-hover:text-red-900 font-tarunima transition-colors">
+                    
+                    <span className="text-lg font-normal text-gray-800 group-hover:text-red-900 font-tarunima transition-colors">
                       {chap.title}
                     </span>
                   </div>
-                  <ChevronRight className="text-gray-300 group-hover:text-red-900 transition-colors" size={20} />
+                  
+                  <ChevronRight className="text-gray-300 group-hover:text-red-900 transition-colors shrink-0" size={18} />
                 </Link>
               ))}
             </div>
