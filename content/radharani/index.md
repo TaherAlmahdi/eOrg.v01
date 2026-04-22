@@ -3,7 +3,7 @@ title: "রাধারাণী"
 author: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়"
 type: "book_index"
 slug: "radharani"
-first_published: 1866
+first_published: 1886
 genre: ["ঐতিহাসিক উপন্যাস", "উপন্যাস"]
 genre_links: 
   - { name: "ঐতিহাসিক উপন্যাস", link: "/genre/historical-novel" }

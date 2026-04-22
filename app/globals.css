@@ -9,6 +9,8 @@
     --accent-red: #8b0000;
     --accent-gold: #666600;
     --bg-purple-light: #f3ebf7;
+    --text-main: #1a1a1a;
+    --accent-blue: #2596be;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -28,52 +30,88 @@
   }
 }
 
-/* ২. কম্পোনেন্ট লেয়ার - রিডেবিলিটি এবং অপ্টিমাইজেশন */
+/* ২. কম্পোনেন্ট লেয়ার - পুনর্বিন্যাসকৃত স্টাইল */
 @layer components {
 
-  /* কমন টেক্সট স্টাইল (মল্লিকা ফন্ট ডিফল্ট হিসেবে রাখা হলো আপনার চাহিদা অনুযায়ী) */
-  .first, .dcap, .normal, .pc, .center {
+  /* --- সাধারণ টেক্সট এবং প্যারাগ্রাফ স্টাইল --- */
+  .first, .dcap, .normal {
+    font-size: 1.0rem;
+    line-height: 1.7;
+    color: var(--text-main);
+    margin-bottom: 0.5rem;
+  }
+
+  /* --- মার্জিন বিহীন ক্লাসসমূহ (.pc, .center, .right) --- */
+  .pc, .center, .right, 
+  ol.list, ol.bnlist, ol.plist {
+    font-size: 1.0rem;
+    line-height: 1.7;
+    color: var(--text-main);
+    margin-bottom: 0; /* মার্জিন বাদ দেওয়া হয়েছে */
+  }
+
+  @media (min-width: 769px) {
+    .first, .dcap, .normal, .pc, .center, .right,
+    ol.list, ol.bnlist, ol.plist {
+      font-size: 1.2rem;
+      line-height: 1.6;
+    }
+  }
+
+  @media (min-width: 1440px) {
+    .first, .dcap, .normal, .pc, .center, .right,
+    ol.list, ol.bnlist, ol.plist {
+      font-size: 1.25rem;
+    }
+  }
+
+  /* --- অ্যালাইনমেন্ট এবং ইনডেন্টেশন --- */
+  .first, .dcap, .normal {
     text-align: justify;
-    margin-bottom: 0.8rem;
-    color: #1a1a1a;
-    line-height: 1.6;
-    font-size: 1.2rem; /* ডেস্কটপ সাইজ */
-  }
-
-  .pc, .center {
-    text-align: center;
-    margin-bottom: 0.8rem;
-    color: #1a1a1a;
-    line-height: 1.6;
-    font-size: 1.2rem; /* ডেস্কটপ সাইজ */
-  }
-
-   .right {
-    text-align: right;
-    margin-bottom: 0.8rem;
-    color: #1a1a1a;
-    line-height: 1.6;
-    font-size: 1.2rem; /* ডেস্কটপ সাইজ */
   }
 
   .normal {
     text-indent: 30px;
   }
 
- 
+  .pc, .center {
+    text-align: center;
+  }
+
+  .right {
+    text-align: right;
+  }
+
+  /* --- টাইপোগ্রাফি ইফেক্টস --- */
+  .first::first-letter {
+    color: #a7373d;
+    font-weight: bold;
+  }
+
+  .normal strong {
+    color: #b3b300;
+  }
+
   .dcap::first-letter {
     float: left;
     line-height: 1;
-    font-size: 2.8rem;
+    font-size: 2.0rem;
     color: var(--accent-purple);
     font-family: var(--font-mallika); 
     padding: 6px 10px;
-    margin-right: 5px;
+    margin-right: 10px;
     background: var(--bg-purple-light);
     border-radius: 4px;
   }
 
-  /* টাইটেল এবং সাবটাইটেল (সাবরিনা ফন্ট) */
+  @media (min-width: 769px) {
+    .dcap::first-letter {
+      font-size: 2.8rem;
+      margin-right: 5px;
+    }
+  }
+
+  /* --- টাইটেল এবং সাবটাইটেল --- */
   .bname, .wname, .subtitle {
     font-family: var(--font-sabrina) !important;
     text-align: center;
@@ -97,43 +135,61 @@
     border-bottom: 1px solid #eee;
   }
 
-  .first::first-letter {
-    color: #a7373d;
-    font-weight: bold;
+  .title {
+    color: var(--accent-blue);
+    font-size: 1.25rem;
+    line-height: normal;
+    text-align: justify;
   }
 
-  .normal strong {
-    color: #b3b300;
+  /* --- লিস্ট স্টাইল --- */
+  ol.list, ol.bnlist, ol.plist {
+    margin-left: 55px;
+    list-style-type: bengali;
+    list-style-position: outside;
+    text-align: justify;
   }
 
-  /* রেসপনসিভ ব্রেকপয়েন্টসমূহ */
-  
-  /* ট্যাবলেট ও মোবাইল */
-  @media (max-width: 768px) {
-    .first, .dcap, .normal, .pc, .center, .right {
-      font-size: 1.0rem;
-      line-height: 1.7;
-      padding: 0 5px;
-    }
+  /* --- কবিতা (Poem) স্টাইল --- */
+  .poem {
+    width: 99%; 
+    margin: .5rem auto; /* কবিতার উপরে-নিচে গ্যাপের জন্য */
+    font-size: 1.0rem;
+    line-height: 1.5;
     
-    .normal {
-      text-indent: 30px; /* মোবাইলেও ইনডেন্ট বজায় রাখা হলো */
-    }
+  }
 
-    .dcap::first-letter {
-      font-size: 2.0rem;
-      margin-right: 10px;
+  /* কবিতার ভেতরের সব প্যারাগ্রাফের মার্জিন বাদ দেওয়া হলো */
+  .poem p {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .poem .en {
+    font-family: var(--font-sabrina) !important; 
+    
+  }
+
+  .poem .bn {
+    font-family: var(--font-tarunima); 
+    
+  }
+
+  @media (min-width: 769px) {
+    .poem {
+      width: 50%;
+      font-size: 1.2rem;
     }
   }
 
-  /* বড় স্ক্রিন (Large Desktop) */
   @media (min-width: 1440px) {
-    .first, .dcap, .normal {
-      font-size: 1.25rem;
+    .poem {
+      font-size: 1.25rem; 
+      font-family: 'tarunima', 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', 'Arial', 'sans-serif';
     }
   }
 
-  /* সমাপ্তি চিহ্ন */
+  /* --- সমাপ্তি চিহ্ন --- */
   .theend, .end {
     display: block;
     width: 200px;
