@@ -15,7 +15,6 @@ type Props = {
   params: Promise<{ slug: string, volume: string, chapter: string }>;
 };
 
-// ইংরেজি নম্বরকে বাংলায় রূপান্তর করার ফাংশন
 const toBengaliNumber = (num: number) => 
   num.toString().replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[parseInt(d)]);
 
@@ -61,12 +60,11 @@ export default async function ChapterPage({ params }: Props) {
   const chapterRaw = fs.readFileSync(chapterFile, 'utf8');
   const { data: chapData, content } = matter(chapterRaw);
 
-  // --- ফুটনোট প্রসেসিং লজিক (বাংলা নম্বর সহ) ---
   const footnotes: string[] = [];
   const processedMarkdown = content.replace(/\[note\]([\s\S]*?)\[\/note\]/g, (_: string, noteText: string) => {
     footnotes.push(noteText.trim());
     const index = footnotes.length;
-    const bnIndex = toBengaliNumber(index); // এখানে নম্বরটি বাংলায় রূপান্তর করা হয়েছে
+    const bnIndex = toBengaliNumber(index);
     return `<sup class="footnote-ref"><a href="#fn-${index}" id="fnref-${index}" class="text-[#7D3C98] font-bold px-0.5">[${bnIndex}]</a></sup>`;
   });
 
@@ -131,24 +129,11 @@ export default async function ChapterPage({ params }: Props) {
         </div>
       </nav>
 
-      <div className="max-w-[1440px] mx-auto grid grid-cols-12 gap-0">
-        <aside className="col-span-12 ml-4 lg:col-span-3 space-y-1">
-          <div className="sticky top-6 space-y-6">
-            <div className="bg-white shadow-sm mt-2">
-              <img src={bookData.cover_image} alt={bookData.title} className="w-full h-auto object-cover" />
-            </div>
-            <div className="bg-white font-tarunima pr-2">
-              <h3 className="text-md font-bold border-b pb-2 mb-2 text-red-900 flex items-center gap-2 mt-4">
-                <List size={18} /> {bookData.title}
-              </h3>
-              <div className="max-h-[500px] overflow-y-auto">
-                <TableOfContents structure={nestedStructure} currentChapter={chapter} slug={slug} />
-              </div>
-            </div>
-          </div>
-        </aside>
-
-        <section className="col-span-12 lg:col-span-9 bg-[#fff2e6] p-4 md:p-4 shadow-sm min-h-screen">
+      {/* Grid: মোবাইলে কলাম ১টি, বড় স্ক্রিনে ১২টি */}
+      <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-0">
+        
+        {/* কন্টেন্ট সেকশন: মোবাইলে order-1 (উপরে), ডেক্সটপে order-2 (ডানে) */}
+        <section className="order-1 lg:order-2 col-span-1 lg:col-span-9 bg-[#fff2e6] p-4 md:p-4 shadow-sm min-h-screen">
           <header className="mb-4 text-center font-tarunima">
             <h2 className="text-xl md:text-2xl text-red-900 mb-1">{bookData.title}</h2>
             <p className="text-xl md:text-md text-gray-500 uppercase tracking-wide mb-1">{volTitle}</p>
@@ -160,14 +145,11 @@ export default async function ChapterPage({ params }: Props) {
           <article className="prose lg:prose-xl max-w-none text-gray-900 leading-relaxed">
             <div dangerouslySetInnerHTML={{ __html: contentHtml }} />
 
-              {/* --- ফুটনোট সেকশন --- */}
               {footnotes.length > 0 && (
                 <div className="mt-4 pt-2 border-t-2 border-orange-200 font-tarunima">
                   <h4 className="text-lg font-bold border-b-[1px] border-orange-200 text-red-900 mb-2">
                     টিকা ও মন্তব্য
                   </h4>
-                  
-                  {/* [list-style-type:bengali] যোগ করা হয়েছে নিচের তালিকাটি বাংলায় করার জন্য */}
                   <ol className="bnlist flex flex-wrap gap-x-4 gap-y-0 list-outside ml-4 p-0 text-base text-gray-700 [list-style-type:bengali]">
                     {footnotes.map((note, i) => (
                       <li 
@@ -204,6 +186,25 @@ export default async function ChapterPage({ params }: Props) {
             </div>
           </article>
         </section>
+
+        {/* সাইডবার সেকশন: মোবাইলে order-2 (নিচে), ডেক্সটপে order-1 (বামে) */}
+        <aside className="order-2 lg:order-1 col-span-1 lg:col-span-3 px-4 lg:ml-4 space-y-1">
+          <div className="lg:sticky lg:top-6 space-y-6">
+            <div className="bg-white shadow-sm mt-2 flex justify-center">
+              {/* মোবাইলে ইমেজ ফুল ওয়াইড ও সেন্টার করার জন্য w-full এবং mx-auto */}
+              <img src={bookData.cover_image} alt={bookData.title} className="w-full max-w-sm lg:max-w-full h-auto object-cover mx-auto" />
+            </div>
+            <div className="bg-white font-tarunima pr-2">
+              <h3 className="text-md font-bold border-b pb-2 mb-2 text-red-900 flex items-center gap-2 mt-4">
+                <List size={18} /> {bookData.title}
+              </h3>
+              <div className="max-h-[500px] overflow-y-auto mb-10 lg:mb-0">
+                <TableOfContents structure={nestedStructure} currentChapter={chapter} slug={slug} />
+              </div>
+            </div>
+          </div>
+        </aside>
+
       </div>
     </main>
   );

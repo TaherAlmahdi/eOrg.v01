@@ -27,7 +27,9 @@ const genreMap: Record<string, string> = {
   "essay": "প্রবন্ধ",
   "drama": "নাটক",
   "letters": "পত্রাবলী",
-  "others": "বিবিধ"
+  "others": "বিবিধ",
+  "romantic-novel": "রোমান্টিক উপন্যাস",
+  "historical-novel": "ঐতিহাসিক উপন্যাস"
 };
 
 type Props = {
