@@ -180,7 +180,7 @@ export default async function BookIndexPage({ params }: { params: any }) {
                             >
                               {g}
                             </Link>
-                            {index < data.genre.length - 1 && <span className="ml-1 text-gray-400">,</span>}
+                            {index < data.genre.length - 1 && <span className="ml-0 text-gray-400">,</span>}
                           </span>
                         );
                       })}

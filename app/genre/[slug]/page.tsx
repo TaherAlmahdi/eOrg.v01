@@ -16,6 +16,7 @@ const toBengaliNumber = (num: number | string) => {
 // ইংরেজি স্লাগ থেকে বাংলা শব্দের ম্যাপিং
 const genreMap: Record<string, string> = {
   "novel": "উপন্যাস",
+  "novella": "অনু-উপন্যাস",
   "humor" : "রম্য সাহিত্য",
   "religious" : "ধর্মীয় সাহিত্য",
   "essays" : "প্রবন্ধাবলী",
@@ -29,7 +30,8 @@ const genreMap: Record<string, string> = {
   "letters": "পত্রাবলী",
   "others": "বিবিধ",
   "romantic-novel": "রোমান্টিক উপন্যাস",
-  "historical-novel": "ঐতিহাসিক উপন্যাস"
+  "historical-novel": "ঐতিহাসিক উপন্যাস",
+  "social-novel": "সামাজিক উপন্যাস"
 };
 
 type Props = {
