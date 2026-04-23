@@ -126,6 +126,13 @@
     margin: 1.5rem 0;
   }
 
+  .wname {
+    font-size: 2.0rem;
+    color: var(--accent-gold);
+    letter-spacing: 2px;
+    margin: 1.5rem 0;
+  }
+
   .subtitle {
     color: var(--accent-red);
     font-size: 1.6rem;
