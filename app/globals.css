@@ -42,7 +42,7 @@
   }
 
   /* --- মার্জিন বিহীন ক্লাসসমূহ (.pc, .center, .right) --- */
-  .pc, .center, .right, 
+  .pc, .center, .right,  .pl, .pr,
   ol.list, ol.bnlist, ol.plist {
     font-size: 1.0rem;
     line-height: 1.7;
@@ -51,7 +51,7 @@
   }
 
   @media (min-width: 769px) {
-    .first, .dcap, .normal, .pc, .center, .right,
+    .first, .dcap, .normal, .pc, .center, .right, .pl, .pr,
     ol.list, ol.bnlist, ol.plist {
       font-size: 1.2rem;
       line-height: 1.6;
@@ -59,7 +59,7 @@
   }
 
   @media (min-width: 1440px) {
-    .first, .dcap, .normal, .pc, .center, .right,
+    .first, .dcap, .normal, .pc, .center, .right, .pl, .pr,
     ol.list, ol.bnlist, ol.plist {
       font-size: 1.25rem;
     }
@@ -77,6 +77,32 @@
   .pc, .center {
     text-align: center;
   }
+
+  .pcg {
+  margin-top: 25px;
+  margin-bottom: 5px;
+  margin-left: 0;
+  margin-right: 0;
+  font-size: 1.1em;
+  text-align: center;
+  color: #2596be;
+}
+
+  .pl {
+  width: 50%;
+  text-align: left;
+  float: left;
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+.pr {
+  width: 50%;
+  text-align: right;
+  float: right;
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
 
   .right {
     text-align: right;
