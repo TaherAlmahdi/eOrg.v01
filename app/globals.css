@@ -142,6 +142,21 @@
     text-align: justify;
   }
 
+  span.gap, .gap {
+  display: inline-block;
+  width: 20px;
+}
+
+  span.vgap, .vgap {
+  display: inline-block;
+    height: 20px; 
+}
+
+
+.gap-margin {
+  margin: 20px;
+}
+
   /* --- লিস্ট স্টাইল --- */
   ol.list, ol.bnlist, ol.plist {
     margin-left: 55px;

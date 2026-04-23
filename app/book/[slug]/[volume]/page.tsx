@@ -137,18 +137,18 @@ export default async function VolumePage({ params }: Props) {
             </article>
           )}
 
-          <div className="mt-6">
-            <h2 className="text-xl font-bold text-red-900 font-tarunima mb-4 flex items-center gap-2 border-b border-red-100 pb-2">
+          <div className="mt-1">
+            <h2 className="text-xl font-bold text-red-900 font-tarunima mb-2 flex items-center gap-2 border-b border-red-100 pb-2">
               <BookOpen size={22} /> সূচিপত্র
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
               {chapters.map((chap) => (
                 <Link 
                   key={chap.slug}
                   href={`/book/${slug}/${volume}/${chap.slug}`}
-                  className="group bg-white p-4 border border-gray-100 shadow-sm flex items-center justify-between hover:border-red-300 transition-all rounded-sm"
+                  className="group bg-white p-2 border border-gray-100 shadow-sm flex items-center justify-between hover:border-red-300 transition-all rounded-sm"
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1">
                     <span className="text-red-400 group-hover:text-red-600 transition-colors text-xl shrink-0">❀</span>
                     <span className="text-md md:text-lg font-normal text-gray-800 group-hover:text-red-900 font-tarunima transition-colors">
                       {chap.title}
