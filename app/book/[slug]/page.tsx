@@ -8,6 +8,10 @@ import remarkRehype from 'remark-rehype';
 import rehypeRaw from 'rehype-raw';
 import rehypeStringify from 'rehype-stringify';
 import { Home } from "lucide-react";
+import Notice from '../../components/Notice';
+
+const toBengaliNumber = (num: number | string) => 
+  num.toString().replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[parseInt(d)]);
 
 export default async function BookIndexPage({ params }: { params: any }) {
   const { slug } = await params;
@@ -30,7 +34,7 @@ export default async function BookIndexPage({ params }: { params: any }) {
 
   const contentHtml = processedContent.toString();
 
-  // ১. ভলিউম ডিটেকশন এবং টাইটেল রিড
+  // ১. ভলিউম ডিটেকশন
   const volumeFolders = fs.readdirSync(bookDir)
     .filter(file => fs.statSync(path.join(bookDir, file)).isDirectory())
     .sort();
@@ -44,10 +48,8 @@ export default async function BookIndexPage({ params }: { params: any }) {
     }
     return { id: v, title };
   });
-// ইংরেজি নম্বরকে বাংলায় রূপান্তর করার ফাংশন
-const toBengaliNumber = (num: number | string) => 
-  num.toString().replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[parseInt(d)]);
-  // ২. সরাসরি চ্যাপ্টার ডিটেকশন এবং টাইটেল রিড
+
+  // ২. চ্যাপ্টার ডিটেকশন
   const chapterFiles = fs.readdirSync(bookDir)
     .filter(file => file.endsWith('.md') && file !== 'index.md')
     .sort();
@@ -76,71 +78,67 @@ const toBengaliNumber = (num: number | string) =>
   return (
     <main className="bg-[#fdfcf8] min-h-screen">
       <nav className="w-full bg-[#7575a3] border-b border-gray-200 py-3 px-4">
-        <div className="max-w-[1440px] mx-auto text-sm text-white font-tarunima flex items-center">
-          <Link href="/" className="hover:text-red-100 flex items-center gap-1"><Home size={16} /></Link> 
-          <span className="mx-2 text-white/50">/</span>
-          <Link href="/books" className="hover:text-red-100">গ্রন্থাগার</Link> 
-          <span className="mx-2 text-white/50">/</span>
-          <span className="text-white font-medium truncate">{data.title}</span>
+        <div className="max-w-[1440px] mx-auto text-sm text-white font-tarunima flex flex-wrap items-center gap-y-1">
+          <Link href="/" className="hover:text-red-100 flex items-center gap-1 shrink-0">
+            <Home size={16} />
+          </Link> 
+          <span className="mx-2 text-white/50 shrink-0">/</span>
+          <Link href="/books" className="hover:text-red-100 shrink-0 whitespace-nowrap">গ্রন্থাগার</Link> 
+          <span className="mx-2 text-white/50 shrink-0">/</span>
+          <span className="text-white font-medium whitespace-nowrap">{data.title}</span>
         </div>
       </nav>
 
-      {/* মোবাইলে কলাম ১টি (grid-cols-1), ডেক্সটপে ১২টি (lg:grid-cols-12) */}
       <div className="max-w-[1440px] mx-auto px-0 py-0 grid grid-cols-1 lg:grid-cols-12 gap-0">
         
-        {/* কন্টেন্ট সেকশন: মোবাইলে order-1 (উপরে) */}
-        <section className="order-1 lg:order-2 col-span-1 lg:col-span-9 bg-[#fff2e6] p-4 md:p-8 shadow-sm">
-          <header className="mb-4 text-center font-tarunima">
-            <h1 className="text-3xl md:text-4xl font-bold font-sabrina text-gray-900 mb-2">{data.title}</h1>
+        <section className="order-1 lg:order-2 col-span-1 lg:col-span-9 bg-[#fff2e6] p-2 md:p-3 shadow-sm min-h-screen">
+          <header className="mb-2 text-center font-tarunima">
+            <h1 className="text-2xl md:text-2xl font-bold font-sabrina text-gray-900 mb-2">{data.title}</h1>
             <p className="text-lg text-red-900 font-tarunima">{data.author}</p>
+            <div className="w-50 h-[2px] bg-red-900 mx-auto mt-2"></div>
           </header>
 
-          <article className="prose lg:prose-xl max-w-none text-gray-900 leading-relaxed">
+          <article className="prose lg:prose-xl max-w-none text-gray-900 leading-relaxed font-tarunima">
+            {/* নোটিশ এরিয়া: Frontmatter এ notice থাকলে তবেই শো করবে */}
+            {data.notice && <Notice message={data.notice} />}
+            
             <div dangerouslySetInnerHTML={{ __html: contentHtml }} />
           </article>
 
-          <div className="mt-16 pt-8 border-t border-orange-200 flex justify-between items-center font-sans">
-            <Link href="/books" className="text-gray-500 hover:text-red-900 flex items-center group transition-all">
+          <div className="mt-1 pt-2 border-t border-orange-200 flex justify-between items-center font-tarunima">
+            <Link href="/books" className="text-gray-500 hover:text-red-900 flex items-center group transition-all text-sm md:text-base whitespace-nowrap">
               <span className="mr-2 transform group-hover:-translate-x-1">←</span> গ্রন্থাগার
             </Link>
             
             <Link 
               href={nextActionLink} 
-              className="bg-red-900 text-white px-6 py-3 rounded font-bold hover:bg-red-800 transition-all flex items-center group shadow-md text-sm md:text-base"
+              className="bg-red-900 text-white px-5 py-3 rounded font-bold hover:bg-red-800 transition-all flex items-center group shadow-md text-sm md:text-base max-w-[60%]"
             >
-              <span className="truncate max-w-[150px] md:max-w-none">{nextActionLabel}</span>
-              <span className="ml-2 transform group-hover:translate-x-1 transition-transform">→</span>
+              <span className="truncate whitespace-nowrap">{nextActionLabel}</span>
+              <span className="ml-2 transform group-hover:translate-x-1 transition-transform shrink-0">→</span>
             </Link>
           </div>
         </section>
 
-        {/* সাইডবার: মোবাইলে order-2 (নিচে) */}
         <aside className="order-2 lg:order-1 col-span-1 lg:col-span-3 px-4 lg:ml-4 space-y-1 mb-10 lg:mb-0">
           <div className="lg:sticky lg:top-6 space-y-6">
-            {/* মোবাইলে ইমেজ ফুল ওয়াইড সেন্টার */}
-            <div className="bg-white shadow-sm mt-2 flex justify-center">
+            <div className="bg-white shadow-sm mt-2 flex justify-center border border-gray-100">
               <img src={data.cover_image} alt={data.title} className="w-full max-w-sm lg:max-w-full h-auto object-cover" />
             </div>
 
             <div className="bg-white font-tarunima">
               <h3 className="text-md font-bold border-b pb-2 mb-3 text-red-900 uppercase tracking-wide">পুস্তক বিবরণী</h3>
               <div className="text-sm space-y-2 text-gray-800">
-                
-                {/* বইয়ের নাম */}
                 <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
                   <span className="font-bold">বই</span>
                   <span className="text-gray-400">:</span>
                   <span>{data.title}</span>
                 </div>
-
-                {/* লেখক */}
                 <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
                   <span className="font-bold">লেখক</span>
                   <span className="text-gray-400">:</span>
                   <span>{data.author}</span>
                 </div>
-
-                {/* প্রথম প্রকাশ */}
                 {data.first_published && (
                   <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
                     <span className="font-bold">প্রকাশ</span>
@@ -148,21 +146,18 @@ const toBengaliNumber = (num: number | string) =>
                     <span>{toBengaliNumber(data.first_published)}</span>
                   </div>
                 )}
-
-                {/* ঘরানা/জনরা উইথ লিংক */}
                 {data.genre && data.genre.length > 0 && (
                   <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
                     <span className="font-bold">ঘরানা</span>
                     <span className="text-gray-400">:</span>
                     <div className="flex flex-wrap gap-1">
                       {data.genre.map((g: string, index: number) => {
-                        // genre_links থেকে ম্যাচিং লিংক খুঁজে বের করা
                         const genreLink = data.genre_links?.find((l: any) => l.name === g);
                         return (
-                          <span key={g}>
+                          <span key={g} className="whitespace-nowrap">
                             <Link 
                               href={genreLink ? genreLink.link : `/genre/${g.toLowerCase()}`} 
-                              className="text-blue-600 hover:text-red-900 hover:underline transition-all"
+                              className="text-blue-600 hover:text-red-900 hover:underline"
                             >
                               {g}
                             </Link>
@@ -173,7 +168,6 @@ const toBengaliNumber = (num: number | string) =>
                     </div>
                   </div>
                 )}
-                
               </div>
             </div>
 
@@ -184,7 +178,7 @@ const toBengaliNumber = (num: number | string) =>
                   <div key={v.id} className="mb-1">
                     <Link 
                       href={`/book/${slug}/${v.id}`}
-                      className="font-normal text-blue-600 hover:text-red-900 mb-0 bg-gray-50 px-0 py-0 text-[15px] tracking-wider block hover:border-gray-200"
+                      className="text-blue-600 hover:text-red-900 text-[15px] block py-1"
                     >
                       {v.title}
                     </Link>
@@ -204,7 +198,6 @@ const toBengaliNumber = (num: number | string) =>
             </div>
           </div>
         </aside>
-
       </div>
     </main>
   );

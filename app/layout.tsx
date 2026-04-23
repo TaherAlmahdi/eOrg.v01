@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import localFont from 'next/font/local';
+import Script from 'next/script'; // ১. Script ইমপোর্ট করা হয়েছে
 import "./globals.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 
-// ১. কাস্টম ফন্টগুলো কনফিগার করা
+// কাস্টম ফন্টগুলো কনফিগার করা
 const mallika = localFont({
   src: '../public/fonts/Mallika.woff2',
   variable: '--font-mallika',
@@ -23,14 +24,14 @@ const tarunima = localFont({
   display: 'swap',
 });
 
-// ২. এসইও এবং মেটাডাটা
+// এসইও এবং মেটাডাটা
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://bankim-rachanabali.vercel.app'),
   title: {
     default: 'বঙ্কিম রচনাবলী',
     template: '%s | বঙ্কিম রচনাবলী'
   },
-  description: 'বঙ্কিমচন্দ্র চট্টোপাধ্যায়ের সকল সাহিত্যকর্মের ডিজিটাল সংগ্রহশালা',
+  description: 'বঙ্কিমচন্দ্র চট্টোপাধ্যায়ের সকল সাহিত্যকর্মের ডিজিটাল সংগ্রহশালা',
 };
 
 export default function RootLayout({
@@ -41,10 +42,19 @@ export default function RootLayout({
   return (
     <html
       lang="bn"
-      // সব ফন্ট ভেরিয়েবল ক্লাস হিসেবে যুক্ত করা হয়েছে
+      // সব ফন্ট ভেরিয়েবল ক্লাস হিসেবে যুক্ত করা হয়েছে
       className={`${mallika.variable} ${sabrina.variable} ${tarunima.variable} h-full antialiased`}
     >
-      {/* body-তে font-tarunima ক্লাস যুক্ত করে পুরো সাইটে এটি ডিফল্ট করা হয়েছে */}
+      <head>
+        {/* গুগল অ্যাডসেন্স কোড */}
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5551708286100565"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
+      </head>
+      {/* body-তে font-tarunima ডিফল্ট করা হয়েছে */}
       <body className="min-h-full flex flex-col bg-[#fdfdf7] text-gray-900 font-tarunima">
         <Header />
         
@@ -55,5 +65,5 @@ export default function RootLayout({
         <Footer />
       </body>
     </html>
-  );
+  ); // ২. অতিরিক্ত ক্যারেক্টার মুছে ফেলা হয়েছে
 }

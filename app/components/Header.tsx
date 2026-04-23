@@ -18,7 +18,7 @@ const Header = () => {
   }, [isMenuOpen]);
 
   return (
-    <header className="bg-[#ffffff] border-b border-gray-200 py-2 px-3 sticky top-0 z-50 shadow-sm font-sans">
+    <header className="bg-[#ffffff] border-b border-gray-200 py-2 px-3 sticky top-0 z-50 shadow-sm font-tarunima">
       <div className="max-w-[1440px] mx-auto flex items-center justify-between gap-4">
         
         {/* লোগো সেকশন */}
@@ -40,7 +40,7 @@ const Header = () => {
                 <span className="text-[#008080]">বঙ্কিম</span>
                 <span className="text-[#cc7a00]"> রচনাবলী</span>
               </h1>
-              <p className="hidden md:block text-[14px] text-gray-600 mt-1 font-normal tracking-[1px]">
+              <p className="hidden md:block text-[14px] text-gray-600 mt-1 font-tarunima font-normal tracking-[1px]">
                 এডুলিচার বিশুদ্ধজ্ঞান প্রকল্প
               </p>
             </div>
@@ -79,7 +79,6 @@ const Header = () => {
               </div>
 
               <nav className="space-y-3 font-tarunima">
-                {/* লিংকগুলোতে /genre/ যুক্ত করা হয়েছে */}
                 <MenuLink href="/genre/novel" icon={<BookOpen size={22} />} title="উপন্যাস সমগ্র" desc="বঙ্কিমচন্দ্রের কালজয়ী উপন্যাসসমূহ" color="blue" close={() => setIsMenuOpen(false)} />
                 <MenuLink href="/genre/humor" icon={<Feather size={22} />} title="রম্য সাহিত্য" desc="কমলাকান্তের দপ্তর ও রম্য রচনা" color="teal" close={() => setIsMenuOpen(false)} />
                 <MenuLink href="/genre/religious" icon={<Library size={22} />} title="ধর্মীয় সাহিত্য" desc="ধর্মতত্ত্ব ও কৃষ্ণচরিত্র বিষয়ক আলোচনা" color="orange" close={() => setIsMenuOpen(false)} />
@@ -90,7 +89,7 @@ const Header = () => {
               </nav>
 
               <div className="mt-8 pt-4 text-center border-t border-gray-100">
-                <p className="text-[10px] text-gray-400 uppercase tracking-widest font-sans">
+                <p className="text-[10px] text-gray-400 uppercase tracking-widest font-tarunima">
                   Eduliture Pure Knowledge Project
                 </p>
               </div>
@@ -106,7 +105,7 @@ const MenuLink = ({ href, icon, title, desc, color, close }: any) => (
   <Link 
     href={href} 
     onClick={close}
-    className="flex items-center gap-5 p-4 bg-white rounded-xl border border-gray-100 hover:border-[#008080] hover:shadow-md transition-all group"
+    className="flex items-center gap-5 p-4 bg-white rounded-xl border border-gray-100 hover:border-[#008080] hover:shadow-md transition-all group font-tarunima"
   >
     <div className={`p-3 rounded-xl transition-colors bg-gray-50 text-gray-600 group-hover:bg-[#008080] group-hover:text-white`}>
       {icon}

@@ -1,30 +1,31 @@
 'use client';
-import { Sparkles as SparklesIcon, BookOpen as BookOpenIcon, Info as InfoIcon } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
-
-// আপনার স্ট্রাকচার অনুযায়ী: app/componant থেকে এক ধাপ উপরে উঠে app/public এ যেতে হবে
 import bankimImage from '../../public/bankim.png';
 
 const Hero = () => {
   return (
-      <div className="relative w-full overflow-hidden">
-        <div className="relative w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] h-[350px] md:h-[500px] md:relative md:w-full md:left-auto md:right-auto md:ml-0 md:mr-0 md:aspect-[2/3] md:rounded-xl md:border-4 md:border-white md:shadow-2xl md:max-w-none">
-          
-          <Image 
-            src={bankimImage} 
-            alt="সাহিত্য সম্রাট বঙ্কিমচন্দ্র চট্টোপাধ্যায়"
-            fill
-            className="object-cover transition-transform duration-500 hover:scale-105"
-            priority
-            sizes="(max-width: 768px) 100vw, 600px"
-          />
+    <div className="relative w-full overflow-hidden">
+      {/* মোবাইলে (Default): w-full এবং h-auto ব্যবহার করা হয়েছে যাতে রেশিও ঠিক থাকে।
+        ডেক্সটপে (md:): আপনার আগের নির্দিষ্ট রেশিও ও বর্ডার বজায় রাখা হয়েছে।
+      */}
+      <div className="relative w-full h-auto aspect-[2/3] md:aspect-[2/3] md:rounded-xl md:border-4 md:border-white md:shadow-2xl overflow-hidden bg-transparent">
+        
+        <Image 
+          src={bankimImage} 
+          alt="সাহিত্য সম্রাট বঙ্কিমচন্দ্র চট্টোপাধ্যায়"
+          fill
+          /* object-contain: ছবি ক্রপ হওয়া রোধ করবে এবং রেশিও ঠিক রাখবে।
+            bg-transparent: ছবির পেছনের অংশ স্বচ্ছ রাখবে।
+          */
+          className="object-contain transition-transform duration-500 hover:scale-105"
+          priority
+          sizes="(max-width: 768px) 100vw, 300px"
+        />
 
-          {/* গ্রেডিয়েন্ট ওভারলে */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
-        </div>
+        {/* গ্রেডিয়েন্ট ওভারলে (ছবির রেশিও ঠিক রাখতে এটি হালকা রাখা হয়েছে) */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent pointer-events-none"></div>
       </div>
-      
+    </div>
   );
 };
 

@@ -16,7 +16,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-[#e0e0eb] border-t border-gray-200 py-6 px-4 font-sans mt-auto">
+    <footer className="bg-[#e0e0eb] border-t border-gray-200 py-1 px-1 font-tarunima mt-auto">
       <div className="max-w-[1440px] mx-auto">
         
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
@@ -40,7 +40,7 @@ const Footer = () => {
                   এডুলিচার
                 </span>
               </Link>
-              <p className="text-[10px] font-tarunima text-gray-500 font-bold mt-1 uppercase tracking-widest leading-none">
+              <p className="text-[10px] font-tarunima text-gray-500 font-normal mt-1 tracking-widest leading-none">
                 বিশুদ্ধজ্ঞানের শিক্ষা বিষয়ক প্রতিষ্ঠান
               </p>
             </div>

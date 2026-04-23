@@ -9,10 +9,25 @@ const FeatureContent = () => {
     <div className="w-full text-justify flow-root">
       
       {/* ইমেজ কন্টেইনার: বামে ফ্লট, নির্দিষ্ট উইডথ এবং মার্জিন */}
-      <div className="float-left w-[300px] h-auto mr-[15px] mb-[3px]">
-        <div className="text-center">
-          <Hero />
-          <span className="text-sm text-gray-400 italic font-tarunima block mt-2">
+      <div className="w-full md:w-[300px] md:float-left md:mr-[15px] mb-6 md:mb-[3px]">
+        <div className="flex flex-col items-center justify-center md:block">
+          
+          {/* ইমেজের কন্টেইনার: aspect ratio ঠিক রাখার জন্য */}
+          <div className="w-full flex justify-center aspect-auto">
+            {/* যদি <Hero /> এর ভেতরে সরাসরি <img> থাকে, তবে তাতে 
+              className="w-full h-auto object-contain" যুক্ত করুন।
+              
+              যদি এখানে সরাসরি ইমেজ বসান, তবে নিচের মতো ব্যবহার করুন:
+              <img 
+                src="/path-to-image.jpg" 
+                alt="বঙ্কিমচন্দ্র চট্টোপাধ্যায়"
+                className="w-full h-auto max-h-[400px] object-contain"
+              />
+            */}
+            <Hero />
+          </div>
+
+          <span className="text-sm text-gray-400 italic font-tarunima block mt-2 text-center w-full">
             বঙ্কিমচন্দ্র চট্টোপাধ্যায়
           </span>
         </div>

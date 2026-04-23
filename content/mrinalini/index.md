@@ -5,6 +5,7 @@ type: "book_index"
 slug: "mrinalini"
 first_published: 1869
 language: "bn"
+notice: "এই পাতার লেখাগুলো মূল গ্রন্থের অংশ নয়!"
 genre: ["ঐতিহাসিক উপন্যাস", "রোমান্টিক উপন্যাস", "উপন্যাস"]
 genre_links: 
   - { name: "ঐতিহাসিক উপন্যাস", link: "/genre/historical-novel" }
