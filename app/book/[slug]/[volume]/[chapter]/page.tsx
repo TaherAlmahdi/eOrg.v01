@@ -154,18 +154,27 @@ export default async function ChapterPage({ params }: Props) {
           <article className="prose lg:prose-xl max-w-none text-gray-900 leading-relaxed font-tarunima">
             <div dangerouslySetInnerHTML={{ __html: processedContent.toString() }} />
 
-            {footnotes.length > 0 && (
-              <div className="mt-12 pt-6 border-t-2 border-orange-200">
-                <h4 className="text-lg font-bold text-red-900 mb-4 border-b border-orange-100 pb-2">টিকা ও মন্তব্য</h4>
-                <ol className="list-outside ml-6 space-y-2 text-gray-700 [list-style-type:bengali]">
-                  {footnotes.map((note, i) => (
-                    <li key={i} id={`fn-${i + 1}`} className="pl-2">
-                      {note} <a href={`#fnref-${i + 1}`} className="ml-1 text-blue-500 hover:text-red-700">↩</a>
-                    </li>
-                  ))}
-                </ol>
-              </div>
-            )}
+              {footnotes.length > 0 && (
+                <div className="mt-4 pt-2 border-t-2 border-orange-200 font-tarunima">
+                  <h4 className="text-lg font-bold border-b-[1px] border-orange-200 text-red-900 mb-2">
+                    টিকা ও মন্তব্য
+                  </h4>
+                  <ol className="bnlist flex flex-wrap gap-x-4 gap-y-0 list-outside ml-4 p-0 text-base text-gray-700 [list-style-type:bengali]">
+                    {footnotes.map((note, i) => (
+                      <li 
+                        key={i} 
+                        id={`fn-${i + 1}`} 
+                        className="flex-auto min-w-[200px] max-w-full border-b-[1px] border-white pb-1 leading-relaxed"
+                      >
+                        <span className="inline">
+                          {note}
+                          <a href={`#fnref-${i + 1}`} className="ml-2 text-blue-500 hover:text-red-700 transition-all">↩</a>
+                        </span>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              )}
 
             <div className="mt-2 pt-2 border-t border-orange-200 grid grid-cols-2 gap-4 font-tarunima">
               <div>
