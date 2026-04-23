@@ -139,13 +139,32 @@ export default async function BookIndexPage({ params }: { params: any }) {
                   <span className="text-gray-400">:</span>
                   <span>{data.author}</span>
                 </div>
+
+                {/* প্রথম প্রকাশ (মাধ্যম) */}
+                {data.pub_medium && (
+                  <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
+                    <span className="font-bold">প্রথম প্রকাশ</span>
+                    <span className="text-gray-400">:</span>
+                    <span>{data.pub_medium}</span>
+                  </div>
+                )}
+
                 {data.first_published && (
                   <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
-                    <span className="font-bold">প্রকাশ</span>
+                    <span className="font-bold">গ্রন্থরূপ</span>
                     <span className="text-gray-400">:</span>
                     <span>{toBengaliNumber(data.first_published)}</span>
                   </div>
                 )}
+
+                {/* অনুস্মৃতি (Reminiscence) */}
+                {data.source_book && (
+                  <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
+                    <span className="font-bold">অনুস্মৃতি</span>
+                    <span className="text-gray-400">:</span>
+                    <span>{data.source_book}</span>
+                  </div>
+                )}                
                 {data.genre && data.genre.length > 0 && (
                   <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
                     <span className="font-bold">ঘরানা</span>
