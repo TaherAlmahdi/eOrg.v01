@@ -85,13 +85,16 @@ export default async function GenrePage({ params }: Props) {
     return null;
   }).filter((book): book is any => book !== null);
 
-  // সর্টিং লজিক: প্রথমে সাল অনুযায়ী, সাল মিলে গেলে নাম অনুযায়ী (বাংলা বর্ণমালা)
-  filteredBooks.sort((a, b) => {
-    if (a.first_published !== b.first_published) {
-      return a.first_published - b.first_published;
-    }
-    return a.title.localeCompare(b.title, 'bn');
-  });
+    // সর্টিং লজিক: প্রথমে sn (ক্রমিক নং) অনুযায়ী, sn মিলে গেলে নাম অনুযায়ী (বাংলা বর্ণমালা)
+    filteredBooks.sort((a, b) => {
+      // sn বা সিরিয়াল নম্বর দিয়ে তুলনা
+      if (a.sn !== b.sn) {
+        return (a.sn || 0) - (b.sn || 0); 
+      }
+      
+      // যদি sn সমান হয় বা না থাকে, তবে নাম অনুযায়ী সর্ট হবে
+      return a.title.localeCompare(b.title, 'bn');
+    });
 
   return (
     <main className="bg-[#fdfcf8] min-h-screen font-tarunima">
@@ -132,11 +135,11 @@ export default async function GenrePage({ params }: Props) {
                   <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
                 
-                <div className="mt-4">
+                <div className="mt-2">
                   <h3 className="text-lg font-bold text-center text-gray-900 group-hover:text-red-900 transition-colors line-clamp-2">
                     {book.title}
                   </h3>
-                  <p className="text-sm text-center text-gray-500 mt-1 uppercase tracking-tight font-sans">
+                  <p className="text-sm text-center text-gray-500 mt-1 uppercase tracking-tight font-tarunima">
                     {book.author}
                   </p>
                 </div>
