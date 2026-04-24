@@ -19,7 +19,7 @@ const Footer = () => {
     <footer className="bg-[#e0e0eb] border-t border-gray-200 py-1 px-1 font-tarunima mt-auto">
       <div className="max-w-[1440px] mx-auto">
         
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-1 text-center md:text-left">
           
           {/* বামপাশ: এডুলিচার লোগো, নাম ও ট্যাগ */}
           <div className="flex items-center gap-3">
@@ -47,7 +47,7 @@ const Footer = () => {
           </div>
 
           {/* ডানপাশ: কপিরাইট (বড় স্ক্রিনে ডানে, মোবাইলে নিচে) */}
-          <div className="md:text-right font-tarunima border-t md:border-t-0 border-gray-300 pt-4 md:pt-0 w-full md:w-auto">
+          <div className="md:text-right font-tarunima border-t md:border-t-0 border-gray-300 pt-1 md:pt-0 w-full md:w-auto">
             <p className="text-[10px] text-gray-600 leading-relaxed">
               © ১৯৯৯ - {getBengaliYear()} এডুলিচার কর্তৃক সমস্ত অধিকার সংরক্ষিত।
             </p>
