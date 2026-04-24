@@ -148,7 +148,7 @@ export default async function ChapterPage({ params }: Props) {
             <h1 className="text-xl md:text-2xl font-normal font-sabrina text-gray-900 leading-tight">
               {chapData.title || chapter} {chapData.subtitle ? `: ${chapData.subtitle}` : ''}
             </h1>
-            <div className="w-100 h-[2px] bg-red-900 mx-auto mt-2"></div>
+            <div className="w-50 h-[2px] bg-red-900 mx-auto mt-2"></div>
           </header>
 
           <article className="prose lg:prose-xl max-w-none text-gray-900 leading-relaxed font-tarunima">
