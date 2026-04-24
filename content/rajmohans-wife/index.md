@@ -10,7 +10,6 @@ genre_links:
   - { name: "সামাজিক উপন্যাস", link: "/genre/social-novel" }
   - { name: "উপন্যাস", link: "/genre/novel" }
 cover_image: "/cover/rajmohans-wife.webp"
-meta_title: "Rajmohan's Wife | বঙ্কিমচন্দ্র চট্টোপাধ্যায় | এডুলিচার"
 meta_description: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়ের প্রথম উপন্যাস 'Rajmohan's Wife'। ১৮৬৪ সালে প্রকাশিত এই কালজয়ী ইংরেজি উপন্যাসের সারসংক্ষেপ ও ঐতিহাসিক গুরুত্ব জানুন।"
 tags: ["বঙ্কিমচন্দ্র চট্টোপাধ্যায়", "Rajmohan's Wife", "মাতঙ্গিনী", "ইংরেজি উপন্যাস", "ভারতীয় সাহিত্য", "বঙ্কিমচন্দ্রের প্রথম উপন্যাস"]
 ---

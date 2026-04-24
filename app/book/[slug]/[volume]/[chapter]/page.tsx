@@ -18,7 +18,7 @@ type Props = {
 const toBengaliNumber = (num: number) => 
   num.toString().replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[parseInt(d)]);
 
-// ১. ডাইনামিক মেটাডেটা এবং ওজি ইমেজ লজিক
+// ১. ডাইনামিক মেটাডেটা এবং ওজি ইমেজ লজিক (meta_title সাপোর্ট সহ)
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, volume, chapter } = await params;
   const rootDir = process.cwd();
@@ -38,11 +38,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     volTitle = matter(fs.readFileSync(volIndexFile, 'utf8')).data.title || volTitle;
   }
 
-  // টাইটেল ফরম্যাট: পরিচ্ছেদ | খণ্ড | গ্রন্থ | সাইট টাইটেল
-  const fullTitle = `${chapData.title || chapter} | ${volTitle} | ${bookData.title} | বঙ্কিম রচনাবলী`;
+  // লজিক: meta_title থাকলে তাই হুবহু থাকবে, নাহলে ডাইনামিক টাইটেল তৈরি হবে
+  const fullTitle = chapData.meta_title || `${chapData.title || chapter} | ${volTitle} | ${bookData.title}`;
   const description = chapData.meta_description || `${bookData.title} গ্রন্থের ${volTitle}-এর অন্তর্গত ${chapData.title || chapter}।`;
   
-  // ওজি ইমেজ লজিক: মূল গ্রন্থের og_image থাকলে সেটি, না থাকলে কভার ইমেজ
   const shareImage = bookData.og_image || bookData.cover_image || '/og-default.jpg';
 
   return {
@@ -58,6 +57,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     twitter: {
       card: 'summary_large_image',
       title: fullTitle,
+      description: description,
       images: [shareImage],
     },
   };
@@ -177,23 +177,23 @@ export default async function ChapterPage({ params }: Props) {
           <article className="prose lg:prose-xl max-w-none text-gray-900 leading-relaxed font-tarunima">
             <div dangerouslySetInnerHTML={{ __html: processedContent.toString() }} />
 
-              {footnotes.length > 0 && (
-                <div className="mt-4 pt-2 border-t-2 border-orange-200 font-tarunima">
-                  <h4 className="text-lg font-bold border-b-[1px] border-orange-200 text-red-900 mb-2">
-                    টিকা ও মন্তব্য
-                  </h4>
-                  <ol className="bnlist flex flex-wrap gap-x-4 gap-y-0 list-outside ml-4 p-0 text-base text-gray-700 [list-style-type:bengali]">
-                    {footnotes.map((note, i) => (
-                      <li key={i} id={`fn-${i + 1}`} className="flex-auto min-w-[200px] max-w-full border-b-[1px] border-white pb-1 leading-relaxed">
-                        <span className="inline">
-                          {note}
-                          <a href={`#fnref-${i + 1}`} className="ml-2 text-blue-500 hover:text-red-700 transition-all">↩</a>
-                        </span>
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-              )}
+            {footnotes.length > 0 && (
+              <div className="mt-4 pt-2 border-t-2 border-orange-200 font-tarunima">
+                <h4 className="text-lg font-bold border-b-[1px] border-orange-200 text-red-900 mb-2">
+                  টিকা ও মন্তব্য
+                </h4>
+                <ol className="bnlist flex flex-wrap gap-x-4 gap-y-0 list-outside ml-4 p-0 text-base text-gray-700 [list-style-type:bengali]">
+                  {footnotes.map((note, i) => (
+                    <li key={i} id={`fn-${i + 1}`} className="flex-auto min-w-[200px] max-w-full border-b-[1px] border-white pb-1 leading-relaxed">
+                      <span className="inline">
+                        {note}
+                        <a href={`#fnref-${i + 1}`} className="ml-2 text-blue-500 hover:text-red-700 transition-all">↩</a>
+                      </span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            )}
 
             <div className="mt-2 pt-2 border-t border-orange-200 grid grid-cols-2 gap-4 font-tarunima">
               <div>

@@ -15,7 +15,7 @@ type Props = {
   params: Promise<{ slug: string; volume: string }>;
 };
 
-// ১. ডাইনামিক মেটাডেটা জেনারেশন
+// ১. ডাইনামিক মেটাডেটা জেনারেশন (meta_title লজিক সহ)
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, volume } = await params;
   const bookDir = path.join(process.cwd(), 'content', slug);
@@ -23,21 +23,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const volMainFile = path.join(volPath, `${volume}.md`);
   const bookIndexFile = path.join(bookDir, 'index.md');
 
-  // মূল বইয়ের ডেটা রিড
+  // মূল বইয়ের ডেটা রিড
   const bookIndexContent = fs.readFileSync(bookIndexFile, 'utf8');
   const { data: bookData } = matter(bookIndexContent);
 
   // খণ্ডের ডেটা রিড
   let volTitle = volume.toUpperCase();
   let volDescription = "";
+  let customMetaTitle = "";
+
   if (fs.existsSync(volMainFile)) {
     const { data: volData } = matter(fs.readFileSync(volMainFile, 'utf8'));
     volTitle = volData.title || volTitle;
     volDescription = volData.meta_description || "";
+    customMetaTitle = volData.meta_title || ""; // meta_title চেক করা হচ্ছে
   }
 
-  // টাইটেল ফরম্যাট: খণ্ড নাম | বইয়ের নাম | বঙ্কিম রচনাবলী
-  const fullTitle = `${volTitle} | ${bookData.title} | বঙ্কিম রচনাবলী`;
+  // লজিক: meta_title থাকলে তাই, নাহলে "খণ্ড নাম | বইয়ের নাম | বঙ্কিম রচনাবলী"
+  const fullTitle = customMetaTitle || `${volTitle} | ${bookData.title}`;
   const shareImage = bookData.og_image || bookData.cover_image || '/og-default.jpg';
 
   return {
