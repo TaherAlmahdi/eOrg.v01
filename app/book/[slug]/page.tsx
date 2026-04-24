@@ -194,6 +194,13 @@ export default async function BookIndexPage({ params }: { params: any }) {
                     <span>{toBengaliNumber(data.first_published)}</span>
                   </div>
                 )}
+                {data.source_book && (
+                  <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
+                    <span className="font-bold">অনুস্মৃতি</span>
+                    <span className="text-gray-400">:</span>
+                    <span>{toBengaliNumber(data.source_book)}</span>
+                  </div>
+                )}
               </div>
             </div>
 
