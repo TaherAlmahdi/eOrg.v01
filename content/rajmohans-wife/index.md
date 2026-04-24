@@ -4,6 +4,7 @@ author: "বঙ্কিমচন্দ্র চট্টোপাধ্যা�
 type: "book_index"
 slug: "rajmohans-wife"
 first_published: 1864
+sn: 01
 genre: ["সামাজিক উপন্যাস", "উপন্যাস"]
 genre_links: 
   - { name: "সামাজিক উপন্যাস", link: "/genre/social-novel" }

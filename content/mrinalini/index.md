@@ -4,6 +4,7 @@ author: "বঙ্কিমচন্দ্র চট্টোপাধ্যা�
 type: "book_index"
 slug: "mrinalini"
 first_published: 1869
+sn: 04
 language: "bn"
 notice: "এই পাতার লেখাগুলো মূল গ্রন্থের অংশ নয়!"
 genre: ["ঐতিহাসিক উপন্যাস", "রোমান্টিক উপন্যাস", "উপন্যাস"]

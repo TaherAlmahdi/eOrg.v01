@@ -4,6 +4,7 @@ author: "বঙ্কিমচন্দ্র চট্টোপাধ্যা�
 type: "book_index"
 slug: "chandrashekhar"
 first_published: 1875
+sn: 08
 genre: ["ঐতিহাসিক উপন্যাস", "উপন্যাস"]
 genre_links: 
   - { name: "ঐতিহাসিক উপন্যাস", link: "/genre/historical-novel" }

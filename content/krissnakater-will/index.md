@@ -2,8 +2,9 @@
 title: "কৃষ্ণকান্তের উইল"
 author: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়"
 type: "book_index"
-slug: "krissnakanter will"
+slug: "krissnakanter-will"
 first_published: 1878
+sn: 11
 genre: ["ঐতিহাসিক উপন্যাস", "উপন্যাস"]
 genre_links: 
   - { name: "ঐতিহাসিক উপন্যাস", link: "/genre/historical-novel" }

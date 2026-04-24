@@ -4,6 +4,7 @@ author: "বঙ্কিমচন্দ্র চট্টোপাধ্যা�
 type: "book_index"
 slug: "kapalkundala"
 first_published: 1866
+sn: 03
 genre: ["উপন্যাস", "রোমান্টিক উপন্যাস", "সামাজিক উপন্যাস"]
 genre_links: 
   - { name: "রোমান্টিক উপন্যাস", link: "/genre/romantic-novel" }

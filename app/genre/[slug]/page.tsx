@@ -85,16 +85,13 @@ export default async function GenrePage({ params }: Props) {
     return null;
   }).filter((book): book is any => book !== null);
 
-    // সর্টিং লজিক: প্রথমে sn (ক্রমিক নং) অনুযায়ী, sn মিলে গেলে নাম অনুযায়ী (বাংলা বর্ণমালা)
-    filteredBooks.sort((a, b) => {
-      // sn বা সিরিয়াল নম্বর দিয়ে তুলনা
-      if (a.sn !== b.sn) {
-        return (a.sn || 0) - (b.sn || 0); 
-      }
-      
-      // যদি sn সমান হয় বা না থাকে, তবে নাম অনুযায়ী সর্ট হবে
-      return a.title.localeCompare(b.title, 'bn');
-    });
+  // সর্টিং লজিক: প্রথমে সাল অনুযায়ী, সাল মিলে গেলে নাম অনুযায়ী (বাংলা বর্ণমালা)
+  filteredBooks.sort((a, b) => {
+    if (a.first_published !== b.first_published) {
+      return a.first_published - b.first_published;
+    }
+    return a.title.localeCompare(b.title, 'bn');
+  });
 
   return (
     <main className="bg-[#fdfcf8] min-h-screen font-tarunima">

@@ -4,6 +4,7 @@ author: "বঙ্কিমচন্দ্র চট্টোপাধ্যা�
 type: "book_index"
 slug: "durgeshnandini"
 first_published: 1865
+sn: 02
 genre: ["ঐতিহাসিক উপন্যাস", "উপন্যাস"]
 genre_links:
   - name: "ঐতিহাসিক উপন্যাস"

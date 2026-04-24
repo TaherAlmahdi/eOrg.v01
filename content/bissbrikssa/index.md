@@ -4,6 +4,7 @@ author: "বঙ্কিমচন্দ্র চট্টোপাধ্যা�
 type: "book_index"
 slug: "bissbrikssa"
 first_published: 1873
+sn: 05
 pub_medium: "বঙ্গদর্শন বৈশাখ ১২৭৯"
 genre: ["সামাজিক উপন্যাস", "উপন্যাস"]
 source_book: "পর্ষদ সংস্করণ, সংশোধিত ঊনবিংশ মুদ্রণ–মাঘ ১৪০৭"
