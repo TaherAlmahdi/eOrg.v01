@@ -48,7 +48,7 @@ const Footer = () => {
 
           {/* ডানপাশ: কপিরাইট (বড় স্ক্রিনে ডানে, মোবাইলে নিচে) */}
           <div className="md:text-right font-tarunima border-t md:border-t-0 border-gray-300 pt-4 md:pt-0 w-full md:w-auto">
-            <p className="text-sm text-gray-600 leading-relaxed">
+            <p className="text-[10px] text-gray-600 leading-relaxed">
               © ১৯৯৯ - {getBengaliYear()} এডুলিচার কর্তৃক সমস্ত অধিকার সংরক্ষিত।
             </p>
           </div>
