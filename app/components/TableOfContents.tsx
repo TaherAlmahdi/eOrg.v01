@@ -65,7 +65,7 @@ return (
               // যদি খণ্ড না থাকে (সরাসরি অধ্যায়)
               <Link
                 href={`/book/${slug}/${vol.volumeId}/${vol.id}`}
-                className={`flex items-center gap-2 text-sm py-2 px-3 rounded transition-colors ${
+                className={`flex items-center gap-1 text-sm py-2 px-3 rounded transition-colors ${
                   vol.id === currentChapter 
                   ? 'bg-red-900 text-white shadow-sm font-bold' 
                   : 'text-blue-700 hover:bg-orange-50'

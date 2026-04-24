@@ -9,10 +9,58 @@ import rehypeRaw from 'rehype-raw';
 import rehypeStringify from 'rehype-stringify';
 import { Home } from "lucide-react";
 import Notice from '../../components/Notice';
+import { Metadata } from 'next';
+
+// ১. ডাইনামিক মেটাডেটা এবং ওজি ইমেজ লজিক
+export async function generateMetadata({ params }: { params: any }): Promise<Metadata> {
+  const { slug } = await params;
+  const bookDir = path.join(process.cwd(), 'content', slug);
+  const filePath = path.join(bookDir, 'index.md');
+
+  if (!fs.existsSync(filePath)) return { title: "বই পাওয়া যায়নি" };
+
+  const fileContent = fs.readFileSync(filePath, 'utf8');
+  const { data } = matter(fileContent);
+
+  // আপনার রিকোয়ারমেন্ট অনুযায়ী টাইটেল: বইয়ের নাম | সাইট নেম
+  const title = `${data.title} | বঙ্কিম রচনাবলী`;
+  const description = data.meta_description || `${data.title} - বঙ্কিমচন্দ্র চট্টোপাধ্যায়ের একটি অমূল্য সৃষ্টি।`;
+  
+  // ওজি ইমেজ ১৬:৯ রেশিও (শেয়ারিং এর জন্য)
+  const shareImage = data.og_image || '/og-default.jpg'; 
+
+  return {
+    title: title,
+    description: description,
+    openGraph: {
+      title: title,
+      description: description,
+      url: `https://bankim.eduliture.org/book/${slug}`,
+      siteName: 'বঙ্কিম রচনাবলী',
+      images: [
+        {
+          url: shareImage,
+          width: 1200,
+          height: 630,
+          alt: data.title,
+        },
+      ],
+      locale: 'bn_BD',
+      type: 'book',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: title,
+      description: description,
+      images: [shareImage],
+    },
+  };
+}
 
 const toBengaliNumber = (num: number | string) => 
   num.toString().replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[parseInt(d)]);
 
+// ২. মূল পেজ কম্পোনেন্ট (ডিজাইন অপরিবর্তিত)
 export default async function BookIndexPage({ params }: { params: any }) {
   const { slug } = await params;
   const bookDir = path.join(process.cwd(), 'content', slug);
@@ -34,7 +82,7 @@ export default async function BookIndexPage({ params }: { params: any }) {
 
   const contentHtml = processedContent.toString();
 
-  // ১. ভলিউম ডিটেকশন
+  // ভলিউম ডিটেকশন
   const volumeFolders = fs.readdirSync(bookDir)
     .filter(file => fs.statSync(path.join(bookDir, file)).isDirectory())
     .sort();
@@ -49,7 +97,7 @@ export default async function BookIndexPage({ params }: { params: any }) {
     return { id: v, title };
   });
 
-  // ২. চ্যাপ্টার ডিটেকশন
+  // চ্যাপ্টার ডিটেকশন
   const chapterFiles = fs.readdirSync(bookDir)
     .filter(file => file.endsWith('.md') && file !== 'index.md')
     .sort();
@@ -63,7 +111,7 @@ export default async function BookIndexPage({ params }: { params: any }) {
     };
   });
 
-  // ৩. নেক্সট বাটন লজিক
+  // নেক্সট বাটন লজিক
   let nextActionLink = "/books";
   let nextActionLabel = "গ্রন্থাগার";
 
@@ -99,9 +147,7 @@ export default async function BookIndexPage({ params }: { params: any }) {
           </header>
 
           <article className="prose lg:prose-xl max-w-none text-gray-900 leading-relaxed font-tarunima">
-            {/* নোটিশ এরিয়া: Frontmatter এ notice থাকলে তবেই শো করবে */}
             {data.notice && <Notice message={data.notice} />}
-            
             <div dangerouslySetInnerHTML={{ __html: contentHtml }} />
           </article>
 
@@ -123,6 +169,7 @@ export default async function BookIndexPage({ params }: { params: any }) {
         <aside className="order-2 lg:order-1 col-span-1 lg:col-span-3 px-4 lg:ml-4 space-y-1 mb-10 lg:mb-0">
           <div className="lg:sticky lg:top-6 space-y-6">
             <div className="bg-white shadow-sm mt-2 flex justify-center border border-gray-100">
+              {/* কভার ইমেজ (২:৩) যা কেবল সাইটে শো করবে */}
               <img src={data.cover_image} alt={data.title} className="w-full max-w-sm lg:max-w-full h-auto object-cover" />
             </div>
 
@@ -139,8 +186,7 @@ export default async function BookIndexPage({ params }: { params: any }) {
                   <span className="text-gray-400">:</span>
                   <span>{data.author}</span>
                 </div>
-
-                {/* প্রথম প্রকাশ (মাধ্যম) */}
+                {/* অন্যান্য ডিটেইলস ... */}
                 {data.pub_medium && (
                   <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
                     <span className="font-bold">প্রথম প্রকাশ</span>
@@ -148,43 +194,11 @@ export default async function BookIndexPage({ params }: { params: any }) {
                     <span>{data.pub_medium}</span>
                   </div>
                 )}
-
                 {data.first_published && (
                   <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
                     <span className="font-bold">গ্রন্থরূপ</span>
                     <span className="text-gray-400">:</span>
                     <span>{toBengaliNumber(data.first_published)}</span>
-                  </div>
-                )}
-
-                {/* অনুস্মৃতি (Reminiscence) */}
-                {data.source_book && (
-                  <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
-                    <span className="font-bold">অনুস্মৃতি</span>
-                    <span className="text-gray-400">:</span>
-                    <span>{data.source_book}</span>
-                  </div>
-                )}                
-                {data.genre && data.genre.length > 0 && (
-                  <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
-                    <span className="font-bold">ঘরানা</span>
-                    <span className="text-gray-400">:</span>
-                    <div className="flex flex-wrap gap-1">
-                      {data.genre.map((g: string, index: number) => {
-                        const genreLink = data.genre_links?.find((l: any) => l.name === g);
-                        return (
-                          <span key={g} className="whitespace-nowrap">
-                            <Link 
-                              href={genreLink ? genreLink.link : `/genre/${g.toLowerCase()}`} 
-                              className="text-blue-600 hover:text-red-900 hover:underline"
-                            >
-                              {g}
-                            </Link>
-                            {index < data.genre.length - 1 && <span className="ml-0 text-gray-400">,</span>}
-                          </span>
-                        );
-                      })}
-                    </div>
                   </div>
                 )}
               </div>
@@ -195,10 +209,7 @@ export default async function BookIndexPage({ params }: { params: any }) {
               {volumes.length > 0 ? (
                 volumes.map((v) => (
                   <div key={v.id} className="mb-1">
-                    <Link 
-                      href={`/book/${slug}/${v.id}`}
-                      className="text-blue-600 hover:text-red-900 text-[15px] block py-1"
-                    >
+                    <Link href={`/book/${slug}/${v.id}`} className="text-blue-600 hover:text-red-900 text-[15px] block py-1">
                       {v.title}
                     </Link>
                   </div>

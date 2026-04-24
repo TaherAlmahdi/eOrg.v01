@@ -18,15 +18,49 @@ type Props = {
 const toBengaliNumber = (num: number) => 
   num.toString().replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[parseInt(d)]);
 
+// ১. ডাইনামিক মেটাডেটা এবং ওজি ইমেজ লজিক
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, volume, chapter } = await params;
-  const chapterFile = path.join(process.cwd(), 'content', slug, volume, 'chapters', `${chapter}.md`);
-  if (!fs.existsSync(chapterFile)) return { title: 'অধ্যায় পাওয়া হয়নি' };
-  const fileContent = fs.readFileSync(chapterFile, 'utf8');
-  const { data: chapData } = matter(fileContent);
-  const bookIndexFile = path.join(process.cwd(), 'content', slug, 'index.md');
+  const rootDir = process.cwd();
+  
+  const bookIndexFile = path.join(rootDir, 'content', slug, 'index.md');
+  const volIndexFile = path.join(rootDir, 'content', slug, volume, `${volume}.md`);
+  const chapterFile = path.join(rootDir, 'content', slug, volume, 'chapters', `${chapter}.md`);
+
+  if (!fs.existsSync(chapterFile)) return { title: 'অধ্যায় পাওয়া যায়নি' };
+
+  // ডেটা সংগ্রহ
   const bookData = matter(fs.readFileSync(bookIndexFile, 'utf8')).data;
-  return { title: `${chapData.title || chapter} | ${bookData.title || slug}` };
+  const chapData = matter(fs.readFileSync(chapterFile, 'utf8')).data;
+  
+  let volTitle = volume.toUpperCase();
+  if (fs.existsSync(volIndexFile)) {
+    volTitle = matter(fs.readFileSync(volIndexFile, 'utf8')).data.title || volTitle;
+  }
+
+  // টাইটেল ফরম্যাট: পরিচ্ছেদ | খণ্ড | গ্রন্থ | সাইট টাইটেল
+  const fullTitle = `${chapData.title || chapter} | ${volTitle} | ${bookData.title} | বঙ্কিম রচনাবলী`;
+  const description = chapData.meta_description || `${bookData.title} গ্রন্থের ${volTitle}-এর অন্তর্গত ${chapData.title || chapter}।`;
+  
+  // ওজি ইমেজ লজিক: মূল গ্রন্থের og_image থাকলে সেটি, না থাকলে কভার ইমেজ
+  const shareImage = bookData.og_image || bookData.cover_image || '/og-default.jpg';
+
+  return {
+    title: fullTitle,
+    description: description,
+    openGraph: {
+      title: fullTitle,
+      description: description,
+      url: `https://bankim.eduliture.org/book/${slug}/${volume}/${chapter}`,
+      images: [{ url: shareImage }],
+      type: 'article',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: fullTitle,
+      images: [shareImage],
+    },
+  };
 }
 
 export default async function ChapterPage({ params }: Props) {
@@ -51,40 +85,32 @@ export default async function ChapterPage({ params }: Props) {
   const bookData = matter(fs.readFileSync(bookIndexFile, 'utf8')).data;
   const { data: chapData, content } = matter(fs.readFileSync(chapterFile, 'utf8'));
 
-  // ১. বর্তমান খণ্ডের টাইটেল বের করা
   let currentVolTitle = volume.toUpperCase();
   if (fs.existsSync(volIndexFile)) {
     currentVolTitle = matter(fs.readFileSync(volIndexFile, 'utf8')).data.title || currentVolTitle;
   }
 
-  // ২. নেভিগেশন লজিক: বর্তমান খণ্ডের অধ্যায়গুলো এবং পরবর্তী খণ্ড খুঁজে বের করা
   const allVolumes = fs.readdirSync(bookDir).filter(f => fs.statSync(path.join(bookDir, f)).isDirectory()).sort();
   const currentVolIndex = allVolumes.indexOf(volume);
   
   const currentVolChapters = fs.readdirSync(chaptersDir).filter(f => f.endsWith('.md')).sort();
   const currentChapterIndex = currentVolChapters.indexOf(`${chapter}.md`);
 
-  // Previous Link লজিক
   let prevLink = null;
   if (currentChapterIndex > 0) {
-    // বর্তমান খণ্ডের আগের অধ্যায়
     const prevChapSlug = currentVolChapters[currentChapterIndex - 1].replace('.md', '');
     const prevChapData = matter(fs.readFileSync(path.join(chaptersDir, `${prevChapSlug}.md`), 'utf8')).data;
     prevLink = { href: `/book/${slug}/${volume}/${prevChapSlug}`, title: prevChapData.title || prevChapSlug };
   } else {
-    // প্রথম অধ্যায় হলে বর্তমান খণ্ডের মূল পাতায় ফিরে যাবে
     prevLink = { href: `/book/${slug}/${volume}`, title: currentVolTitle };
   }
 
-  // Next Link লজিক
   let nextLink = null;
   if (currentChapterIndex < currentVolChapters.length - 1) {
-    // বর্তমান খণ্ডের পরের অধ্যায়
     const nextChapSlug = currentVolChapters[currentChapterIndex + 1].replace('.md', '');
     const nextChapData = matter(fs.readFileSync(path.join(chaptersDir, `${nextChapSlug}.md`), 'utf8')).data;
     nextLink = { href: `/book/${slug}/${volume}/${nextChapSlug}`, title: nextChapData.title || nextChapSlug };
   } else if (currentVolIndex < allVolumes.length - 1) {
-    // খণ্ড শেষ হলে পরবর্তী খণ্ডের মূল পাতায় যাবে
     const nextVolId = allVolumes[currentVolIndex + 1];
     let nextVolTitle = nextVolId.toUpperCase();
     const nextVolMeta = path.join(bookDir, nextVolId, `${nextVolId}.md`);
@@ -93,11 +119,9 @@ export default async function ChapterPage({ params }: Props) {
     }
     nextLink = { href: `/book/${slug}/${nextVolId}`, title: nextVolTitle };
   } else {
-    // বইয়ের একদম শেষ হলে গ্রন্থাগারে যাবে
     nextLink = { href: "/books", title: "গ্রন্থাগার" };
   }
 
-  // ৩. কন্টেন্ট প্রসেসিং
   const footnotes: string[] = [];
   const processedMarkdown = content.replace(/\[note\]([\s\S]*?)\[\/note\]/g, (_: string, noteText: string) => {
     footnotes.push(noteText.trim());
@@ -106,7 +130,6 @@ export default async function ChapterPage({ params }: Props) {
 
   const processedContent = await unified().use(remarkParse).use(remarkRehype, { allowDangerousHtml: true }).use(rehypeRaw).use(rehypeStringify).process(processedMarkdown);
 
-  // ৪. সাইডবার স্ট্রাকচার
   const nestedStructure = {
     bookTitle: bookData.title,
     currentVolume: volume,
@@ -161,11 +184,7 @@ export default async function ChapterPage({ params }: Props) {
                   </h4>
                   <ol className="bnlist flex flex-wrap gap-x-4 gap-y-0 list-outside ml-4 p-0 text-base text-gray-700 [list-style-type:bengali]">
                     {footnotes.map((note, i) => (
-                      <li 
-                        key={i} 
-                        id={`fn-${i + 1}`} 
-                        className="flex-auto min-w-[200px] max-w-full border-b-[1px] border-white pb-1 leading-relaxed"
-                      >
+                      <li key={i} id={`fn-${i + 1}`} className="flex-auto min-w-[200px] max-w-full border-b-[1px] border-white pb-1 leading-relaxed">
                         <span className="inline">
                           {note}
                           <a href={`#fnref-${i + 1}`} className="ml-2 text-blue-500 hover:text-red-700 transition-all">↩</a>
