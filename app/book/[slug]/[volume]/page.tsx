@@ -149,18 +149,18 @@ export default async function VolumePage({ params }: Props) {
       </nav>
 
       <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-0">
-        <aside className="order-2 lg:order-1 col-span-1 lg:col-span-3 px-4 lg:ml-4 space-y-1 mb-10 lg:mb-0">
+        <aside className="order-2 lg:order-1 col-span-1 lg:col-span-3 px-2 lg:ml-2 space-y-1 mb-1 lg:mb-1">
           <div className="lg:sticky lg:top-6 space-y-6">
-            <div className="bg-white shadow-sm mt-4 flex justify-center">
+            <div className="bg-white shadow-sm mt-2 flex justify-center">
               <img src={bookData.cover_image} alt={bookData.title} className="w-full max-w-sm lg:max-w-full h-auto object-contain" />
             </div>
-            <div className="bg-white max-h-[400px] overflow-y-auto font-tarunima p-2">
+            <div className="bg-white max-h-[400px] overflow-y-auto font-tarunima p-0">
               <h3 className="text-md font-bold border-b pb-2 mb-2 border-red-100 text-red-900">সূচিপত্র</h3>
               {volumesWithTitles.map((v) => (
                 <Link 
                   key={v.id}
                   href={`/book/${slug}/${v.id}`}
-                  className={`font-normal mb-1 px-3 py-2 block transition-all border-l-2 ${v.id === volume ? 'bg-red-50 border-red-900 text-red-900 font-bold' : 'bg-transparent border-transparent text-blue-600 hover:bg-gray-50'}`}
+                  className={`font-xl mb-1 px-1 py-1 block transition-all border-l-2 ${v.id === volume ? 'bg-red-50 border-red-900 text-red-900 font-bold' : 'bg-[#e0e0eb] border-transparent text-blue-600 hover:bg-gray-50'}`}
                 >
                   {v.title}
                 </Link>
