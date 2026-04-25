@@ -169,8 +169,8 @@
   }
 
   .title {
-    color: var(--accent-blue);
-    font-size: 1.25rem;
+    color: #52527a;
+    font-size: 1.15rem;
     line-height: normal;
     text-align: justify;
   }

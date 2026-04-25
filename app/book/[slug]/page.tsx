@@ -161,7 +161,7 @@ export default async function BookIndexPage({ params }: { params: any }) {
           </div>
         </section>
 
-        <aside className="order-2 lg:order-1 col-span-1 lg:col-span-3 px-4 lg:ml-4 space-y-1 mb-10 lg:mb-0">
+        <aside className="order-2 lg:order-1 col-span-1 lg:col-span-3 px-4 lg:ml-0 space-y-1 mb-10 lg:mb-0">
           <div className="lg:sticky lg:top-6 space-y-6">
             <div className="bg-white shadow-sm mt-2 flex justify-center border border-gray-100">
               <img src={data.cover_image} alt={data.title} className="w-full max-w-sm lg:max-w-full h-auto object-cover" />
@@ -208,8 +208,8 @@ export default async function BookIndexPage({ params }: { params: any }) {
               <h3 className="text-md font-bold border-b pb-2 mb-4 text-red-900">সূচিপত্র</h3>
               {volumes.length > 0 ? (
                 volumes.map((v) => (
-                  <div key={v.id} className="mb-1">
-                    <Link href={`/book/${slug}/${v.id}`} className="text-blue-600 hover:text-red-900 text-[15px] block py-1">
+                  <div key={v.id} className="mb-1 bg-[#e0e0eb] pl-1">
+                    <Link href={`/book/${slug}/${v.id}`} className="text-blue-600 hover:text-red-900 text-[16px] block py-1">
                       {v.title}
                     </Link>
                   </div>
