@@ -33,23 +33,26 @@
 /* ২. কম্পোনেন্ট লেয়ার - পুনর্বিন্যাসকৃত স্টাইল */
 @layer components {
 
-  /* --- সাধারণ টেক্সট এবং প্যারাগ্রাফ স্টাইল --- */
-  .first, .dcap, .normal {
-    font-size: 1.0rem;
-    line-height: 1.7;
-    color: var(--text-main);
-    margin-bottom: 0.5rem;
-  }
-
-  /* --- মার্জিন বিহীন ক্লাসসমূহ (.pc, .center, .right) --- */
-  .pc, .center, .right,  .pl, .pr,
+  /* --- টাইপোগ্রাফি সাইজ এবং রেসপন্সিভনেস --- */
+  .first, .dcap, .normal, .pc, .center, .right, .pl, .pr,
   ol.list, ol.bnlist, ol.plist {
     font-size: 1.0rem;
     line-height: 1.7;
     color: var(--text-main);
-    margin-bottom: 0; /* মার্জিন বাদ দেওয়া হয়েছে */
   }
 
+  /* মার্জিন কন্ট্রোল */
+  .first, .dcap, .normal {
+    margin-bottom: 0.5rem;
+    text-align: justify;
+  }
+
+  .pc, .center, .right, .pl, .pr, 
+  ol.list, ol.bnlist, ol.plist {
+    margin-bottom: 0;
+  }
+
+  /* ট্যাবলেট ভিউ */
   @media (min-width: 769px) {
     .first, .dcap, .normal, .pc, .center, .right, .pl, .pr,
     ol.list, ol.bnlist, ol.plist {
@@ -58,6 +61,7 @@
     }
   }
 
+  /* ডেস্কটপ ভিউ */
   @media (min-width: 1440px) {
     .first, .dcap, .normal, .pc, .center, .right, .pl, .pr,
     ol.list, ol.bnlist, ol.plist {
@@ -65,11 +69,7 @@
     }
   }
 
-  /* --- অ্যালাইনমেন্ট এবং ইনডেন্টেশন --- */
-  .first, .dcap, .normal {
-    text-align: justify;
-  }
-
+  /* --- অ্যালাইনমেন্ট এবং লেআউট --- */
   .normal {
     text-indent: 30px;
   }
@@ -78,37 +78,37 @@
     text-align: center;
   }
 
-  .pcg {
-  margin-top: 25px;
-  margin-bottom: 5px;
-  margin-left: 0;
-  margin-right: 0;
-  font-size: 1.1em;
-  text-align: center;
-  color: #2596be;
-}
-
-  .pl {
-  width: 50%;
-  text-align: left;
-  float: left;
-  margin-top: 0px;
-  margin-bottom: 0px;
-}
-
-.pr {
-  width: 50%;
-  text-align: right;
-  float: right;
-  margin-top: 0px;
-  margin-bottom: 0px;
-}
-
   .right {
     text-align: right;
   }
 
-  /* --- টাইপোগ্রাফি ইফেক্টস --- */
+  .pcg {
+    margin-top: 25px;
+    margin-bottom: 5px;
+    margin-left: 0;
+    margin-right: 0;
+    font-size: 1.1em;
+    text-align: center;
+    color: #2596be;
+  }
+
+  .pl {
+    width: 50%;
+    text-align: left;
+    float: left;
+    margin-top: 0px;
+    margin-bottom: 0px;
+  }
+
+  .pr {
+    width: 50%;
+    text-align: right;
+    float: right;
+    margin-top: 0px;
+    margin-bottom: 0px;
+  }
+
+  /* --- স্পেশাল টাইপোগ্রাফি ইফেক্টস --- */
   .first::first-letter {
     color: #a7373d;
     font-weight: bold;
@@ -175,20 +175,48 @@
     text-align: justify;
   }
 
-  span.gap, .gap {
-  display: inline-block;
-  width: 20px;
+  /* --- উদ্ধৃতি (Quote) স্টাইল --- */
+  div.quote,
+  div.quote .normal,
+  .quote .normal,
+  .quote .first,
+  .quote .right,
+  .quote {
+    color: #666666;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    font-style: normal;
+  }
+
+div.quote, .quote {
+    border-left: 3px solid #dddddd; 
+    margin-left: 20px;
+    padding-left: 10px;
 }
+
+
+  .quote .normal {
+    text-indent: 30px;
+  }
+
+  .quote .right {
+    text-align: right;
+  }
+
+  /* --- স্পেসিং ক্লাস --- */
+  span.gap, .gap {
+    display: inline-block;
+    width: 20px;
+  }
 
   span.vgap, .vgap {
-  display: inline-block;
+    display: inline-block;
     height: 20px; 
-}
+  }
 
-
-.gap-margin {
-  margin: 20px;
-}
+  .gap-margin {
+    margin: 20px;
+  }
 
   /* --- লিস্ট স্টাইল --- */
   ol.list, ol.bnlist, ol.plist {
@@ -201,13 +229,11 @@
   /* --- কবিতা (Poem) স্টাইল --- */
   .poem {
     width: 99%; 
-    margin: .5rem auto; /* কবিতার উপরে-নিচে গ্যাপের জন্য */
+    margin: .5rem auto;
     font-size: 1.0rem;
     line-height: 1.5;
-    
   }
 
-  /* কবিতার ভেতরের সব প্যারাগ্রাফের মার্জিন বাদ দেওয়া হলো */
   .poem p {
     margin: 0 !important;
     padding: 0 !important;
@@ -215,12 +241,10 @@
 
   .poem .en {
     font-family: var(--font-sabrina) !important; 
-    
   }
 
   .poem .bn {
     font-family: var(--font-tarunima); 
-    
   }
 
   @media (min-width: 769px) {

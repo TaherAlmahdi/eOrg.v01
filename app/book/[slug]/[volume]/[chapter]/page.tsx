@@ -9,6 +9,7 @@ import rehypeStringify from 'rehype-stringify';
 import Link from 'next/link';
 import { Home, ChevronLeft, ChevronRight, List } from "lucide-react";
 import { Metadata } from 'next';
+import Notice from '../../../../components/Notice'; 
 import TableOfContents from '../../../../components/TableOfContents';
 
 type Props = {
@@ -18,7 +19,7 @@ type Props = {
 const toBengaliNumber = (num: number) => 
   num.toString().replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[parseInt(d)]);
 
-// ১. ডাইনামিক মেটাডেটা এবং ওজি ইমেজ লজিক (meta_title সাপোর্ট সহ)
+// ১. ডাইনামিক মেটাডেটা লজিক
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, volume, chapter } = await params;
   const rootDir = process.cwd();
@@ -29,7 +30,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!fs.existsSync(chapterFile)) return { title: 'অধ্যায় পাওয়া যায়নি' };
 
-  // ডেটা সংগ্রহ
   const bookData = matter(fs.readFileSync(bookIndexFile, 'utf8')).data;
   const chapData = matter(fs.readFileSync(chapterFile, 'utf8')).data;
   
@@ -38,10 +38,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     volTitle = matter(fs.readFileSync(volIndexFile, 'utf8')).data.title || volTitle;
   }
 
-  // লজিক: meta_title থাকলে তাই হুবহু থাকবে, নাহলে ডাইনামিক টাইটেল তৈরি হবে
   const fullTitle = chapData.meta_title || `${chapData.title || chapter} | ${volTitle} | ${bookData.title}`;
   const description = chapData.meta_description || `${bookData.title} গ্রন্থের ${volTitle}-এর অন্তর্গত ${chapData.title || chapter}।`;
-  
   const shareImage = bookData.og_image || bookData.cover_image || '/og-default.jpg';
 
   return {
@@ -85,14 +83,19 @@ export default async function ChapterPage({ params }: Props) {
   const bookData = matter(fs.readFileSync(bookIndexFile, 'utf8')).data;
   const { data: chapData, content } = matter(fs.readFileSync(chapterFile, 'utf8'));
 
+  // --- নোটিশ লজিক শুরু (সংশোধিত) ---
+  // শুধুমাত্র চ্যাপ্টারের ফ্রন্টমেটারে নোটিশ থাকলে দেখাবে, ভলিউম থেকে নেবে না।
+  let activeNotice = chapData.notice || null;
   let currentVolTitle = volume.toUpperCase();
+
   if (fs.existsSync(volIndexFile)) {
-    currentVolTitle = matter(fs.readFileSync(volIndexFile, 'utf8')).data.title || currentVolTitle;
+    const volFileData = matter(fs.readFileSync(volIndexFile, 'utf8')).data;
+    currentVolTitle = volFileData.title || currentVolTitle;
   }
+  // --- নোটিশ লজিক শেষ ---
 
   const allVolumes = fs.readdirSync(bookDir).filter(f => fs.statSync(path.join(bookDir, f)).isDirectory()).sort();
   const currentVolIndex = allVolumes.indexOf(volume);
-  
   const currentVolChapters = fs.readdirSync(chaptersDir).filter(f => f.endsWith('.md')).sort();
   const currentChapterIndex = currentVolChapters.indexOf(`${chapter}.md`);
 
@@ -128,7 +131,12 @@ export default async function ChapterPage({ params }: Props) {
     return `<sup class="footnote-ref"><a href="#fn-${footnotes.length}" id="fnref-${footnotes.length}" class="text-[#7D3C98] font-bold px-0.5">[${toBengaliNumber(footnotes.length)}]</a></sup>`;
   });
 
-  const processedContent = await unified().use(remarkParse).use(remarkRehype, { allowDangerousHtml: true }).use(rehypeRaw).use(rehypeStringify).process(processedMarkdown);
+  const processedContent = await unified()
+    .use(remarkParse)
+    .use(remarkRehype, { allowDangerousHtml: true })
+    .use(rehypeRaw)
+    .use(rehypeStringify)
+    .process(processedMarkdown);
 
   const nestedStructure = {
     bookTitle: bookData.title,
@@ -171,20 +179,20 @@ export default async function ChapterPage({ params }: Props) {
             <h1 className="text-xl md:text-2xl font-normal font-sabrina text-gray-900 leading-tight">
               {chapData.title || chapter} {chapData.subtitle ? `: ${chapData.subtitle}` : ''}
             </h1>
-            <div className="w-50 h-[2px] bg-red-900 mx-auto mt-2"></div>
+            <div className="w-40 h-[2px] bg-red-900 mx-auto mt-2"></div>
           </header>
-
-          <article className="prose lg:prose-xl max-w-none text-gray-900 leading-relaxed font-tarunima">
+          
+          {activeNotice && <Notice message={activeNotice} />}
+          
+          <article className="prose lg:prose-xl max-w-none text-gray-900 leading-relaxed font-tarunima mt-6">
             <div dangerouslySetInnerHTML={{ __html: processedContent.toString() }} />
 
             {footnotes.length > 0 && (
-              <div className="mt-4 pt-2 border-t-2 border-orange-200 font-tarunima">
-                <h4 className="text-lg font-bold border-b-[1px] border-orange-200 text-red-900 mb-2">
-                  টিকা ও মন্তব্য
-                </h4>
-                <ol className="bnlist flex flex-wrap gap-x-4 gap-y-0 list-outside ml-4 p-0 text-base text-gray-700 [list-style-type:bengali]">
+              <div className="mt-8 pt-4 border-t-2 border-orange-200">
+                <h4 className="text-lg font-bold text-red-900 mb-4">টিকা ও মন্তব্য</h4>
+                <ol className="bnlist flex flex-wrap gap-x-8 gap-y-2 list-outside ml-6 p-0 text-base text-gray-700 [list-style-type:bengali]">
                   {footnotes.map((note, i) => (
-                    <li key={i} id={`fn-${i + 1}`} className="flex-auto min-w-[200px] max-w-full border-b-[1px] border-white pb-1 leading-relaxed">
+                    <li key={i} id={`fn-${i + 1}`} className="flex-auto min-w-[250px] border-b border-orange-50 pb-2">
                       <span className="inline">
                         {note}
                         <a href={`#fnref-${i + 1}`} className="ml-2 text-blue-500 hover:text-red-700 transition-all">↩</a>
@@ -195,7 +203,7 @@ export default async function ChapterPage({ params }: Props) {
               </div>
             )}
 
-            <div className="mt-2 pt-2 border-t border-orange-200 grid grid-cols-2 gap-4 font-tarunima">
+            <div className="mt-10 pt-6 border-t border-orange-200 grid grid-cols-2 gap-4">
               <div>
                 {prevLink && (
                   <Link href={prevLink.href} className="group flex items-center gap-2 p-3 rounded hover:bg-white transition-all border border-transparent hover:border-orange-100">
@@ -218,12 +226,14 @@ export default async function ChapterPage({ params }: Props) {
 
         <aside className="order-2 lg:order-1 col-span-1 lg:col-span-3 px-4 lg:ml-4 space-y-1">
           <div className="lg:sticky lg:top-6 space-y-6">
-            <div className="bg-white shadow-sm mt-4">
-              <img src={bookData.cover_image} alt={bookData.title} className="w-full max-w-sm lg:max-w-full h-auto object-cover mx-auto" />
+            <div className="bg-white shadow-sm mt-4 p-1">
+              <img src={bookData.cover_image} alt={bookData.title} className="w-full h-auto object-cover" />
             </div>
-            <div className="bg-white font-tarunima pb-10">
-              <h3 className="text-md font-bold border-b pb-2 mb-2 text-red-900 flex items-center gap-2 mt-4"><List size={18} /> {bookData.title}</h3>
-              <div className="max-h-[500px] overflow-y-auto">
+            <div className="bg-white font-tarunima p-4 shadow-sm min-h-[400px]">
+              <h3 className="text-md font-bold border-b pb-2 mb-2 text-red-900 flex items-center gap-2">
+                <List size={18} /> সূচিপত্র
+              </h3>
+              <div className="max-h-[60vh] overflow-y-auto custom-scrollbar">
                 <TableOfContents structure={nestedStructure} currentChapter={chapter} slug={slug} />
               </div>
             </div>
