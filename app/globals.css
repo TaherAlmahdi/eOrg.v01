@@ -30,18 +30,17 @@
   }
 }
 
-/* ২. কম্পোনেন্ট লেয়ার - পুনর্বিন্যাসকৃত স্টাইল */
+/* ২. কম্পোনেন্ট লেয়ার */
 @layer components {
 
-  /* --- টাইপোগ্রাফি সাইজ এবং রেসপন্সিভনেস --- */
+  /* --- বেসিক টাইপোগ্রাফি (মোবাইল - ডিফল্ট) --- */
   .first, .dcap, .normal, .pc, .center, .right, .pl, .pr,
   ol.list, ol.bnlist, ol.plist {
-    font-size: 1.0rem;
+    font-size: 1.0rem; /* মোবাইলে ছোট ফন্ট */
     line-height: 1.7;
     color: var(--text-main);
   }
 
-  /* মার্জিন কন্ট্রোল */
   .first, .dcap, .normal {
     margin-bottom: 0.5rem;
     text-align: justify;
@@ -52,29 +51,30 @@
     margin-bottom: 0;
   }
 
-  /* ট্যাবলেট ভিউ */
+  /* --- ট্যাবলেট ভিউ (৭৬৯ পিক্সেল থেকে) --- */
   @media (min-width: 769px) {
     .first, .dcap, .normal, .pc, .center, .right, .pl, .pr,
     ol.list, ol.bnlist, ol.plist {
-      font-size: 1.2rem;
+      font-size: 1.15rem; /* মোবাইলের চেয়ে একটু বড় */
       line-height: 1.6;
     }
- div.quote,
-  div.quote .normal,
-  .quote .normal,
-  .quote .first,
-  .quote .right,
-  .quote {
-    font-size: 0.9rem; 
-line-height: 1.5;
-  }
+
+    div.quote,
+    div.quote .normal,
+    .quote .normal,
+    .quote .first,
+    .quote .right,
+    .quote {
+      font-size: 0.9rem; 
+      line-height: 1.5;
+    }
   }
 
-  /* ডেস্কটপ ভিউ */
+  /* --- ডেস্কটপ ভিউ (১৪৪০ পিক্সেল থেকে) --- */
   @media (min-width: 1440px) {
     .first, .dcap, .normal, .pc, .center, .right, .pl, .pr,
     ol.list, ol.bnlist, ol.plist {
-      font-size: 1.25rem;
+      font-size: 1.25rem; /* সবচেয়ে বড় ফন্ট */
     }
   }
 
@@ -105,16 +105,12 @@ line-height: 1.5;
     width: 50%;
     text-align: left;
     float: left;
-    margin-top: 0px;
-    margin-bottom: 0px;
   }
 
   .pr {
     width: 50%;
     text-align: right;
     float: right;
-    margin-top: 0px;
-    margin-bottom: 0px;
   }
 
   /* --- স্পেশাল টাইপোগ্রাফি ইফেক্টস --- */
@@ -142,11 +138,10 @@ line-height: 1.5;
   @media (min-width: 769px) {
     .dcap::first-letter {
       font-size: 2.8rem;
-      margin-right: 5px;
     }
   }
 
-  /* --- টাইটেল এবং সাবটাইটেল --- */
+  /* --- টাইটেল এবং সাবটাইটেল (রেসপন্সিভ) --- */
   .bname, .wname, .subtitle {
     font-family: var(--font-sabrina) !important;
     text-align: center;
@@ -155,138 +150,109 @@ line-height: 1.5;
   }
 
   .bname {
-    font-size: 2.2rem;
+    font-size: 1.8rem; /* মোবাইল */
     color: var(--accent-gold);
     letter-spacing: 2px;
     margin: 1.5rem 0;
   }
 
   .wname {
-    font-size: 2.0rem;
+    font-size: 1.6rem; /* মোবাইল */
     color: var(--accent-gold);
     letter-spacing: 2px;
     margin: 1.5rem 0;
   }
 
+  @media (min-width: 769px) {
+    .bname { font-size: 2.2rem; }
+    .wname { font-size: 2.0rem; }
+  }
+
   .subtitle {
     color: var(--accent-red);
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     font-weight: 700;
     margin-top: .5rem;
     margin-bottom: .7rem;
     border-bottom: 1px solid #eee;
   }
 
+  @media (min-width: 769px) {
+    .subtitle { font-size: 1.4rem; }
+  }
+
   .title {
     color: #52527a;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     line-height: normal;
     text-align: justify;
     font-weight: 600;
   }
 
   /* --- উদ্ধৃতি (Quote) স্টাইল --- */
-  div.quote,
-  div.quote .normal,
-  .quote .normal,
-  .quote .first,
-  .quote .right,
-  .quote {
-    color: #666666;
-    font-size: 1.1rem;
-    line-height: 1.6;
-    font-style: normal;
-  }
-
-div.quote, .quote {
+  div.quote, .quote {
     border-left: 3px solid #dddddd; 
     margin-left: 20px;
     padding-left: 10px;
-}
-
-
-  .quote .normal {
-    text-indent: 30px;
+    color: #666666;
+    font-size: 0.95rem; /* মোবাইল */
+    line-height: 1.6;
   }
 
-  .quote .right {
-    text-align: right;
-  }
-
-  /* --- স্পেসিং ক্লাস --- */
-  span.gap, .gap {
-    display: inline-block;
-    width: 20px;
-  }
-
-  span.vgap, .vgap {
-    display: inline-block;
-    height: 20px; 
-  }
-
-  .gap-margin {
-    margin: 20px;
-  }
-
-  /* --- লিস্ট স্টাইল --- */
-  ol.list, ol.bnlist, ol.plist {
-    margin-left: 55px;
-    list-style-type: bengali;
-    list-style-position: outside;
-    text-align: justify;
-  }
+  .quote .normal { text-indent: 30px; }
+  .quote .right { text-align: right; }
 
   /* --- কবিতা (Poem) স্টাইল --- */
   .poem {
-    width: 99%; 
+    width: 90%; 
     margin: .5rem auto;
-    font-size: 1.0rem;
+    font-size: 1.0rem; /* মোবাইল */
     line-height: 1.5;
   }
 
-  .poem p {
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  .poem .en {
-    font-family: var(--font-sabrina) !important; 
-  }
-
-  .poem .bn {
-    font-family: var(--font-tarunima); 
-  }
+  .poem p { margin: 0 !important; padding: 0 !important; }
+  .poem .en { font-family: var(--font-sabrina) !important; }
+  .poem .bn { font-family: var(--font-tarunima); }
 
   @media (min-width: 769px) {
     .poem {
-      width: 50%;
-      font-size: 1.2rem;
+      width: 60%;
+      font-size: 1.15rem; /* ট্যাবলেট */
     }
-div.quote,
-  div.quote .normal,
-  .quote .normal,
-  .quote .first,
-  .quote .right,
-  .quote {
-    font-size: 0.8rem;
-line-height: 1.4;
-  }
   }
 
   @media (min-width: 1440px) {
     .poem {
-      font-size: 1.25rem; 
-      font-family: 'tarunima', 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', 'Arial', 'sans-serif';
+      width: 50%;
+      font-size: 1.25rem; /* ডেস্কটপ */
     }
- 
   }
+
+  /* --- লিস্ট এবং গ্যাপ --- */
+  ol.list, ol.bnlist, ol.plist {
+    margin-left: 35px; /* মোবাইলে একটু কম */
+    list-style-type: bengali;
+    list-style-position: outside;
+  }
+
+  @media (min-width: 769px) {
+    ol.list, ol.bnlist, ol.plist { margin-left: 55px; }
+  }
+
+  span.gap, .gap { display: inline-block; width: 20px; }
+  span.vgap, .vgap { display: inline-block; height: 20px; }
+  .gap-margin { margin: 20px; }
 
   /* --- সমাপ্তি চিহ্ন --- */
   .theend, .end {
     display: block;
-    width: 200px;
-    margin: 60px auto;
+    width: 150px;
+    margin: 40px auto;
     opacity: 0.6;
     content: url('/theend.png');
+  }
+
+  @media (min-width: 769px) {
+    .theend, .end { width: 200px; margin: 60px auto; }
   }
 }
