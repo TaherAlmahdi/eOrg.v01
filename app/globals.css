@@ -59,6 +59,14 @@
       font-size: 1.2rem;
       line-height: 1.6;
     }
+ div.quote,
+  div.quote .normal,
+  .quote .normal,
+  .quote .first,
+  .quote .right,
+  .quote {
+    font-size: 0.9rem; 
+  }
   }
 
   /* ডেস্কটপ ভিউ */
@@ -260,6 +268,14 @@ div.quote, .quote {
       font-size: 1.25rem; 
       font-family: 'tarunima', 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', 'Arial', 'sans-serif';
     }
+ div.quote,
+  div.quote .normal,
+  .quote .normal,
+  .quote .first,
+  .quote .right,
+  .quote {
+    font-size: 0.8rem;
+  }
   }
 
   /* --- সমাপ্তি চিহ্ন --- */
