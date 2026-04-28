@@ -188,11 +188,11 @@ export default async function ChapterPage({ params }: Props) {
             <div dangerouslySetInnerHTML={{ __html: processedContent.toString() }} />
 
             {footnotes.length > 0 && (
-              <div className="mt-8 pt-4 border-t-2 border-orange-200">
-                <h4 className="text-lg font-bold text-red-900 mb-4">টিকা ও মন্তব্য</h4>
-                <ol className="bnlist flex flex-wrap gap-x-8 gap-y-2 list-outside ml-6 p-0 text-base text-gray-700 [list-style-type:bengali]">
+              <div className="mt-2 pt-2 border-t-2 border-orange-200">
+                <h4 className="text-lg font-bold text-red-900 mb-1">টিকা ও মন্তব্য</h4>
+                <ol className="bnlist flex flex-wrap gap-x-2 gap-y-2 list-outside ml-6 p-0 text-base text-gray-700 [list-style-type:bengali]">
                   {footnotes.map((note, i) => (
-                    <li key={i} id={`fn-${i + 1}`} className="flex-auto min-w-[250px] border-b border-orange-50 pb-2">
+                    <li key={i} id={`fn-${i + 1}`} className="flex-auto min-w-[250px] border-b border-white pb-0">
                       <span className="inline">
                         {note}
                         <a href={`#fnref-${i + 1}`} className="ml-2 text-blue-500 hover:text-red-700 transition-all">↩</a>
@@ -203,7 +203,7 @@ export default async function ChapterPage({ params }: Props) {
               </div>
             )}
 
-            <div className="mt-10 pt-6 border-t border-orange-200 grid grid-cols-2 gap-4">
+            <div className="mt-2 pt-2 border-t border-orange-200 grid grid-cols-2 gap-1">
               <div>
                 {prevLink && (
                   <Link href={prevLink.href} className="group flex items-center gap-2 p-3 rounded hover:bg-white transition-all border border-transparent hover:border-orange-100">
