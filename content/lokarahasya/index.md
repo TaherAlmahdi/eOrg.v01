@@ -5,9 +5,9 @@ type: "book_index"
 slug: "lok-rahasya"
 first_published: 1874
 source_book: "পর্ষদ সংস্করণ, সংশোধিত দ্বাদশ মুদ্রণঃ আশ্বিন ১৪০১"
-genre: ["প্রবন্ধ", "রম্য সাহিত্য"]
+genre: ["প্রবন্ধাবলী", "রম্য সাহিত্য"]
 genre_links: 
-  - { name: "প্রবন্ধ", link: "/genre/essays" }
+  - { name: "প্রবন্ধাবলী", link: "/genre/essays" }
   - { name: "রম্য সাহিত্য", link: "/genre/humor" }
 cover_image: "/cover/lokrahasya.webp"
 meta_description: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়ের অনবদ্য ব্যঙ্গাত্মক প্রবন্ধ সংকলন 'লোকরহস্য'। হাস্যরসের অন্তরালে উনিশ শতকের বাঙালি সমাজ, সংস্কৃতি ও মানুষের ভণ্ডামির এক তীক্ষ্ণ বিশ্লেষণ।"
