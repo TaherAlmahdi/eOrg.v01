@@ -4,6 +4,8 @@ author: "বঙ্কিমচন্দ্র চট্টোপাধ্যা�
 type: "book_index"
 slug: "rajmohans-wife"
 first_published: 1864
+pub_medium: "Indian Field পত্রিকা"
+source_book: "Wikisource"
 sn: 01
 genre: ["সামাজিক উপন্যাস", "উপন্যাস"]
 genre_links: 

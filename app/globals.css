@@ -13,6 +13,7 @@
     --bg-purple-light: #f3ebf7;
     --text-main: #1a1a1a;
     --accent-blue: #2596be;
+    --icon-space: 20px; /* ভেরিয়েবল যোগ করা হয়েছে */
   }
 
   @media (prefers-color-scheme: dark) {
@@ -33,6 +34,16 @@
 }
 
 @layer components {
+  /* লিংকের স্টাইল */
+  .normal a, .first a, .dcap a {
+    color: #cc0044;
+  }
+  .normal a:hover, .first a:hover, .dcap a:hover {
+    color: #80002a;
+  }
+.first::first-letter {
+  color: #a7373d;
+}
   /* বেসিক টাইপোগ্রাফি */
   .first, .dcap, .normal, .pc, .center, .right, .pl, .pr,
   ol.list, ol.bnlist, ol.plist, ul.custom-list {
@@ -57,26 +68,24 @@
     text-align: justify;
     font-weight: 600;
   }
+
   strong {
     color: #52527a;
     font-size: inherit;
     line-height: inherit;
     text-align: inherit;
-    
-  }  
-
-  ul.custom-list {font-size: 1rem;} 
+  }
 
   /* উদ্ধৃতি (Quote) */
   div.quote, .quote {
-    border-left: 3px solid #dddddd; 
+    border-left: 3px solid #dddddd;
     margin-left: 15px;
     padding-left: 10px;
     color: #666666;
   }
 
   div.quote, .quote, .quote .normal, .quote .first, .quote .right {
-    font-size: 0.9rem; 
+    font-size: 0.9rem;
     line-height: 1.5;
   }
 
@@ -86,7 +95,7 @@
     line-height: 1;
     font-size: 2.2rem;
     color: var(--accent-purple);
-    font-family: var(--font-mallika); 
+    font-family: var(--font-mallika);
     padding: 4px 8px;
     margin-right: 8px;
     background: var(--bg-purple-light);
@@ -107,7 +116,7 @@
 
   /* কবিতা (Poem) */
   .poem {
-    width: 95%; 
+    width: 95%;
     margin: 1rem auto;
     font-size: 1.0rem;
   }
@@ -129,7 +138,6 @@
     margin-left: 35px;
     list-style-type: bengali;
   }
- 
 
   .theend, .end {
     display: block;
@@ -139,105 +147,75 @@
     content: url('/theend.png');
   }
 
-/* কাস্টম লিস্ট (Flower Bullet) */
+  /* কাস্টম লিস্ট */
   ul.custom-list {
     list-style: none;
-    margin-left: 25px;   /* পুরো লিস্টটি বাম থেকে ডানে সরানোর জন্য */
+    margin-left: 25px;
     margin-bottom: 0rem;
     padding-left: 0px;
   }
 
   ul.custom-list li {
     position: relative;
-    padding-left: 20px;  /* আইকন এবং টেক্সটের মধ্যবর্তী ফাঁকা জায়গা */
-    margin-bottom: 0px;
+    padding-left: 20px;
     line-height: 1.6;
     font-size: 1.15rem;
     color: var(--text-main);
   }
 
-  ul.custom-list li::before {
-    content: "\2740"; 
+  ul.custom-list li::before, 
+  .sidebar ul li:before,
+  ul.cont li:before {
+    content: "❀";
     display: inline-block;
-    margin-left: calc( var(--icon-space) * -1 );
-     width: var(--icon-space);
+    width: var(--icon-space);
+    margin-left: calc(var(--icon-space) * -1);
     margin-right: 10px;
     color: #2596be;
-    
   }
 
-    ul.custom-list li::first-letter {
-    margin-left: 15px;
-       
+  ul.cont li {
+    margin-bottom: 2px;
+    border: 1px solid #ebf9f6;
+    background: #ebf9f6;
+    padding: 5px 5px 1px 7px;
+    list-style: none;
   }
-
- .sidebar ul li:before{
-  display: inline-block;
-  margin-left: calc( var(--icon-space) * -1 );
-  width: var(--icon-space);
-  content: "❀";
-  margin-right: 10px;
-  color: #2596be;
-}
 }
 
 /* ==========================================
-   ২. ট্যাবলেট ভিউ কোড (Tablet - 769px+)
+   ২. ট্যাবলেট ভিউ (769px+)
    ========================================== */
 @media (min-width: 769px) {
   @layer components {
     .first, .dcap, .normal, .pc, .center, .right, .pl, .pr,
     ol.list, ol.bnlist, ol.plist {
       font-size: 1.2rem;
-      line-height: 1.6;
     }
 
-    .title {
-      font-size: 1.25rem;
-    }
+    .title { font-size: 1.25rem; }
 
     div.quote, .quote, .quote .normal, .quote .first, .quote .right {
       font-size: 1.0rem;
-      line-height: 1.6;
-    }
-
-    div.quote, .quote {
-      margin-left: 25px;
     }
 
     .dcap::first-letter {
       font-size: 2.8rem;
       padding: 6px 10px;
-      margin-right: 10px;
     }
 
     .bname { font-size: 2.2rem; }
     .wname { font-size: 2.0rem; }
     .subtitle { font-size: 1.4rem; }
 
-    .poem {
-      width: 60%;
-      font-size: 1.15rem;
-    }
+    .poem { width: 60%; font-size: 1.15rem; }
 
-    ol.list, ol.bnlist, ol.plist {
-      margin-left: 55px;
-    }
-
-    .theend, .end {
-      width: 200px;
-      margin: 60px auto;
-    }
-
-    ul.custom-list li {
-      font-size: 1.25rem;
-      padding-left: 10px;
-    }
+    ul.custom-list li { font-size: 1.25rem; }
   }
 }
 
 /* ==========================================
-   ৩. ডেস্কটপ ভিউ কোড (Desktop - 1440px+)
+   ৩. ডেস্কটপ ভিউ (1440px+)
    ========================================== */
 @media (min-width: 1440px) {
   @layer components {
@@ -246,35 +224,8 @@
       font-size: 1.25rem;
     }
 
-    .title {
-      font-size: 1.5rem;
-    }
+    .title { font-size: 1.5rem; }
 
-    div.quote, .quote, .quote .normal, .quote .first, .quote .right {
-      font-size: 1.1rem;
-    }
-
-    .poem {
-      width: 50%;
-      font-size: 1.25rem;
-    }
-
-    ul.custom-list li {
-      font-size: 1.25rem;
-    }
+    .poem { width: 50%; font-size: 1.25rem; }
   }
-}
-
-
-ul.cont li{
- margin-bottom: 2px; border: 1px solid #ebf9f6; background: #ebf9f6; padding: 5px 5px 1px 7px; 
-}
-
-ul.cont li:before{
-  display: inline-block;
-  margin-left: calc( var(--icon-space) * -1 );
-  width: var(--icon-space);
-  content: "❀";
-  margin-right: 10px;
-  color: #2596be;
 }
