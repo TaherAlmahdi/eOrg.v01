@@ -201,6 +201,35 @@ export default async function BookIndexPage({ params }: { params: any }) {
                     <span>{toBengaliNumber(data.source_book)}</span>
                   </div>
                 )}
+                {/* ঘরানা (Genre) সেকশন আপডেট */}
+                {data.genre && (
+                  <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
+                    <span className="font-bold">ঘরানা</span>
+                    <span className="text-gray-400">:</span>
+                    <span className="flex flex-wrap gap-x-1">
+                      {Array.isArray(data.genre) ? (
+                        data.genre.map((g, index) => {
+                          // genre_links থেকে ম্যাচিং লিঙ্ক খোঁজা
+                          const linkObj = data.genre_links?.find((l: any) => l.name === g);
+                          return (
+                            <span key={index}>
+                              {linkObj ? (
+                                <Link href={linkObj.link} className="text-blue-600 hover:underline">
+                                  {toBengaliNumber(g)}
+                                </Link>
+                              ) : (
+                                toBengaliNumber(g)
+                              )}
+                              {index < data.genre.length - 1 && <span className="mr-1">,</span>}
+                            </span>
+                          );
+                        })
+                      ) : (
+                        toBengaliNumber(data.genre)
+                      )}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
 
