@@ -127,6 +127,14 @@
   .pl { width: 50%; float: left; text-align: left; }
   .pr { width: 50%; float: right; text-align: right; }
   
+  .hgap {
+    margin: 0 10%;
+  }
+
+  .pgap {
+    margin: 0 50px;
+  }
+
   .pcg {
     margin: 25px 0 5px 0;
     font-size: 1.1em;

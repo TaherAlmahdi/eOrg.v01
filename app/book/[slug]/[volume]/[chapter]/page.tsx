@@ -192,7 +192,7 @@ export default async function ChapterPage({ params }: Props) {
                 <h4 className="text-lg font-bold text-red-900 mb-1">টিকা ও মন্তব্য</h4>
                 <ol className="bnlist flex flex-wrap gap-x-2 gap-y-2 list-outside ml-6 p-0 text-base text-gray-700 [list-style-type:bengali]">
                   {footnotes.map((note, i) => (
-                    <li key={i} id={`fn-${i + 1}`} className="flex-auto min-w-[250px] border-b border-white pb-0">
+                    <li key={i} id={`fn-${i + 1}`} className="flex-auto min-w-[250px] border-b border-white text-justify">
                       <span className="inline">
                         {note}
                         <a href={`#fnref-${i + 1}`} className="ml-2 text-blue-500 hover:text-red-700 transition-all">↩</a>
