@@ -212,17 +212,17 @@ export default async function VolumePage({ params }: Props) {
             </div>
           </div>
 
-          <div className="mt-2 pt-2 border-t border-orange-200 grid grid-cols-2 gap-4 font-tarunima">
+          <div className="mt-2 pt-2 border-t border-orange-200 grid grid-cols-2 gap-1 font-tarunima">
             <div>
               {prevVol ? (
-                <Link href={`/book/${slug}/${prevVol.id}`} className="group flex items-center gap-2 p-3 rounded-lg hover:bg-white transition-all border border-transparent hover:border-orange-100">
+                <Link href={`/book/${slug}/${prevVol.id}`} className="group flex items-center gap-1 p-2 rounded-lg hover:bg-white transition-all border border-transparent hover:border-orange-100">
                   <ChevronLeft size={18} className="text-gray-400 group-hover:text-red-900 shrink-0" />
                   <span className="text-sm md:text-base font-bold text-blue-600 group-hover:text-red-900 line-clamp-1">
                     {prevVol.title}
                   </span>
                 </Link>
               ) : (
-                <Link href={`/book/${slug}`} className="group flex items-center gap-2 p-3 rounded-lg hover:bg-white transition-all border border-transparent hover:border-orange-100">
+                <Link href={`/book/${slug}`} className="group flex items-center gap-1 p-2 rounded-lg hover:bg-white transition-all border border-transparent hover:border-orange-100">
                   <ChevronLeft size={18} className="text-gray-400 group-hover:text-red-900 shrink-0" />
                   <span className="text-sm md:text-base font-bold text-blue-600 group-hover:text-red-900 line-clamp-1">
                     {bookData.title}
@@ -233,14 +233,14 @@ export default async function VolumePage({ params }: Props) {
 
             <div className="text-right">
               {firstChapter ? (
-                <Link href={`/book/${slug}/${volume}/${firstChapter.slug}`} className="group flex items-center justify-end gap-2 p-3 rounded-lg hover:bg-white transition-all border border-transparent hover:border-orange-100">
+                <Link href={`/book/${slug}/${volume}/${firstChapter.slug}`} className="group flex items-center justify-end gap-1 p-2 rounded-lg hover:bg-white transition-all border border-transparent hover:border-orange-100">
                   <span className="text-sm md:text-base font-bold text-blue-600 group-hover:text-red-900 line-clamp-1">
                     {firstChapter.title}
                   </span>
                   <ChevronRight size={18} className="text-gray-400 group-hover:text-red-900 shrink-0" />
                 </Link>
               ) : nextVol ? (
-                <Link href={`/book/${slug}/${nextVol.id}`} className="group flex items-center justify-end gap-2 p-3 rounded-lg hover:bg-white transition-all border border-transparent hover:border-orange-100">
+                <Link href={`/book/${slug}/${nextVol.id}`} className="group flex items-center justify-end gap-1 p-2 rounded-lg hover:bg-white transition-all border border-transparent hover:border-orange-100">
                   <span className="text-sm md:text-base font-bold text-blue-600 group-hover:text-red-900 line-clamp-1">
                     {nextVol.title}
                   </span>

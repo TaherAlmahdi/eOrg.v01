@@ -172,7 +172,7 @@ export default async function BookIndexPage({ params }: { params: any }) {
             
             <Link 
               href={nextActionLink} 
-              className="bg-red-900 text-white px-5 py-3 rounded font-bold hover:bg-red-800 transition-all flex items-center group shadow-md text-sm md:text-base max-w-[60%]"
+              className="bg-red-900 text-white px-2 py-1 rounded font-normal hover:bg-red-800 transition-all flex items-center group shadow-md text-sm md:text-base max-w-[60%]"
             >
               <span className="truncate whitespace-nowrap">{nextActionLabel}</span>
               <span className="ml-2 transform group-hover:translate-x-1 transition-transform shrink-0">→</span>
@@ -263,7 +263,7 @@ export default async function BookIndexPage({ params }: { params: any }) {
                   </div>
                 ))
               ) : (
-                <ul className="pl-3 border-l-2 border-gray-100 space-y-1">
+                <ul className="pl-1 border-l-2 border-gray-100 space-y-1">
                   {directChapters.map(c => (
                     <li key={c.slug}>
                       <Link href={`/book/${slug}/${c.slug}`} className="text-[15px] text-blue-600 hover:text-red-900 block py-1 transition-colors">

@@ -95,14 +95,14 @@ export default async function GenrePage({ params }: Props) {
 
   return (
     <main className="bg-[#fdfcf8] min-h-screen font-tarunima">
-      <nav className="w-full bg-[#7575a3] py-2 px-3 text-white shadow-md">
-        <div className="max-w-8xl mx-auto flex items-center gap-3">
-          <Link href="/" className="hover:text-orange-200"><Home size={18} /></Link>
-          <span className="text-white/50">/</span>
+      <nav className="w-full bg-[#7575a3] border-b border-gray-200 py-2 px-3 text-white overflow-x-auto no-scrollbar">
+        <div className="max-w-[1440px] mx-auto text-sm font-tarunima flex items-center whitespace-nowrap">
+          <Link href="/" className="shrink-0"><Home size={16} /></Link>
+          <span className="mx-2 text-white/50 shrink-0">/</span>
           <Link href="/books" className="hover:text-orange-200">গ্রন্থাগার</Link>
-          <span className="text-white/50">/</span>
+          <span className="mx-2 text-white/50 shrink-0">/</span>
           <span className="flex items-center gap-2 font-medium">
-            <Tag size={16} /> {targetBengaliGenre || slug}
+            {targetBengaliGenre || slug}
           </span>
         </div>
       </nav>
