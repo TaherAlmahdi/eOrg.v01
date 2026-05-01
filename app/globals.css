@@ -35,10 +35,10 @@
 
 @layer components {
   /* লিংকের স্টাইল */
-  .normal a, .first a, .dcap a {
+  a, .normal a, .first a, .dcap a {
     color: #cc0044;
   }
-  .normal a:hover, .first a:hover, .dcap a:hover {
+  a:hover, .normal a:hover, .first a:hover, .dcap a:hover {
     color: #80002a;
   }
 .first::first-letter {
@@ -46,7 +46,7 @@
 }
   /* বেসিক টাইপোগ্রাফি */
   .first, .dcap, .normal, .pc, .center, .right, .pl, .pr,
-  ol.list, ol.bnlist, ol.plist, ul.custom-list, .center {
+  ol.list, ol.bnlist, ol.plist, ul.custom-list, .center, .none, ul, ul.none {
     font-size: 1.0rem;
     line-height: 1.7;
     color: var(--text-main);
@@ -151,10 +151,13 @@
   }
 
   ol.list, ol.bnlist, ol.plist {
-    margin-left: 35px;
+    margin-left: 45px;
     list-style-type: bengali;
   }
-
+ ul, ul.none {
+    margin-left: 30px;
+    list-style-type: none; text-align: justify;
+  }
   .theend, .end {
     display: block;
     width: 150px;
@@ -205,7 +208,7 @@
 @media (min-width: 769px) {
   @layer components {
     .first, .dcap, .normal, .pc, .center, .right, .pl, .pr,
-    ol.list, ol.bnlist, ol.plist {
+    ol.list, ol.bnlist, ol.plist .none, ul, ul.none {
       font-size: 1.2rem;
     }
 
@@ -236,7 +239,7 @@
 @media (min-width: 1440px) {
   @layer components {
     .first, .dcap, .normal, .pc, .center, .right, .pl, .pr,
-    ol.list, ol.bnlist, ol.plist {
+    ol.list, ol.bnlist, ol.plist .none, ul, ul.none {
       font-size: 1.25rem;
     }
 

@@ -216,7 +216,7 @@ export default async function ChapterPage({ params, searchParams }: Props) {
             {footnotes.length > 0 && (
               <div className="mt-2 pt-2 border-t-2 border-orange-200">
                 <h4 className="text-lg font-bold text-red-900 mb-1">টিকা ও মন্তব্য</h4>
-                <ol className="bnlist flex flex-wrap gap-x-2 gap-y-2 list-outside ml-6 p-0 text-base text-gray-700 [list-style-type:bengali]">
+                <ol className="nlist flex flex-wrap gap-x-2 gap-y-2 list-outside ml-6 p-0 text-base text-gray-700 [list-style-type:bengali] [&_*]:text-base md:[&_*]:text-base">
                   {footnotes.map((note, i) => (
                     <li key={i} id={`fn-${i + 1}`} className="flex-auto min-w-[250px] border-b border-white text-justify">
                         <span className="inline">
