@@ -46,15 +46,11 @@ export default function BooksPage() {
   return (
     <main className="bg-[#fdfcf8] min-h-screen">
       {/* নেভিগেশন বার */}
-      <nav className="w-full bg-[#7575a3] py-4 px-6 text-white shadow-md">
-        <div className="max-w-7xl mx-auto flex items-center gap-3 font-tarunima">
-          <Link href="/" className="hover:text-orange-200 transition-colors">
-            <Home size={20} />
-          </Link>
-          <span className="text-white/50">/</span>
-          <h1 className="text-lg font-medium flex items-center gap-2">
-            <BookOpen size={20} /> গ্রন্থাগার
-          </h1>
+      <nav className="w-full bg-[#7575a3] border-b border-gray-200 py-2 px-3 text-white overflow-x-auto no-scrollbar">
+        <div className="max-w-[1440px] mx-auto text-sm font-tarunima flex items-center whitespace-nowrap">
+          <Link href="/" className="shrink-0"><Home size={16} /></Link> 
+          <span className="mx-2 text-white/50 shrink-0">/</span>
+          <Link href="/books" className="hover:text-red-100 shrink-0">গ্রন্থাগার</Link> 
         </div>
       </nav>
 
