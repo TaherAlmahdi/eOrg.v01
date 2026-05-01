@@ -136,8 +136,8 @@ export default async function VolumePage({ params }: Props) {
 
   return (
     <main className="bg-[#fdfcf8] min-h-screen">
-      <nav className="w-full bg-[#7575a3] border-b border-gray-200 py-3 px-4 text-white">
-        <div className="max-w-[1440px] mx-auto text-sm font-tarunima flex flex-wrap items-center gap-y-1">
+      <nav className="w-full bg-[#7575a3] border-b border-gray-200 py-2 px-3 text-white overflow-x-auto no-scrollbar">
+        <div className="max-w-[1440px] mx-2 text-sm font-tarunima flex items-center whitespace-nowrap">
           <Link href="/" className="hover:text-red-100 flex items-center gap-1 shrink-0"><Home size={16} /></Link> 
           <span className="mx-2 text-white/50 shrink-0">/</span>
           <Link href="/books" className="hover:text-red-100 shrink-0">গ্রন্থাগার</Link> 
@@ -148,7 +148,7 @@ export default async function VolumePage({ params }: Props) {
         </div>
       </nav>
 
-      <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-0">
+      <div className="max-w-[1440px] mx-2 grid grid-cols-1 lg:grid-cols-12 gap-0">
         <aside className="order-2 lg:order-1 col-span-1 lg:col-span-3 px-2 lg:ml-2 space-y-1 mb-1 lg:mb-1">
           <div className="lg:sticky lg:top-6 space-y-6">
             <div className="bg-white shadow-sm mt-2 flex justify-center">

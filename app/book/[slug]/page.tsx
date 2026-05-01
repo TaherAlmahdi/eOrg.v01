@@ -126,13 +126,11 @@ export default async function BookIndexPage({ params }: { params: any }) {
 
   return (
     <main className="bg-[#fdfcf8] min-h-screen">
-      <nav className="w-full bg-[#7575a3] border-b border-gray-200 py-3 px-4">
-        <div className="max-w-[1440px] mx-auto text-sm text-white font-tarunima flex flex-wrap items-center gap-y-1">
-          <Link href="/" className="hover:text-red-100 flex items-center gap-1 shrink-0">
-            <Home size={16} />
-          </Link> 
+      <nav className="w-full bg-[#7575a3] border-b border-gray-200 py-2 px-3 text-white overflow-x-auto no-scrollbar">
+        <div className="max-w-[1440px] mx-auto text-sm font-tarunima flex items-center whitespace-nowrap">
+          <Link href="/" className="shrink-0"><Home size={16} /></Link> 
           <span className="mx-2 text-white/50 shrink-0">/</span>
-          <Link href="/books" className="hover:text-red-100 shrink-0 whitespace-nowrap">গ্রন্থাগার</Link> 
+          <Link href="/books" className="hover:text-red-100 shrink-0">গ্রন্থাগার</Link> 
           <span className="mx-2 text-white/50 shrink-0">/</span>
           <span className="text-white font-medium whitespace-nowrap">{data.title}</span>
         </div>

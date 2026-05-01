@@ -14,13 +14,13 @@ import TableOfContents from '../../../../components/TableOfContents';
 
 type Props = {
   params: Promise<{ slug: string, volume: string, chapter: string }>;
+  searchParams: Promise<{ page?: string }>;
 };
 
 const toBengaliNumber = (num: number) => 
   num.toString().replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[parseInt(d)]);
 
-// ১. ডাইনামিক মেটাডেটা লজিক
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Props['params'] }): Promise<Metadata> {
   const { slug, volume, chapter } = await params;
   const rootDir = process.cwd();
   
@@ -61,8 +61,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function ChapterPage({ params }: Props) {
+export default async function ChapterPage({ params, searchParams }: Props) {
   const { slug, volume, chapter } = await params;
+  const { page } = await searchParams;
+  const currentPage = parseInt(page || '1');
+  
   const rootDir = process.cwd();
   const bookDir = path.join(rootDir, 'content', slug);
   const volPath = path.join(bookDir, volume);
@@ -83,8 +86,11 @@ export default async function ChapterPage({ params }: Props) {
   const bookData = matter(fs.readFileSync(bookIndexFile, 'utf8')).data;
   const { data: chapData, content } = matter(fs.readFileSync(chapterFile, 'utf8'));
 
-  // --- নোটিশ লজিক শুরু (সংশোধিত) ---
-  // শুধুমাত্র চ্যাপ্টারের ফ্রন্টমেটারে নোটিশ থাকলে দেখাবে, ভলিউম থেকে নেবে না।
+  // Pagination Logic using <!--nextpage-->
+  const pages = content.split('<!--nextpage-->');
+  const totalPages = pages.length;
+  const activeContent = pages[currentPage - 1] || pages[0];
+
   let activeNotice = chapData.notice || null;
   let currentVolTitle = volume.toUpperCase();
 
@@ -92,15 +98,17 @@ export default async function ChapterPage({ params }: Props) {
     const volFileData = matter(fs.readFileSync(volIndexFile, 'utf8')).data;
     currentVolTitle = volFileData.title || currentVolTitle;
   }
-  // --- নোটিশ লজিক শেষ ---
 
   const allVolumes = fs.readdirSync(bookDir).filter(f => fs.statSync(path.join(bookDir, f)).isDirectory()).sort();
   const currentVolIndex = allVolumes.indexOf(volume);
   const currentVolChapters = fs.readdirSync(chaptersDir).filter(f => f.endsWith('.md')).sort();
   const currentChapterIndex = currentVolChapters.indexOf(`${chapter}.md`);
 
+  // Chapter Navigation Logic
   let prevLink = null;
-  if (currentChapterIndex > 0) {
+  if (currentPage > 1) {
+    prevLink = { href: `/book/${slug}/${volume}/${chapter}?page=${currentPage - 1}`, title: `পূর্ববর্তী পৃষ্ঠা (${toBengaliNumber(currentPage - 1)})` };
+  } else if (currentChapterIndex > 0) {
     const prevChapSlug = currentVolChapters[currentChapterIndex - 1].replace('.md', '');
     const prevChapData = matter(fs.readFileSync(path.join(chaptersDir, `${prevChapSlug}.md`), 'utf8')).data;
     prevLink = { href: `/book/${slug}/${volume}/${prevChapSlug}`, title: prevChapData.title || prevChapSlug };
@@ -109,7 +117,9 @@ export default async function ChapterPage({ params }: Props) {
   }
 
   let nextLink = null;
-  if (currentChapterIndex < currentVolChapters.length - 1) {
+  if (currentPage < totalPages) {
+    nextLink = { href: `/book/${slug}/${volume}/${chapter}?page=${currentPage + 1}`, title: `পরবর্তী পৃষ্ঠা (${toBengaliNumber(currentPage + 1)})` };
+  } else if (currentChapterIndex < currentVolChapters.length - 1) {
     const nextChapSlug = currentVolChapters[currentChapterIndex + 1].replace('.md', '');
     const nextChapData = matter(fs.readFileSync(path.join(chaptersDir, `${nextChapSlug}.md`), 'utf8')).data;
     nextLink = { href: `/book/${slug}/${volume}/${nextChapSlug}`, title: nextChapData.title || nextChapSlug };
@@ -126,7 +136,7 @@ export default async function ChapterPage({ params }: Props) {
   }
 
   const footnotes: string[] = [];
-  const processedMarkdown = content.replace(/\[note\]([\s\S]*?)\[\/note\]/g, (_: string, noteText: string) => {
+  const processedMarkdown = activeContent.replace(/\[note\]([\s\S]*?)\[\/note\]/g, (_: string, noteText: string) => {
     footnotes.push(noteText.trim());
     return `<sup class="footnote-ref"><a href="#fn-${footnotes.length}" id="fnref-${footnotes.length}" class="text-[#7D3C98] font-bold px-0.5">[${toBengaliNumber(footnotes.length)}]</a></sup>`;
   });
@@ -157,7 +167,7 @@ export default async function ChapterPage({ params }: Props) {
 
   return (
     <main className="bg-[#fdfcf8] min-h-screen">
-      <nav className="w-full bg-[#7575a3] border-b border-gray-200 py-3 px-4 text-white overflow-x-auto no-scrollbar">
+      <nav className="w-full bg-[#7575a3] border-b border-gray-200 py-2 px-3 text-white overflow-x-auto no-scrollbar">
         <div className="max-w-[1440px] mx-auto text-sm font-tarunima flex items-center whitespace-nowrap">
           <Link href="/" className="shrink-0"><Home size={16} /></Link> 
           <span className="mx-2 text-white/50 shrink-0">/</span>
@@ -167,17 +177,18 @@ export default async function ChapterPage({ params }: Props) {
           <span className="mx-2 text-white/50 shrink-0">/</span>
           <Link href={`/book/${slug}/${volume}`} className="hover:text-red-100 shrink-0">{currentVolTitle}</Link>
           <span className="mx-2 text-white/50 shrink-0">/</span>
-          <span className="font-medium shrink-0">{chapData.title || chapter}</span>
+          <span className="font-medium shrink-0">{chapData.title || chapter} {totalPages > 1 && `(পৃষ্ঠা ${toBengaliNumber(currentPage)})`}</span>
         </div>
       </nav>
 
       <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-0">
-        <section className="order-1 lg:order-2 col-span-1 lg:col-span-9 bg-[#fff2e6] p-2 md:p-3 shadow-sm min-h-screen">
+        <section className="order-1 lg:order-2 col-span-1 lg:col-span-9 bg-[#fff2e6] p-2 md:p-2 shadow-sm min-h-screen">
           <header className="mb-2 text-center font-tarunima">
             <h2 className="text-xl md:text-2xl text-red-900 mb-1">{bookData.title}</h2>
             <p className="text-xl md:text-md text-gray-500 uppercase tracking-wide mb-1">{currentVolTitle}</p>
             <h1 className="text-xl md:text-2xl font-normal font-sabrina text-gray-900 leading-tight">
               {chapData.title || chapter} {chapData.subtitle ? `: ${chapData.subtitle}` : ''}
+              {totalPages > 1 && <span className="block text-sm text-gray-500 mt-1 italic">পৃষ্ঠা: {toBengaliNumber(currentPage)} / {toBengaliNumber(totalPages)}</span>}
             </h1>
             <div className="w-40 h-[2px] bg-red-900 mx-auto mt-2"></div>
           </header>
@@ -187,15 +198,31 @@ export default async function ChapterPage({ params }: Props) {
           <article className="prose lg:prose-xl max-w-none text-gray-900 leading-relaxed font-tarunima mt-6">
             <div dangerouslySetInnerHTML={{ __html: processedContent.toString() }} />
 
+            {/* Page Number Indicator for Internal Pages */}
+            {totalPages > 1 && (
+              <div className="flex justify-center gap-2 mt-8 mb-4">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                  <Link
+                    key={p}
+                    href={`/book/${slug}/${volume}/${chapter}?page=${p}`}
+                    className={`px-3 py-1 border rounded ${currentPage === p ? 'bg-red-900 text-white' : 'bg-white text-red-900 hover:bg-orange-50'}`}
+                  >
+                    {toBengaliNumber(p)}
+                  </Link>
+                ))}
+              </div>
+            )}
+
             {footnotes.length > 0 && (
               <div className="mt-2 pt-2 border-t-2 border-orange-200">
                 <h4 className="text-lg font-bold text-red-900 mb-1">টিকা ও মন্তব্য</h4>
                 <ol className="bnlist flex flex-wrap gap-x-2 gap-y-2 list-outside ml-6 p-0 text-base text-gray-700 [list-style-type:bengali]">
                   {footnotes.map((note, i) => (
                     <li key={i} id={`fn-${i + 1}`} className="flex-auto min-w-[250px] border-b border-white text-justify">
-                      <span className="inline">
-                        {note}
-                        <a href={`#fnref-${i + 1}`} className="ml-2 text-blue-500 hover:text-red-700 transition-all">↩</a>
+                        <span className="inline">
+                           {/* HTML কাজ করার জন্য নিচের পরিবর্তনটি করা হয়েছে */}
+                        <span dangerouslySetInnerHTML={{ __html: note }} />
+                        <a href={`#fnref-${i + 1}`} className="ml-1 text-blue-500 hover:text-red-700 transition-all">↑</a>
                       </span>
                     </li>
                   ))}
@@ -224,9 +251,9 @@ export default async function ChapterPage({ params }: Props) {
           </article>
         </section>
 
-        <aside className="order-2 lg:order-1 col-span-1 lg:col-span-3 px-4 lg:ml-4 space-y-1">
+        <aside className="order-2 lg:order-1 col-span-1 lg:col-span-3 px-2 lg:ml-1 space-y-1">
           <div className="lg:sticky lg:top-6 space-y-6">
-            <div className="bg-white shadow-sm mt-4 p-1">
+            <div className="bg-white shadow-sm mt-1 p-1">
               <img src={bookData.cover_image} alt={bookData.title} className="w-full h-auto object-cover" />
             </div>
             <div className="bg-white font-tarunima p-4 shadow-sm min-h-[400px]">

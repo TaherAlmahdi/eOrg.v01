@@ -46,7 +46,7 @@
 }
   /* বেসিক টাইপোগ্রাফি */
   .first, .dcap, .normal, .pc, .center, .right, .pl, .pr,
-  ol.list, ol.bnlist, ol.plist, ul.custom-list {
+  ol.list, ol.bnlist, ol.plist, ul.custom-list, .center {
     font-size: 1.0rem;
     line-height: 1.7;
     color: var(--text-main);
@@ -76,6 +76,11 @@
     text-align: inherit;
   }
 
+ .dan {text-align: right !important; font-size: inherit !important;} 
+ .center {text-align: center !important;} 
+ .indent {text-indent: 30px !important; font-size: inherit !important;} 
+
+
   /* উদ্ধৃতি (Quote) */
   div.quote, .quote {
     border-left: 3px solid #dddddd;
@@ -103,7 +108,7 @@
   }
 
   /* শিরোনাম (Titles) */
-  .bname, .wname, .subtitle {
+  .bname, .wname, .subtitle, .chapter {
     font-family: var(--font-sabrina) !important;
     text-align: center;
     display: block;
@@ -112,7 +117,7 @@
 
   .bname { font-size: 1.8rem; color: var(--accent-purple); margin: .1rem 0; }
   .wname { font-size: 1.6rem; color: var(--accent-gold); margin: .1rem 0; }
-  .subtitle { color: var(--accent-red); font-size: 1.2rem; font-weight: 700; border-bottom: 1px solid #eee; }
+  .subtitle, .chapter { color: var(--accent-red); font-size: 1.2rem; font-weight: 700; border-bottom: 1px solid #eee; }
 
   /* কবিতা (Poem) */
   .poem {
@@ -133,6 +138,9 @@
 
   .pgap {
     margin: 0 50px;
+  }
+  .ngap {
+    margin: 0 15px;
   }
 
   .pcg {
@@ -214,7 +222,7 @@
 
     .bname { font-size: 2.2rem; }
     .wname { font-size: 2.0rem; }
-    .subtitle { font-size: 1.4rem; }
+    .subtitle, .chapter { font-size: 1.4rem; }
 
     .poem { width: 60%; font-size: 1.15rem; }
 
