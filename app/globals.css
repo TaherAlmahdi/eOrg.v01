@@ -41,6 +41,7 @@
   .normal a:hover, .first a:hover, .dcap a:hover {
     color: #80002a;
   }
+  span .right {text-align:right !important; font-size:inherit !important;}
 .first::first-letter {
   color: #a7373d;
 }
