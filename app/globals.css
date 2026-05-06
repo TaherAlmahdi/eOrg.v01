@@ -35,10 +35,10 @@
 
 @layer components {
   /* লিংকের স্টাইল */
-  a, .normal a, .first a, .dcap a {
+  .normal a, .first a, .dcap a {
     color: #cc0044;
   }
-  a:hover, .normal a:hover, .first a:hover, .dcap a:hover {
+  .normal a:hover, .first a:hover, .dcap a:hover {
     color: #80002a;
   }
 .first::first-letter {

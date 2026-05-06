@@ -140,7 +140,7 @@ export default async function BookIndexPage({ params }: { params: any }) {
         
         <section className="order-1 lg:order-2 col-span-1 lg:col-span-9 bg-[#fff2e6] p-2 md:p-3 shadow-sm min-h-screen">
           <header className="mb-2 text-center font-tarunima">
-            <h1 className="text-2xl md:text-2xl font-bold font-sabrina text-gray-900 mb-2">{data.title}</h1>
+            <h1 className="text-2xl md:text-2xl font-normal font-sabrina text-gray-900 mb-2">{data.title}</h1>
             <p className="text-lg text-red-900 font-tarunima">{data.author}</p>
             <div className="w-50 h-[2px] bg-red-900 mx-auto mt-2"></div>
           </header>
