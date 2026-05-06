@@ -174,7 +174,7 @@ export default async function VolumePage({ params }: Props) {
             <p className="text-xl md:text-xl text-red-900 uppercase tracking-widest mb-1 opacity-90">
               {bookData.title}
             </p>
-            <h1 className="text-2xl md:text-2xl font-bold font-sabrina text-gray-900 mb-2">
+            <h1 className="text-xl md:text-xl font-normal font-sabrina text-gray-900 mb-2">
               {volTitle}
               {volSubtitle && ` : ${volSubtitle}`}
             </h1>

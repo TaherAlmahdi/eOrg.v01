@@ -184,9 +184,9 @@ export default async function ChapterPage({ params, searchParams }: Props) {
       <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-0">
         <section className="order-1 lg:order-2 col-span-1 lg:col-span-9 bg-[#fff2e6] p-2 md:p-2 shadow-sm min-h-screen">
           <header className="mb-2 text-center font-tarunima">
-            <h2 className="text-xl md:text-2xl text-red-900 mb-1">{bookData.title}</h2>
-            <p className="text-xl md:text-md text-gray-500 uppercase tracking-wide mb-1">{currentVolTitle}</p>
-            <h1 className="text-xl md:text-2xl font-normal font-sabrina text-gray-900 leading-tight">
+            <h2 className="text-xl md:text-xl text-red-900 mb-1">{bookData.title}</h2>
+            <p className="text-md md:text-md text-gray-500 uppercase tracking-wide mb-1">{currentVolTitle}</p>
+            <h1 className="text-xl md:text-xl font-normal font-sabrina text-gray-900 leading-tight">
               {chapData.title || chapter} {chapData.subtitle ? `: ${chapData.subtitle}` : ''}
               {totalPages > 1 && <span className="block text-sm text-gray-500 mt-1 italic">পৃষ্ঠা: {toBengaliNumber(currentPage)} / {toBengaliNumber(totalPages)}</span>}
             </h1>
@@ -195,7 +195,7 @@ export default async function ChapterPage({ params, searchParams }: Props) {
           
           {activeNotice && <Notice message={activeNotice} />}
           
-          <article className="prose lg:prose-xl max-w-none text-gray-900 leading-relaxed font-tarunima mt-6">
+          <article className="prose lg:prose-md max-w-none text-gray-900 leading-relaxed font-tarunima mt-6">
             <div dangerouslySetInnerHTML={{ __html: processedContent.toString() }} />
 
             {/* Page Number Indicator for Internal Pages */}
@@ -216,13 +216,15 @@ export default async function ChapterPage({ params, searchParams }: Props) {
             {footnotes.length > 0 && (
               <div className="mt-2 pt-2 border-t-2 border-orange-200">
                 <h4 className="text-lg font-bold text-red-900 mb-1">টিকা ও মন্তব্য</h4>
-                <ol className="nlist flex flex-wrap gap-x-2 gap-y-2 list-outside ml-6 p-0 text-base text-gray-700 [list-style-type:bengali] [&_*]:text-base md:[&_*]:text-base">
+                 <ol className="not-prose flex flex-wrap gap-x-2 gap-y-2 list-outside ml-7 pl-2 [list-style-type:bengali]">
                   {footnotes.map((note, i) => (
                     <li key={i} id={`fn-${i + 1}`} className="flex-auto min-w-[250px] border-b border-white text-justify">
-                        <span className="inline">
-                           {/* HTML কাজ করার জন্য নিচের পরিবর্তনটি করা হয়েছে */}
+                      {/* [&_*] ব্যবহার করে নিশ্চিত করা হয়েছে যে ভেতরে অন্য কোনো ট্যাগ থাকলেও সে একই সাইজ পাবে */}
+                      <span className="text-gray-700 leading-snug text-[0.7rem] md:text-[0.8rem] lg:text-[0.9rem] [&_*]:text-inherit [&_*]:text-gray-700">
+                        <a href={`#fnref-${i + 1}`} className="mr-1 !text-blue-500 hover:!text-red-700 transition-all font-bold !text-[1em]">
+                          ↑
+                        </a>
                         <span dangerouslySetInnerHTML={{ __html: note }} />
-                        <a href={`#fnref-${i + 1}`} className="ml-1 text-blue-500 hover:text-red-700 transition-all">↑</a>
                       </span>
                     </li>
                   ))}
