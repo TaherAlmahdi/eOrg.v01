@@ -15,7 +15,7 @@ type Props = {
   params: Promise<{ slug: string; volume: string }>;
 };
 
-// ১. ডাইনামিক মেটাডেটা জেনারেশন (meta_title লজিক সহ)
+// ১. ডাইনামিক মেটাডেটা জেনারেশন
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, volume } = await params;
   const bookDir = path.join(process.cwd(), 'content', slug);
@@ -23,11 +23,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const volMainFile = path.join(volPath, `${volume}.md`);
   const bookIndexFile = path.join(bookDir, 'index.md');
 
-  // মূল বইয়ের ডেটা রিড
   const bookIndexContent = fs.readFileSync(bookIndexFile, 'utf8');
   const { data: bookData } = matter(bookIndexContent);
 
-  // খণ্ডের ডেটা রিড
   let volTitle = volume.toUpperCase();
   let volDescription = "";
   let customMetaTitle = "";
@@ -36,10 +34,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { data: volData } = matter(fs.readFileSync(volMainFile, 'utf8'));
     volTitle = volData.title || volTitle;
     volDescription = volData.meta_description || "";
-    customMetaTitle = volData.meta_title || ""; // meta_title চেক করা হচ্ছে
+    customMetaTitle = volData.meta_title || ""; 
   }
 
-  // লজিক: meta_title থাকলে তাই, নাহলে "খণ্ড নাম | বইয়ের নাম | বঙ্কিম রচনাবলী"
   const fullTitle = customMetaTitle || `${volTitle} | ${bookData.title}`;
   const shareImage = bookData.og_image || bookData.cover_image || '/og-default.jpg';
 
@@ -58,9 +55,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
   };
 }
-
-const toBengaliNumber = (num: number | string) => 
-  num.toString().replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[parseInt(d)]);
 
 // ২. মূল পেজ কম্পোনেন্ট
 export default async function VolumePage({ params }: Props) {
@@ -99,6 +93,7 @@ export default async function VolumePage({ params }: Props) {
     volContentHtml = processedContent.toString();
   }
 
+  // বর্তমান ভলিয়মের চ্যাপ্টারসমূহ
   const chaptersDir = path.join(volPath, 'chapters');
   let chapters: any[] = [];
   if (fs.existsSync(chaptersDir)) {
@@ -109,11 +104,12 @@ export default async function VolumePage({ params }: Props) {
         const { data } = matter(fs.readFileSync(path.join(chaptersDir, file), 'utf8'));
         return {
           slug: file.replace('.md', ''),
-          title: data.title || `অধ্যায় ${file.replace('.md', '').replace('c', '')}`,
+          title: data.title || `পরিচ্ছেদ ${file.replace('.md', '').replace('c', '')}`,
         };
       });
   }
 
+  // সব ভলিয়ম খুঁজে বের করা
   const volumeFolders = fs.readdirSync(bookDir)
     .filter(file => fs.statSync(path.join(bookDir, file)).isDirectory())
     .sort();
@@ -129,10 +125,45 @@ export default async function VolumePage({ params }: Props) {
   });
 
   const currentVolIndex = volumesWithTitles.findIndex(v => v.id === volume);
-  const prevVol = currentVolIndex > 0 ? volumesWithTitles[currentVolIndex - 1] : null;
-  const nextVol = currentVolIndex < volumesWithTitles.length - 1 ? volumesWithTitles[currentVolIndex + 1] : null;
+
+  // ৩. নেভিগেশন লজিক (প্রিভিয়াস চ্যাপ্টার/ভলিয়ম/প্যারেন্ট)
+  let prevNavigation = { href: `/book/${slug}`, title: bookData.title };
+
+  if (currentVolIndex > 0) {
+    const prevVolId = volumesWithTitles[currentVolIndex - 1].id;
+    const prevVolPath = path.join(bookDir, prevVolId);
+    const prevChaptersDir = path.join(prevVolPath, 'chapters');
+    
+    if (fs.existsSync(prevChaptersDir)) {
+      const prevChaptersFiles = fs.readdirSync(prevChaptersDir)
+        .filter(file => file.endsWith('.md'))
+        .sort();
+      
+      if (prevChaptersFiles.length > 0) {
+        const lastChapterFile = prevChaptersFiles[prevChaptersFiles.length - 1];
+        const lastChapterPath = path.join(prevChaptersDir, lastChapterFile);
+        const { data: lastChapData } = matter(fs.readFileSync(lastChapterPath, 'utf8'));
+        
+        prevNavigation = {
+          href: `/book/${slug}/${prevVolId}/${lastChapterFile.replace('.md', '')}`,
+          title: lastChapData.title || "আগের পরিচ্ছেদ"
+        };
+      } else {
+        prevNavigation = {
+          href: `/book/${slug}/${prevVolId}`,
+          title: volumesWithTitles[currentVolIndex - 1].title
+        };
+      }
+    } else {
+      prevNavigation = {
+        href: `/book/${slug}/${prevVolId}`,
+        title: volumesWithTitles[currentVolIndex - 1].title
+      };
+    }
+  }
 
   const firstChapter = chapters.length > 0 ? chapters[0] : null;
+  const nextVol = currentVolIndex < volumesWithTitles.length - 1 ? volumesWithTitles[currentVolIndex + 1] : null;
 
   return (
     <main className="bg-[#fdfcf8] min-h-screen">
@@ -214,21 +245,12 @@ export default async function VolumePage({ params }: Props) {
 
           <div className="mt-2 pt-2 border-t border-orange-200 grid grid-cols-2 gap-1 font-tarunima">
             <div>
-              {prevVol ? (
-                <Link href={`/book/${slug}/${prevVol.id}`} className="group flex items-center gap-1 p-2 rounded-lg hover:bg-white transition-all border border-transparent hover:border-orange-100">
-                  <ChevronLeft size={18} className="text-gray-400 group-hover:text-red-900 shrink-0" />
-                  <span className="text-sm md:text-base font-bold text-blue-600 group-hover:text-red-900 line-clamp-1">
-                    {prevVol.title}
-                  </span>
-                </Link>
-              ) : (
-                <Link href={`/book/${slug}`} className="group flex items-center gap-1 p-2 rounded-lg hover:bg-white transition-all border border-transparent hover:border-orange-100">
-                  <ChevronLeft size={18} className="text-gray-400 group-hover:text-red-900 shrink-0" />
-                  <span className="text-sm md:text-base font-bold text-blue-600 group-hover:text-red-900 line-clamp-1">
-                    {bookData.title}
-                  </span>
-                </Link>
-              )}
+              <Link href={prevNavigation.href} className="group flex items-center gap-1 p-2 rounded-lg hover:bg-white transition-all border border-transparent hover:border-orange-100">
+                <ChevronLeft size={18} className="text-gray-400 group-hover:text-red-900 shrink-0" />
+                <span className="text-sm md:text-base font-bold text-blue-600 group-hover:text-red-900 line-clamp-1">
+                  {prevNavigation.title}
+                </span>
+              </Link>
             </div>
 
             <div className="text-right">

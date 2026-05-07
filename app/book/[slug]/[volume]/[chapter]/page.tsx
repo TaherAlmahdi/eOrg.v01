@@ -234,7 +234,7 @@ export default async function ChapterPage({ params, searchParams }: Props) {
             <div className="mt-2 pt-2 border-t border-orange-200 grid grid-cols-2 gap-1">
               <div>
                 {prevLink && (
-                  <Link href={prevLink.href} className="group flex items-center gap-2 p-3 rounded hover:bg-white transition-all border border-transparent hover:border-orange-100">
+                  <Link href={prevLink.href} className="group flex items-center gap-0 p-1 rounded hover:bg-white transition-all border border-transparent hover:border-orange-100">
                     <ChevronLeft size={18} className="text-gray-400 group-hover:text-red-900 shrink-0" />
                     <span className="text-sm md:text-base font-bold text-blue-600 group-hover:text-red-900 line-clamp-1">{prevLink.title}</span>
                   </Link>
@@ -242,7 +242,7 @@ export default async function ChapterPage({ params, searchParams }: Props) {
               </div>
               <div className="text-right">
                 {nextLink && (
-                  <Link href={nextLink.href} className="group flex items-center justify-end gap-2 p-3 rounded-lg hover:bg-white transition-all border border-transparent hover:border-orange-100">
+                  <Link href={nextLink.href} className="group flex items-center justify-end gap-0 p-1 rounded hover:bg-white transition-all border border-transparent hover:border-orange-100">
                     <span className="text-sm md:text-base font-bold text-blue-600 group-hover:text-red-900 line-clamp-1">{nextLink.title}</span>
                     <ChevronRight size={18} className="text-gray-400 group-hover:text-red-900 shrink-0" />
                   </Link>
