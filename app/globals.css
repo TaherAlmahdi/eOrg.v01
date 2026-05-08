@@ -163,11 +163,11 @@
   .dcap::first-letter {
     float: left;
     line-height: 1;
-    font-size: 2.2rem;
+    font-size: 1.50rem;
     color: var(--accent-purple);
     font-family: var(--font-mallika);
-    padding: 4px 8px;
-    margin-right: 8px;
+    padding: 2px 4px;
+    margin-right: 4px;
     background: var(--bg-purple-light);
     border-radius: 4px;
   }
@@ -219,13 +219,13 @@
     ol.list, ol.bnlist, ol.plist .none, ul, ul.none { font-size: 1.0rem; }
 
     .title { font-size: 1.25rem; }
-    .dcap::first-letter { font-size: 2.8rem; padding: 6px 10px; }
+    .dcap::first-letter { font-size: 1.8rem; padding: 4px 6px; }
     .bname { font-size: 2.2rem; }
     .wname { font-size: 2.0rem; }
     .subtitle, .chapter { font-size: 1.4rem; }
 
     .not-prose .poem, .poem {
-      max-width: 60% !important;
+      max-width: 70% !important;
       font-size: inherit !important;
       margin-top: 0rem;
       margin-bottom: 0rem;

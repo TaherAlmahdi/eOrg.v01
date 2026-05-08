@@ -7,7 +7,7 @@ import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import rehypeRaw from 'rehype-raw';
 import rehypeStringify from 'rehype-stringify';
-import { Home, BookOpen, ChevronRight, ChevronLeft } from "lucide-react";
+import { Home, BookOpen, ChevronRight, ChevronLeft, List, Book } from "lucide-react";
 import Notice from '../../../components/Notice'; 
 import { Metadata } from 'next';
 
@@ -186,14 +186,18 @@ export default async function VolumePage({ params }: Props) {
               <img src={bookData.cover_image} alt={bookData.title} className="w-full max-w-sm lg:max-w-full h-auto object-contain" />
             </div>
             <div className="bg-white max-h-[400px] overflow-y-auto font-tarunima p-0">
-              <h3 className="text-md font-bold border-b pb-2 mb-2 border-red-100 text-red-900">সূচিপত্র</h3>
+              <h3 className="text-md font-bold border-b pb-2 mb-2 text-red-900 flex items-center gap-2">
+                <List size={18} /> {bookData.title}
+              </h3>
               {volumesWithTitles.map((v) => (
                 <Link 
                   key={v.id}
                   href={`/book/${slug}/${v.id}`}
                   className={`font-xl mb-1 px-1 py-1 block transition-all border-l-2 ${v.id === volume ? 'bg-red-50 border-red-900 text-red-900 font-bold' : 'bg-[#e0e0eb] border-transparent text-blue-600 hover:bg-gray-50'}`}
                 >
-                  {v.title}
+                  <span className="flex items-center gap-1.5">
+                    <Book size={16} /> {v.title}
+                  </span> 
                 </Link>
               ))}
             </div>

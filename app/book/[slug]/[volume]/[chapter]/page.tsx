@@ -253,13 +253,13 @@ export default async function ChapterPage({ params, searchParams }: Props) {
         </section>
 
         <aside className="order-2 lg:order-1 col-span-1 lg:col-span-3 px-2 lg:ml-1 space-y-1">
-          <div className="lg:sticky lg:top-6 space-y-6">
+          <div className="lg:sticky lg:top-6 space-y-1">
             <div className="bg-white shadow-sm mt-1 p-1">
               <img src={bookData.cover_image} alt={bookData.title} className="w-full h-auto object-cover" />
             </div>
-            <div className="bg-white font-tarunima p-4 shadow-sm min-h-[400px]">
+            <div className="bg-white font-tarunima p-1 shadow-sm min-h-[400px]">
               <h3 className="text-md font-bold border-b pb-2 mb-2 text-red-900 flex items-center gap-2">
-                <List size={18} /> সূচিপত্র
+                <List size={18} /> {bookData.title}
               </h3>
               <div className="max-h-[60vh] overflow-y-auto custom-scrollbar">
                 <TableOfContents structure={nestedStructure} currentChapter={chapter} slug={slug} />

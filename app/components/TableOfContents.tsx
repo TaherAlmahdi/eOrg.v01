@@ -1,7 +1,7 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { ChevronDown, ChevronRight, FileText, Folder } from 'lucide-react';
+import { ChevronDown, ChevronRight, FileText, Folder, List } from 'lucide-react';
 
 export default function TableOfContents({ 
   structure, 
@@ -13,29 +13,40 @@ export default function TableOfContents({
   slug: string 
 }) {
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
-    [structure.currentVolume]: true // বর্তমান ভলিউমটি ডিফল্টভাবে খোলা থাকবে
+    [structure.currentVolume]: true 
   });
+
+  // একটি Ref তৈরি করা হলো কারেন্ট আইটেমকে ধরার জন্য
+  const activeItemRef = useRef<HTMLAnchorElement | null>(null);
 
   const toggleSection = (id: string) => {
     setOpenSections(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
-return (
-  <div className="space-y-1 font-tarunima">
-    {structure.items?.map((vol: any) => { 
-      const hasChapters = vol.chapters && vol.chapters.length > 0;
-      const isVolume = vol.type === 'volume';
+  // কারেন্ট চ্যাপ্টার পরিবর্তন হলে স্ক্রল করার লজিক
+  useEffect(() => {
+    if (activeItemRef.current) {
+      activeItemRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start', // স্ক্রিনের টপে নিয়ে আসবে
+      });
+    }
+  }, [currentChapter]);
+
+  return (
+    <div className="space-y-1 font-tarunima">
+      {structure.items?.map((vol: any) => { 
+        const isVolume = vol.type === 'volume';
 
         return (
           <div key={vol.id} className="border-b border-gray-100 last:border-0 pb-1">
             {isVolume ? (
-              // যদি খণ্ড থাকে
               <>
                 <button
                   onClick={() => toggleSection(vol.id)}
-                  className="w-full flex items-center justify-between py-1 px-1 hover:bg-orange-50 rounded transition-all text-red-900 font-bold"
+                  className="w-full flex items-center justify-between py-0 px-0 hover:bg-orange-50 transition-all text-red-900 font-medium text-sm"
                 >
-                  <span className="flex items-center gap-1">
+                  <span className="flex items-center gap-1.5">
                     <Folder size={16} className="text-orange-400" />
                     {vol.title}
                   </span>
@@ -44,28 +55,32 @@ return (
 
                 {openSections[vol.id] && (
                   <div className="ml-4 mt-0 space-y-1 border-l-2 border-orange-100 pl-2">
-                    {vol.chapters.map((chap: any) => (
-                      <Link
-                        key={chap.slug}
-                        href={`/book/${slug}/${vol.id}/${chap.slug}`}
-                        className={`flex items-center gap-1 text-sm py-1 px-1 rounded transition-colors ${
-                          chap.slug === currentChapter 
-                          ? 'bg-red-900 text-white shadow-sm' 
-                          : 'text-blue-700 hover:bg-orange-50'
-                        }`}
-                      >
-                        <FileText size={14} opacity={0.5} />
-                        {chap.title}
-                      </Link>
-                    ))}
+                    {vol.chapters.map((chap: any) => {
+                      const isActive = chap.slug === currentChapter;
+                      return (
+                        <Link
+                          key={chap.slug}
+                          ref={isActive ? activeItemRef : null} // শুধুমাত্র কারেন্ট লিংকে ref বসবে
+                          href={`/book/${slug}/${vol.id}/${chap.slug}`}
+                          className={`flex items-center gap-1 text-sm py-1 px-1 border-b border-red-300 transition-colors ${
+                            isActive 
+                            ? 'bg-red-900 text-white shadow-sm' 
+                            : 'text-blue-500 hover:bg-orange-50'
+                          }`}
+                        >
+                          <FileText size={14} opacity={0.5} />
+                          {chap.title}
+                        </Link>
+                      );
+                    })}
                   </div>
                 )}
               </>
             ) : (
-              // যদি খণ্ড না থাকে (সরাসরি অধ্যায়)
               <Link
+                ref={vol.id === currentChapter ? activeItemRef : null}
                 href={`/book/${slug}/${vol.volumeId}/${vol.id}`}
-                className={`flex items-center gap-1 text-sm py-2 px-3 rounded transition-colors ${
+                className={`flex items-center gap-1 text-sm py-1 px-1 rounded transition-colors ${
                   vol.id === currentChapter 
                   ? 'bg-red-900 text-white shadow-sm font-bold' 
                   : 'text-blue-700 hover:bg-orange-50'
