@@ -163,7 +163,7 @@
   .dcap::first-letter {
     float: left;
     line-height: 1;
-    font-size: 1.50rem;
+    font-size: 2.50rem;
     color: var(--accent-purple);
     font-family: var(--font-mallika);
     padding: 2px 4px;
@@ -191,7 +191,7 @@
   .pcg { margin: 25px 0 5px 0; font-size: 1.1em; text-align: center; color: var(--accent-blue); }
 
   /* লিস্ট স্টাইল */
-  ol.list, ol.bnlist, ol.plist { margin-left: 45px; list-style-type: bengali; }
+  ol.list, ol.bnlist, ol.plist { margin-left: 45px; list-style-type: bengali; text-align: justify; }
   ul, ul.none { margin-left: 30px; list-style-type: none; text-align: justify; }
   
   ul.custom-list { list-style: none; margin-left: 25px; margin-bottom: 0rem; padding-left: 0px; }
