@@ -136,8 +136,7 @@ export default async function BookIndexPage({ params }: { params: any }) {
         </div>
       </nav>
 
-      <div className="max-w-[1440px] mx-auto px-0 py-0 grid grid-cols-1 lg:grid-cols-12 gap-0">
-        
+      <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-0">
         <section className="order-1 lg:order-2 col-span-1 lg:col-span-9 bg-[#fff2e6] p-2 md:p-3 shadow-sm min-h-screen">
           <header className="mb-2 text-center font-tarunima">
             <h1 className="text-2xl md:text-2xl font-normal font-sabrina text-gray-900 mb-2">{data.title}</h1>
@@ -180,9 +179,9 @@ export default async function BookIndexPage({ params }: { params: any }) {
           </div>
         </section>
 
-        <aside className="order-2 lg:order-1 col-span-1 lg:col-span-3 px-4 lg:ml-0 space-y-1 mb-10 lg:mb-0">
-          <div className="lg:sticky lg:top-6 space-y-6">
-            <div className="bg-white shadow-sm mt-2 flex justify-center border border-gray-100">
+        <aside className="order-2 lg:order-1 col-span-1 lg:col-span-3 px-2 lg:ml-1 space-y-1">
+          <div className="lg:sticky lg:top-6 space-y-1">
+            <div className="bg-white shadow-sm mt-2 flex justify-center">
               <img src={data.cover_image} alt={data.title} className="w-full max-w-sm lg:max-w-full h-auto object-cover" />
             </div>
 

@@ -7,9 +7,11 @@ import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import rehypeRaw from 'rehype-raw';
 import rehypeStringify from 'rehype-stringify';
-import { Home, BookOpen, ChevronRight, ChevronLeft, List, Book } from "lucide-react";
+import { Home, BookOpen, ChevronRight, ChevronLeft, Folder } from "lucide-react";
 import Notice from '../../../components/Notice'; 
+import BookCover from '../../../components/BookCover'; 
 import { Metadata } from 'next';
+
 
 type Props = {
   params: Promise<{ slug: string; volume: string }>;
@@ -168,7 +170,7 @@ export default async function VolumePage({ params }: Props) {
   return (
     <main className="bg-[#fdfcf8] min-h-screen">
       <nav className="w-full bg-[#7575a3] border-b border-gray-200 py-2 px-3 text-white overflow-x-auto no-scrollbar">
-        <div className="max-w-[1440px] mx-2 text-sm font-tarunima flex items-center whitespace-nowrap">
+        <div className="max-w-[1440px] mx-auto text-sm font-tarunima flex items-center whitespace-nowrap">
           <Link href="/" className="hover:text-red-100 flex items-center gap-1 shrink-0"><Home size={16} /></Link> 
           <span className="mx-2 text-white/50 shrink-0">/</span>
           <Link href="/books" className="hover:text-red-100 shrink-0">গ্রন্থাগার</Link> 
@@ -179,16 +181,13 @@ export default async function VolumePage({ params }: Props) {
         </div>
       </nav>
 
-      <div className="max-w-[1440px] mx-2 grid grid-cols-1 lg:grid-cols-12 gap-0">
-        <aside className="order-2 lg:order-1 col-span-1 lg:col-span-3 px-2 lg:ml-2 space-y-1 mb-1 lg:mb-1">
-          <div className="lg:sticky lg:top-6 space-y-6">
+      <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-0">
+        <aside className="order-2 lg:order-1 col-span-1 lg:col-span-3 px-2 lg:ml-1 space-y-1">
+          <div className="lg:sticky lg:top-6 space-y-1">
             <div className="bg-white shadow-sm mt-2 flex justify-center">
-              <img src={bookData.cover_image} alt={bookData.title} className="w-full max-w-sm lg:max-w-full h-auto object-contain" />
+              <BookCover coverImage={bookData.cover_image} title={bookData.title} />
             </div>
             <div className="bg-white max-h-[400px] overflow-y-auto font-tarunima p-0">
-              <h3 className="text-md font-bold border-b pb-2 mb-2 text-red-900 flex items-center gap-2">
-                <List size={18} /> {bookData.title}
-              </h3>
               {volumesWithTitles.map((v) => (
                 <Link 
                   key={v.id}
@@ -196,7 +195,7 @@ export default async function VolumePage({ params }: Props) {
                   className={`font-xl mb-1 px-1 py-1 block transition-all border-l-2 ${v.id === volume ? 'bg-red-50 border-red-900 text-red-900 font-bold' : 'bg-[#e0e0eb] border-transparent text-blue-600 hover:bg-gray-50'}`}
                 >
                   <span className="flex items-center gap-1.5">
-                    <Book size={16} /> {v.title}
+                    <Folder size={16} /> {v.title}
                   </span> 
                 </Link>
               ))}
@@ -285,3 +284,5 @@ export default async function VolumePage({ params }: Props) {
     </main>
   );
 }
+
+

@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { Home, ChevronLeft, ChevronRight, List } from "lucide-react";
 import { Metadata } from 'next';
 import Notice from '../../../../components/Notice'; 
+import BookCover from '../../../../components/BookCover'; 
 import TableOfContents from '../../../../components/TableOfContents';
 
 type Props = {
@@ -254,16 +255,11 @@ export default async function ChapterPage({ params, searchParams }: Props) {
 
         <aside className="order-2 lg:order-1 col-span-1 lg:col-span-3 px-2 lg:ml-1 space-y-1">
           <div className="lg:sticky lg:top-6 space-y-1">
-            <div className="bg-white shadow-sm mt-1 p-1">
-              <img src={bookData.cover_image} alt={bookData.title} className="w-full h-auto object-cover" />
+            <div className="bg-white shadow-sm mt-2 flex justify-center">
+              <BookCover coverImage={bookData.cover_image} title={bookData.title} />
             </div>
             <div className="bg-white font-tarunima p-1 shadow-sm min-h-[400px]">
-              <h3 className="text-md font-bold border-b pb-2 mb-2 text-red-900 flex items-center gap-2">
-                <List size={18} /> {bookData.title}
-              </h3>
-              <div className="max-h-[60vh] overflow-y-auto custom-scrollbar">
-                <TableOfContents structure={nestedStructure} currentChapter={chapter} slug={slug} />
-              </div>
+              <TableOfContents structure={nestedStructure} currentChapter={chapter} slug={slug} />
             </div>
           </div>
         </aside>

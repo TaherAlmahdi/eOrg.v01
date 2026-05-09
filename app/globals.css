@@ -163,9 +163,9 @@
   .dcap::first-letter {
     float: left;
     line-height: 1;
-    font-size: 2.50rem;
+    font-size: 2.0rem;
     color: var(--accent-purple);
-    font-family: var(--font-mallika);
+    font-family: var(--font-tarunima);
     padding: 2px 4px;
     margin-right: 4px;
     background: var(--bg-purple-light);
@@ -233,6 +233,11 @@
     
     ul.custom-list li { font-size: 1.25rem; }
   }
+    /* ড্রপ ক্যাপ (Drop Cap) */
+  .dcap::first-letter {
+    font-size: 2.9rem;
+  }
+
 }
 
 /* ==========================================

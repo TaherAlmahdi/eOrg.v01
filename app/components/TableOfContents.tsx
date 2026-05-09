@@ -1,7 +1,7 @@
 'use client';
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
-import { ChevronDown, ChevronRight, FileText, Folder, List } from 'lucide-react';
+import { ChevronDown, ChevronRight, FileText, Folder } from 'lucide-react';
 
 export default function TableOfContents({ 
   structure, 
@@ -16,26 +16,24 @@ export default function TableOfContents({
     [structure.currentVolume]: true 
   });
 
-  // একটি Ref তৈরি করা হলো কারেন্ট আইটেমকে ধরার জন্য
-  const activeItemRef = useRef<HTMLAnchorElement | null>(null);
-
   const toggleSection = (id: string) => {
     setOpenSections(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
-  // কারেন্ট চ্যাপ্টার পরিবর্তন হলে স্ক্রল করার লজিক
-  useEffect(() => {
-    const isMobile = window.innerWidth < 768;
-    if (activeItemRef.current) {
-      activeItemRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start', // স্ক্রিনের টপে নিয়ে আসবে
-      });
-    }
-  }, [currentChapter]);
-
   return (
-    <div className="space-y-1 font-tarunima">
+    <div 
+      className="space-y-1 font-tarunima overflow-y-auto max-h-screen relative no-scrollbar"
+      style={{ 
+        msOverflowStyle: 'none',  /* IE and Edge */
+        scrollbarWidth: 'none',   /* Firefox */
+      }}
+    >
+      <style jsx>{`
+        div::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
+
       {structure.items?.map((vol: any) => { 
         const isVolume = vol.type === 'volume';
 
@@ -43,16 +41,28 @@ export default function TableOfContents({
           <div key={vol.id} className="border-b border-gray-100 last:border-0 pb-1">
             {isVolume ? (
               <>
-                <button
-                  onClick={() => toggleSection(vol.id)}
-                  className="w-full flex items-center justify-between py-0 px-0 hover:bg-orange-50 transition-all text-red-900 font-medium text-sm"
+                <div
+                  className="w-full flex items-center justify-between py-0 px-0 hover:bg-orange-50 transition-all text-red-900 font-medium text-sm group"
                 >
-                  <span className="flex items-center gap-1.5">
+                  {/* ভলিউম নেম লিংক - এখন এটি সরাসরি ভলিউম পেজে নিয়ে যাবে */}
+                  <Link 
+                    href={`/book/${slug}/${vol.id}`}
+                    className="flex items-center gap-1.5 flex-grow py-1"
+                  >
                     <Folder size={16} className="text-orange-400" />
-                    {vol.title}
-                  </span>
-                  {openSections[vol.id] ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                </button>
+                    <span className="hover:underline underline-offset-4 decoration-orange-300">
+                      {vol.title}
+                    </span>
+                  </Link>
+
+                  {/* টগল বাটন - শুধুমাত্র লিস্ট ওপেন/ক্লোজ করার জন্য */}
+                  <button 
+                    onClick={() => toggleSection(vol.id)}
+                    className="p-1 hover:bg-orange-100 rounded-md transition-colors"
+                  >
+                    {openSections[vol.id] ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                  </button>
+                </div>
 
                 {openSections[vol.id] && (
                   <div className="ml-4 mt-0 space-y-1 border-l-2 border-orange-100 pl-2">
@@ -61,7 +71,6 @@ export default function TableOfContents({
                       return (
                         <Link
                           key={chap.slug}
-                          ref={isActive ? activeItemRef : null} // শুধুমাত্র কারেন্ট লিংকে ref বসবে
                           href={`/book/${slug}/${vol.id}/${chap.slug}`}
                           className={`flex items-center gap-1 text-sm py-1 px-1 border-b border-red-300 transition-colors ${
                             isActive 
@@ -79,7 +88,6 @@ export default function TableOfContents({
               </>
             ) : (
               <Link
-                ref={vol.id === currentChapter ? activeItemRef : null}
                 href={`/book/${slug}/${vol.volumeId}/${vol.id}`}
                 className={`flex items-center gap-1 text-sm py-1 px-1 rounded transition-colors ${
                   vol.id === currentChapter 
