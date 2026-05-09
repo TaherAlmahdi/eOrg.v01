@@ -29,7 +29,7 @@ export default function TableOfContents({
     if (activeItemRef.current) {
       activeItemRef.current.scrollIntoView({
         behavior: 'smooth',
-        block: 'start'
+        block: 'start', // স্ক্রিনের টপে নিয়ে আসবে
       });
     }
   }, [currentChapter]);
