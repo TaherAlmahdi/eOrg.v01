@@ -25,10 +25,11 @@ export default function TableOfContents({
 
   // কারেন্ট চ্যাপ্টার পরিবর্তন হলে স্ক্রল করার লজিক
   useEffect(() => {
+    const isMobile = window.innerWidth < 768;
     if (activeItemRef.current) {
       activeItemRef.current.scrollIntoView({
         behavior: 'smooth',
-        block: 'start', // স্ক্রিনের টপে নিয়ে আসবে
+        block: 'start'
       });
     }
   }, [currentChapter]);
