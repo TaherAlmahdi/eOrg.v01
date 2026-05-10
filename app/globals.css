@@ -153,16 +153,16 @@
 .alap-sin {
   margin-top: 4px;
   margin-bottom: 4px;
-  margin-left: 50px;
+  margin-left: 20px;
   text-align: justify;
 }
 
 .alap-n {
   margin-top: 4px;
   margin-bottom: 4px;
-  margin-left: 50px;
+  margin-left: 20px;
   text-align: justify;
-  text-indent: 25px;
+  text-indent: 20px;
 }
   .normal { text-indent: 30px; }
   .first::first-letter { color: #a7373d; }
