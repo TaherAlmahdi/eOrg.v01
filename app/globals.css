@@ -108,6 +108,7 @@
 
   /* --- সাধারণ টাইপোগ্রাফি --- */
   .first, .dcap, .normal, .pc, .center, .right, .pl, .pr, .poem,
+  .natok, .n-normal, .alap, .alap-sin, .alap-n,
   ol.list, ol.bnlist, ol.plist, ul.custom-list, .center, .none, ul, ul.none {
     font-size: 1.0rem;
     line-height: 1.7;
@@ -118,7 +119,51 @@
     margin-bottom: 0.5rem;
     text-align: justify;
   }
+/* ------ Drama ------ */
 
+.natok {
+  margin-top: 4px;
+  margin-bottom: 4px;
+  margin-left: 50px;
+  text-align: justify;
+  text-align-last: center;
+}
+
+.n-normal {
+  margin-top: 4px;
+  margin-bottom: 4px;
+  margin-left: 50px;
+  text-align: justify;
+  text-align-last: center;
+  text-indent: 30px;
+}
+
+.alap {
+  margin-top: 4px;
+  margin-bottom: 4px;
+  margin-left: 50px;
+  text-align: justify;
+  text-indent: -50px;
+}
+
+.alap::first-letter {
+  color: #bd2e2e!important;
+}
+
+.alap-sin {
+  margin-top: 4px;
+  margin-bottom: 4px;
+  margin-left: 50px;
+  text-align: justify;
+}
+
+.alap-n {
+  margin-top: 4px;
+  margin-bottom: 4px;
+  margin-left: 50px;
+  text-align: justify;
+  text-indent: 25px;
+}
   .normal { text-indent: 30px; }
   .first::first-letter { color: #a7373d; }
 
