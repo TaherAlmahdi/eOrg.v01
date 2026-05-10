@@ -108,7 +108,7 @@ export default async function ChapterPage({ params, searchParams }: Props) {
   // Chapter Navigation Logic
   let prevLink = null;
   if (currentPage > 1) {
-    prevLink = { href: `/book/${slug}/${volume}/${chapter}?page=${currentPage - 1}`, title: `পূর্ববর্তী পৃষ্ঠা (${toBengaliNumber(currentPage - 1)})` };
+    prevLink = { href: `/book/${slug}/${volume}/${chapter}?page=${currentPage - 1}`, title: `পৃষ্ঠা ${toBengaliNumber(currentPage - 1)}` };
   } else if (currentChapterIndex > 0) {
     const prevChapSlug = currentVolChapters[currentChapterIndex - 1].replace('.md', '');
     const prevChapData = matter(fs.readFileSync(path.join(chaptersDir, `${prevChapSlug}.md`), 'utf8')).data;
@@ -119,7 +119,7 @@ export default async function ChapterPage({ params, searchParams }: Props) {
 
   let nextLink = null;
   if (currentPage < totalPages) {
-    nextLink = { href: `/book/${slug}/${volume}/${chapter}?page=${currentPage + 1}`, title: `পরবর্তী পৃষ্ঠা (${toBengaliNumber(currentPage + 1)})` };
+    nextLink = { href: `/book/${slug}/${volume}/${chapter}?page=${currentPage + 1}`, title: `পৃষ্ঠা ${toBengaliNumber(currentPage + 1)}` };
   } else if (currentChapterIndex < currentVolChapters.length - 1) {
     const nextChapSlug = currentVolChapters[currentChapterIndex + 1].replace('.md', '');
     const nextChapData = matter(fs.readFileSync(path.join(chaptersDir, `${nextChapSlug}.md`), 'utf8')).data;
