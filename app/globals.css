@@ -141,9 +141,9 @@
 .alap {
   margin-top: 4px;
   margin-bottom: 4px;
-  margin-left: 50px;
+  margin-left: 20px;
   text-align: justify;
-  text-indent: -50px;
+  text-indent: -20px;
 }
 
 .alap::first-letter {
@@ -153,16 +153,16 @@
 .alap-sin {
   margin-top: 4px;
   margin-bottom: 4px;
-  margin-left: 50px;
+  margin-left: 20px;
   text-align: justify;
 }
 
 .alap-n {
   margin-top: 4px;
   margin-bottom: 4px;
-  margin-left: 50px;
+  margin-left: 20px;
   text-align: justify;
-  text-indent: 25px;
+  text-indent: 20px;
 }
   .normal { text-indent: 30px; }
   .first::first-letter { color: #a7373d; }
@@ -287,6 +287,11 @@
     font-size: 2.9rem;
   }
 
+.alap {
+  margin-left: 35px;
+  text-indent: -35px;
+}
+
 }
 
 /* ==========================================
@@ -304,5 +309,11 @@
       margin-top: 0rem;
       margin-bottom: 0rem;
     }
+
+.alap {
+  margin-left: 50px;
+  text-indent: -50px;
+}
+
   }
 }
