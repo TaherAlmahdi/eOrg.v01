@@ -31,7 +31,9 @@ const genreMap: Record<string, string> = {
   "others": "বিবিধ",
   "romantic-novel": "রোমান্টিক উপন্যাস",
   "historical-novel": "ঐতিহাসিক উপন্যাস",
-  "social-novel": "সামাজিক উপন্যাস"
+  "social-novel": "সামাজিক উপন্যাস",
+  "hinduism": "হিন্দুধর্ম",
+  "philosophy": "দর্শন"
 };
 
 type Props = {
