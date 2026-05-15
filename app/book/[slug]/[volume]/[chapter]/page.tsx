@@ -168,8 +168,8 @@ export default async function ChapterPage({ params, searchParams }: Props) {
 
   return (
     <main className="bg-[#fdfcf8] min-h-screen">
-      <nav className="w-full bg-[#7575a3] border-b border-gray-200 py-2 px-3 text-white flex flex-wrap gap-2">
-        <div className="max-w-[1440px] mx-auto text-sm font-tarunima flex items-center whitespace-nowrap">
+      <nav className="w-full bg-[#7575a3] border-b border-gray-200 py-2 px-3 text-white">
+  <div className="max-w-[1440px] mx-auto text-sm font-tarunima flex flex-wrap items-center gap-2">
           <Link href="/" className="shrink-0"><Home size={16} /></Link> 
           <span className="mx-2 text-white/50 shrink-0">/</span>
           <Link href="/books" className="hover:text-red-100 shrink-0">গ্রন্থাগার</Link> 
