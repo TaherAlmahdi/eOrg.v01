@@ -177,7 +177,7 @@ export default async function ChapterPage({ params, searchParams }: Props) {
           <Link href={`/book/${slug}`} className="hover:text-red-100 shrink-0">{bookData.title}</Link>
           <span className="mx-1 text-white/50 shrink-0">/</span>
           <Link href={`/book/${slug}/${volume}`} className="hover:text-red-100 shrink-0">{currentVolTitle}</Link>
-          <span className="mx-1 text-white/50 shrink-0">/</span>
+          <span className="mx-1 text-white/50">/</span>
           <span className="font-medium shrink-0">{chapData.title || chapter} {totalPages > 1 && `(পৃষ্ঠা ${toBengaliNumber(currentPage)})`}</span>
         </div>
       </nav>
