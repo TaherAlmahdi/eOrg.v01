@@ -19,7 +19,7 @@ const Header = () => {
 
   return (
     <header className="bg-[#ffffff] border-b border-gray-200 py-2 px-3 sticky top-0 z-50 shadow-sm font-tarunima">
-      <div className="max-w-[1440px] mx-auto flex items-center justify-between gap-4">
+      <div className="max-w-full mx-auto flex items-center justify-between gap-4">
         
         {/* লোগো সেকশন */}
         <div className="flex items-center gap-3">
@@ -27,7 +27,7 @@ const Header = () => {
             <div className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
               <Image 
                 src={siteLogo}
-                alt="বঙ্কিম রচনাবলী"
+                alt="এডুলিচার"
                 width={48}
                 height={48}
                 className="w-full h-full object-contain drop-shadow-md"
@@ -36,12 +36,11 @@ const Header = () => {
             </div>
 
             <div className="flex flex-col justify-center">
-              <h1 className="text-lg md:text-2xl font-black font-tarunima leading-none tracking-normal md:tracking-[1px]">
-                <span className="text-[#008080]">বঙ্কিম</span>
-                <span className="text-[#cc7a00]"> রচনাবলী</span>
+              <h1 className="text-2xl md:text-3xl font-black font-tarunima leading-none tracking-normal md:tracking-[1px] pb-1">
+                <span className="text-[#008080]">এডুলিচার</span>
               </h1>
-              <p className="hidden md:block text-[14px] text-gray-600 mt-1 font-tarunima font-normal tracking-[1px]">
-                এডুলিচার বিশুদ্ধজ্ঞান প্রকল্প
+              <p className="hidden md:block text-[14px] mt-1 font-tarunima font-normal tracking-[1px]">
+                  <span className="text-gray-600">বিশুদ্ধজ্ঞানের প্রত্যয়</span>
               </p>
             </div>
           </Link>
@@ -58,7 +57,7 @@ const Header = () => {
 
         {/* মোডাল মেনু ওভারলে */}
         {isMenuOpen && (
-          <div className="fixed inset-0 z-[100] flex justify-end">
+          <div className="fixed inset-0 z-100 flex justify-end">
             {/* ব্যাকড্রপ */}
             <div 
               className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300"
@@ -90,7 +89,7 @@ const Header = () => {
 
               <div className="mt-8 pt-4 text-center border-t border-gray-100">
                 <p className="text-[10px] text-gray-400 uppercase tracking-widest font-tarunima">
-                  Eduliture Pure Knowledge Project
+                  বিশুদ্ধজ্ঞানের শিক্ষা বিষয়ক প্রতিষ্ঠান
                 </p>
               </div>
             </div>

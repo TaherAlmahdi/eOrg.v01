@@ -1,7 +1,10 @@
 // app/page.tsx
 
-import WelcomeBadge from './components/Welcome';
-import FeatureContent from './components/FeatureContent';
+
+import WelcomeSection from './components/WelcomeSection';
+import FeatureSection from './components/FeatureSection';
+import AboutSection from './components/AboutSection';
+import GenreList from './components/GenreList';
 import { 
   BookOpen, Info, Users, Sparkles, ShieldCheck, 
   Zap, Feather, Library, History, Mail, Archive
@@ -11,19 +14,19 @@ import { Metadata } from 'next';
 
 // মেটাডেটা এবং ওজি ইমেজ সেটআপ
 export const metadata: Metadata = {
-  title: "বঙ্কিম রচনাবলী | এডুলিচার বিশুদ্ধজ্ঞান প্রকল্প",
-  description: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়ের কালজয়ী সাহিত্যকর্মের ডিজিটাল সংগ্রহশালা। উপন্যাস, প্রবন্ধ, রম্য সাহিত্য ও গবেষণামূলক রচনার এক বিশাল আর্কাইভ।",
+  title: "এডুলিচার ❀ বিশুদ্ধজ্ঞানের প্রত্যয়",
+  description: "জ্ঞান হোক উন্মুক্ত।",
   openGraph: {
-    title: "বঙ্কিম রচনাবলী | এডুলিচার বিশুদ্ধজ্ঞান প্রকল্প",
-    description: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়ের সাহিত্যের ডিজিটাল আর্কাইভ।",
-    url: 'https://bankim.eduliture.org', // আপনার ডোমেইন অনুযায়ী পরিবর্তন করুন
-    siteName: 'বঙ্কিম রচনাবলী',
+    title: "এডুলিচার ❀ বিশুদ্ধজ্ঞানের প্রত্যয়",
+    description: "শিক্ষা, সাহিত্য, সংস্কৃতি–বিশুদ্ধজ্ঞান।",
+    url: 'https://www.eduliture.org', // আপনার ডোমেইন অনুযায়ী পরিবর্তন করুন
+    siteName: 'এডুলিচার',
     images: [
       {
         url: '/og-image.jpg', // public ফোল্ডারে থাকা ওজি ইমেজের পাথ
         width: 1200,
         height: 630,
-        alt: 'বঙ্কিম রচনাবলী হোমপেজ',
+        alt: 'এডুলিচার প্রবেশক',
       },
     ],
     locale: 'bn_BD',
@@ -31,8 +34,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: "বঙ্কিম রচনাবলী",
-    description: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়ের সাহিত্যের ডিজিটাল আর্কাইভ।",
+    title: "এডুলিচার ❀ বিশুদ্ধজ্ঞানের প্রত্যয়",
+    description: "শিক্ষা, সাহিত্য, সংস্কৃতি–বিশুদ্ধজ্ঞান।",
     images: ['/og-image.jpg'],
   },
 };
@@ -40,28 +43,38 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-[#fdfdf7]">
-      <main className="flex-grow">
-        {/* ওয়েলকাম সেকশন */}
-        <section className="relative bg-white">
-          <div className="max-w-[1440px] mx-auto">
-            <WelcomeBadge />
-          </div>
-        </section>
+      <main className="grow">
 
         {/* ফিচার কন্টেন্ট সেকশন */}
-        <section className="relative bg-white pb-[15px]">
-          <div className="max-w-[1440px] mx-auto px-3 md:px-3">
-            <FeatureContent />
+        <section className="relative bg-white">
+          <div className="max-w-full mx-auto px-0 md:px-0">
+            <WelcomeSection />
+          </div>
+        </section>
+        <section className="relative pb-3.75">
+          <div className="max-w-full mx-auto px-0 md:px-0">
+            <FeatureSection />
           </div>
         </section>
 
-        {/* বঙ্কিম সাহিত্য বিন্যাস ও ফিচার কার্ডস */}
-        <section className="py-10 px-4 bg-[#f0f2f4]">
-          <div className="max-w-[1440px] mx-auto">
+        <section className="py-0 px-0 bg-[#f0f2f4]">
+          <div className="max-w-full mx-auto px-0 md:px-0">
+            <GenreList />
+          </div>
+        </section>        
+        
+        <section className="py-0 px-0 bg-[#f0f2f4]">
+          <div className="max-w-full mx-auto px-0 md:px-0">
+            <AboutSection />
+          </div>
+        </section>   
+
+        <section className="py-0 px-0 bg-[#f0f2f4]">
+          <div className="max-w-full mx-auto">
             {/* হেডিং */}
             <div className="flex justify-center">
               <div className="inline-flex items-center justify-center gap-4 px-5 py-2 rounded bg-teal-50 text-[#008080] mb-8 animate-pulse border border-teal-100 shadow-sm text-center">
-                <Sparkles size={28} className="flex-shrink-0" />
+                <Sparkles size={28} className="shrink-0" />
                 <h1 className="text-xl md:text-2xl font-tarunima font-black text-gray-900 leading-none tracking-tight">
                   <span className="text-[#008080]">বঙ্কিম</span> রচনা <span className="text-[#cc7a00]">বিন্যাস</span>
                 </h1>

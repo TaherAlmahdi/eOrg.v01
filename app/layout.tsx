@@ -28,12 +28,12 @@ const tarunima = localFont({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://bankim-rachanabali.vercel.app'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://eduliture.vercel.app'),
   title: {
-    default: 'বঙ্কিম রচনাবলী',
-    template: '%s | বঙ্কিম রচনাবলী'
+    default: 'এডুলিচার',
+    template: '%s ❀ এডুলিচার'
   },
-  description: 'বঙ্কিমচন্দ্র চট্টোপাধ্যায়ের সকল সাহিত্যকর্মের ডিজিটাল সংগ্রহশালা',
+  description: 'বিশুদ্ধজ্ঞানের শিক্ষাবিষয়ক প্রতিষ্ঠান',
 };
 
 export default function RootLayout({
@@ -59,7 +59,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-[#fdfdf7] text-gray-900 font-tarunima">
         <Header />
-        <main className="flex-grow">
+        <main className="grow">
           {children}
         </main>
         <Footer />

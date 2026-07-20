@@ -12,7 +12,7 @@
     "@vercel/analytics": "^2.0.1",
     "gray-matter": "^4.0.3",
     "lucide-react": "^1.8.0",
-    "next": "16.2.4",
+    "next": "^16.2.10",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "rehype-raw": "^7.0.0",
@@ -20,7 +20,8 @@
     "remark": "^15.0.1",
     "remark-html": "^16.0.1",
     "remark-parse": "^11.0.0",
-    "remark-rehype": "^11.1.2"
+    "remark-rehype": "^11.1.2",
+    "slugify": "^1.6.9"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
