@@ -1,13 +1,13 @@
 @import "tailwindcss";
 
 /* ==========================================
-   ১. বেস স্টাইল ও ভেরিয়েবল (Root & Base)
+   ১. বেস স্টাইল ও ভেরিয়েবল (Root & Base)
    ========================================== */
 @layer base {
   :root {
     --background: #fdfdf7;
     --foreground: #171717;
-    --accent-purple: #7D3C98;
+    --accent-purple: #7d3c98;
     --accent-red: #8b0000;
     --accent-gold: #666600;
     --bg-purple-light: #f3ebf7;
@@ -38,8 +38,16 @@
    ========================================== */
 @layer components {
   /* লিংকের স্টাইল */
-  .normal a, .first a, .dcap a { color: #cc0044; }
-  .normal a:hover, .first a:hover, .dcap a:hover { color: #80002a; }
+  .normal a,
+  .first a,
+  .dcap a {
+    color: #cc0044;
+  }
+  .normal a:hover,
+  .first a:hover,
+  .dcap a:hover {
+    color: #80002a;
+  }
 
   /* ইনলাইন ও রাইট অ্যালাইনমেন্ট */
   span.right {
@@ -50,8 +58,7 @@
   }
 
   /* --- নোট ও ফুটনোট স্পেসিফিক স্টাইল --- */
-  /* ১. নোটের ভেতর কাস্টম ক্লাসের ইনহেরিটেন্স */
-  .not-prose .right, 
+  .not-prose .right,
   .not-prose .poem,
   .not-prose .first,
   .not-prose .pc,
@@ -61,7 +68,6 @@
     text-align: inherit;
   }
 
-  /* ২. ফুটনোট (ol) স্টাইল */
   ol.not-prose .right,
   ol.not-prose .pc,
   ol.not-prose .first,
@@ -78,107 +84,134 @@
     padding: 0 !important;
   }
 
-  /* ৩. নোটের ভেতর .right এর বিশেষ ট্রিটমেন্ট */
   .not-prose .right {
     display: block !important;
     text-align: right !important;
     width: 100% !important;
   }
 
-  /* ৪. নোটের ভেতর .pc এর বিশেষ ট্রিটমেন্ট */
   .not-prose .pc {
     display: block !important;
     text-align: center !important;
   }
 
   /* কবিতা/শ্লোক (Poem) - ডিফল্ট মোবাইল ভিউ */
-  .not-prose .poem, .poem {
+  .not-prose .poem,
+  .poem {
     display: block !important;
     width: fit-content !important;
     min-width: 200px;
     max-width: 95% !important;
     margin-left: auto !important;
     margin-right: auto !important;
-      margin-top: 0rem;
-      margin-bottom: 0rem;
+    margin-top: 0rem;
+    margin-bottom: 0rem;
     text-align: left;
     line-height: 1.7;
-    font-size: 1.0rem;
+    font-size: 1.1rem;
   }
 
-  /* --- সাধারণ টাইপোগ্রাফি --- */
-  .first, .dcap, .normal, .pc, .center, .right, .pl, .pr, .poem,
-  .natok, .n-normal, .alap, .alap-sin, .alap-n,
-  ol.list, ol.bnlist, ol.plist, ul.custom-list, .center, .none, ul, ul.none {
-    font-size: 1.0rem;
-    line-height: 1.7;
+  /* --- সাধারণ টাইপোগ্রাফি (মোবাইল/ডিফল্ট) --- */
+  .first,
+  .dcap,
+  .normal,
+  .pc,
+  .center,
+  .right,
+  .pl,
+  .pr,
+  .poem,
+  .natok,
+  .n-normal,
+  .alap,
+  .alap-sin,
+  .alap-n,
+  ol.list,
+  ol.bnlist,
+  ol.plist,
+  ul.custom-list,
+  .none,
+  ul,
+  ul.none {
+    font-size: 1.15rem !important; /* আগের 1.35rem থেকে কমিয়ে সামঞ্জস্যপূর্ণ করা হলো */
+    line-height: 1.75;
     color: var(--text-main);
   }
 
-  .first, .dcap, .normal {
+  .first,
+  .dcap,
+  .normal {
     margin-bottom: 0.5rem;
     text-align: justify;
   }
-/* ------ Drama ------ */
 
-.natok {
-  margin-top: 4px;
-  margin-bottom: 4px;
-  margin-left: 50px;
-  text-align: justify;
-  text-align-last: center;
-}
+  /* ------ Drama ------ */
+  .natok {
+    margin-top: 4px;
+    margin-bottom: 4px;
+    margin-left: 50px;
+    text-align: justify;
+    text-align-last: center;
+  }
 
-.n-normal {
-  margin-top: 4px;
-  margin-bottom: 4px;
-  margin-left: 50px;
-  text-align: justify;
-  text-align-last: center;
-  text-indent: 30px;
-}
+  .n-normal {
+    margin-top: 4px;
+    margin-bottom: 4px;
+    margin-left: 50px;
+    text-align: justify;
+    text-align-last: center;
+    text-indent: 30px;
+  }
 
-.alap {
-  margin-top: 4px;
-  margin-bottom: 4px;
-  margin-left: 20px;
-  text-align: justify;
-  text-indent: -20px;
-}
+  .alap {
+    margin-top: 4px;
+    margin-bottom: 4px;
+    margin-left: 20px;
+    text-align: justify;
+    text-indent: -20px;
+  }
 
-.alap::first-letter {
-  color: #bd2e2e!important;
-}
+  .alap::first-letter {
+    color: #bd2e2e !important;
+  }
 
-.alap-sin {
-  margin-top: 4px;
-  margin-bottom: 4px;
-  margin-left: 20px;
-  text-align: justify;
-}
+  .alap-sin {
+    margin-top: 4px;
+    margin-bottom: 4px;
+    margin-left: 20px;
+    text-align: justify;
+  }
 
-.alap-n {
-  margin-top: 4px;
-  margin-bottom: 4px;
-  margin-left: 20px;
-  text-align: justify;
-  text-indent: 20px;
-}
-  .normal { text-indent: 30px; }
-  .first::first-letter { color: #a7373d; }
+  .alap-n {
+    margin-top: 4px;
+    margin-bottom: 4px;
+    margin-left: 20px;
+    text-align: justify;
+    text-indent: 20px;
+  }
+
+  .normal {
+    text-indent: 30px;
+  }
+
+  .first::first-letter {
+    color: #a7373d;
+  }
 
   .title {
     color: #52527a;
-    font-size: 1.2rem;
+    font-size: 1.15rem;
     line-height: normal;
     text-align: justify;
     font-weight: 600;
   }
-.poem span.right {
+
+  .poem span.right {
     display: inline-block;
     width: 100%;
     text-align: right;
-}
+  }
+
   strong {
     color: #52527a;
     font-size: inherit;
@@ -187,32 +220,58 @@
   }
 
   /* ইউটিলিটি ক্লাসেস */
-  .dan { text-align: right !important; font-size: inherit !important; } 
-  .center { text-align: center !important; } 
-  .indent { text-indent: 30px !important; font-size: inherit !important; } 
-  .pc, .center { text-align: center; }
-  .right { text-align: right; }
-  .pl { width: 50%; float: left; text-align: left; }
-  .pr { width: 50%; float: right; text-align: right; }
+  .dan {
+    text-align: right !important;
+    font-size: inherit !important;
+  }
+  .center {
+    text-align: center !important;
+  }
+  .indent {
+    text-indent: 30px !important;
+    font-size: inherit !important;
+  }
+  .pc,
+  .center {
+    text-align: center;
+  }
+  .right {
+    text-align: right;
+  }
+  .pl {
+    width: 50%;
+    float: left;
+    text-align: left;
+  }
+  .pr {
+    width: 50%;
+    float: right;
+    text-align: right;
+  }
 
   /* উদ্ধৃতি (Quote) */
-  div.quote, .quote {
+  div.quote,
+  .quote {
     border-left: 3px solid #dddddd;
     margin-left: 15px;
     padding-left: 10px;
     color: #666666;
   }
 
-  div.quote, .quote, .quote .normal, .quote .first, .quote .right {
-    font-size: 0.9rem;
-    line-height: 1.5;
+  div.quote,
+  .quote,
+  .quote .normal,
+  .quote .first,
+  .quote .right {
+    font-size: 1.05rem;
+    line-height: 1.6;
   }
 
   /* ড্রপ ক্যাপ (Drop Cap) */
   .dcap::first-letter {
     float: left;
     line-height: 1;
-    font-size: 2.0rem;
+    font-size: 2rem;
     color: var(--accent-purple);
     font-family: var(--font-tarunima);
     padding: 2px 4px;
@@ -222,30 +281,82 @@
   }
 
   /* শিরোনাম (Titles) */
-  .bname, .wname, .subtitle, .chapter {
+  .bname,
+  .wname,
+  .subtitle,
+  .chapter {
     font-family: var(--font-sabrina) !important;
     text-align: center;
     display: block;
     clear: both;
   }
 
-  .bname { font-size: 1.8rem; color: var(--accent-purple); margin: .1rem 0; }
-  .wname { font-size: 1.6rem; color: var(--accent-gold); margin: .1rem 0; }
-  .subtitle, .chapter { color: var(--accent-red); font-size: 1.2rem; font-weight: 700; border-bottom: 1px solid #eee; }
+  .bname {
+    font-size: 1.6rem;
+    color: var(--accent-purple);
+    margin: 0.1rem 0;
+  }
+  .wname {
+    font-size: 1.4rem;
+    color: var(--accent-gold);
+    margin: 0.1rem 0;
+  }
+  .subtitle,
+  .chapter {
+    color: var(--accent-red);
+    font-size: 1.15rem;
+    font-weight: 700;
+    border-bottom: 1px solid #eee;
+  }
 
   /* গ্যাপ ও মার্জিন */
-  .hgap { margin: 0 10%; }
-  .pgap { margin: 0 50px; }
-  .ngap { margin: 0 15px; }
-  .pcg { margin: 25px 0 5px 0; font-size: 1.1em; text-align: center; color: var(--accent-blue); }
+  .hgap {
+    margin: 0 10%;
+  }
+  .pgap {
+    margin: 0 50px;
+  }
+  .ngap {
+    margin: 0 15px;
+  }
+  .pcg {
+    margin: 25px 0 5px 0;
+    font-size: 1rem;
+    text-align: center;
+    color: var(--accent-blue);
+  }
 
   /* লিস্ট স্টাইল */
-  ol.list, ol.bnlist, ol.plist { margin-left: 45px; list-style-type: bengali; text-align: justify; }
-  ul, ul.none { margin-left: 30px; list-style-type: none; text-align: justify; }
-  
-  ul.custom-list { list-style: none; margin-left: 25px; margin-bottom: 0rem; padding-left: 0px; }
-  ul.custom-list li { position: relative; padding-left: 20px; line-height: 1.6; font-size: 1.15rem; color: var(--text-main); }
-  ul.custom-list li::before, .sidebar ul li:before, ul.cont li:before {
+  ol.list,
+  ol.bnlist,
+  ol.plist {
+    margin-left: 45px;
+    list-style-type: bengali;
+    text-align: justify;
+  }
+  ul,
+  ul.none {
+    margin-left: 30px;
+    list-style-type: none;
+    text-align: justify;
+  }
+
+  ul.custom-list {
+    list-style: none;
+    margin-left: 25px;
+    margin-bottom: 0rem;
+    padding-left: 0px;
+  }
+  ul.custom-list li {
+    position: relative;
+    padding-left: 20px;
+    line-height: 1.6;
+    font-size: 1.15rem;
+    color: var(--text-main);
+  }
+  ul.custom-list li::before,
+  .sidebar ul li:before,
+  ul.cont li:before {
     content: "❀";
     display: inline-block;
     width: var(--icon-space);
@@ -254,9 +365,22 @@
     color: #2596be;
   }
 
-  ul.cont li { margin-bottom: 2px; border: 1px solid #ebf9f6; background: #ebf9f6; padding: 5px 5px 1px 7px; list-style: none; }
+  ul.cont li {
+    margin-bottom: 2px;
+    border: 1px solid #ebf9f6;
+    background: #ebf9f6;
+    padding: 5px 5px 1px 7px;
+    list-style: none;
+  }
 
-  .theend, .end { display: block; width: 150px; margin: 40px auto; opacity: 0.6; content: url('/theend.png'); }
+  .theend,
+  .end {
+    display: block;
+    width: 150px;
+    margin: 40px auto;
+    opacity: 0.6;
+    content: url("/theend.png");
+  }
 }
 
 /* ==========================================
@@ -264,34 +388,59 @@
    ========================================== */
 @media (min-width: 769px) {
   @layer components {
-    .first, .dcap, .normal, .pc, .center, .right, .pl, .pr, .poem,
-    ol.list, ol.bnlist, ol.plist .none, ul, ul.none { font-size: 1.0rem; }
+    .first,
+    .dcap,
+    .normal,
+    .pc,
+    .center,
+    .right,
+    .pl,
+    .pr,
+    .poem,
+    ol.list,
+    ol.bnlist,
+    ol.plist,
+    .none,
+    ul,
+    ul.none {
+      font-size: 1.25rem !important; /* আগের 1.5rem থেকে কমিয়ে 1.25rem করা হলো */
+    }
 
-    .title { font-size: 1.25rem; }
-    .dcap::first-letter { font-size: 1.8rem; padding: 4px 6px; }
-    .bname { font-size: 2.2rem; }
-    .wname { font-size: 2.0rem; }
-    .subtitle, .chapter { font-size: 1.4rem; }
+    .title {
+      font-size: 1.3rem;
+    }
+    .dcap::first-letter {
+      font-size: 2.2rem;
+      padding: 3px 5px;
+    }
+    .bname {
+      font-size: 1.8rem;
+    }
+    .wname {
+      font-size: 1.6rem;
+    }
+    .subtitle,
+    .chapter {
+      font-size: 1.25rem;
+    }
 
-    .not-prose .poem, .poem {
+    .not-prose .poem,
+    .poem {
       max-width: 70% !important;
       font-size: inherit !important;
       margin-top: 0rem;
       margin-bottom: 0rem;
     }
-    
-    ul.custom-list li { font-size: 1.25rem; }
-  }
-    /* ড্রপ ক্যাপ (Drop Cap) */
-  .dcap::first-letter {
-    font-size: 2.9rem;
-  }
 
-.alap {
-  margin-left: 35px;
-  text-indent: -35px;
-}
+    ul.custom-list li {
+      font-size: 1.25rem;
+    }
 
+    .alap {
+      margin-left: 35px;
+      text-indent: -35px;
+    }
+  }
 }
 
 /* ==========================================
@@ -299,21 +448,38 @@
    ========================================== */
 @media (min-width: 1440px) {
   @layer components {
-    .first, .dcap, .normal, .pc, .center, .right, .pl, .pr, .poem,
-    ol.list, ol.bnlist, ol.plist .none, ul, ul.none { font-size: 1.25rem; }
+    .first,
+    .dcap,
+    .normal,
+    .pc,
+    .center,
+    .right,
+    .pl,
+    .pr,
+    .poem,
+    ol.list,
+    ol.bnlist,
+    ol.plist,
+    .none,
+    ul,
+    ul.none {
+      font-size: 1.35rem !important; /* বড় মনিটরেও যাতে অতিরিক্ত বড় না দেখায় */
+    }
 
-    .title { font-size: 1.5rem; }
+    .title {
+      font-size: 1.4rem;
+    }
 
-    .not-prose .poem, .poem {
+    .not-prose .poem,
+    .poem {
       max-width: 50% !important;
       margin-top: 0rem;
       margin-bottom: 0rem;
     }
 
-.alap {
-  margin-left: 50px;
-  text-indent: -50px;
-}
-
+    .alap {
+      margin-left: 50px;
+      text-indent: -50px;
+    }
   }
 }

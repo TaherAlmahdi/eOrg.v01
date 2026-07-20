@@ -24,7 +24,7 @@ async function getSuccessStories(): Promise<StoryItem[]> {
   const files = fs.readdirSync(targetDir);
   
   const stories = files
-    .filter((file) => file.endsWith('.mdx'))
+    .filter((file) => file.endsWith('.md'))
     .map((file) => {
       const filePath = path.join(targetDir, file);
       const fileContent = fs.readFileSync(filePath, 'utf-8');
@@ -50,13 +50,13 @@ export default async function SuccessStories() {
 
   return (
     <section 
-      className="relative w-full h-auto bg-cover bg-center bg-no-repeat bg-fixed py-8 px-4 overflow-hidden"
+      className="relative w-full h-auto bg-cover bg-center bg-no-repeat bg-fixed py-8 px-4 overflow-x-clip"
       style={{ backgroundImage: "url('/bg03.png')" }} 
     >
       
       <div className="absolute inset-0 bg-[#ffcc66]/20 z-10 pointer-events-none backdrop-blur-[1px]" />
       
-      <div className="relative z-10 mx-auto w-full">
+      <div className="relative z-10 mx-auto w-full max-w-full overflow-hidden">
         
         {/* প্রধান হেডার সেকশন */}
         <div className="flex justify-center pt-2 md:pt-2">
@@ -76,17 +76,17 @@ export default async function SuccessStories() {
           আমাদের সম্পন্ন হওয়া দীর্ঘমেয়াদী প্রকল্পসমূহের একটি সংক্ষিপ্ত তালিকা। এই প্রজেক্টগুলোর সফল বাস্তবায়ন আমাদের কাজের পরিধি এবং গুণগত মানকে প্রকাশ করে। এডুলিচারের প্রথম সাফল্য ছিল ১৯৯৮ সালের ভাষা শহীদ দিবস উপলক্ষ্যে একটি সাহিত্য সঙ্কলন প্রকাশ। এরপর একই সালে বিদ্রোহী কবি ও বাংলাদেশের জাতীয় কবি কাজী নজরুল ইসলামের জন্মশতবার্ষিকী উপলক্ষ্যে নানান আয়োজন…
         </p>
 
-        {/* CARD কন্টেইনার */}
-        <div className="flex flex-wrap gap-1.25 justify-start items-stretch relative z-20">
+        {/* CARD কন্টেইনার: সঠিক পিক্সেল পারফেক্ট গ্রিডের জন্য ফ্লুয়িড ফ্লেক্স উইডথ */}
+        <div className="flex flex-wrap gap-3 justify-start items-stretch relative z-20 w-full">
           {stories.map((story, index) => (
             <a
               key={index}
               href={story.externalLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-3 px-2 py-2 rounded bg-white/90 text-[#008080] border border-teal-100 shadow-sm text-center transition-all duration-300 backdrop-blur-sm hover:bg-teal-50 hover:shadow-lg hover:border-teal-300 hover:scale-[1.03] grow basis-[calc(50%-5px)] sm:basis-[calc(33.3333%-5px)] lg:basis-[calc(25%-5px)] xl:basis-[calc(20%-5px)] 2xl:basis-[calc(16.666%-5px)] max-w-full group cursor-pointer"
+              className="flex items-center justify-center gap-1.25 px-3 py-2.5 rounded bg-white/90 text-[#008080] border border-teal-100 shadow-sm text-center transition-all duration-300 backdrop-blur-sm hover:bg-teal-50 hover:shadow-lg hover:border-teal-300 hover:scale-[1.02] shrink-0 grow basis-full sm:basis-[calc(50%-0.75rem)] lg:basis-[calc(33.333%-0.75rem)] xl:basis-[calc(25%-0.75rem)] 2xl:basis-[calc(20%-0.75rem)] max-w-full group cursor-pointer overflow-hidden"
             >
- 
+
               <div className="relative w-12 h-12 shrink-0 overflow-hidden">
                 <Image
                   src={story.icon}
@@ -98,8 +98,8 @@ export default async function SuccessStories() {
               </div>
 
               {/* ডানে টাইটেল ও ট্যাগ লাইন */}
-              <div className="grow text-left flex flex-col justify-center">
-                <h3 className="text-green text-lg md:text-xl font-semibold leading-snug font-tarunima">
+              <div className="grow text-left flex flex-col justify-center min-w-0">
+                <h3 className="text-green text-lg md:text-xl font-semibold leading-snug font-tarunima truncate">
                   {story.title}
                 </h3>
                 {story.excerpt && (
