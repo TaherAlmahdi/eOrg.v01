@@ -6,11 +6,7 @@ import WelcomeBadge from './Welcome';
 const FeatureContent = () => {
   return (
       <div
-        /* 
-          - w-[100dvw]: dynamic viewport width যা স্ক্রলবারের উইডথ হিসাব করে নিখুঁত স্ক্রিন-ওয়াইড সাইজ দেয়।
-          - left-1/2 right-1/2: মেইন কন্টেনারের বাইরে ব্লিড (bleed) করার জন্য।
-        */
-        className="relative w-dvw left-1/2 right-1/2 overflow-hidden h-auto min-h-25"
+        className="relative w-dvw left-1/2 right-1/2 overflow-hidden h-auto"
         style={{
           backgroundImage: "url('/bg01.png')",
           backgroundSize: "cover",

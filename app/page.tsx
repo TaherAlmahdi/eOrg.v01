@@ -5,6 +5,7 @@ import WelcomeSection from './components/WelcomeSection';
 import FeatureSection from './components/FeatureSection';
 import AboutSection from './components/AboutSection';
 import GenreList from './components/GenreList';
+import SuccessStories from './components/SuccessStories';
 import { 
   BookOpen, Info, Users, Sparkles, ShieldCheck, 
   Zap, Feather, Library, History, Mail, Archive
@@ -51,7 +52,7 @@ export default function Home() {
             <WelcomeSection />
           </div>
         </section>
-        <section className="relative pb-3.75">
+        <section className="relative pb-0">
           <div className="max-w-full mx-auto px-0 md:px-0">
             <FeatureSection />
           </div>
@@ -61,8 +62,14 @@ export default function Home() {
           <div className="max-w-full mx-auto px-0 md:px-0">
             <GenreList />
           </div>
-        </section>        
-        
+        </section>
+
+        <section className="py-0 px-0 bg-[#f0f2f4]">
+          <div className="max-w-full mx-auto px-0 md:px-0">                
+            <SuccessStories />
+          </div>
+        </section>
+
         <section className="py-0 px-0 bg-[#f0f2f4]">
           <div className="max-w-full mx-auto px-0 md:px-0">
             <AboutSection />
