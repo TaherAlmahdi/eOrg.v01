@@ -11,71 +11,65 @@ interface Book {
   slug: string;
   title: string;
   author: string;
-  genres: string[]; // একাধিক জনরা সাপোর্ট করার জন্য স্ট্রিং অ্যারে
+  genres: string[];
   publishDate?: string;
-  coverImage?: string;
+  coverImage?: string; // ক্যামেলকেস প্রপার্টি নাম নিশ্চিত করা হলো
 }
 
 // ২. সিকোয়েনশিয়াল ফর-লুপ দিয়ে ডাটা ফেচিং ফাংশন
 async function getLibraryBooks(): Promise<{ latestBooks: Book[]; booksByGenre: Record<string, Book[]> }> {
   const booksDirectory = path.join(process.cwd(), 'content', 'books');
-  let allBooks: Book[] = [];
+  const allBooks: Book[] = [];
 
   try {
     // ক) প্রথম লেভেল: সব লেখক (Author) ফোল্ডার রিড করা
     const authorItems = await fs.readdir(booksDirectory, { withFileTypes: true });
     
     for (const authorItem of authorItems) {
-      if (authorItem.isDirectory()) {
-        const authorFolderName = authorItem.name;
-        const authorFolderPath = path.join(booksDirectory, authorFolderName);
-        
-        // খ) দ্বিতীয় লেভেল: লেখকের ভেতরের সব বইয়ের (Book) ফোল্ডার রিড করা
-        const bookItems = await fs.readdir(authorFolderPath, { withFileTypes: true });
+      if (!authorItem.isDirectory()) continue;
 
-        for (const bookItem of bookItems) {
-          if (bookItem.isDirectory()) {
-            const bookFolderName = bookItem.name; // এটিই বইয়ের আসল slug (যেমন: anandamoth)
-            const indexMdPath = path.join(authorFolderPath, bookFolderName, 'index.md');
+      const authorFolderName = authorItem.name;
+      const authorFolderPath = path.join(booksDirectory, authorFolderName);
+      
+      // খ) দ্বিতীয় লেভেল: লেখকের ভেতরের সব বইয়ের (Book) ফোল্ডার রিড করা
+      const bookItems = await fs.readdir(authorFolderPath, { withFileTypes: true });
 
-            try {
-              const fileContents = await fs.readFile(indexMdPath, 'utf8');
-              
-              // gray-matter দিয়ে ফ্রন্টমেটার পার্স
-              const { data } = matter(fileContents);
-              
-              // genre একক স্ট্রিং নাকি অ্যারে তা যাচাই করে নরমাল অ্যারেতে রূপান্তর
-              let extractedGenres: string[] = ['অন্যান্য'];
-              if (data.genre) {
-                if (Array.isArray(data.genre)) {
-                  extractedGenres = data.genre;
-                } else {
-                  extractedGenres = [data.genre];
-                }
-              }
-              
-              allBooks.push({
-                id: `${authorFolderName}-${bookFolderName}`,
-                slug: bookFolderName,
-                title: data.title || 'শিরোনামহীন বই',
-                author: data.author || 'অজ্ঞাত লেখক',
-                genres: extractedGenres,
-                publishDate: data.date ? String(data.date) : '',
-                coverImage: data.cover_image || '', // ফ্রন্টমেটারের 'cover_image' ম্যাপিং ফিক্স
-              });
-            } catch (fileError) {
-              console.warn(`ফাইল রিড করা যায়নি: ${indexMdPath}`);
-              continue;
-            }
+      for (const bookItem of bookItems) {
+        if (!bookItem.isDirectory()) continue;
+
+        const bookFolderName = bookItem.name; 
+        const indexMdPath = path.join(authorFolderPath, bookFolderName, 'index.md');
+
+        try {
+          const fileContents = await fs.readFile(indexMdPath, 'utf8');
+          const { data } = matter(fileContents);
+          
+          // genre একক স্ট্রিং নাকি অ্যারে তা যাচাই করে নরমাল অ্যারেতে রূপান্তর
+          let extractedGenres: string[] = ['অন্যান্য'];
+          if (data.genre) {
+            extractedGenres = Array.isArray(data.genre) ? data.genre : [data.genre];
           }
+          
+          allBooks.push({
+            id: `${authorFolderName}-${bookFolderName}`,
+            slug: bookFolderName,
+            title: data.title || 'শিরোনামহীন বই',
+            author: data.author || 'অজ্ঞাত লেখক',
+            genres: extractedGenres,
+            publishDate: data.date ? String(data.date) : '',
+            coverImage: data.cover_image || '', // মার্কডাউনের cover_image-কে প্রপার্টিতে এসাইন করা হলো
+          });
+        } catch (fileError) {
+          console.warn(`ফাইল রিড করা যায়নি: ${indexMdPath}`);
+          continue;
         }
       }
     }
 
     // তারিখ অনুযায়ী সাজানো (নতুন আপলোড হওয়া বই আগে আসবে)
-    const sortedBooks = allBooks.sort((a, b) => {
-      return (b.publishDate || '').localeCompare(a.publishDate || '');
-    });
+    const sortedBooks = allBooks.sort((a, b) => 
+      (b.publishDate || '').localeCompare(a.publishDate || '')
+    );
 
     // 'সংযোজন' সেকশনের জন্য প্রথম ৮টি বই
     const latestBooks = sortedBooks.slice(0, 8);
@@ -88,7 +82,6 @@ async function getLibraryBooks(): Promise<{ latestBooks: Book[]; booksByGenre: R
         if (!booksByGenre[gName]) {
           booksByGenre[gName] = [];
         }
-        // একই বই ওই নির্দিষ্ট জনরা গ্রুপে পুশ হচ্ছে
         booksByGenre[gName].push(book);
       }
     }
@@ -105,7 +98,7 @@ export default async function LibraryHomePage() {
   const { latestBooks, booksByGenre } = await getLibraryBooks();
 
   return (
-    <div className="max-w-full mx-auto px-4 py-10 space-y-16 font-tarunima">
+    <div className="max-w-full mx-auto px-2 py-2 space-y-16 font-tarunima">
       
       {/* 🆕 ১. সর্বশেষ সংযোজিত বই সেকশন (সংযোজন) */}
       <section aria-labelledby="latest-books-heading">
@@ -122,7 +115,7 @@ export default async function LibraryHomePage() {
         {latestBooks.length === 0 ? (
           <p className="text-sm text-slate-500 py-6">কোনো বই পাওয়া যায়নি।</p>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-5">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
             {latestBooks.map((book) => (
               <BookCard key={book.id} book={book} />
             ))}
@@ -154,16 +147,33 @@ export default async function LibraryHomePage() {
 
 // 🎴 ৪. রিইউজেবল বুক কার্ড সাব-কম্পোনেন্ট
 function BookCard({ book }: { book: Book }) {
+  let formattedCoverPath = book.coverImage || '';
+
+  console.log("বইয়ের শিরোনাম:", book.title, "— প্রচ্ছদের পাথ:", formattedCoverPath);
+  
+  if (formattedCoverPath) {
+    // উইন্ডোজের ব্যাকস্ল্যাশ ফিক্স করা
+    formattedCoverPath = formattedCoverPath.replace(/\\/g, '/');
+    
+    // যদি ভুল করে কেউ public লিখে ফেলে, সেটা কাটার জন্য ব্যাকআপ
+    formattedCoverPath = formattedCoverPath.replace(/^\/?public\//, '/');
+    
+    // শুরুতে স্ল্যাশ না থাকলে যোগ করা
+    if (!formattedCoverPath.startsWith('/')) {
+      formattedCoverPath = '/' + formattedCoverPath;
+    }
+  }
+
   return (
     <Link 
       href={`/book/${book.slug}`}
       className="group flex flex-col h-full border border-slate-100 rounded-xl bg-white p-3.5 shadow-sm hover:shadow-xl hover:border-emerald-100 transition-all duration-300 relative top-0 hover:-top-1"
     >
       <div className="aspect-[3/4] w-full bg-gradient-to-tr from-slate-100 to-slate-50 rounded-lg mb-3 flex flex-col items-center justify-center text-xs text-slate-400 font-medium relative overflow-hidden border border-slate-200/60 shadow-inner group-hover:from-emerald-50 group-hover:to-white transition-colors">
-        {book.coverImage ? (
+        {formattedCoverPath ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img 
-            src={book.coverImage} 
+            src={formattedCoverPath} 
             alt={book.title} 
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" 
           />
