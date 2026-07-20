@@ -1,4 +1,3 @@
-// app/layout.tsx
 import { headers } from 'next/headers';
 import Header from './components/Header'; // আপনার হেডারের সঠিক পাথ দিন
 import Footer from './components/Footer'; // আপনার ফুটারের সঠিক পাথ দিন
@@ -6,6 +5,7 @@ import Footer from './components/Footer'; // আপনার ফুটারে�
 import type { Metadata } from "next";
 import localFont from 'next/font/local';
 import Script from 'next/script';
+import AOSProvider from './components/AOSProvider'; // AOS হ্যান্ডেল করার জন্য নতুন সাব-কম্পোনেন্ট
 import "./globals.css";
 
 // ফন্ট কনফিগারেশন: preload অপশনটি সতর্কতার সাথে ব্যবহার করা হয়েছে
@@ -66,9 +66,7 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        {/* গুগল অ্যাডসেন্স: data-nscript এরর এড়াতে strategy পরিবর্তন করা হয়েছে। 
-           Next.js-এ AdSense-এর জন্য 'lazyOnload' সবচেয়ে নিরাপদ। 
-        */}
+        {/* গুগল অ্যাডসেন্স: data-nscript এরর এড়াতে strategy পরিবর্তন করা হয়েছে। */}
         <Script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5551708286100565"
@@ -77,6 +75,9 @@ export default async function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col bg-[#fdfdf7] text-gray-900 font-tarunima">
+        {/* AOS অ্যানিমেশন সক্রিয় করার জন্য ক্লায়েন্ট প্রোভাইডার */}
+        <AOSProvider />
+
         {/* 🌟 ডাইনামিক ডোমেন কি প্রপ্স হিসেবে পাস করা হলো */}
         <Header domainKey={currentDomainKey} />
         
@@ -84,7 +85,7 @@ export default async function RootLayout({
           {children}
         </main>
         
-        <Footer />
+        <footer />
       </body>
     </html>
   );

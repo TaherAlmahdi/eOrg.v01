@@ -3,6 +3,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import matter from 'gray-matter';
 
+// ১. আপনার রিকোয়ারমেন্ট এবং ফ্রন্টম্যাটারের সাথে মিলিয়ে ইন্টারফেস সংশোধন করা হলো
 export interface Book {
   id: string;
   slug: string;
@@ -10,7 +11,8 @@ export interface Book {
   author: string;
   genres: string[];
   publishDate?: string;
-  coverImage?: string;
+  published?: string; // ফ্রন্টম্যাটারের সরাসরি ডেট/স্ট্রিং রাখার জন্য
+  cover?: string;     // হোমপেজে book.cover ব্যবহারের জন্য
 }
 
 export async function getLibraryBooks(): Promise<{ latestBooks: Book[]; booksByGenre: Record<string, Book[]> }> {
@@ -42,14 +44,16 @@ export async function getLibraryBooks(): Promise<{ latestBooks: Book[]; booksByG
             extractedGenres = Array.isArray(data.genre) ? data.genre : [data.genre];
           }
           
+          // ২. ফ্রন্টম্যাটার থেকে আসা variables ম্যাপিং ঠিক করা হলো
           allBooks.push({
             id: `${authorFolderName}-${bookFolderName}`,
             slug: bookFolderName,
             title: data.title || 'শিরোনামহীন বই',
             author: data.author || 'অজ্ঞাত লেখক',
             genres: extractedGenres,
-            publishDate: data.date ? String(data.date) : '',
-            coverImage: data.cover_image || '',
+            publishDate: data.published ? String(data.published) : (data.date ? String(data.date) : ''),
+            published: data.published ? String(data.published) : '', // সরাসরি published ফিল্ড রিড করবে
+            cover: data.cover || data.cover_image || '', // cover অথবা cover_image ব্যাকআপ সহ রিড করবে
           });
         } catch (fileError) {
           continue;
@@ -57,11 +61,13 @@ export async function getLibraryBooks(): Promise<{ latestBooks: Book[]; booksByG
       }
     }
 
+    // ডেট অনুসারে সাজানো (সবচেয়ে নতুন বইগুলো আগে আসবে)
     const sortedBooks = allBooks.sort((a, b) => 
       (b.publishDate || '').localeCompare(a.publishDate || '')
     );
 
-    const latestBooks = sortedBooks.slice(0, 8);
+    // ৩. ৮টির সীমাবদ্ধতা তুলে পুরো অ্যারে পাঠানো হলো, যাতে হোমপেজ তার প্রয়োজনমতো ১২টি বা তার বেশি ফিল্টার করতে পারে
+    const latestBooks = sortedBooks; 
     const booksByGenre: Record<string, Book[]> = {};
 
     for (const book of sortedBooks) {

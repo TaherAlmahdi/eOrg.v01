@@ -24,7 +24,7 @@ export default async function AuthorLayout({ children, params }: Props) {
         </div>
       </header>
 
-      <main className="flex-grow">{children}</main>
+      <main className="grow">{children}</main>
     </div>
   );
 }

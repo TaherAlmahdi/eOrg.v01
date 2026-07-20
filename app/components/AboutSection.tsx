@@ -59,7 +59,7 @@ const AboutSection = () => {
             </h3>
 
             {/* টেক্সট ইনডেন্ট ২০ পিক্সেল কাস্টম সিএসএস আর্বিট্রারি ভ্যালু দিয়ে ফিক্স করা হয়েছে */}
-            <div className="text-white text-lg md:text-xl leading-relaxed opacity-100 font-normal text-justify [&>p]:mb-4 [&>p]:indent-[20px]">
+            <div className="text-white text-lg md:text-xl leading-relaxed opacity-100 font-normal text-justify">
               <p className="">
                 বই পড়লে অনেক কিছু জানা যায়, ফলে জ্ঞান-বুদ্ধি বাড়ে—সে বিষয়ে কোনো সন্দেহ নেই।
                 এছাড়াও নিয়মিত বই পড়লে মানুষ শারীরিক ও মানসিকভাবে সুস্থ থাকে; ফলে প্রশান্তি
@@ -68,7 +68,7 @@ const AboutSection = () => {
                 সামনে খুলে দেয় নতুন দুয়ার।
               </p>
 
-              <p className="">
+              <p className="[&>p]:mb-4 [&>p]:indent-5">
                 ভূরাজনীতি, মূল্যাধিক্য, মুদ্রণাভাব ইত্যাদি কারণে বই সর্বদা সহজলভ্য হয় না। তাই
                 বই সহজলভ্য করার উদ্দেশ্যে এডুলিচার বাংলা সাহিত্যের মেধাস্বত্বমুক্ত ও
                 মুদ্রণাভাবে দুর্লভ গ্রন্থাদি নিয়ে সাজিয়েছে{" "}
@@ -76,14 +76,11 @@ const AboutSection = () => {
                   href="https://library.eduliture.org"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-yellow-300 underline font-bold"
-                >
-                  এডুলিচার পাঠশালা
-                </a>{" "}
-                নামক অনালাইন প্রকল্প।
+                  className="text-yellow-300 font-normal"
+                >এডুলিচার পাঠশালা</a> নামক অনালাইন প্রকল্প।
               </p>
 
-              <p className="">
+              <p className="[&>p]:mb-4 [&>p]:indent-5">
                 নিয়মিত ঈশ্বরচন্দ্র বিদ্যাসাগর, বঙ্কিমচন্দ্র চট্টোপাধ্যায়, রবীন্দ্রনাথ ঠাকুর,
                 শরৎচন্দ্র চট্টোপাধ্যায়, কাজী নজরুল ইসলাম, সৈয়দ ইসমাইল হোসেন সিরাজিসহ বিশিষ্ট
                 কবি-সাহিত্যিকদের গ্রন্থসমূহ নিয়ে পৃথক পৃথক অনলাইন রচনাবলী প্রকল্প বাস্তবায়ন
@@ -91,7 +88,7 @@ const AboutSection = () => {
               </p>
             </div>
 
-            <div className="mt-8 mb-8 text-center md:text-left">
+            <div className="mt-8 mb-8 text-center md:text-center">
               <Link
                 href="/about"
                 className="inline-block bg-white text-[#00BCD4] font-bold py-2.5 px-8 rounded-[10px] shadow-lg hover:bg-gray-100 transition-all active:scale-95 text-base"

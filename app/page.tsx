@@ -47,36 +47,36 @@ export default function Home() {
       <main className="grow">
 
         {/* ফিচার কন্টেন্ট সেকশন */}
-        <section className="relative bg-white">
+        <section data-aos="fade-down" className="relative bg-white">
           <div className="max-w-full mx-auto px-0 md:px-0">
             <WelcomeSection />
           </div>
         </section>
-        <section className="relative pb-0">
+        <section data-aos="fade-right" className="relative pb-0">
           <div className="max-w-full mx-auto px-0 md:px-0">
             <FeatureSection />
           </div>
         </section>
 
-        <section className="py-0 px-0 bg-[#f0f2f4]">
+        <section data-aos="fade-left" className="py-0 px-0 bg-[#f0f2f4]">
           <div className="max-w-full mx-auto px-0 md:px-0">
             <GenreList />
           </div>
         </section>
 
-        <section className="py-0 px-0 bg-[#f0f2f4]">
+        <section data-aos="fade-up" className="py-0 px-0 bg-[#f0f2f4]">
           <div className="max-w-full mx-auto px-0 md:px-0">                
             <SuccessStories />
           </div>
         </section>
 
-        <section className="py-0 px-0 bg-[#f0f2f4]">
+        <section data-aos="fade-right" className="py-0 px-0 bg-[#f0f2f4]">
           <div className="max-w-full mx-auto px-0 md:px-0">
             <AboutSection />
           </div>
         </section>   
 
-        <section className="py-0 px-0 bg-[#f0f2f4]">
+        <section data-aos="fade-left" className="py-0 px-0 bg-[#f0f2f4]">
           <div className="max-w-full mx-auto">
             {/* হেডিং */}
             <div className="flex justify-center">
