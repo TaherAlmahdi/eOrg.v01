@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 
-import publicLogo from '../../public/elogo.png'; 
+import publicLogo from '../../public/logo/logo.png'; 
 
 const Footer = () => {
   // ইংরেজি সালকে বাংলায় রূপান্তর করার ফাংশন
@@ -16,8 +16,8 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-[#e0e0eb] border-t border-gray-200 py-1 px-1 font-tarunima mt-auto">
-      <div className="max-w-[1440px] mx-auto">
+    <footer className="bg-[#e0e0eb] max-w-full border-t border-gray-200 py-1 px-1 font-tarunima mt-auto">
+      <div className="max-w-full mx-auto">
         
         <div className="flex flex-col md:flex-row justify-between items-center gap-1 text-center md:text-left">
           
@@ -48,7 +48,7 @@ const Footer = () => {
 
           {/* ডানপাশ: কপিরাইট (বড় স্ক্রিনে ডানে, মোবাইলে নিচে) */}
           <div className="md:text-right font-tarunima border-t md:border-t-0 border-gray-300 pt-1 md:pt-0 w-full md:w-auto">
-            <p className="text-[10px] text-gray-600 leading-relaxed">
+            <p className="text-base text-gray-600 leading-relaxed">
               © ১৯৯৯ - {getBengaliYear()} এডুলিচার কর্তৃক সমস্ত অধিকার সংরক্ষিত।
             </p>
           </div>

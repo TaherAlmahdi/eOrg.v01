@@ -96,9 +96,9 @@ export default async function GenrePage({ params }: Props) {
   });
 
   return (
-    <main className="bg-[#fdfcf8] min-h-screen font-tarunima">
+    <main className="bg-[#fdfcf8] max-w-full min-h-screen font-tarunima">
       <nav className="w-full bg-[#7575a3] border-b border-gray-200 py-2 px-3 text-white overflow-x-auto no-scrollbar">
-        <div className="max-w-[1440px] mx-auto text-sm font-tarunima flex items-center whitespace-nowrap">
+        <div className="max-w-full mx-auto text-sm font-tarunima flex items-center whitespace-nowrap">
           <Link href="/" className="shrink-0"><Home size={16} /></Link>
           <span className="mx-2 text-white/50 shrink-0">/</span>
           <Link href="/books" className="hover:text-orange-200">গ্রন্থাগার</Link>
