@@ -23,7 +23,7 @@ const Footer = () => {
           
           {/* বামপাশ: এডুলিচার লোগো, নাম ও ট্যাগ */}
           <div className="flex items-center gap-3">
-            <Link href="https://eduliture.org" target="_blank" className="flex-shrink-0">
+            <Link href="https://eduliture.org" target="_blank" className="shrink-0">
               <div className="w-12 h-12 flex items-center justify-center transition-transform duration-300 hover:scale-110">
                 <Image 
                   src={publicLogo} 

@@ -7,7 +7,7 @@ import { Book } from '../lib/books';
 
 export function BookCard({ book }: { book: Book }) {
   // ১. কভার ইমেজের পাথ ক্লিনিং ও ফরম্যাটিং লজিক
-  let rawPath = (book.coverImage || '').trim().replace(/\\/g, '/');
+  let rawPath = (book.cover || '').trim().replace(/\\/g, '/');
   
   // যদি পাথের শুরুতে 'public/' বা '/public/' থাকে, তা বাদ দেওয়া
   if (rawPath.startsWith('public/')) {
@@ -28,7 +28,7 @@ export function BookCard({ book }: { book: Book }) {
       className="group flex flex-col h-full border border-slate-100 rounded bg-white p-3.5 shadow-sm hover:shadow-xl hover:border-emerald-100 transition-all duration-300"
     >
       {/* ইমেজ কন্টেইনার */}
-      <div className="aspect-[3/4] w-full bg-gradient-to-tr from-slate-100 to-slate-50 rounded mb-3 flex flex-col items-center justify-center text-xs text-slate-400 font-medium relative overflow-hidden border border-slate-200/60 shadow-inner">
+      <div className="aspect-3/4 w-full bg-linear-to-tr from-slate-100 to-slate-50 rounded mb-3 flex flex-col items-center justify-center text-xs text-slate-400 font-medium relative overflow-hidden border border-slate-200/60 shadow-inner">
         {formattedCoverPath && !imageError ? (
           <img 
             src={formattedCoverPath} 
@@ -45,7 +45,7 @@ export function BookCard({ book }: { book: Book }) {
       </div>
       
       {/* টেক্সট কন্টেন্ট */}
-      <div className="flex flex-col flex-grow justify-between pt-1">
+      <div className="flex flex-col grow justify-between pt-1">
         <div>
           <h3 className="font-bold text-sm text-slate-800 line-clamp-2 leading-snug group-hover:text-emerald-600 transition-colors">
             {book.title}

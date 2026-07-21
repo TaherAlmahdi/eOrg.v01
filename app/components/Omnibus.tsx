@@ -62,12 +62,12 @@ export default function Omnibus() {
 
   return (
     <section className="py-12 bg-[#fdfdf7]">
-      <div className="max-w-[1440px] mx-auto px-6">
+      <div className="max-w-full mx-auto px-6">
         <h2 className="text-3xl font-bold text-[#008080] mb-10">অমনিবাস</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-8">
           {books.map((book) => (
             <Link href={`/novel/${book.slug}`} key={book.slug} className="group flex flex-col">
-              <div className="relative aspect-[2/3] w-full overflow-hidden rounded-sm shadow-md transition-all group-hover:-translate-y-2 bg-gray-100">
+              <div className="relative aspect-2/3 w-full overflow-hidden rounded-sm shadow-md transition-all group-hover:-translate-y-2 bg-gray-100">
                 <Image
                   src={book.featuredImage?.node?.sourceUrl || '/placeholder.jpg'}
                   alt={book.title}

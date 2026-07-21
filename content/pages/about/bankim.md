@@ -2,7 +2,7 @@
 title: বঙ্কিম রচনাবলী
 slug: bankim-rachanabali
 
-icon: "/success/bankim.ico"
+icon: "/favicon/favicon-bankim.ico"
 featured_image: "/images/projects/project-dummy.webp"
 excerpt: "বঙ্কিম রচিত সকল সাহিত্যকর্ম"
 category: "রচনাবলী"

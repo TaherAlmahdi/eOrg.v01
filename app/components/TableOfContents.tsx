@@ -47,7 +47,7 @@ export default function TableOfContents({
                   {/* ভলিউম নেম লিংক - এখন এটি সরাসরি ভলিউম পেজে নিয়ে যাবে */}
                   <Link 
                     href={`/book/${slug}/${vol.id}`}
-                    className="flex items-center gap-1.5 flex-grow py-1"
+                    className="flex items-center gap-1.5 grow py-1"
                   >
                     <Folder size={16} className="text-orange-400" />
                     <span className="hover:underline underline-offset-4 decoration-orange-300">

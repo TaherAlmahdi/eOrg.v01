@@ -1,7 +1,7 @@
 import { headers } from 'next/headers';
 import Header from './components/Header'; // আপনার হেডারের সঠিক পাথ দিন
 import Footer from './components/Footer'; // আপনার ফুটারের সঠিক পাথ দিন
-
+import { getSubdomainData } from '@/app/lib/get-site-data'; // সঠিক পাথ সেট করা হলো
 import type { Metadata } from "next";
 import localFont from 'next/font/local';
 import Script from 'next/script';
@@ -30,14 +30,42 @@ const tarunima = localFont({
   preload: true,
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://eduliture.vercel.app'),
-  title: {
-    default: 'এডুলিচার',
-    template: '%s ❀ এডুলিচার'
-  },
-  description: 'বিশুদ্ধজ্ঞানের শিক্ষাবিষয়ক প্রতিষ্ঠান',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const headersList = await headers();
+  const host = headersList.get('host'); // ডাইনামিক হোস্ট নেম (e.g. bankim.eduliture.com)
+
+  // সাবডোমেন অনুযায়ী অটোমেটিক টাইটেল ও ইমেজ ডাটা বের করা
+  const siteData = getSubdomainData(host);
+
+  const siteUrl = host ? `https://${host}` : (process.env.NEXT_PUBLIC_SITE_URL || 'https://eduliture.com');
+
+  return {
+    title: siteData.title || 'এডুলিচার',
+    description: `${siteData.title || 'এডুলিচার'} — সাহিত্য, শিক্ষা ও সংস্কৃতি সঙ্কলন।`,
+    metadataBase: new URL(siteUrl),
+    openGraph: {
+      title: siteData.title || 'এডুলিচার',
+      description: `${siteData.title || 'এডুলিচার'} — সাহিত্য, শিক্ষা ও সংস্কৃতি সঙ্কলন।`,
+      url: siteUrl,
+      siteName: 'এডুলিচার',
+      images: [
+        {
+          url: siteData.ogImage, // /og/site/bankim.jpg অটোমেটিক সেট হবে
+          width: 1200,
+          height: 630,
+          alt: siteData.title,
+        },
+      ],
+      locale: 'bn_BD',
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: siteData.title,
+      images: [siteData.ogImage],
+    },
+  };
+}
 
 export default async function RootLayout({
   children,
@@ -75,7 +103,7 @@ export default async function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col bg-[#fdfdf7] text-gray-900 font-tarunima">
-        {/* AOS অ্যানিমেশন সক্রিয় করার জন্য ক্লায়েন্ট প্রোভাইডার */}
+        {/* AOS অ্যানিমেশন সক্রিয় করার জন্য ক্লায়েন্ট প্রোভাইডার */}
         <AOSProvider />
 
         {/* 🌟 ডাইনামিক ডোমেন কি প্রপ্স হিসেবে পাস করা হলো */}
@@ -85,7 +113,7 @@ export default async function RootLayout({
           {children}
         </main>
         
-        <footer />
+        <Footer />
       </body>
     </html>
   );

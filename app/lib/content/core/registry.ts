@@ -1,16 +1,14 @@
 // app/lib/content/core/registry.ts
 
 export const CONTENT_REGISTRY = {
-  // ১. মেটাডাটার ইংরেজি কী (Key) গুলোর বাংলা পরিভাষা (যা সাইটের পেজে প্রদর্শিত হবে)
   labels: {
     author: "লেখক",
-    genre: "ঘরানা", // আপনার পছন্দ অনুযায়ী "ধরণ" বা "সাহিত্যশ্রেণী"ও দিতে পারেন
-    tags: "শ্রেণী",   // আপনার পছন্দ অনুযায়ী "ট্যাগ" এর বদলে "সূচক শব্দ" বা "বিষয়" দিতে পারেন
+    genre: "ঘরানা",
+    tags: "শ্রেণী",
     volume: "গ্রন্থখণ্ড",
-    chapter: "অধ্যায় বা পরিচ্ছেদ",
+    chapter: "অধ্যায় বা পরিচ্ছেদ",
   } as Record<string, string>,
 
-  // ২. লেখকদের বাংলা নাম থেকে ইংরেজি স্ল্যাগ ম্যাপিং
   authors: {
     "বঙ্কিমচন্দ্র চট্টোপাধ্যায়": "bankim",
     "রবীন্দ্রনাথ ঠাকুর": "rabindra",
@@ -19,16 +17,29 @@ export const CONTENT_REGISTRY = {
     "শরৎচন্দ্র চট্টোপাধ্যায়": "sharat",
   } as Record<string, string>,
 
-  // ৩. সাহিত্যের জনরা (Genre) বাংলা নাম থেকে ইংরেজি স্ল্যাগ ম্যাপিং
+  // English Slug -> Bengali Value
   genres: {
-    "উপন্যাস": "novel",
-    "কবিতা": "poetry",
-    "প্রবন্ধ": "essay",
-    "ছোটগল্প": "short-story",
-    "নাটক": "drama",
+    "novel": "উপন্যাস",
+    "novella": "অনু-উপন্যাস", 
+    "humor": "রম্য সাহিত্য",
+    "religious": "ধর্মীয় সাহিত্য",
+    "essays": "প্রবন্ধাবলী",
+    "poetry": "কবিতা",
+    "classic": "ধ্রুপদী সাহিত্য",
+    "folklore": "লোকগাথা",
+    "history": "ইতিহাস",
+    "story": "ছোটগল্প",
+    "essay": "প্রবন্ধ",
+    "drama": "নাটক",
+    "letters": "পত্রাবলী",
+    "others": "বিবিধ",
+    "romantic-novel": "রোমান্টিক উপন্যাস",
+    "historical-novel": "ঐতিহাসিক উপন্যাস",
+    "social-novel": "সামাজিক উপন্যাস",
+    "hinduism": "হিন্দুধর্ম",
+    "philosophy": "দর্শন"
   } as Record<string, string>,
 
-  // ৪. ট্যাগের বাংলা নাম থেকে ইংরেজি স্ল্যাগ ম্যাপিং
   tags: {
     "ধ্রুপদী": "classical",
     "ঐতিহাসিক": "historical",
@@ -37,18 +48,50 @@ export const CONTENT_REGISTRY = {
 };
 
 /**
- * ইউআরএল-এর জন্য: বাংলা নাম ইনপুট দিলে রেজিস্ট্রি থেকে তার ইংরেজি স্ল্যাগ খুঁজে বের করার ফাংশন
+ * রুল ১: MD ফাইলের যেকোনো বাংলা টেক্সট থেকে ইংরেজি স্লাগ তৈরি করার সর্বজনীন ফাংশন।
+ * উদাহরণ: getSlug("genres", "উপন্যাস") -> "novel"
  */
-export function getSlugFromRegistry(type: "authors" | "genres" | "tags", banglaName: string): string {
-  if (!banglaName) return "unknown";
-  const cleanedName = banglaName.trim();
-  return CONTENT_REGISTRY[type][cleanedName] || "unknown";
+export function getSlug(type: "authors" | "genres" | "tags", banglaText: string): string {
+  if (!banglaText) return "others";
+  const cleaned = banglaText.trim();
+
+  // Genres-এর জন্য Value (বাংলা) ধরে Key (ইংরেজি স্লাগ) খোঁজা হবে
+  if (type === "genres") {
+    const entry = Object.entries(CONTENT_REGISTRY.genres).find(
+      ([_, value]) => value === cleaned
+    );
+    return entry ? entry[0] : encodeURIComponent(cleaned);
+  }
+
+  // Authors এবং Tags-এর জন্য Key (বাংলা) ধরে Value (ইংরেজি) খোঁজা হবে
+  if (CONTENT_REGISTRY[type] && CONTENT_REGISTRY[type][cleaned]) {
+    return CONTENT_REGISTRY[type][cleaned];
+  }
+
+  return encodeURIComponent(cleaned);
 }
 
 /**
- * পেজে প্রদর্শনের জন্য: ইংরেজি মেটাডাটা কী (যেমন 'genre' বা 'author') দিলে তার খাঁটি বাংলা পরিভাষা রিটার্ন করার ফাংশন
- * উদাহরণ: getLabelTranslation("genre") -> "সাহিত্যরূপ"
+ * রুল ২: ইউআরএল-এর ইংরেজি স্লাগ থেকে মূল বাংলা টেক্সট উদ্ধার করার ফাংশন (পেজ ফিল্টারিং ও টাইটেলের জন্য)।
+ * উদাহরণ: getGenreTitle("novel") -> "উপন্যাস"
  */
-export function getLabelTranslation(englishKey: "author" | "genre" | "tags" | "volume" | "chapter"): string {
-  return CONTENT_REGISTRY.labels[englishKey] || englishKey;
+export function getGenreTitle(slug: string): string {
+  if (!slug) return "";
+  const decoded = decodeURIComponent(slug).toLowerCase();
+  
+  return CONTENT_REGISTRY.genres[decoded] || decodeURIComponent(slug);
+}
+
+// app/lib/content/core/registry.ts-এ এই ফাংশনটি এক্সপোর্ট করুন
+
+export function getLabelTranslation(key: string): string {
+  const labels: Record<string, string> = {
+    author: "লেখক",
+    genre: "ঘরানা",
+    tags: "ট্যাগসমূহ",
+    publisher: "প্রকাশক",
+    published: "প্রকাশকাল",
+  };
+
+  return labels[key] || key;
 }

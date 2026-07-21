@@ -50,7 +50,7 @@ export default async function SuccessStories() {
 
   return (
     <section 
-      className="relative w-full h-auto bg-cover bg-center bg-no-repeat bg-fixed py-8 px-4 overflow-x-clip"
+      className="relative w-full h-auto bg-cover bg-center bg-no-repeat bg-fixed py-2 px-2 overflow-x-clip"
       style={{ backgroundImage: "url('/bg03.png')" }} 
     >
       
@@ -77,7 +77,7 @@ export default async function SuccessStories() {
         </p>
 
         {/* CARD কন্টেইনার: সঠিক পিক্সেল পারফেক্ট গ্রিডের জন্য ফ্লুয়িড ফ্লেক্স উইডথ */}
-        <div className="flex flex-wrap gap-3 justify-start items-stretch relative z-20 w-full">
+        <div className="flex flex-wrap gap-3 justify-start items-stretch relative px-2 z-20 w-full">
           {stories.map((story, index) => (
             <a
               key={index}

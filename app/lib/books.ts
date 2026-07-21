@@ -3,7 +3,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import matter from 'gray-matter';
 
-// ১. আপনার রিকোয়ারমেন্ট এবং ফ্রন্টম্যাটারের সাথে মিলিয়ে ইন্টারফেস সংশোধন করা হলো
+// ১. ফ্রন্টম্যাটারের নতুন ফিল্ডগুলোসহ ইন্টারফেস আপডেট
 export interface Book {
   id: string;
   slug: string;
@@ -11,8 +11,12 @@ export interface Book {
   author: string;
   genres: string[];
   publishDate?: string;
-  published?: string; // ফ্রন্টম্যাটারের সরাসরি ডেট/স্ট্রিং রাখার জন্য
-  cover?: string;     // হোমপেজে book.cover ব্যবহারের জন্য
+  published?: string;           // সাইটে যুক্ত করার তারিখ/স্ট্রিং
+  first_published?: string | number; // আসল বই প্রকাশের প্রথম সাল
+  cover?: string;              // প্রচ্ছদের পাথ
+  source_book?: string;        // যে সংস্করণ বা উৎস থেকে বইটি সংগৃহীত
+  pub_medium?: string;         // প্রথম প্রকাশ মাধ্যম/পত্রিকার নাম
+  notice?: string;             // বিশেষ কোনো নোটিশ বা বার্তা
 }
 
 export async function getLibraryBooks(): Promise<{ latestBooks: Book[]; booksByGenre: Record<string, Book[]> }> {
@@ -40,11 +44,12 @@ export async function getLibraryBooks(): Promise<{ latestBooks: Book[]; booksByG
           const { data } = matter(fileContents);
           
           let extractedGenres: string[] = ['অন্যান্য'];
-          if (data.genre) {
-            extractedGenres = Array.isArray(data.genre) ? data.genre : [data.genre];
+          if (data.genre || data.genres) {
+            const raw = data.genre || data.genres;
+            extractedGenres = Array.isArray(raw) ? raw : [raw];
           }
           
-          // ২. ফ্রন্টম্যাটার থেকে আসা variables ম্যাপিং ঠিক করা হলো
+          // ২. ফ্রন্টম্যাটার থেকে আসা সমস্ত ফিল্ড ম্যাপিং
           allBooks.push({
             id: `${authorFolderName}-${bookFolderName}`,
             slug: bookFolderName,
@@ -52,21 +57,24 @@ export async function getLibraryBooks(): Promise<{ latestBooks: Book[]; booksByG
             author: data.author || 'অজ্ঞাত লেখক',
             genres: extractedGenres,
             publishDate: data.published ? String(data.published) : (data.date ? String(data.date) : ''),
-            published: data.published ? String(data.published) : '', // সরাসরি published ফিল্ড রিড করবে
-            cover: data.cover || data.cover_image || '', // cover অথবা cover_image ব্যাকআপ সহ রিড করবে
+            published: data.published ? String(data.published) : '',
+            first_published: data.first_published || '',
+            cover: data.cover || data.cover_image || '',
+            source_book: data.source_book ? String(data.source_book) : '',
+            pub_medium: data.pub_medium ? String(data.pub_medium) : '',
+            notice: data.notice ? String(data.notice) : '',
           });
-        } catch (fileError) {
+        } catch {
           continue;
         }
       }
     }
 
-    // ডেট অনুসারে সাজানো (সবচেয়ে নতুন বইগুলো আগে আসবে)
+    // সাইটে যুক্ত হওয়ার তারিখ অনুসারে সাজানো (সবচেয়ে নতুন যুক্ত হওয়া বইগুলো আগে আসবে)
     const sortedBooks = allBooks.sort((a, b) => 
       (b.publishDate || '').localeCompare(a.publishDate || '')
     );
 
-    // ৩. ৮টির সীমাবদ্ধতা তুলে পুরো অ্যারে পাঠানো হলো, যাতে হোমপেজ তার প্রয়োজনমতো ১২টি বা তার বেশি ফিল্টার করতে পারে
     const latestBooks = sortedBooks; 
     const booksByGenre: Record<string, Book[]> = {};
 
