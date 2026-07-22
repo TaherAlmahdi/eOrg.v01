@@ -2,7 +2,7 @@
 title: নজরুল রচনাবলী
 slug: nazrul-rachanabali
 
-image: kazi-nazrul-islam.jpg
+icon: "/favicon/nazrul.ico"
 featured_image: "/images/projects/project-dummy.webp"
 excerpt: "নজরুল রচিত সকল সাহিত্যকর্ম"
 category: "রচনাবলী"

@@ -2,7 +2,7 @@
 title: এডুলিচার পাঠশালা
 slug: eduliture-library
 
-image: library.jpg
+icon: "/favicon/library.ico"
 featured_image: "/images/projects/project-dummy.webp"
 excerpt: "অনলাইন উন্মুক্ত গ্রন্থাগার"
 category: "বিশুদ্ধজ্ঞান"
