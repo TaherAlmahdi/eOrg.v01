@@ -17,7 +17,7 @@ interface AuthorHomePageProps {
 export default async function AuthorHomePage({ params }: AuthorHomePageProps) {
   const { authorSlug } = await params;
 
-  // ১. মার্কডাউন ফাইল পড়া (লেখক পরিচিতির জন্য)
+  // ১. লেখক পরিচিতির জন্য মার্কডাউন ফাইল পড়া
   const mdFilePath = path.join(
     process.cwd(),
     'content',
@@ -71,6 +71,15 @@ export default async function AuthorHomePage({ params }: AuthorHomePageProps) {
     );
   }
 
+  // 🖼️ ইমেজের অস্তিত্ব পরীক্ষা করা (404 এরর রোধে)
+  const imageRelativePath = `/authors/${authorSlug}.webp`;
+  const absoluteImagePath = path.join(process.cwd(), 'public', 'authors', `${authorSlug}.webp`);
+  
+  // যদি নির্দিষ্ট লেখকের ফাইল না থাকে, তবে ডিফল্ট ইমেজ দেখাবে
+  const authorImageSrc = fs.existsSync(absoluteImagePath) 
+    ? imageRelativePath 
+    : '/authors/default.webp';
+
   // ২. লাইব্রেরি থেকে বইয়ের ডাটা আনা
   const { latestBooks } = await getLibraryBooks();
 
@@ -116,7 +125,7 @@ export default async function AuthorHomePage({ params }: AuthorHomePageProps) {
         <div className="w-full text-slate-800 leading-relaxed">
           <div className="w-full aspect-2/3 mb-6 md:float-left md:mr-6 md:mb-4 md:w-64 md:h-100 relative bg-slate-100 rounded-lg border border-slate-200 overflow-hidden shadow-sm">
             <Image
-              src={`/authors/${authorSlug}.webp`}
+              src={authorImageSrc}
               alt={fullTitle ? `${fullTitle}-এর ছবি` : 'লেখকের ছবি'}
               fill
               sizes="(max-width: 768px) 100vw, 256px"
@@ -148,17 +157,18 @@ export default async function AuthorHomePage({ params }: AuthorHomePageProps) {
             <p className="text-sm text-slate-500 py-4 text-center">কোনো ঘরানা পাওয়া যায়নি।</p>
           ) : (
             <div className="flex flex-wrap gap-2 w-full">
-              {extractedGenres.map((genre) => (
-                <Link
-                  key={genre}
-                  /* 'getSlug' এর মাধ্যমে বাংলা ঘরানার নাম (যেমন "উপন্যাস") থেকে ইংরেজি স্লাগ (যেমন "novel") পাবে */
-                  href={`/genre/${getSlug("genres", genre)}`}
-                  className="grow text-center min-w-30 bg-slate-50 hover:bg-emerald-50 text-slate-800 hover:text-emerald-700 font-medium p-3 rounded border border-slate-200 hover:border-emerald-300 transition-all text-sm md:text-base shadow-sm"
-                >
-                  {genre}
-                </Link>
-              ))}
-
+              {extractedGenres.map((genre) => {
+                const genreSlug = getSlug("genres", genre) || genre;
+                return (
+                  <Link
+                    key={genre}
+                    href={`/genre/${genreSlug}`}
+                    className="grow text-center min-w-30 bg-slate-50 hover:bg-emerald-50 text-slate-800 hover:text-emerald-700 font-medium p-3 rounded border border-slate-200 hover:border-emerald-300 transition-all text-sm md:text-base shadow-sm"
+                  >
+                    {genre}
+                  </Link>
+                );
+              })}
             </div>
           )}
         </div>
