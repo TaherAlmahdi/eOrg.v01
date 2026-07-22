@@ -11,6 +11,7 @@
     --accent-red: #8b0000;
     --accent-gold: #666600;
     --bg-purple-light: #f3ebf7;
+    --bg-gold: #666600;
     --text-main: #1a1a1a;
     --accent-blue: #2596be;
     --icon-space: 20px;
@@ -34,84 +35,13 @@
 }
 
 /* ==========================================
-   ২. কম্পোনেন্ট স্টাইল (All Components)
+   ২. ক্লাস-ভিত্তিক কম্পোনেন্ট স্টাইল (Class-Based Architecture)
    ========================================== */
 @layer components {
-  /* লিংকের স্টাইল */
-  .normal a,
-  .first a,
-  .dcap a {
-    color: #cc0044;
-  }
-  .normal a:hover,
-  .first a:hover,
-  .dcap a:hover {
-    color: #80002a;
-  }
 
-  /* ইনলাইন ও রাইট অ্যালাইনমেন্ট */
-  span.right {
-    display: inline-block;
-    text-align: right;
-    min-width: 100px;
-    font-size: inherit;
-  }
-
-  /* --- নোট ও ফুটনোট স্পেসিফিক স্টাইল --- */
-  .not-prose .right,
-  .not-prose .poem,
-  .not-prose .first,
-  .not-prose .pc,
-  .not-prose .normal {
-    font-size: inherit !important;
-    color: inherit !important;
-    text-align: inherit;
-  }
-
-  ol.not-prose .right,
-  ol.not-prose .pc,
-  ol.not-prose .first,
-  ol.not-prose .normal {
-    color: #374151 !important;
-    font-size: inherit !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  ol.not-prose .poem {
-    color: #374151 !important;
-    font-size: inherit !important;
-    padding: 0 !important;
-  }
-
-  .not-prose .right {
-    display: block !important;
-    text-align: right !important;
-    width: 100% !important;
-  }
-
-  .not-prose .pc {
-    display: block !important;
-    text-align: center !important;
-  }
-
-  /* কবিতা/শ্লোক (Poem) - ডিফল্ট মোবাইল ভিউ */
-  .not-prose .poem,
-  .poem {
-    display: block !important;
-    width: fit-content !important;
-    min-width: 200px;
-    max-width: 95% !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    margin-top: 0rem;
-    margin-bottom: 0rem;
-    text-align: left;
-    line-height: 1.7;
-    font-size: 1.1rem;
-  }
-
-  /* --- সাধারণ টাইপোগ্রাফি (মোবাইল/ডিফল্ট) --- */
+  /* ----------------------------------
+     ক. সাধারণ টাইপোগ্রাফি ও প্যারাগ্রাফ
+     ---------------------------------- */
   .first,
   .dcap,
   .normal,
@@ -120,7 +50,6 @@
   .right,
   .pl,
   .pr,
-  .poem,
   .natok,
   .n-normal,
   .alap,
@@ -133,8 +62,9 @@
   .none,
   ul,
   ul.none {
-    font-size: 1.15rem !important; /* আগের 1.35rem থেকে কমিয়ে সামঞ্জস্যপূর্ণ করা হলো */
-    line-height: 1.75;
+    /* স্ক্রিনের সাইজ অনুযায়ী ফন্ট স্কেল হবে (সর্বনিম্ন 1.15rem থেকে সর্বোচ্চ 1.85rem) */
+    font-size: clamp(1.15rem, 1.2vw + 0.8rem, 1.5rem) !important;
+    line-height: 1.55;
     color: var(--text-main);
   }
 
@@ -145,11 +75,103 @@
     text-align: justify;
   }
 
-  /* ------ Drama ------ */
+  .normal {
+    text-indent: 30px;
+  }
+
+  .first::first-letter {
+    color: #a7373d;
+  }
+
+  /* ----------------------------------
+     খ. ড্রপ ক্যাপ (Drop Cap) - আল্ট্রা-ওয়াইড ফিক্সড
+     ---------------------------------- */
+  /* প্যারাগ্রাফের ফন্ট সাইজের সাথে অনুপাত ঠিক রেখে অটো-স্কেল হবে */
+  .dcap::first-letter {
+    float: left;
+    line-height: 1;
+    font-size: clamp(1.5rem, 2.5vw + 1rem, 3.5rem); /* 🎯 আল্ট্রা ওয়াইড স্ক্রিনে আর ছোট দেখাবে না */
+    color: whitesmoke;
+    font-family: var(--font-tarunima);
+    padding: 20px 12px 8px 16px;
+    margin-right: 8px;
+    margin-top: 8px;
+    background: var(--bg-gold);
+    border-radius: 6px;
+  }
+
+  /* ----------------------------------
+     গ. শিরোনাম ও হেডিংস (Titles & Headings)
+     ---------------------------------- */
+  .bname,
+  .wname,
+  .subtitle,
+  .chapter {
+    font-family: var(--font-sabrina) !important;
+    text-align: center;
+    display: block;
+    clear: both;
+  }
+
+  .bname {
+    font-size: clamp(1.6rem, 2vw + 1rem, 2.5rem);
+    color: var(--accent-purple);
+    margin: 0.2rem 0;
+  }
+
+  .wname {
+    font-size: clamp(1.4rem, 1.8vw + 0.8rem, 2.1rem);
+    color: var(--accent-gold);
+    margin: 0.2rem 0;
+  }
+
+  .subtitle,
+  .chapter {
+    color: var(--accent-red);
+    font-size: clamp(1.15rem, 1.2vw + 0.8rem, 1.6rem);
+    font-weight: 700;
+    border-bottom: 1px solid #eee;
+  }
+
+  .title {
+    color: #52527a;
+    font-size: clamp(1.15rem, 1.2vw + 0.8rem, 1.5rem);
+    line-height: normal;
+    text-align: justify;
+    font-weight: 600;
+  }
+
+  /* ----------------------------------
+     ঘ. কবিতা ও শ্লোক (Poem Class)
+     ---------------------------------- */
+  .not-prose .poem,
+  .poem {
+    display: block !important;
+    width: fit-content !important;
+    min-width: 250px;
+    max-width: clamp(50%, 40vw + 20%, 95%) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    margin-top: 0rem;
+    margin-bottom: 0rem;
+    text-align: left;
+    line-height: 1.7;
+    font-size: clamp(1.1rem, 1.1vw + 0.7rem, 1.6rem) !important;
+  }
+
+  .poem span.right {
+    display: inline-block;
+    width: 100%;
+    text-align: right;
+  }
+
+  /* ----------------------------------
+     ঙ. নাটকের স্ক্রিপ্ট (Drama Classes)
+     ---------------------------------- */
   .natok {
     margin-top: 4px;
     margin-bottom: 4px;
-    margin-left: 50px;
+    margin-left: clamp(20px, 3vw, 50px);
     text-align: justify;
     text-align-last: center;
   }
@@ -157,7 +179,7 @@
   .n-normal {
     margin-top: 4px;
     margin-bottom: 4px;
-    margin-left: 50px;
+    margin-left: clamp(20px, 3vw, 50px);
     text-align: justify;
     text-align-last: center;
     text-indent: 30px;
@@ -166,9 +188,9 @@
   .alap {
     margin-top: 4px;
     margin-bottom: 4px;
-    margin-left: 20px;
+    margin-left: clamp(20px, 2.5vw, 50px);
     text-align: justify;
-    text-indent: -20px;
+    text-indent: calc(clamp(20px, 2.5vw, 50px) * -1);
   }
 
   .alap::first-letter {
@@ -178,38 +200,37 @@
   .alap-sin {
     margin-top: 4px;
     margin-bottom: 4px;
-    margin-left: 20px;
+    margin-left: clamp(20px, 2.5vw, 50px);
     text-align: justify;
   }
 
   .alap-n {
     margin-top: 4px;
     margin-bottom: 4px;
-    margin-left: 20px;
+    margin-left: clamp(20px, 2.5vw, 50px);
     text-align: justify;
     text-indent: 20px;
   }
 
-  .normal {
-    text-indent: 30px;
+  /* ----------------------------------
+     চ. লিংক, উদ্ধৃতি ও ইউটিলিটি ক্লাস
+     ---------------------------------- */
+  .normal a,
+  .first a,
+  .dcap a {
+    color: #cc0044;
+  }
+  .normal a:hover,
+  .first a:hover,
+  .dcap a:hover {
+    color: #80002a;
   }
 
-  .first::first-letter {
-    color: #a7373d;
-  }
-
-  .title {
-    color: #52527a;
-    font-size: 1.15rem;
-    line-height: normal;
-    text-align: justify;
-    font-weight: 600;
-  }
-
-  .poem span.right {
+  span.right {
     display: inline-block;
-    width: 100%;
     text-align: right;
+    min-width: 100px;
+    font-size: inherit;
   }
 
   strong {
@@ -219,37 +240,6 @@
     text-align: inherit;
   }
 
-  /* ইউটিলিটি ক্লাসেস */
-  .dan {
-    text-align: right !important;
-    font-size: inherit !important;
-  }
-  .center {
-    text-align: center !important;
-  }
-  .indent {
-    text-indent: 30px !important;
-    font-size: inherit !important;
-  }
-  .pc,
-  .center {
-    text-align: center;
-  }
-  .right {
-    text-align: right;
-  }
-  .pl {
-    width: 50%;
-    float: left;
-    text-align: left;
-  }
-  .pr {
-    width: 50%;
-    float: right;
-    text-align: right;
-  }
-
-  /* উদ্ধৃতি (Quote) */
   div.quote,
   .quote {
     border-left: 3px solid #dddddd;
@@ -263,62 +253,22 @@
   .quote .normal,
   .quote .first,
   .quote .right {
-    font-size: 1.05rem;
+    font-size: clamp(1rem, 1vw + 0.6rem, 1.4rem);
     line-height: 1.6;
   }
 
-  /* ড্রপ ক্যাপ (Drop Cap) */
-  .dcap::first-letter {
-    float: left;
-    line-height: 1;
-    font-size: 2rem;
-    color: var(--accent-purple);
-    font-family: var(--font-tarunima);
-    padding: 2px 4px;
-    margin-right: 4px;
-    background: var(--bg-purple-light);
-    border-radius: 4px;
-  }
-
-  /* শিরোনাম (Titles) */
-  .bname,
-  .wname,
-  .subtitle,
-  .chapter {
-    font-family: var(--font-sabrina) !important;
-    text-align: center;
-    display: block;
-    clear: both;
-  }
-
-  .bname {
-    font-size: 1.6rem;
-    color: var(--accent-purple);
-    margin: 0.1rem 0;
-  }
-  .wname {
-    font-size: 1.4rem;
-    color: var(--accent-gold);
-    margin: 0.1rem 0;
-  }
-  .subtitle,
-  .chapter {
-    color: var(--accent-red);
-    font-size: 1.15rem;
-    font-weight: 700;
-    border-bottom: 1px solid #eee;
-  }
+  /* আলফা ইউটিলিটি */
+  .dan { text-align: right !important; font-size: inherit !important; }
+  .center, .pc { text-align: center !important; }
+  .indent { text-indent: 30px !important; font-size: inherit !important; }
+  .right { text-align: right; }
+  .pl { width: 50%; float: left; text-align: left; }
+  .pr { width: 50%; float: right; text-align: right; }
 
   /* গ্যাপ ও মার্জিন */
-  .hgap {
-    margin: 0 10%;
-  }
-  .pgap {
-    margin: 0 50px;
-  }
-  .ngap {
-    margin: 0 15px;
-  }
+  .hgap { margin: 0 10%; }
+  .pgap { margin: 0 50px; }
+  .ngap { margin: 0 15px; }
   .pcg {
     margin: 25px 0 5px 0;
     font-size: 1rem;
@@ -326,7 +276,9 @@
     color: var(--accent-blue);
   }
 
-  /* লিস্ট স্টাইল */
+  /* ----------------------------------
+     ছ. লিস্ট স্টাইল (Lists)
+     ---------------------------------- */
   ol.list,
   ol.bnlist,
   ol.plist {
@@ -334,6 +286,7 @@
     list-style-type: bengali;
     text-align: justify;
   }
+  
   ul,
   ul.none {
     margin-left: 30px;
@@ -347,13 +300,14 @@
     margin-bottom: 0rem;
     padding-left: 0px;
   }
+
   ul.custom-list li {
     position: relative;
     padding-left: 20px;
     line-height: 1.6;
-    font-size: 1.15rem;
     color: var(--text-main);
   }
+
   ul.custom-list li::before,
   .sidebar ul li:before,
   ul.cont li:before {
@@ -373,6 +327,41 @@
     list-style: none;
   }
 
+  /* ----------------------------------
+     জ. নোট ও ফুটনোট ওভাররাইড
+     ---------------------------------- */
+  .not-prose .right,
+  .not-prose .poem,
+  .not-prose .first,
+  .not-prose .pc,
+  .not-prose .normal {
+    font-size: inherit !important;
+    color: inherit !important;
+    text-align: inherit;
+  }
+
+  ol.not-prose .right,
+  ol.not-prose .pc,
+  ol.not-prose .first,
+  ol.not-prose .normal,
+  ol.not-prose .poem {
+    color: #374151 !important;
+    font-size: inherit !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .not-prose .right {
+    display: block !important;
+    text-align: right !important;
+    width: 100% !important;
+  }
+
+  .not-prose .pc {
+    display: block !important;
+    text-align: center !important;
+  }
+
   .theend,
   .end {
     display: block;
@@ -380,106 +369,5 @@
     margin: 40px auto;
     opacity: 0.6;
     content: url("/theend.png");
-  }
-}
-
-/* ==========================================
-   ৩. ট্যাবলেট ভিউ (769px+)
-   ========================================== */
-@media (min-width: 769px) {
-  @layer components {
-    .first,
-    .dcap,
-    .normal,
-    .pc,
-    .center,
-    .right,
-    .pl,
-    .pr,
-    .poem,
-    ol.list,
-    ol.bnlist,
-    ol.plist,
-    .none,
-    ul,
-    ul.none {
-      font-size: 1.25rem !important; /* আগের 1.5rem থেকে কমিয়ে 1.25rem করা হলো */
-    }
-
-    .title {
-      font-size: 1.3rem;
-    }
-    .dcap::first-letter {
-      font-size: 2.2rem;
-      padding: 3px 5px;
-    }
-    .bname {
-      font-size: 1.8rem;
-    }
-    .wname {
-      font-size: 1.6rem;
-    }
-    .subtitle,
-    .chapter {
-      font-size: 1.25rem;
-    }
-
-    .not-prose .poem,
-    .poem {
-      max-width: 70% !important;
-      font-size: inherit !important;
-      margin-top: 0rem;
-      margin-bottom: 0rem;
-    }
-
-    ul.custom-list li {
-      font-size: 1.25rem;
-    }
-
-    .alap {
-      margin-left: 35px;
-      text-indent: -35px;
-    }
-  }
-}
-
-/* ==========================================
-   ৪. ডেস্কটপ ভিউ (1440px+)
-   ========================================== */
-@media (min-width: 1440px) {
-  @layer components {
-    .first,
-    .dcap,
-    .normal,
-    .pc,
-    .center,
-    .right,
-    .pl,
-    .pr,
-    .poem,
-    ol.list,
-    ol.bnlist,
-    ol.plist,
-    .none,
-    ul,
-    ul.none {
-      font-size: 1.35rem !important; /* বড় মনিটরেও যাতে অতিরিক্ত বড় না দেখায় */
-    }
-
-    .title {
-      font-size: 1.4rem;
-    }
-
-    .not-prose .poem,
-    .poem {
-      max-width: 50% !important;
-      margin-top: 0rem;
-      margin-bottom: 0rem;
-    }
-
-    .alap {
-      margin-left: 50px;
-      text-indent: -50px;
-    }
   }
 }

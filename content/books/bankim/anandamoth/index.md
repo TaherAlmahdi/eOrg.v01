@@ -1,6 +1,7 @@
 ---
 title: "আনন্দমঠ"
 author: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়"
+subdomain: "library, bankim"
 type: "book_index"
 slug: "anandamoth"
 genre: ["উপন্যাস", "ঐতিহাসিক উপন্যাস"]

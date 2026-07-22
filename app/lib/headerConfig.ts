@@ -48,8 +48,8 @@ export const headerConfig: Record<string, DomainConfig> = {
     themeColor: "emerald",
     menu: [
       { label: "মূল হোমপেজ", url: "goto:main:", icon: "Info", desc: "এডুলিচার প্রধান ওয়েবসাইট" },
-      { label: "সব বই", url: "/all-books", icon: "BookOpen", desc: "লাইব্রেরির সর্বমোট বই সংগ্রহ" },
-      { label: "বিভাগসমূহ", url: "/categories", icon: "Library", desc: "ক্যাটাগরি ভিত্তিক বইয়ের তালিকা" }
+      { label: "সব বই", url: "/books", icon: "BookOpen", desc: "লাইব্রেরির সর্বমোট বই সংগ্রহ" },
+      { label: "বিভাগসমূহ", url: "/genres", icon: "Library", desc: "ক্যাটাগরি ভিত্তিক বইয়ের তালিকা" }
     ]
   },
 

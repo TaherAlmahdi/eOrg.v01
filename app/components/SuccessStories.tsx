@@ -50,7 +50,7 @@ export default async function SuccessStories() {
 
   return (
     <section 
-      className="relative w-full h-auto bg-cover bg-center bg-no-repeat bg-fixed py-2 px-2 overflow-x-clip"
+      className="relative w-full h-auto bg-cover bg-center bg-no-repeat bg-fixed py-10 px-2 overflow-x-clip"
       style={{ backgroundImage: "url('/bg03.png')" }} 
     >
       

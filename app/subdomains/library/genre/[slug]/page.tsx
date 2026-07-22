@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { headers } from 'next/headers';
 import { Home, BookOpen } from "lucide-react";
 import { getLibraryBooks } from '@/app/lib/books';
 import { getGenreTitle } from '@/app/lib/content/core/registry';
@@ -22,7 +23,7 @@ export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const decodedSlug = slug.toLowerCase();
   
-  // রেজিস্ট্রি থেকেই সরাসরি টাইটেল ফেচিং (না পাওয়া গেলে স্লাগ ফলব্যাক)
+  // রেজিস্ট্রি থেকেই সরাসরি টাইটেল ফেচিং (না পাওয়া গেলে স্লাগ ফলব্যাক)
   const bengaliTitle = getGenreTitle(decodedSlug) || slug;
   
   return {
@@ -33,18 +34,30 @@ export async function generateMetadata({ params }: Props) {
 export default async function GenrePage({ params }: Props) {
   const { slug } = await params;
   const decodedSlug = slug.toLowerCase();
+
+  // মিডলওয়্যার থেকে সাবডোমেন রিসিভ করা
+  const headerList = await headers();
+  const subdomain = headerList.get('x-subdomain') || '';
   
   // রেজিস্ট্রি থেকে বাংলা ঘরানার নাম বের করা
   const targetBengaliGenre = getGenreTitle(decodedSlug) || slug;
   const targetStr = String(targetBengaliGenre).trim().toLowerCase();
 
-  // কেন্দ্রীয় বই লোডার ব্যবহার করে কন্টেন্ট আনা
+  // কেন্দ্রীয় বই লোডার ব্যবহার করে কন্টেন্ট আনা
   const { latestBooks } = await getLibraryBooks();
 
-  // ফিল্টারিং লজিক
-  // ফিল্টারিং লজিক
+  // ফিল্টারিং লজিক (১. ঘরানা এবং ২. লেখক সাবডোমেন ফিল্টার)
   const filteredBooks = latestBooks.filter((book) => {
-    // unknown টাইপে কাস্ট করে টাইপস্ক্রিপ্ট এরর বাইপাস করা হচ্ছে
+    // 🎯 লেখক সাবডোমেন ফিল্টারিং (যেমন: bankim)
+    if (subdomain && subdomain !== 'library' && subdomain !== 'localhost:3000' && subdomain !== 'eduliture') {
+      const bookAuthorSlug = (book as unknown as Record<string, unknown>).authorSlug || book.author;
+      const isMatchingAuthor = String(bookAuthorSlug).trim().toLowerCase() === subdomain.trim().toLowerCase();
+      
+      // যদি এই বইটির লেখক সাবডোমেনের লেখকের সাথে না মিলে, তবে বাদ যাবে
+      if (!isMatchingAuthor) return false;
+    }
+
+    // 🎯 ঘরানা (Genre) ফিল্টারিং
     const rawGenres = book.genres || (book as unknown as Record<string, unknown>).genre;
     if (!rawGenres) return false;
 
@@ -57,13 +70,11 @@ export default async function GenrePage({ params }: Props) {
     return false;
   });
 
-  // প্রকাশনার সাল ও নাম অনুযায়ী সর্টিং (প্রথমে সাল, সাল মিলে গেলে বাংলা বর্ণমালা অনুযায়ী)
-  // সর্টিং লজিক: প্রথমে 'প্রথম প্রকাশনার সাল' (first_published), না থাকলে 'সাইটে যুক্তের সাল' (published)
+  // প্রকাশনার সাল ও নাম অনুযায়ী সর্টিং (প্রথমে সাল, সাল মিলে গেলে বাংলা বর্ণমালা অনুযায়ী)
   filteredBooks.sort((a, b) => {
     const rawA = (a as unknown as Record<string, unknown>).first_published || a.published;
     const rawB = (b as unknown as Record<string, unknown>).first_published || b.published;
 
-    // সাল পার্সিং লজিক (যা কেবল YYYY সংখ্যা বের করে নেবে)
     const pubA = rawA ? parseInt(String(rawA), 10) || new Date(String(rawA)).getFullYear() : Infinity;
     const pubB = rawB ? parseInt(String(rawB), 10) || new Date(String(rawB)).getFullYear() : Infinity;
 
@@ -111,7 +122,7 @@ export default async function GenrePage({ params }: Props) {
               >
                 <div className="relative aspect-2/3 overflow-hidden rounded shadow-sm bg-white border border-gray-100 transition-transform duration-300 group-hover:-translate-y-1.5 group-hover:shadow-md">
                   <Image 
-                    src={book.cover || book.cover || '/default-cover.jpg'} 
+                    src={book.cover || '/default-cover.jpg'} 
                     alt={book.title || 'বইয়ের প্রচ্ছদ'} 
                     fill
                     sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 16vw"

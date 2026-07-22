@@ -9,14 +9,15 @@ export interface Book {
   slug: string;
   title: string;
   author: string;
+  authorSlug: string;               // 👈 সাবডোমেন ফিল্টারিংয়ের জন্য যুক্ত করা হলো
   genres: string[];
   publishDate?: string;
-  published?: string;           // সাইটে যুক্ত করার তারিখ/স্ট্রিং
+  published?: string;               // সাইটে যুক্ত করার তারিখ/স্ট্রিং
   first_published?: string | number; // আসল বই প্রকাশের প্রথম সাল
-  cover?: string;              // প্রচ্ছদের পাথ
-  source_book?: string;        // যে সংস্করণ বা উৎস থেকে বইটি সংগৃহীত
-  pub_medium?: string;         // প্রথম প্রকাশ মাধ্যম/পত্রিকার নাম
-  notice?: string;             // বিশেষ কোনো নোটিশ বা বার্তা
+  cover?: string;                  // প্রচ্ছদের পাথ
+  source_book?: string;            // যে সংস্করণ বা উৎস থেকে বইটি সংগৃহীত
+  pub_medium?: string;             // প্রথম প্রকাশ মাধ্যম/পত্রিকার নাম
+  notice?: string;                 // বিশেষ কোনো নোটিশ বা বার্তা
 }
 
 export async function getLibraryBooks(): Promise<{ latestBooks: Book[]; booksByGenre: Record<string, Book[]> }> {
@@ -55,6 +56,7 @@ export async function getLibraryBooks(): Promise<{ latestBooks: Book[]; booksByG
             slug: bookFolderName,
             title: data.title || 'শিরোনামহীন বই',
             author: data.author || 'অজ্ঞাত লেখক',
+            authorSlug: data.authorSlug || authorFolderName, // 👈 ফোল্ডারের নাম (যেমন: bankim) অটোমেটিক যুক্ত হবে
             genres: extractedGenres,
             publishDate: data.published ? String(data.published) : (data.date ? String(data.date) : ''),
             published: data.published ? String(data.published) : '',
@@ -70,7 +72,7 @@ export async function getLibraryBooks(): Promise<{ latestBooks: Book[]; booksByG
       }
     }
 
-    // সাইটে যুক্ত হওয়ার তারিখ অনুসারে সাজানো (সবচেয়ে নতুন যুক্ত হওয়া বইগুলো আগে আসবে)
+    // সাইটে যুক্ত হওয়ার তারিখ অনুসারে সাজানো (সবচেয়ে নতুন যুক্ত হওয়া বইগুলো আগে আসবে)
     const sortedBooks = allBooks.sort((a, b) => 
       (b.publishDate || '').localeCompare(a.publishDate || '')
     );

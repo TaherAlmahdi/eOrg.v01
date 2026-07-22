@@ -1,4 +1,3 @@
-// middleware.ts
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
@@ -6,12 +5,12 @@ export function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
   const hostname = request.headers.get('host') || '';
 
-  // সাবডোমেন এক্সট্র্যাক্ট করা (যেমন: bankim.localhost:3000 থেকে 'bankim')
+  // ১. সাবডোমেন এক্সট্র্যাক্ট করা
   const currentHost = hostname
     .replace('.localhost:3000', '')
     .replace('.eduliture.org', '');
 
-  // যদি কোনো সাবডোমেন না থাকে (যেমন শুধু localhost:3000 বা eduliture.org)
+  // ২. মূল ডোমেন চেক
   const isMainDomain =
     currentHost === 'localhost:3000' ||
     currentHost === 'eduliture' ||
@@ -23,20 +22,21 @@ export function middleware(request: NextRequest) {
 
   const requestHeaders = new Headers(request.headers);
 
-  // ১. হেডার ও ক্যোয়ারি প্যারাম সেট করা (Server Component-এ সাবডোমেন চেনার জন্য)
+  // হেডার ও ক্যোয়ারি প্যারাম সেট করা
   requestHeaders.set('x-subdomain', currentHost);
   url.searchParams.set('subdomain', currentHost);
 
-  // ২. শুধুমাত্র সাবডোমেনের হোমপেজ (/) রিকোয়েস্ট নির্দিষ্ট ফোল্ডারে রিরাইট হবে
-  if (url.pathname === '/') {
-    if (currentHost === 'library') {
-      url.pathname = '/subdomains/library';
-    } else {
-      url.pathname = `/subdomains/author/${currentHost}`;
-    }
+  // ৩. ডাইনামিক পাথম্যাপিং (লাইব্রেরি নাকি অথর সাবডোমেন)
+  const pathname = url.pathname;
+
+  if (currentHost === 'library') {
+    // library.eduliture.org/genre/novel -> /subdomains/library/genre/novel
+    url.pathname = `/subdomains/library${pathname === '/' ? '' : pathname}`;
+  } else {
+    // bankim.eduliture.org/genre/novel -> /subdomains/author/bankim/genre/novel
+    url.pathname = `/subdomains/author/${currentHost}${pathname === '/' ? '' : pathname}`;
   }
 
-  // ৩. হোমপেজ ছাড়া অন্য সব রাউটে (যেমন: /genre/novel) মূল ইউআরএল পাথ ঠিক রেখেই রিরাইট করবে
   return NextResponse.rewrite(url, {
     request: {
       headers: requestHeaders,
@@ -44,15 +44,8 @@ export function middleware(request: NextRequest) {
   });
 }
 
-// কোন কোন পাথগুলো মিডলওয়্যার স্ক্যান করবে না (ফাইল, ইমেজ ইত্যাদি বাদ দেওয়া)
 export const config = {
   matcher: [
-    /*
-     * নিচের ফাইল/পাথগুলোকে মিডলওয়্যার এক্সিকিউশন থেকে সম্পূর্ণ বাদ দেবে:
-     * - api, _next/static, _next/image
-     * - assets, images, favicon (ফোল্ডার হিসেবে)
-     * - সকল প্রকার Static File Extensions (.ico, .png, .webp, .svg, .jpg, ইত্যাদি)
-     */
     '/((?!api|_next/static|_next/image|assets|images|favicon|sw.js|.*\\.(?:ico|png|webp|svg|jpg|jpeg|gif)$).*)',
   ],
 };

@@ -10,11 +10,11 @@ export const CONTENT_REGISTRY = {
   } as Record<string, string>,
 
   authors: {
-    "বঙ্কিমচন্দ্র চট্টোপাধ্যায়": "bankim",
-    "রবীন্দ্রনাথ ঠাকুর": "rabindra",
-    "কাজী নজরুল ইসলাম": "nazrul",
-    "জীবনানন্দ দাশ": "jibananda",
-    "শরৎচন্দ্র চট্টোপাধ্যায়": "sharat",
+    "bankim-chandra-chatterjee": "বঙ্কিমচন্দ্র চট্টোপাধ্যায়",
+    "rabindranath-tagore": "রবীন্দ্রনাথ ঠাকুর",
+    "kazi-nazrul-islam": "কাজী নজরুল ইসলাম",
+    "jibananda-dash": "জীবনানন্দ দাশ",
+    "sharat-chandra-chattopadhyay": "শরৎচন্দ্র চট্টোপাধ্যায়",
   } as Record<string, string>,
 
   // English Slug -> Bengali Value
@@ -37,7 +37,8 @@ export const CONTENT_REGISTRY = {
     "historical-novel": "ঐতিহাসিক উপন্যাস",
     "social-novel": "সামাজিক উপন্যাস",
     "hinduism": "হিন্দুধর্ম",
-    "philosophy": "দর্শন"
+    "philosophy": "দর্শন",
+    "science": "বিজ্ঞান"
   } as Record<string, string>,
 
   tags: {
@@ -72,7 +73,7 @@ export function getSlug(type: "authors" | "genres" | "tags", banglaText: string)
 }
 
 /**
- * রুল ২: ইউআরএল-এর ইংরেজি স্লাগ থেকে মূল বাংলা টেক্সট উদ্ধার করার ফাংশন (পেজ ফিল্টারিং ও টাইটেলের জন্য)।
+ * রুল ২: ইউআরএল-এর ইংরেজি স্লাগ থেকে মূল বাংলা ঘরানা উদ্ধার করার ফাংশন।
  * উদাহরণ: getGenreTitle("novel") -> "উপন্যাস"
  */
 export function getGenreTitle(slug: string): string {
@@ -82,13 +83,39 @@ export function getGenreTitle(slug: string): string {
   return CONTENT_REGISTRY.genres[decoded] || decodeURIComponent(slug);
 }
 
-// app/lib/content/core/registry.ts-এ এই ফাংশনটি এক্সপোর্ট করুন
+/**
+ * রুল ৩: ইউআরএল-এর ইংরেজি স্লাগ থেকে লেখকের বাংলা নাম উদ্ধার করার ফাংশন।
+ * উদাহরণ: getAuthorTitle("rabindranath-tagore") -> "রবীন্দ্রনাথ ঠাকুর"
+ */
+export function getAuthorTitle(slug: string): string {
+  if (!slug) return "";
+  const decoded = decodeURIComponent(slug).toLowerCase();
 
+  return CONTENT_REGISTRY.authors[decoded] || decodeURIComponent(slug);
+}
+
+/**
+ * রুল ৪: লেখকের বাংলা নাম থেকে ইংরেজি স্লাগ উদ্ধার করার ফাংশন।
+ * উদাহরণ: getAuthorSlugFromTitle("রবীন্দ্রনাথ ঠাকুর") -> "rabindranath-tagore"
+ */
+export function getAuthorSlugFromTitle(authorName: string): string | undefined {
+  if (!authorName) return undefined;
+  const trimmed = authorName.trim();
+
+  // CONTENT_REGISTRY.authors-এর Value (বাংলা নাম) সার্চ করে matching Key (English Slug) রিটার্ন করবে
+  const entry = Object.entries(CONTENT_REGISTRY.authors).find(
+    ([_, value]) => value.trim() === trimmed
+  );
+
+  return entry ? entry[0] : undefined;
+}
+
+/**
+ * লেবেল অনুবাদের ফাংশন
+ */
 export function getLabelTranslation(key: string): string {
   const labels: Record<string, string> = {
-    author: "লেখক",
-    genre: "ঘরানা",
-    tags: "ট্যাগসমূহ",
+    ...CONTENT_REGISTRY.labels,
     publisher: "প্রকাশক",
     published: "প্রকাশকাল",
   };
