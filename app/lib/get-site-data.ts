@@ -11,11 +11,11 @@ const siteMap: Record<string, { title: string; image: string }> = {
     image: 'nazrul.jpg',
   },
   tagore: {
-    title: 'রবীন্দ্র সংকলন',
+    title: 'রবীন্দ্র রচনাবলী',
     image: 'tagore.jpg',
   },
   library: {
-    title: 'গ্রন্থাগার',
+    title: 'পাঠশালা',
     image: 'library.jpg',
   },
   // প্রয়োজন অনুযায়ী নতুন সাবডোমেন যুক্ত করুন
@@ -23,8 +23,8 @@ const siteMap: Record<string, { title: string; image: string }> = {
 
 export function getSubdomainData(host: string | null) {
   const mainDomainTitle = 'এডুলিচার';
-  const defaultTitle = 'বিশুদ্ধজ্ঞান ও সাহিত্য সঙ্কলন';
-  const defaultImage = 'default.jpg';
+  const defaultTitle = 'বিশুদ্ধজ্ঞানের শিক্ষা বিষয়ক প্রতিষ্ঠান';
+  const defaultImage = 'default.png';
 
   if (!host) {
     return {
@@ -41,12 +41,16 @@ export function getSubdomainData(host: string | null) {
   let subdomain = '';
   if (parts.length > 2 && parts[0] !== 'www') {
     subdomain = parts[0].toLowerCase();
-  } else if (host.includes('bankim.localhost')) {
-    subdomain = 'bankim';
+  
   } else if (host.includes('library.localhost')) {
     subdomain = 'library';
+  
+  } else if (host.includes('bankim.localhost')) {
+    subdomain = 'bankim';
+  
+  } else if (host.includes('nazrul.localhost')) {
+    subdomain = 'nazrul';
   }
-
   // ১. সাবডোমেন যদি siteMap এ সংজ্ঞায়িত থাকে
   if (subdomain && siteMap[subdomain]) {
     const site = siteMap[subdomain];

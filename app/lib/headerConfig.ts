@@ -12,7 +12,6 @@ export interface DomainConfig {
   siteName: string;  // সাইটের নাম (যেমন: "বঙ্কিম রচনাবলী")
   tagline: string;   // সাইটের ট্যাগলাইন বা স্লোগান
   logo: string;      // সাইটের সুনির্দিষ্ট লোগো ইমেজের পাথ (যেমন: "/images/logo-main.png")
-  favicon: string;   // সাইটের কাস্টম ফেভিকন পাথ (যেমন: "/favicons/favicon-main.ico")
   siteUrl: string;   // প্রোডাকশনে লাইভ সাবডোমেন/মেইন ইউআরএল (যেমন: "https://eduliture.org")
   bgColor: string;   // হেডারের ব্যাকগ্রাউন্ড কালার ক্লাস (যেমন: "bg-[#ffffff]")
   themeColor: 'teal' | 'emerald' | 'amber' | 'purple' | 'blue'; // সাবডোমেন থিম কালার
@@ -26,7 +25,6 @@ export const headerConfig: Record<string, DomainConfig> = {
     siteName: "এডুলিচার",
     tagline: "বিশুদ্ধজ্ঞানের প্রত্যয়",
     logo: "/logo/logo.png", 
-    favicon: "/favicon/favicon.ico",
     siteUrl: "https://eduliture.org",
     bgColor: "bg-[#ffffff]",
     themeColor: "teal",
@@ -43,7 +41,6 @@ export const headerConfig: Record<string, DomainConfig> = {
     siteName: "এডুলিচার লাইব্রেরি",
     tagline: "একটি এডুলিচার বিশুদ্ধজ্ঞান প্রকল্প",
     logo: "/logo/logo-library.png",
-    favicon: "/favicon/favicon-library.ico",
     siteUrl: "https://library.eduliture.org",
     bgColor: "bg-[#f4fbf7]", 
     themeColor: "emerald",
@@ -66,7 +63,6 @@ export const headerConfig: Record<string, DomainConfig> = {
     siteName: "বঙ্কিম রচনাবলী",
     tagline: "একটি এডুলিচার বিশুদ্ধজ্ঞান প্রকল্প",
     logo: "/logo/logo-bankim.png",
-    favicon: "/favicon/favicon-bankim.ico",
     siteUrl: "https://bankim.eduliture.org",
     bgColor: "bg-[#fffdf9]", 
     themeColor: "amber",
@@ -90,7 +86,6 @@ export const headerConfig: Record<string, DomainConfig> = {
     siteName: "রবীন্দ্রনাথ ঠাকুর আর্কাইভ",
     tagline: "রবীন্দ্র রচনাবলী ও গবেষণা",
     logo: "/images/logo-rabindra.png",
-    favicon: "/favicons/favicon-rabindra.ico",
     siteUrl: "https://rabindra.eduliture.org",
     bgColor: "bg-[#fdfaff]", 
     themeColor: "purple",
