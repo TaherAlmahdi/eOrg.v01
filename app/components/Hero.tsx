@@ -5,7 +5,7 @@ import lightedCandle from '../../public/lighted-candle.png'; // আপনার 
 
 const Hero = () => {
   return (
-    <div className="relative w-full overflow-hidden flex justify-center items-center">
+    <div className="relative w-full overflow-hidden flex justify-center items-center h-full">
       {/* 
         মোবাইলে (Default): w-full এবং h-auto ব্যবহার করা হয়েছে যাতে রেশিও ঠিক থাকে।
         ডেক্সটপে (md:): আপনার আগের নির্দিষ্ট রেশিও ও বর্ডার বজায় রাখা হয়েছে।

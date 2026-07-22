@@ -3,7 +3,7 @@
 import Hero from './Hero';
 import WelcomeBadge from './Welcome';
 
-const FeatureContent = () => {
+const WelcomeSection = () => {
   return (
     <div
       className="relative w-full max-w-full overflow-hidden h-auto"
@@ -55,4 +55,4 @@ const FeatureContent = () => {
   );
 };
 
-export default FeatureContent;
+export default WelcomeSection;
