@@ -11,6 +11,22 @@ interface HeaderProps {
   domainKey: string;
 }
 
+// headerConfig অবজেক্টের জন্য টাইপ ডিফাইন করা হলো যেন টাইপস্ক্রিপ্ট এরর না দেয়
+interface HeaderConfigItem {
+  siteName: string;
+  tagline: string;
+  logo: string;
+  favicon?: string;
+  bgColor?: string;
+  themeColor: string;
+  menu: Array<{
+    label: string;
+    url: string;
+    icon: string;
+    desc?: string;
+  }>;
+}
+
 // সাবডোমেন রাউটিং ম্যানেজ করার জন্য একটি লাইটওয়েট ইনলাইন হেল্পার ফাংশন
 const createDynamicUrl = (targetUrl: string): string => {
   if (typeof window === 'undefined') return targetUrl.startsWith('goto:') ? '/' : targetUrl;
@@ -57,12 +73,13 @@ const RenderTitle = ({ title }: { title: string }) => {
 const Header = ({ domainKey }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // ডাইনামিক কনফিগ গেট করা (যদি ডোমেন কি ম্যাচ না করে তবে মেইন ডোমেন ফলব্যাক)
-  const currentHeader = headerConfig[domainKey] || headerConfig.main || {
+  // ডাইনামিক কনফিগ গেট করা (টাইপসহ)
+  const currentHeader: HeaderConfigItem = (headerConfig as Record<string, HeaderConfigItem>)[domainKey] || 
+    (headerConfig as Record<string, HeaderConfigItem>).main || {
     siteName: "এডুলিচার",
     tagline: "বিশুদ্ধজ্ঞানের প্রত্যয়",
     logo: "/logo/logo.png",
-    favicon: "/favicon/favicon.ico",
+    favicon: "/favicon.ico",
     bgColor: "bg-[#ffffff]",
     themeColor: "teal",
     menu: [{ label: "হোম", url: "/", icon: "BookOpen", desc: "প্রধান পাতা" }]
@@ -77,21 +94,23 @@ const Header = ({ domainKey }: HeaderProps) => {
     }
   }, [isMenuOpen]);
 
-  useEffect(() => {
-    if (typeof window !== 'undefined' && currentHeader) {
+//  useEffect(() => {
+//   if (typeof window !== 'undefined' && currentHeader) {
       // ব্রাউজার ট্যাব টাইটেল আপডেট
-      document.title = `${currentHeader.siteName} - ${currentHeader.tagline}`;
+//      document.title = `${currentHeader.siteName} - ${currentHeader.tagline}`;
       
       // ব্রাউজার ফেভিকন ডাইনামিক আপডেট
-      let link: HTMLLinkElement | null = document.querySelector("link[rel*='icon']");
-      if (!link) {
-        link = document.createElement('link');
-        link.rel = 'icon';
-        document.getElementsByTagName('head')[0].appendChild(link);
-      }
-      link.href = currentHeader.favicon;
-    }
-  }, [currentHeader]);
+//      if (currentHeader.favicon) {
+//        let link: HTMLLinkElement | null = document.querySelector("link[rel*='icon']");
+//        if (!link) {
+//          link = document.createElement('link');
+//          link.rel = 'icon';
+//          document.getElementsByTagName('head')[0].appendChild(link);
+//        }
+//        link.href = currentHeader.favicon;
+//      }
+//    }
+//  }, [currentHeader]);
 
   // থিম অনুসারে বর্ডার ও আইকনের হোভার কালার সেট করার ডাইনামিক অবজেক্ট
   const themeClasses: Record<string, string> = {
