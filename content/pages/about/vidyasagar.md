@@ -2,7 +2,7 @@
 title: বিদ্যাসাগর রচনাবলী
 slug: vidyasagar-rachanabali
 
-image: eduliture-vidyasagar.jpg
+icon: "/favicon/vidyasagar.ico"
 featured_image: "/images/projects/project-dummy.webp"
 excerpt: "বিদ্যাসাগর রচিত সাহিত্যকর্ম।"
 category: "রচনাবলী"

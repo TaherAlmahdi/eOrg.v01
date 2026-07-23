@@ -2,7 +2,7 @@
 title: রবীন্দ্র রচনাবলী
 slug: rabindra-rachanabali
 
-image: eduliture-rabindra.jpg
+icon: "/favicon/rabindra.ico"
 featured_image: "/images/projects/project-dummy.webp"
 excerpt: "রবীন্দ্রনাথ রচিত সকল সাহিত্যকর্ম"
 category: "রচনাবলী"

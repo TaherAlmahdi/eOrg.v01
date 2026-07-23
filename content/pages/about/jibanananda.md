@@ -2,7 +2,7 @@
 title: জীবনানন্দ রচনাবলী
 slug: jibanananda-rachanabali
 
-image: eduliture-jibanananda.png
+icon: "/favicon/jibanananda.ico"
 featured_image: "/images/projects/project-dummy.webp"
 excerpt: "জীবনানন্দ দাশের সাহিত্যকর্ম"
 category: "রচনাবলী"

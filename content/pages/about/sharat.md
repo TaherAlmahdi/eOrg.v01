@@ -2,7 +2,7 @@
 title: শরৎ রচনাবলী
 slug: sharat-rachanabali
 
-image: eduliture-sharat.jpg
+icon: "/favicon/sharat.ico"
 featured_image: "/images/projects/project-dummy.webp"
 excerpt: "শরৎচন্দ্র রচিত সকল সাহিত্যকর্ম"
 category: "রচনাবলী"
