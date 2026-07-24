@@ -123,14 +123,14 @@ export default async function AuthorHomePage({ params }: AuthorHomePageProps) {
         </div>
 
         <div className="w-full text-slate-800 leading-relaxed">
-          <div className="w-full mb-6 md:float-left md:mr-6 md:mb-4 md:w-64 md:h-96 relative bg-slate-100 rounded-lg border border-slate-200 overflow-hidden shadow-sm p-2 flex items-center justify-center">
+          <div className="w-full aspect-2/3 mb-3 md:float-left md:mr-3 md:mb-2 md:w-64 md:h-96 relative bg-slate-100 rounded border border-slate-200 overflow-hidden shadow-sm p-0 flex items-center justify-center">
             <Image
               src={authorImageSrc}
               alt={fullTitle ? `${fullTitle}-এর ছবি` : 'লেখকের ছবি'}
               fill
               sizes="(max-width: 768px) 100vw, 256px"
               priority
-              className="object-contain drop-shadow-sm p-2"
+              className="object-contain drop-shadow-sm"
             />
           </div>
 
