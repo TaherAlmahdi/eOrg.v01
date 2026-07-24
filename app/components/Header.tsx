@@ -11,7 +11,16 @@ interface HeaderProps {
   domainKey: string;
 }
 
-// headerConfig অবজেক্টের জন্য টাইপ ডিফাইন করা হলো যেন টাইপস্ক্রিপ্ট এরর না দেয়
+// MenuItem ইন্টারফেস যুক্ত করা হলো (যাতে children সাপোর্ট করে)
+interface MenuItem {
+  label: string;
+  url: string;
+  icon: string;
+  desc?: string;
+  children?: MenuItem[];
+}
+
+// headerConfig অবজেক্টের টাইপ ডিফিনিশন আপডেট করা হলো
 interface HeaderConfigItem {
   siteName: string;
   tagline: string;
@@ -19,12 +28,7 @@ interface HeaderConfigItem {
   favicon?: string;
   bgColor?: string;
   themeColor: string;
-  menu: Array<{
-    label: string;
-    url: string;
-    icon: string;
-    desc?: string;
-  }>;
+  menu: MenuItem[];
 }
 
 // সাবডোমেন রাউটিং ম্যানেজ করার জন্য একটি লাইটওয়েট ইনলাইন হেল্পার ফাংশন
@@ -82,10 +86,10 @@ const Header = ({ domainKey }: HeaderProps) => {
     favicon: "/favicon.ico",
     bgColor: "bg-[#ffffff]",
     themeColor: "teal",
-    menu: [{ label: "আলয়", url: "/", icon: "BookOpen", desc: "প্রধান পাতা" }]
+    menu: [{ label: "আলয়", url: "/", icon: "BookOpen", desc: "প্রধান পাতা" }]
   };
 
-  // স্ক্রোল লক এবং ডাইনামিক ফেভিকন/টাইটেল ক্লায়েন্ট-সাইড আপডেট
+  // স্ক্রোল লক
   useEffect(() => {
     if (isMenuOpen) {
       document.body.style.overflow = 'hidden';
@@ -93,24 +97,6 @@ const Header = ({ domainKey }: HeaderProps) => {
       document.body.style.overflow = 'unset';
     }
   }, [isMenuOpen]);
-
-//  useEffect(() => {
-//   if (typeof window !== 'undefined' && currentHeader) {
-      // ব্রাউজার ট্যাব টাইটেল আপডেট
-//      document.title = `${currentHeader.siteName} - ${currentHeader.tagline}`;
-      
-      // ব্রাউজার ফেভিকন ডাইনামিক আপডেট
-//      if (currentHeader.favicon) {
-//        let link: HTMLLinkElement | null = document.querySelector("link[rel*='icon']");
-//        if (!link) {
-//          link = document.createElement('link');
-//          link.rel = 'icon';
-//          document.getElementsByTagName('head')[0].appendChild(link);
-//        }
-//        link.href = currentHeader.favicon;
-//      }
-//    }
-//  }, [currentHeader]);
 
   // থিম অনুসারে বর্ডার ও আইকনের হোভার কালার সেট করার ডাইনামিক অবজেক্ট
   const themeClasses: Record<string, string> = {
@@ -133,7 +119,7 @@ const Header = ({ domainKey }: HeaderProps) => {
           <Link href="/" className="flex items-center gap-3 group">
             <div className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
               <Image 
-                src={currentHeader.logo} // কনফিগ ফাইল থেকে সরাসরি ডাইনামিক পাথ
+                src={currentHeader.logo}
                 alt={`${currentHeader.siteName} Logo`}
                 width={48}
                 height={48}
@@ -172,9 +158,9 @@ const Header = ({ domainKey }: HeaderProps) => {
             ></div>
             
             {/* মেনু কন্টেন্ট প্যানেল */}
-            <div className="relative w-full max-w-sm bg-[#fdfdf7] h-full overflow-y-auto p-6 md:p-10 shadow-2xl animate-in slide-in-from-right duration-300 font-tarunima">
+            <div className="relative w-full max-w-sm bg-[#fdfdf7] h-full overflow-y-auto p-2 md:p-2 shadow-2xl animate-in slide-in-from-right duration-300 font-tarunima">
               
-              <div className="flex justify-between items-center mb-6 border-b border-gray-200 pb-4">
+              <div className="flex justify-between items-center mb-2 border-b border-gray-200 pb-2">
                 <h2 className={`text-xl font-tarunima font-bold ${currentTheme.split(' ')[0]}`}>
                   {currentHeader.siteName}
                 </h2>
@@ -188,13 +174,10 @@ const Header = ({ domainKey }: HeaderProps) => {
 
               {/* লেআউট ম্যাপ আইটেম */}
               <nav className="space-y-3 font-tarunima">
-                {currentHeader.menu?.map((item: any, index: number) => (
-                  <MenuLink 
+                {currentHeader.menu?.map((item: MenuItem, index: number) => (
+                  <MenuItemContainer
                     key={index}
-                    href={createDynamicUrl(item.url)}
-                    icon={<DynamicIcon name={item.icon} />}
-                    title={item.label}
-                    desc={item.desc || ""}
+                    item={item}
                     close={() => setIsMenuOpen(false)}
                     themeClasses={currentTheme}
                   />
@@ -214,8 +197,94 @@ const Header = ({ domainKey }: HeaderProps) => {
   );
 };
 
+// প্যারেন্ট ও চিলড্রেন লজিক হ্যান্ডেল করার জন্য কন্টেইনার কম্পোনেন্ট
+const MenuItemContainer = ({ 
+  item, 
+  close, 
+  themeClasses 
+}: { 
+  item: MenuItem; 
+  close: () => void; 
+  themeClasses: string; 
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const hasChildren = Boolean(item.children && item.children.length > 0);
+
+  const hoverBorderColor = themeClasses.split(' ')[1]; 
+  const activeIconBg = themeClasses.split(' ')[2]; 
+
+  if (hasChildren) {
+    return (
+      <div className="flex flex-col rounded border border-gray-100 bg-white overflow-hidden transition-all font-tarunima">
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className={`flex items-center justify-between p-2 bg-white text-left ${hoverBorderColor} transition-all group font-tarunima`}
+        >
+          <div className="flex items-center gap-3">
+            <div className={`p-3 rounded transition-colors bg-gray-50 text-gray-600 ${activeIconBg} group-hover:text-white`}>
+              <DynamicIcon name={item.icon} />
+            </div>
+            <div>
+              <h3 className="text-md font-tarunima font-bold text-gray-800">{item.label}</h3>
+              {item.desc && <p className="text-xs font-tarunima text-gray-500 leading-tight">{item.desc}</p>}
+            </div>
+          </div>
+          <div className="text-gray-400 transition-transform duration-200 pl-2">
+            {isOpen ? <Icons.ChevronUp size={20} /> : <Icons.ChevronDown size={20} />}
+          </div>
+        </button>
+
+        {/* সাবমেনু লিস্ট (Accordion) */}
+        {isOpen && (
+          <div className="bg-[#f9f9f3] border-t border-gray-100 p-2 space-y-2 pl-4">
+            {item.children?.map((child: MenuItem, idx: number) => (
+              <MenuLink
+                key={idx}
+                href={createDynamicUrl(child.url)}
+                icon={<DynamicIcon name={child.icon} size={18} />}
+                title={child.label}
+                desc={child.desc || ""}
+                close={close}
+                themeClasses={themeClasses}
+                isChild={true}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <MenuLink 
+      href={createDynamicUrl(item.url)}
+      icon={<DynamicIcon name={item.icon} />}
+      title={item.label}
+      desc={item.desc || ""}
+      close={close}
+      themeClasses={themeClasses}
+    />
+  );
+};
+
 // মেনু লিংক সাব-কম্পোনেন্ট
-const MenuLink = ({ href, icon, title, desc, close, themeClasses }: any) => {
+const MenuLink = ({ 
+  href, 
+  icon, 
+  title, 
+  desc, 
+  close, 
+  themeClasses,
+  isChild = false
+}: {
+  href: string;
+  icon: React.ReactNode;
+  title: string;
+  desc: string;
+  close: () => void;
+  themeClasses: string;
+  isChild?: boolean;
+}) => {
   const hoverBorderColor = themeClasses.split(' ')[1]; 
   const activeIconBg = themeClasses.split(' ')[2];     
 
@@ -223,14 +292,14 @@ const MenuLink = ({ href, icon, title, desc, close, themeClasses }: any) => {
     <Link 
       href={href} 
       onClick={close}
-      className={`flex items-center gap-5 p-4 bg-white rounded-xl border border-gray-100 ${hoverBorderColor} hover:shadow-md transition-all group font-tarunima`}
+      className={`flex items-center gap-2 ${isChild ? 'p-2.5 bg-transparent border-none' : 'p-4 bg-white rounded border border-gray-100'} ${hoverBorderColor} hover:shadow-md transition-all group font-tarunima`}
     >
-      <div className={`p-3 rounded-xl transition-colors bg-gray-50 text-gray-600 ${activeIconBg} group-hover:text-white`}>
+      <div className={`${isChild ? 'p-2' : 'p-3'} rounded transition-colors bg-gray-50 text-gray-600 ${activeIconBg} group-hover:text-white`}>
         {icon}
       </div>
       <div>
-        <h3 className="text-md font-tarunima font-bold text-gray-800">{title}</h3>
-        <p className="text-xs font-tarunima text-gray-500 leading-tight">{desc}</p>
+        <h3 className={`${isChild ? 'text-sm' : 'text-md'} font-tarunima font-bold text-gray-800`}>{title}</h3>
+        {desc && <p className="text-xs font-tarunima text-gray-500 leading-tight">{desc}</p>}
       </div>
     </Link>
   );
