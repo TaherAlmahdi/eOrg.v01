@@ -103,7 +103,7 @@ export default async function SuccessStories() {
                   {story.title}
                 </h3>
                 {story.excerpt && (
-                  <p className="text-gray-600 text-xs md:text-sm mt-1 font-normal font-sans line-clamp-2">
+                  <p className="text-gray-600 text-xs md:text-sm mt-1 font-normal font-tarunima line-clamp-2">
                     {story.excerpt}
                   </p>
                 )}
