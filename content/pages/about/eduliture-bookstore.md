@@ -2,14 +2,14 @@
 title: এডুলিচার বুকস্টোর
 slug: eduliture-bookstore
 
-icon: "/favicon/default.ico"
+icon: "/favicon/favicon.ico"
 featured_image: "/images/projects/project-dummy.webp"
 excerpt: "পুস্তক প্রকাশনা ও বিক্রয়।"
 category: "প্রকাশনা"
 externalLink: "https://eduliture.com"
 
 featured: true
-order: 2
+order: 11
 ---
 
 <p class="dcap">১৯শ শতাব্দীর বাংলার নবজাগরণের অন্যতম শ্রেষ্ঠ পুরুষ ঈশ্বরচন্দ্র বিদ্যাসাগর। তিনি কেবল একজন পণ্ডিত বা শিক্ষাবিদ ছিলেন না, বরং ছিলেন একাধারে সমাজসংস্কারক, মানবতাবাদী এবং আধুনিক বাংলা গদ্যের জনক। তাঁর সংস্কার আন্দোলন এবং সাহিত্যচর্চা—উভয়ই বাঙালি সমাজ ও মনন গঠনে অপরিহার্য ভূমিকা পালন করেছে।</p>
