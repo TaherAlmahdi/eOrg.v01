@@ -31,9 +31,9 @@ export const headerConfig: Record<string, DomainConfig> = {
     bgColor: "bg-[#ffffff]",
     themeColor: "teal",
     menu: [
-      { label: "হোম", url: "/", icon: "Info", desc: "প্রধান ওয়েবসাইট" },
-      { label: "ডিজিটাল লাইব্রেরি", url: "goto:library:", icon: "Library", desc: "অনলাইন লাইব্রেরি সাবডোমেন" },
-      { label: "বঙ্কিম আর্কাইভ", url: "goto:bankim:", icon: "Archive", desc: "বঙ্কিমচন্দ্র স্মারক সাবডোমেন" },
+      { label: "আলয়", url: "/", icon: "Home", desc: "প্রধান প্রবেশপথ" },
+      { label: "এডুলিচার লাইব্রেরি", url: "goto:library:", icon: "Library", desc: "উন্মুক্ত গ্রন্থ সংগ্রহ" },
+      { label: "বঙ্কিম রচনাবলী", url: "goto:bankim:", icon: "Archive", desc: "বঙ্কিমচন্দ্র রচিত সাহিত্য সংগ্রহ" },
       { label: "ব্লগ", url: "/blogs", icon: "Feather", desc: "শিক্ষামূলক নিবন্ধ ও ব্লগসমূহ" }
     ]
   },
@@ -48,7 +48,7 @@ export const headerConfig: Record<string, DomainConfig> = {
     bgColor: "bg-[#f4fbf7]", 
     themeColor: "emerald",
     menu: [
-      { label: "মূল হোমপেজ", url: "goto:main:", icon: "Info", desc: "এডুলিচার প্রধান ওয়েবসাইট" },
+      { label: "আলয়", url: "goto:main:", icon: "Home", desc: "এডুলিচারের প্রধান প্রবেশক" },
       { label: "সব বই", url: "/books", icon: "BookOpen", desc: "লাইব্রেরির সর্বমোট বই সংগ্রহ" },
       { label: "বিভাগসমূহ", url: "/genres", icon: "Library", desc: "ক্যাটাগরি ভিত্তিক বইয়ের তালিকা" },
       { label:"উপন্যাস সমগ্র", url:"/genre/novel", icon: "BookOpen",  desc:"বঙ্কিমচন্দ্রের কালজয়ী উপন্যাসসমূহ", color:"blue"},
