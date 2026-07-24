@@ -3,7 +3,7 @@
 // সাবডোমেন অনুযায়ী বিষয়টির নাম এবং ওজি ইমেজের ফাইল নেম ম্যাপিং
 const siteMap: Record<string, { title: string; image: string }> = {
   library: {
-    title: 'পাঠশালা',
+    title: 'এডুলিচার পাঠশালা',
     image: 'library.jpg',
   },
 
