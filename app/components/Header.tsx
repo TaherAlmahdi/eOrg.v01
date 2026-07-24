@@ -82,7 +82,7 @@ const Header = ({ domainKey }: HeaderProps) => {
     favicon: "/favicon.ico",
     bgColor: "bg-[#ffffff]",
     themeColor: "teal",
-    menu: [{ label: "হোম", url: "/", icon: "BookOpen", desc: "প্রধান পাতা" }]
+    menu: [{ label: "আলয়", url: "/", icon: "BookOpen", desc: "প্রধান পাতা" }]
   };
 
   // স্ক্রোল লক এবং ডাইনামিক ফেভিকন/টাইটেল ক্লায়েন্ট-সাইড আপডেট
@@ -157,7 +157,7 @@ const Header = ({ domainKey }: HeaderProps) => {
         <button 
           onClick={() => setIsMenuOpen(true)}
           aria-label="Open Menu"
-          className={`p-2 hover:bg-gray-100 rounded-lg transition-colors ${currentTheme.split(' ')[0]}`}
+          className={`p-2 hover:bg-gray-100 rounded transition-colors ${currentTheme.split(' ')[0]}`}
         >
           <Icons.Menu size={28} />
         </button>
@@ -176,7 +176,7 @@ const Header = ({ domainKey }: HeaderProps) => {
               
               <div className="flex justify-between items-center mb-6 border-b border-gray-200 pb-4">
                 <h2 className={`text-xl font-tarunima font-bold ${currentTheme.split(' ')[0]}`}>
-                  {currentHeader.siteName} মেনু
+                  {currentHeader.siteName}
                 </h2>
                 <button 
                   onClick={() => setIsMenuOpen(false)} 
