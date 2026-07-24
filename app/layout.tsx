@@ -52,13 +52,13 @@ export async function generateMetadata(): Promise<Metadata> {
 
   if (subdomain) {
     const targetIconName = `${subdomain}.ico`;
-    const localFilePath = path.join(process.cwd(), 'public', 'favicons', targetIconName);
+    const localFilePath = path.join(process.cwd(), 'public', 'favicon', targetIconName);
 
     if (fs.existsSync(localFilePath)) {
-      iconPath = `/favicons/${targetIconName}`;
+      iconPath = `/favicon/${targetIconName}`;
     } else {
-      const defaultSubPath = path.join(process.cwd(), 'public', 'favicons', 'default.ico');
-      iconPath = fs.existsSync(defaultSubPath) ? '/favicons/default.ico' : '/favicon.ico';
+      const defaultSubPath = path.join(process.cwd(), 'public', 'favicon', 'default.ico');
+      iconPath = fs.existsSync(defaultSubPath) ? '/favicon/default.ico' : '/favicon.ico';
     }
   }
 
@@ -69,7 +69,7 @@ export async function generateMetadata(): Promise<Metadata> {
   // ৪. ডায়নামিক টাইটেল ও ইমেজের ভেরিয়েবল সেট করা (আপনার ফরম্যাট অনুযায়ী)
   const defaultTitle = siteData?.title || 'এডুলিচার';
   const mainDomainTitle = 'এডুলিচার';
-  const dynamicTitle = subdomain ? `${defaultTitle} ❀ ${mainDomainTitle}` : mainDomainTitle;
+  const dynamicTitle = subdomain ? `${defaultTitle}` : mainDomainTitle;
   const ogImageUrl = siteData?.ogImage || '/og/site/default.jpg';
 
   // ৫. একটিমাত্র রিটার্ন অবজেক্ট
@@ -120,8 +120,18 @@ export default async function RootLayout({
     currentDomainKey = parts[0]; 
   } else if (hostname.includes('library.localhost')) {
     currentDomainKey = 'library';
+  } else if (hostname.includes('vidyasagar.localhost')) {
+    currentDomainKey = 'vidyasagar';    
   } else if (hostname.includes('bankim.localhost')) {
     currentDomainKey = 'bankim';
+  } else if (hostname.includes('rabindra.localhost')) {
+    currentDomainKey = 'rabindra';
+  } else if (hostname.includes('sharat.localhost')) {
+    currentDomainKey = 'sharat';
+  } else if (hostname.includes('nazrul.localhost')) {
+    currentDomainKey = 'nazrul';
+  } else if (hostname.includes('jibanananda.localhost')) {
+    currentDomainKey = 'jibanananda';                
   }
 
   return (

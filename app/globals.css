@@ -38,7 +38,6 @@
    ২. ক্লাস-ভিত্তিক কম্পোনেন্ট স্টাইল (Class-Based Architecture)
    ========================================== */
 @layer components {
-
   /* ----------------------------------
      ক. সাধারণ টাইপোগ্রাফি ও প্যারাগ্রাফ
      ---------------------------------- */
@@ -63,7 +62,7 @@
   ul,
   ul.none {
     /* স্ক্রিনের সাইজ অনুযায়ী ফন্ট স্কেল হবে (সর্বনিম্ন 1.15rem থেকে সর্বোচ্চ 1.85rem) */
-    font-size: clamp(1.15rem, 1.2vw + 0.8rem, 1.5rem) !important;
+    font-size: clamp(1.15rem, 1.2vw + 0.2rem, 1.5rem) !important;
     line-height: 1.55;
     color: var(--text-main);
   }
@@ -71,7 +70,7 @@
   .first,
   .dcap,
   .normal {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
     text-align: justify;
   }
 
@@ -90,7 +89,11 @@
   .dcap::first-letter {
     float: left;
     line-height: 1;
-    font-size: clamp(1.5rem, 2.5vw + 1rem, 3.5rem); /* 🎯 আল্ট্রা ওয়াইড স্ক্রিনে আর ছোট দেখাবে না */
+    font-size: clamp(
+      1.5rem,
+      2.5vw + 1rem,
+      3.5rem
+    ); /* 🎯 আল্ট্রা ওয়াইড স্ক্রিনে আর ছোট দেখাবে না */
     color: whitesmoke;
     font-family: var(--font-tarunima);
     padding: 20px 12px 8px 16px;
@@ -258,17 +261,42 @@
   }
 
   /* আলফা ইউটিলিটি */
-  .dan { text-align: right !important; font-size: inherit !important; }
-  .center, .pc { text-align: center !important; }
-  .indent { text-indent: 30px !important; font-size: inherit !important; }
-  .right { text-align: right; }
-  .pl { width: 50%; float: left; text-align: left; }
-  .pr { width: 50%; float: right; text-align: right; }
+  .dan {
+    text-align: right !important;
+    font-size: inherit !important;
+  }
+  .center,
+  .pc {
+    text-align: center !important;
+  }
+  .indent {
+    text-indent: 30px !important;
+    font-size: inherit !important;
+  }
+  .right {
+    text-align: right;
+  }
+  .pl {
+    width: 50%;
+    float: left;
+    text-align: left;
+  }
+  .pr {
+    width: 50%;
+    float: right;
+    text-align: right;
+  }
 
   /* গ্যাপ ও মার্জিন */
-  .hgap { margin: 0 10%; }
-  .pgap { margin: 0 50px; }
-  .ngap { margin: 0 15px; }
+  .hgap {
+    margin: 0 10%;
+  }
+  .pgap {
+    margin: 0 50px;
+  }
+  .ngap {
+    margin: 0 15px;
+  }
   .pcg {
     margin: 25px 0 5px 0;
     font-size: 1rem;
@@ -286,7 +314,7 @@
     list-style-type: bengali;
     text-align: justify;
   }
-  
+
   ul,
   ul.none {
     margin-left: 30px;

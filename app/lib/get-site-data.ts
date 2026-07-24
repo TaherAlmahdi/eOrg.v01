@@ -2,22 +2,40 @@
 
 // সাবডোমেন অনুযায়ী বিষয়টির নাম এবং ওজি ইমেজের ফাইল নেম ম্যাপিং
 const siteMap: Record<string, { title: string; image: string }> = {
-  bankim: {
-    title: 'বঙ্কিম রচনাবলী',
-    image: 'bankim.jpg', // public/og/site/bankim.jpg
-  },
-  nazrul: {
-    title: 'নজরুল রচনাবলী',
-    image: 'nazrul.jpg',
-  },
-  tagore: {
-    title: 'রবীন্দ্র রচনাবলী',
-    image: 'tagore.jpg',
-  },
   library: {
     title: 'পাঠশালা',
     image: 'library.jpg',
   },
+
+  vidyasagar: {
+    title: 'বিদ্যাসাগর রচনাবলী',
+    image: 'bankim.jpg', // public/og/site/bankim.jpg
+  },
+
+  bankim: {
+    title: 'বঙ্কিম রচনাবলী',
+    image: 'bankim.jpg', // public/og/site/bankim.jpg
+  },
+
+  rabindra: {
+    title: 'রবীন্দ্র রচনাবলী',
+    image: 'tagore.jpg',
+  },
+
+  sharat: {
+    title: 'শরৎ রচনাবলী',
+    image: 'bankim.jpg', // public/og/site/bankim.jpg
+  },
+  
+  nazrul: {
+    title: 'নজরুল রচনাবলী',
+    image: 'nazrul.jpg',
+  },
+
+  jibanananda: {
+    title: 'জীবনানন্দ রচনাবলী',
+    image: 'bankim.jpg', // public/og/site/bankim.jpg
+  },  
   // প্রয়োজন অনুযায়ী নতুন সাবডোমেন যুক্ত করুন
 };
 
@@ -44,12 +62,22 @@ export function getSubdomainData(host: string | null) {
   
   } else if (host.includes('library.localhost')) {
     subdomain = 'library';
+
+  } else if (host.includes('vidyasagar.localhost')) {
+    subdomain = 'vidyasagar';   
   
   } else if (host.includes('bankim.localhost')) {
     subdomain = 'bankim';
+
+  } else if (host.includes('sharat.localhost')) {
+    subdomain = 'sharat';    
   
   } else if (host.includes('nazrul.localhost')) {
     subdomain = 'nazrul';
+  
+  } else if (host.includes('jibanananda.localhost')) {
+    subdomain = 'jibanananda';
+
   }
   // ১. সাবডোমেন যদি siteMap এ সংজ্ঞায়িত থাকে
   if (subdomain && siteMap[subdomain]) {

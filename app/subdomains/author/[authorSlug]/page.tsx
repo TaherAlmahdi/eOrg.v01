@@ -123,18 +123,18 @@ export default async function AuthorHomePage({ params }: AuthorHomePageProps) {
         </div>
 
         <div className="w-full text-slate-800 leading-relaxed">
-          <div className="w-full aspect-2/3 mb-6 md:float-left md:mr-6 md:mb-4 md:w-64 md:h-100 relative bg-slate-100 rounded-lg border border-slate-200 overflow-hidden shadow-sm">
+          <div className="w-full mb-6 md:float-left md:mr-6 md:mb-4 md:w-64 md:h-96 relative bg-slate-100 rounded-lg border border-slate-200 overflow-hidden shadow-sm p-2 flex items-center justify-center">
             <Image
               src={authorImageSrc}
               alt={fullTitle ? `${fullTitle}-এর ছবি` : 'লেখকের ছবি'}
               fill
               sizes="(max-width: 768px) 100vw, 256px"
               priority
-              className="object-cover"
+              className="object-contain drop-shadow-sm p-2"
             />
           </div>
 
-          <div className="space-y-4 text-xl md:text-2xl leading-relaxed">
+          <div className="space-y-4 leading-relaxed">
             {mdContent}
           </div>
         </div>
@@ -154,7 +154,9 @@ export default async function AuthorHomePage({ params }: AuthorHomePageProps) {
           </div> 
 
           {extractedGenres.length === 0 ? (
-            <p className="text-sm text-slate-500 py-4 text-center">কোনো ঘরানা পাওয়া যায়নি।</p>
+            <div className="inline-flex items-center justify-center gap-4 px-5 py-2 rounded bg-teal-50 text-[#008080] mb-8 animate-pulse border border-teal-100 shadow-sm text-center">
+              <p className="text-lg text-slate-500 py-4 font-tarunima font-medium italic text-center"><span className="text-[#008080]">এডুলিচার</span> বিশুদ্ধজ্ঞান প্রকল্প <span className="text-[#cc7a00]">{fullTitle}</span>র নির্মাণের কাজ চলমান রয়েছে, অনুগ্রহ করে পরে আবার চেষ্টা করুন। আমাদের প্রকল্প উন্নয়ন কর্মীগণ চেষ্টা করছেন যতদূর সম্ভব দ্রুত আপনাদের সম্পূর্ণ <span className="text-[#cc7a00]">{fullTitle}</span> উপহার দেওয়ার জন্য। সাথে থাকার জন্য ধন্যবাদ।</p>
+            </div>
           ) : (
             <div className="flex flex-wrap gap-2 w-full">
               {extractedGenres.map((genre) => {
