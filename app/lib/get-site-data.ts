@@ -1,47 +1,39 @@
-// app/lib/get-site-data.ts
-
-// সাবডোমেন অনুযায়ী বিষয়টির নাম এবং ওজি ইমেজের ফাইল নেম ম্যাপিং
-const siteMap: Record<string, { title: string; image: string }> = {
+// ১. siteMap-এর সামনে 'export' যুক্ত করে দিন
+export const siteMap: Record<string, { title: string; image: string }> = {
   library: {
     title: 'এডুলিচার পাঠশালা',
     image: 'library.jpg',
   },
-
   vidyasagar: {
     title: 'বিদ্যাসাগর রচনাবলী',
-    image: 'bankim.jpg', // public/og/site/bankim.jpg
+    image: 'bankim.jpg',
   },
-
   bankim: {
     title: 'বঙ্কিম রচনাবলী',
-    image: 'bankim.jpg', // public/og/site/bankim.jpg
+    image: 'bankim.jpg',
   },
-
   rabindra: {
     title: 'রবীন্দ্র রচনাবলী',
     image: 'tagore.jpg',
   },
-
   sharat: {
     title: 'শরৎ রচনাবলী',
-    image: 'bankim.jpg', // public/og/site/bankim.jpg
+    image: 'bankim.jpg',
   },
-  
   nazrul: {
     title: 'নজরুল রচনাবলী',
     image: 'nazrul.jpg',
   },
-
   jibanananda: {
     title: 'জীবনানন্দ রচনাবলী',
-    image: 'bankim.jpg', // public/og/site/bankim.jpg
-  },  
-  // প্রয়োজন অনুযায়ী নতুন সাবডোমেন যুক্ত করুন
+    image: 'bankim.jpg',
+  },
 };
 
+// আপনার বিদ্যমান getSubdomainData ফাংশন
 export function getSubdomainData(host: string | null) {
   const mainDomainTitle = 'এডুলিচার';
-  const defaultTitle = 'বিশুদ্ধজ্ঞানের শিক্ষা বিষয়ক প্রতিষ্ঠান';
+  const defaultTitle = 'বিশুদ্ধজ্ঞানের শিক্ষা বিষয়ক প্রতিষ্ঠান';
   const defaultImage = 'default.png';
 
   if (!host) {
@@ -52,57 +44,71 @@ export function getSubdomainData(host: string | null) {
     };
   }
 
-  // host থেকে সাবডোমেন আলাদা করা (e.g., bankim.eduliture.com -> bankim)
-  const parts = host.split('.');
-  
-  // localhost বা মূল ডোমেনের বাইরে কাস্টম সাবডোমেন চেক
   let subdomain = '';
-  if (parts.length > 2 && parts[0] !== 'www') {
-    subdomain = parts[0].toLowerCase();
+  const hostWithoutPort = host.split(':')[0];
   
-  } else if (host.includes('library.localhost')) {
-    subdomain = 'library';
-
-  } else if (host.includes('vidyasagar.localhost')) {
-    subdomain = 'vidyasagar';   
-  
-  } else if (host.includes('bankim.localhost')) {
-    subdomain = 'bankim';
-
-  } else if (host.includes('sharat.localhost')) {
-    subdomain = 'sharat';    
-  
-  } else if (host.includes('nazrul.localhost')) {
-    subdomain = 'nazrul';
-  
-  } else if (host.includes('jibanananda.localhost')) {
-    subdomain = 'jibanananda';
-
+  if (hostWithoutPort.endsWith('.localhost')) {
+    subdomain = hostWithoutPort.replace('.localhost', '').toLowerCase();
+  } else {
+    const parts = hostWithoutPort.split('.');
+    if (parts.length > 2 && parts[0] !== 'www') {
+      subdomain = parts[0].toLowerCase();
+    }
   }
-  // ১. সাবডোমেন যদি siteMap এ সংজ্ঞায়িত থাকে
+
   if (subdomain && siteMap[subdomain]) {
     const site = siteMap[subdomain];
     return {
-      title: `${site.title} ❀ ${mainDomainTitle}`, // যেমন: বঙ্কিম রচনাবলী ❀ এডুলিচার
+      title: `${site.title} ❀ ${mainDomainTitle}`,
       ogImage: `/og/site/${site.image}`,
       subdomain,
     };
   }
 
-  // ২. সাবডোমেন পাওয়া গেছে কিন্তু siteMap এ ম্যানুয়ালি যুক্ত করা নেই (ডাইনামিক ফ্যালব্যাক)
-  if (subdomain) {
+  if (subdomain && subdomain !== 'localhost') {
     const formattedName = subdomain.charAt(0).toUpperCase() + subdomain.slice(1);
     return {
-      title: `${formattedName} ❀ ${mainDomainTitle}`, // যেমন: Library ❀ এডুলিচার
-      ogImage: `/og/site/${subdomain}.jpg`, // অটোমেটিক /og/site/[subdomain].jpg খুঁজবে
+      title: `${formattedName} ❀ ${mainDomainTitle}`,
+      ogImage: `/og/site/${subdomain}.jpg`,
       subdomain,
     };
   }
 
-  // ৩. মূল ডোমেনের জন্য (যেমন: eduliture.com)
   return {
     title: `${defaultTitle} ❀ ${mainDomainTitle}`,
     ogImage: `/og/site/${defaultImage}`,
     subdomain: '',
   };
+}
+
+// ২. ফাইলের নিচে এই নতুন হেলপার ফাংশনটি যুক্ত করে দিন
+interface DynamicTitleOptions {
+  metaTitle?: string | null;
+  currentPageTitle?: string | null;
+  volumePageTitle?: string | null;
+  bookTitle?: string | null;
+  siteName: string;
+}
+
+export function buildTabTitle({
+  metaTitle,
+  currentPageTitle,
+  volumePageTitle,
+  bookTitle,
+  siteName,
+}: DynamicTitleOptions): string {
+  // শর্ত ১: meta_title নির্দিষ্ট থাকলে সরাসরি সেটাই রিটার্ন করবে
+  if (metaTitle) {
+    return metaTitle;
+  }
+
+  // শর্ত ২: কারেন্ট পেজ | ভলিউম পেজ | বুক পেজ | সাইট টাইটেল
+  const titleParts = [
+    currentPageTitle,
+    volumePageTitle,
+    bookTitle,
+    siteName,
+  ].filter(Boolean); // null/undefined বাদ দেবে
+
+  return titleParts.join(' | ');
 }

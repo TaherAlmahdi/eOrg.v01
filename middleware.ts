@@ -5,7 +5,7 @@ export function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
   const hostname = request.headers.get('host') || '';
 
-  // ১. ডোমেন থেকে পোর্ট সরিয়ে ফেলা (e.g., eduliture.org:3000 -> eduliture.org)
+  // ১. ডোমেন থেকে পোর্ট সরিয়ে ফেলা (e.g., eduliture.org:3000 -> eduliture.org)
   const hostWithoutPort = hostname.split(':')[0];
   const parts = hostWithoutPort.split('.');
 
@@ -18,13 +18,13 @@ export function middleware(request: NextRequest) {
       subdomain = parts[0];
     }
   } else if (hostWithoutPort.endsWith('.vercel.app')) {
-    // ভার্সেল প্রিভিউ ডোমেন হ্যান্ডলিং (e.g., bankim.my-app.vercel.app)
-    if (parts.length > 3) {
+    // ভার্সেল প্রিভিউ ডোমেন হ্যান্ডলিং
+    // e-org-v02-xxx.vercel.app টাইপ প্রিভিউ ইউআরএলে যেন ভুল সাবডোমেন না ধরে
+    if (parts.length > 3 && !hostWithoutPort.includes('-projects')) {
       subdomain = parts[0];
     }
   } else {
     // কাস্টম প্রডাকশন ডোমেন হ্যান্ডলিং (e.g., bankim.eduliture.org)
-    // parts[0] যেন 'www' বা মূল ডোমেন না হয় তা নিশ্চিত করা
     if (parts.length > 2 && parts[0] !== 'www') {
       subdomain = parts[0];
     }
@@ -35,7 +35,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // ৪. সাবডোমেন থাকলে হেডার ও কোয়েরি প্যারাম সেট করা
+  // ৪. সাবডোমেন থাকলে হেডার ও কোয়েরি প্যারাম সেট করা
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set('x-subdomain', subdomain);
   url.searchParams.set('subdomain', subdomain);
@@ -43,10 +43,15 @@ export function middleware(request: NextRequest) {
   const pathname = url.pathname;
 
   // ৫. ডাইনামিক পাথম্যাপিং (লাইব্রেরি নাকি অথর সাবডোমেন)
+  // লুপ বা ডাবল প্রিফিক্স রোধ করতে নিশ্চিত করা
   if (subdomain === 'library') {
-    url.pathname = `/subdomains/library${pathname === '/' ? '' : pathname}`;
+    if (!pathname.startsWith('/subdomains/library')) {
+      url.pathname = `/subdomains/library${pathname === '/' ? '' : pathname}`;
+    }
   } else {
-    url.pathname = `/subdomains/author/${subdomain}${pathname === '/' ? '' : pathname}`;
+    if (!pathname.startsWith('/subdomains/author')) {
+      url.pathname = `/subdomains/author/${subdomain}${pathname === '/' ? '' : pathname}`;
+    }
   }
 
   return NextResponse.rewrite(url, {

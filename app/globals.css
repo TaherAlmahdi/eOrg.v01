@@ -61,7 +61,7 @@
   .none,
   ul,
   ul.none {
-    /* স্ক্রিনের সাইজ অনুযায়ী ফন্ট স্কেল হবে (সর্বনিম্ন 1.15rem থেকে সর্বোচ্চ 1.85rem) */
+    /* স্ক্রিনের সাইজ অনুযায়ী ফন্ট স্কেল হবে (সর্বনিম্ন 1.15rem থেকে সর্বোচ্চ 1.85rem) */
     font-size: clamp(1.15rem, 1.2vw + 0.2rem, 1.5rem) !important;
     line-height: 1.55;
     color: var(--text-main);
@@ -93,9 +93,9 @@
       1.5rem,
       2.5vw + 1rem,
       3.5rem
-    ); /* 🎯 আল্ট্রা ওয়াইড স্ক্রিনে আর ছোট দেখাবে না */
+    ); /* 🎯 আল্ট্রা ওয়াইড স্ক্রিনে আর ছোট দেখাবে না */
     color: whitesmoke;
-    font-family: var(--font-tarunima);
+    font-family: var(--font-tarunima), serif;
     padding: 20px 12px 8px 16px;
     margin-right: 8px;
     margin-top: 8px;
@@ -110,7 +110,7 @@
   .wname,
   .subtitle,
   .chapter {
-    font-family: var(--font-sabrina) !important;
+    font-family: var(--font-sabrina), serif !important;
     text-align: center;
     display: block;
     clear: both;

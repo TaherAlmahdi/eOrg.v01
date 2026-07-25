@@ -47,7 +47,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   const subdomain = isSubdomain ? parts[0] : null;
 
-  // ২. সাবডোমেন অনুযায়ী আইকনের পাথ নির্ধারণ
+  // ২. সাবডোমেন অনুযায়ী আইকনের পাথ নির্ধারণ
   let iconPath = '/favicon.ico'; // মূল ডোমেনের জন্য ডিফল্ট app/favicon.ico
 
   if (subdomain) {
@@ -62,27 +62,30 @@ export async function generateMetadata(): Promise<Metadata> {
     }
   }
 
-  // ৩. সাবডোমেন অনুযায়ী ডাটাবেজ/কনফিগ থেকে সাইটের ডাটা আনা
+  // ৩. সাবডোমেন অনুযায়ী ডাটাবেজ/কনফিগ থেকে সাইটের ডাটা আনা
   const siteData = getSubdomainData(host);
   const siteUrl = host ? `https://${host}` : (process.env.NEXT_PUBLIC_SITE_URL || 'https://eduliture.org');
 
-  // ৪. ডায়নামিক টাইটেল ও ইমেজের ভেরিয়েবল সেট করা (আপনার ফরম্যাট অনুযায়ী)
+  // ৪. ডায়নামিক টাইটেল ও ইমেজের ভেরিয়েবল সেট করা
   const defaultTitle = siteData?.title || 'এডুলিচার';
   const mainDomainTitle = 'এডুলিচার';
   const dynamicTitle = subdomain ? `${defaultTitle}` : mainDomainTitle;
   const ogImageUrl = siteData?.ogImage || '/og/site/default.jpg';
 
-  // ৫. একটিমাত্র রিটার্ন অবজেক্ট
+  // ৫. টাইটেল টেমপ্লেট সহ রিটার্ন অবজেক্ট (সাব-পেজের ডাইনামিক টাইটেল সাপোর্ট করার জন্য)
   return {
-    title: dynamicTitle,
-    description: `${defaultTitle} ❀ বিশুদ্ধজ্ঞানের শিক্ষা বিষয়ক প্রতিষ্ঠান`,
+    title: {
+      template: `%s`,           // 👈 এটি থাকলে সাব-পেজের ডাইনামিক মেটা-টাইটেল সরাসরি ট্যাবে দেখাবে
+      default: dynamicTitle,    // 👈 রুট হোমপেজে এই ডিফল্ট টাইটেলটিই থাকবে
+    },
+    description: `${defaultTitle} ❀ বিশুদ্ধজ্ঞানের শিক্ষা বিষয়ক প্রতিষ্ঠান`,
     metadataBase: new URL(siteUrl),
     icons: {
-      icon: iconPath, // ব্রাউজারের <head> এ ডায়নামিক .ico ফাইল লিঙ্ক হবে
+      icon: iconPath,
     },
     openGraph: {
       title: dynamicTitle,
-      description: `${defaultTitle} ❀ বিশুদ্ধজ্ঞানের শিক্ষা বিষয়ক প্রতিষ্ঠান`,
+      description: `${defaultTitle} ❀ বিশুদ্ধজ্ঞানের শিক্ষা বিষয়ক প্রতিষ্ঠান`,
       url: siteUrl,
       siteName: mainDomainTitle,
       images: [
