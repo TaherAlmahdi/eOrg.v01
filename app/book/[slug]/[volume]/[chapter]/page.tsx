@@ -9,7 +9,9 @@ import rehypeStringify from 'rehype-stringify';
 import Link from 'next/link';
 import { Home, ChevronLeft, ChevronRight, List } from "lucide-react";
 import { Metadata } from 'next';
-
+import Notice from '../../../../components/Notice'; 
+import BookCover from '../../../../components/BookCover'; 
+import TableOfContents from '../../../../components/TableOfContents';
 
 type Props = {
   params: Promise<{ slug: string, volume: string, chapter: string }>;
@@ -196,7 +198,7 @@ export default async function ChapterPage({ params, searchParams }: Props) {
             <div className="w-40 h-[2px] bg-red-900 mx-auto mt-2"></div>
           </header>
           
-
+          {activeNotice && <Notice message={activeNotice} />}
           
           <article className="prose lg:prose-md max-w-none text-gray-900 leading-relaxed font-tarunima mt-6">
             <div dangerouslySetInnerHTML={{ __html: processedContent.toString() }} />
@@ -258,10 +260,10 @@ export default async function ChapterPage({ params, searchParams }: Props) {
         <aside className="order-2 lg:order-1 col-span-1 lg:col-span-3 px-2 lg:ml-1 space-y-1">
           <div className="lg:sticky lg:top-6 space-y-1">
             <div className="bg-white shadow-sm mt-2 flex justify-center">
-
+              <BookCover coverImage={bookData.cover_image} title={bookData.title} />
             </div>
             <div className="bg-white font-tarunima p-1 shadow-sm min-h-[400px]">
-   
+              <TableOfContents structure={nestedStructure} currentChapter={chapter} slug={slug} />
             </div>
           </div>
         </aside>
