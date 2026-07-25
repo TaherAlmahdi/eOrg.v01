@@ -63,6 +63,15 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|assets|images|favicon|sw.js|.*\\.(?:ico|png|webp|svg|jpg|jpeg|gif)$).*)',
+    /*
+     * নিচের ফাইল, ডিরেক্টরি এবং এক্সটেনশনগুলোতে মিডলওয়্যার রান হবে না (Bypass/Skip করবে):
+     * - api (API রাউট)
+     * - _next/static, _next/image (Next.js এর অভ্যন্তরীণ ফাইল)
+     * - assets, images (আপনার পাবলিক অ্যাসেট ফোল্ডার)
+     * - favicon, favicon.ico, sw.js
+     * - robots.txt, sitemap.xml (SEO ফাইলসমূহ)
+     * - সমস্ত ইমেজ ও আইকন ফাইল এক্সটেনশন (.png, .jpg, .svg, ইত্যাদি)
+     */
+    '/((?!api|_next/static|_next/image|assets|images|favicon|robots\\.txt|sitemap\\.xml|sw\\.js|.*\\.(?:ico|png|webp|svg|jpg|jpeg|gif)$).*)',
   ],
 };
