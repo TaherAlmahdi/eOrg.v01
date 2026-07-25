@@ -9,9 +9,9 @@ import rehypeStringify from 'rehype-stringify';
 import Link from 'next/link';
 import { Home, ChevronLeft, ChevronRight, List } from "lucide-react";
 import { Metadata } from 'next';
-import Notice from '../../../../components/Notice'; 
-import BookCover from '../../../../components/BookCover'; 
-import TableOfContents from '../../../../components/TableOfContents';
+import Notice from '@/app/components/Notice';
+import BookCover from '@/app/components/BookCover'; 
+import TableOfContents from '@/app/components/TableOfContents';
 
 type Props = {
   params: Promise<{ slug: string, volume: string, chapter: string }>;
@@ -169,7 +169,7 @@ export default async function ChapterPage({ params, searchParams }: Props) {
   return (
     <main className="bg-[#fdfcf8] min-h-screen">
       <nav className="w-full bg-[#7575a3] border-b border-gray-200 py-2 px-3 text-white">
-  <div className="max-w-[1440px] mx-auto text-sm font-tarunima flex flex-wrap items-center gap-1 text-left">
+  <div className="max-w-full mx-auto text-sm font-tarunima flex flex-wrap items-center gap-1 text-left">
           <Link href="/" className="shrink-0"><Home size={16} /></Link> 
           <span className="mx-1 text-white/50 shrink-0">/</span>
           <Link href="/books" className="hover:text-red-100 shrink-0">গ্রন্থাগার</Link> 
@@ -178,7 +178,7 @@ export default async function ChapterPage({ params, searchParams }: Props) {
           <span className="mx-1 text-white/50 shrink-0">/</span>
           <Link href={`/book/${slug}/${volume}`} className="hover:text-red-100 shrink-0">{currentVolTitle}</Link>
           <span className="mx-1 text-white/50 shrink-0">/</span>
-         <span className="font-medium flex flex-wrap break-words inline-block">
+         <span className="font-medium flex-wrap warp-break-words inline-flex">
   {chapData.title || chapter} {totalPages > 1 && `(পৃষ্ঠা ${toBengaliNumber(currentPage)})`}
 </span>
 
@@ -186,7 +186,7 @@ export default async function ChapterPage({ params, searchParams }: Props) {
         </div>
       </nav>
 
-      <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-0">
+      <div className="max-w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-0">
         <section className="order-1 lg:order-2 col-span-1 lg:col-span-9 bg-[#fff2e6] p-2 md:p-2 shadow-sm min-h-screen">
           <header className="mb-2 text-center font-tarunima">
             <h2 className="text-xl md:text-xl text-red-900 mb-1">{bookData.title}</h2>
@@ -195,7 +195,7 @@ export default async function ChapterPage({ params, searchParams }: Props) {
               {chapData.title || chapter} {chapData.subtitle ? `: ${chapData.subtitle}` : ''}
               {totalPages > 1 && <span className="block text-sm text-gray-500 mt-1 italic">পৃষ্ঠা: {toBengaliNumber(currentPage)} / {toBengaliNumber(totalPages)}</span>}
             </h1>
-            <div className="w-40 h-[2px] bg-red-900 mx-auto mt-2"></div>
+            <div className="w-40 h-0.5 bg-red-900 mx-auto mt-2"></div>
           </header>
           
           {activeNotice && <Notice message={activeNotice} />}
@@ -221,11 +221,11 @@ export default async function ChapterPage({ params, searchParams }: Props) {
             {footnotes.length > 0 && (
               <div className="mt-2 pt-2 border-t-2 border-orange-200">
                 <h4 className="text-md font-bold text-red-900 mb-1">টিকা ও মন্তব্য</h4>
-                <ol className="not-prose flex flex-wrap gap-x-4 gap-y-0 list-outside text-[0.7rem] md:text-[0.8rem] lg:text-[0.9rem] [&_*]:text-inherit [&_*]:text-gray-700 ml-8 [list-style-type:bengali]">
+                <ol className="not-prose flex flex-wrap gap-x-4 gap-y-0 list-outside text-[0.7rem] md:text-[0.8rem] lg:text-[0.9rem] **:text-gray-700 ml-8 list:[bengali]">
                   {footnotes.map((note, i) => (
-                    <li key={i} id={`fn-${i + 1}`} className="flex-auto min-w-[250px] mb-0 border-t border-white text-justify">
-                      <span className="text-gray-700 leading-normal text-[0.7rem] md:text-[0.8rem] lg:text-[0.9rem] [&_*]:text-inherit [&_*]:text-gray-700">
-                        <a href={`#fnref-${i + 1}`} className="mr-1 !text-blue-500 hover:!text-red-700 transition-all font-normal !text-[1em]">
+                    <li key={i} id={`fn-${i + 1}`} className="flex-auto min-w-62.5 mb-0 border-t border-white text-justify">
+                      <span className="text-gray-700 leading-normal text-[0.7rem] md:text-[0.8rem] lg:text-[0.9rem] **:text-gray-700">
+                        <a href={`#fnref-${i + 1}`} className="mr-1 text-blue-500! hover:text-red-700! transition-all font-normal text-[1em]!">
                           ↑
                         </a>
                         <span dangerouslySetInnerHTML={{ __html: note }} />
@@ -262,7 +262,7 @@ export default async function ChapterPage({ params, searchParams }: Props) {
             <div className="bg-white shadow-sm mt-2 flex justify-center">
               <BookCover coverImage={bookData.cover_image} title={bookData.title} />
             </div>
-            <div className="bg-white font-tarunima p-1 shadow-sm min-h-[400px]">
+            <div className="bg-white font-tarunima p-1 shadow-sm min-h-400">
               <TableOfContents structure={nestedStructure} currentChapter={chapter} slug={slug} />
             </div>
           </div>

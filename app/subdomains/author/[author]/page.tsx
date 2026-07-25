@@ -10,12 +10,13 @@ import { getSlug } from '../../../lib/content/core/registry';
 
 interface AuthorHomePageProps {
   params: Promise<{
-    authorSlug: string;
+    author: string;
+    slug: string;
   }>;
 }
 
 export default async function AuthorHomePage({ params }: AuthorHomePageProps) {
-  const { authorSlug } = await params;
+  const { author } = await params;
 
   // ১. লেখক পরিচিতির জন্য মার্কডাউন ফাইল পড়া
   const mdFilePath = path.join(
@@ -23,7 +24,7 @@ export default async function AuthorHomePage({ params }: AuthorHomePageProps) {
     'content',
     'pages',
     'about',
-    `${authorSlug}.md`
+    `${author}.md`
   );
 
   let mdContent: React.ReactNode = null;
@@ -66,14 +67,14 @@ export default async function AuthorHomePage({ params }: AuthorHomePageProps) {
   } else {
     mdContent = (
       <div className="text-sm text-slate-500 italic py-4">
-        {authorSlug} সংক্রান্ত কোনো কন্টেন্ট ফাইল পাওয়া যায়নি।
+        {author} সংক্রান্ত কোনো কন্টেন্ট ফাইল পাওয়া যায়নি।
       </div>
     );
   }
 
   // 🖼️ ইমেজের অস্তিত্ব পরীক্ষা করা (404 এরর রোধে)
-  const imageRelativePath = `/authors/${authorSlug}.webp`;
-  const absoluteImagePath = path.join(process.cwd(), 'public', 'authors', `${authorSlug}.webp`);
+  const imageRelativePath = `/authors/${author}.webp`;
+  const absoluteImagePath = path.join(process.cwd(), 'public', 'authors', `${author}.webp`);
   
   // যদি নির্দিষ্ট লেখকের ফাইল না থাকে, তবে ডিফল্ট ইমেজ দেখাবে
   const authorImageSrc = fs.existsSync(absoluteImagePath) 
@@ -84,14 +85,14 @@ export default async function AuthorHomePage({ params }: AuthorHomePageProps) {
   const { latestBooks } = await getLibraryBooks();
 
   // টাইটেল বা স্ল্যাগ থেকে প্রথমাংশ নেওয়া
-  const fullTitle = pageTitle || (authorSlug ? authorSlug.charAt(0).toUpperCase() + authorSlug.slice(1) : '');
+  const fullTitle = pageTitle || (author ? author.charAt(0).toUpperCase() + author.slice(1) : '');
   const authorFirstName = fullTitle.split(' ')[0] || fullTitle;
 
   // ঐ লেখকের সব বই ফিল্টার করা
   const authorBooks = latestBooks.filter((book) => {
     if (!book.author) return false;
     const formattedBookAuthor = book.author.toLowerCase().replace(/\s+/g, '-');
-    return formattedBookAuthor === authorSlug.toLowerCase() || book.author.includes(authorFirstName);
+    return formattedBookAuthor === author.toLowerCase() || book.author.includes(authorFirstName);
   });
 
   // ৩. 'genres' প্রপার্টি ব্যবহার করে ইউনিক ঘরানা তালিকা বের করা

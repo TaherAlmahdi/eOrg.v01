@@ -124,7 +124,7 @@ export default async function LibraryBookPage({ params }: BookPageProps) {
               </p>
             )}
             <p className="text-lg text-red-900 font-tarunima">{book.author}</p>
-            <div className="w-50 h-[2px] bg-red-900 mx-auto mt-2"></div>
+            <div className="w-48 h-0.5 bg-red-900 mx-auto mt-2"></div>
           </header>
 
           <article className="prose lg:prose-xl max-w-none text-gray-900 leading-relaxed font-tarunima">
@@ -140,20 +140,20 @@ export default async function LibraryBookPage({ params }: BookPageProps) {
             {notes && notes.length > 0 && (
               <div className="mt-2 pt-2 border-t-2 border-orange-200">
                 <h4 className="text-xl font-bold text-red-900 mb-1 font-tarunima">টিকা ও মন্তব্য</h4>
-                <ol className="not-prose flex flex-wrap gap-x-4 gap-y-0 list-outside text-[0.7rem] md:text-[0.8rem] lg:text-[0.9rem] [&_*]:text-inherit [&_*]:text-gray-700 ml-0">
+                <ol className="not-prose flex flex-wrap gap-x-4 gap-y-0 list-outside text-[0.7rem] md:text-[0.8rem] lg:text-[0.9rem] text-gray-700 ml-0">
                   {notes.map((note) => (
                     <li 
                       key={note.id} 
                       id={`fn-${note.id}`} 
-                      className="flex-auto min-w-[250px] mb-0 border-t border-white text-justify">
-                      <span className="text-gray-700 leading-normal text-[0.8rem] md:text-[0.9rem] lg:text-[1.0rem] [&_*]:text-inherit [&_*]:text-gray-700">                      
-                      <span className="font-normal text-blue-600 font-tarunima">{note.label}. </span>
+                      className="flex-auto min-w-62.5 mb-0 border-t border-white text-justify">
+                      <span className="text-gray-700 leading-normal text-[0.8rem] md:text-[0.9rem] lg:text-[1.0rem]">      
+                        <span className="font-normal text-blue-600 font-tarunima">{note.label}. </span>
                         <a 
                           href={`#fnref-${note.id}`} 
                           className="mb-2 text-blue-500 hover:text-red-700 transition-all font-tarunima"
                           title="উপরে ফিরে যান">↑ </a>                        
 
-                        {/* নিশ্চিত করুন এখানে note.text রেন্ডার করা হচ্ছে, পুরো note অবজেক্ট নয় */}
+                        {/* নিশ্চিত করুন এখানে note.text রেন্ডার করা হচ্ছে, পুরো note অবজেক্ট নয় */}
                         {typeof note.text === 'string' ? note.text : JSON.stringify(note.text)}
 
                       </span>
@@ -254,7 +254,7 @@ export default async function LibraryBookPage({ params }: BookPageProps) {
               </div>
             </div>
 
-            <div className="bg-white p-3 shadow-sm max-h-[400px] overflow-y-auto font-tarunima">
+            <div className="bg-white p-3 shadow-sm max-h-100 overflow-y-auto font-tarunima">
               <h3 className="text-md font-bold border-b pb-2 mb-3 text-red-900">সূচিপত্র</h3>
               {volumes.length > 0 ? (
                 volumes.map((v: Volume) => (
