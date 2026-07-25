@@ -3,6 +3,7 @@ title: "মৃত্যুক্ষুধা"
 author: "কাজী নজরুল ইসলাম"
 type: "book_index"
 slug: "mrityukshudha"
+subdomain: "library, nazrul"
 first_published: 1866
 published: 03/01/2026
 notice: "এই পাতা মূল গ্রন্থের অন্তর্ভুক্ত নয়!"

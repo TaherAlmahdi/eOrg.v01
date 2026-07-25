@@ -3,6 +3,7 @@ title: "বাঁধন-হারা"
 author: "কাজী নজরুল ইসলাম"
 type: "book_index"
 slug: "bandan-raha"
+subdomain: "library, nazrul"
 first_published: 1922
 published: 01/01/2026
 genre: ["সামাজিক উপন্যাস", "উপন্যাস"]

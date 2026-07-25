@@ -2,6 +2,7 @@
 title: "কুহেলিকা"
 author: "কাজী নজরুল ইসলাম"
 type: "book_index"
+subdomain: "library, nazrul"
 slug: "kuhelika"
 pub_medium: "প্রচার, ধারাবাহিক প্রকাশিত– ১২৯১ সালের আশ্বিন থেকে ১২৯৩ বঙ্গাব্দ পর্যন্ত"
 first_published: 1886
