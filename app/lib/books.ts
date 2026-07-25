@@ -108,10 +108,11 @@ export async function getLibraryBooks(currentSubdomain?: string): Promise<{
             extractedGenres = Array.isArray(raw) ? raw : [raw];
           }
 
-          const bookSlug = data.slug || bookFolderName;
+          // ✅ ফ্রন্টম্যাটারের slug অগ্রাধিকার পাবে, না থাকলে ফোল্ডারের নাম
+          const bookSlug = data.slug ? String(data.slug).trim() : bookFolderName;
 
           allBooks.push({
-            id: `${authorFolderName}-${bookFolderName}`,
+            id: bookSlug, // ✅ অথর ফোল্ডারের নাম বাদ দিয়ে শুধুমাত্র স্লাগ রাখা হলো
             slug: bookSlug,
             title: data.title || 'শিরোনামহীন বই',
             subtitle: data.subtitle || '',
@@ -166,7 +167,7 @@ export async function getLibraryBooks(currentSubdomain?: string): Promise<{
 }
 
 /**
- * ২. নির্দিষ্ট বই ফেচ করার ফাংশন (Frontmatter-এর subdomain এবং slug মিলিয়ে)
+ * ২. নির্দিষ্ট বই ফেচ করার ফাংশন (Frontmatter-এর slug মিলিয়ে)
  */
 export async function getBookBySlug(bookSlug: string, currentSubdomain?: string): Promise<BookDetail | null> {
   if (!existsSync(booksDirectory)) return null;
@@ -193,7 +194,8 @@ export async function getBookBySlug(bookSlug: string, currentSubdomain?: string)
           const fileContents = await fs.readFile(indexMdPath, 'utf8');
           const { data, content } = matter(fileContents);
 
-          const fileSlug = data.slug || bookFolderName;
+          // ✅ ফ্রন্টম্যাটারের slug অগ্রাধিকার পাবে
+          const fileSlug = data.slug ? String(data.slug).trim() : bookFolderName;
 
           // ১. স্লাগ চেক করা
           if (fileSlug.toLowerCase() !== bookSlug.toLowerCase()) {
@@ -209,7 +211,7 @@ export async function getBookBySlug(bookSlug: string, currentSubdomain?: string)
           }
 
           return {
-            id: `${authorFolderName}-${bookFolderName}`,
+            id: fileSlug, // ✅ অথর প্রেফিক্স মুক্ত বিশুদ্ধ স্লাগ
             slug: fileSlug,
             title: data.title || 'শিরোনামহীন বই',
             subtitle: data.subtitle || '',

@@ -2,7 +2,7 @@
 title: "বাঁধন-হারা"
 author: "কাজী নজরুল ইসলাম"
 type: "book_index"
-slug: "bandan-raha"
+slug: "bandhan-hara"
 subdomain: "library, nazrul"
 first_published: 1922
 published: 01/01/2026

@@ -1,8 +1,9 @@
+// app/components/GenreView.tsx
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Home, BookOpen } from "lucide-react";
-import { getLibraryBooks } from '@/app/lib/books';
+import { getLibraryBooks, Book } from '@/app/lib/books';
 import { getGenreTitle } from '@/app/lib/content/core/registry';
 
 // ইংরেজি সংখ্যাকে বাংলায় রূপান্তর করার ফাংশন
@@ -14,37 +15,23 @@ const toBengaliNumber = (num: number | string) => {
   return num.toString().replace(/\d/g, (digit) => englishToBengali[digit] || digit);
 };
 
-type Props = {
-  params: Promise<{ slug: string }>;
-};
-
-export async function generateMetadata({ params }: Props) {
-  const { slug } = await params;
-  const decodedSlug = slug.toLowerCase();
-  
-  // রেজিস্ট্রি থেকেই সরাসরি টাইটেল ফেচিং (না পাওয়া গেলে স্লাগ ফলব্যাক)
-  const bengaliTitle = getGenreTitle(decodedSlug) || slug;
-  
-  return {
-    title: `${bengaliTitle} | গ্রন্থাগার`,
-  };
+interface GenreViewProps {
+  slug: string;
+  authorSlug?: string;
 }
 
-export default async function GenrePage({ params }: Props) {
-  const { slug } = await params;
+export default async function GenreView({ slug, authorSlug }: GenreViewProps) {
   const decodedSlug = slug.toLowerCase();
   
-  // রেজিস্ট্রি থেকে বাংলা ঘরানার নাম বের করা
+  // রেজিস্ট্রি থেকে বাংলা ঘরানার নাম বের করা (যেমন: novel -> উপন্যাস)
   const targetBengaliGenre = getGenreTitle(decodedSlug) || slug;
   const targetStr = String(targetBengaliGenre).trim().toLowerCase();
 
-  // কেন্দ্রীয় বই লোডার ব্যবহার করে কন্টেন্ট আনা
-  const { latestBooks } = await getLibraryBooks();
+  // কেন্দ্রীয় বই লোডার ব্যবহার করে কন্টেন্ট আনা (authorSlug থাকলে কেবল সেই সাবডোমেনের বই আসবে)
+  const { latestBooks } = await getLibraryBooks(authorSlug);
 
-  // ফিল্টারিং লজিক
-  // ফিল্টারিং লজিক
-  const filteredBooks = latestBooks.filter((book) => {
-    // unknown টাইপে কাস্ট করে টাইপস্ক্রিপ্ট এরর বাইপাস করা হচ্ছে
+  // ফিল্টারিং লজিক (ঠিক আপনার অরিজিনাল পেজের মতো)
+  const filteredBooks = latestBooks.filter((book: Book) => {
     const rawGenres = book.genres || (book as unknown as Record<string, unknown>).genre;
     if (!rawGenres) return false;
 
@@ -57,13 +44,11 @@ export default async function GenrePage({ params }: Props) {
     return false;
   });
 
-  // প্রকাশনার সাল ও নাম অনুযায়ী সর্টিং (প্রথমে সাল, সাল মিলে গেলে বাংলা বর্ণমালা অনুযায়ী)
   // সর্টিং লজিক: প্রথমে 'প্রথম প্রকাশনার সাল' (first_published), না থাকলে 'সাইটে যুক্তের সাল' (published)
-  filteredBooks.sort((a, b) => {
+  filteredBooks.sort((a: Book, b: Book) => {
     const rawA = (a as unknown as Record<string, unknown>).first_published || a.published;
     const rawB = (b as unknown as Record<string, unknown>).first_published || b.published;
 
-    // সাল পার্সিং লজিক (যা কেবল YYYY সংখ্যা বের করে নেবে)
     const pubA = rawA ? parseInt(String(rawA), 10) || new Date(String(rawA)).getFullYear() : Infinity;
     const pubB = rawB ? parseInt(String(rawB), 10) || new Date(String(rawB)).getFullYear() : Infinity;
 
@@ -103,7 +88,7 @@ export default async function GenrePage({ params }: Props) {
 
         {filteredBooks.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-6 gap-4">
-            {filteredBooks.map((book) => (
+            {filteredBooks.map((book: Book) => (
               <Link 
                 key={book.id || book.slug} 
                 href={`/book/${book.id || book.slug}`} 
@@ -111,7 +96,7 @@ export default async function GenrePage({ params }: Props) {
               >
                 <div className="relative aspect-2/3 overflow-hidden rounded shadow-sm bg-white border border-gray-100 transition-transform duration-300 group-hover:-translate-y-1.5 group-hover:shadow-md">
                   <Image 
-                    src={book.cover || book.cover || '/default-cover.jpg'} 
+                    src={book.cover || book.cover_image || '/default-cover.jpg'} 
                     alt={book.title || 'বইয়ের প্রচ্ছদ'} 
                     fill
                     sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 16vw"
