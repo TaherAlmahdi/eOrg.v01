@@ -62,7 +62,7 @@
   ul,
   ul.none {
     /* স্ক্রিনের সাইজ অনুযায়ী ফন্ট স্কেল হবে (সর্বনিম্ন 1.15rem থেকে সর্বোচ্চ 1.85rem) */
-    font-size: clamp(1.15rem, 1.2vw + 0.2rem, 1.5rem) !important;
+    font-size: clamp(1.0rem, 1.2vw + 0.2rem, 1.5rem) !important;
     line-height: 1.55;
     color: var(--text-main);
   }
@@ -70,7 +70,7 @@
   .first,
   .dcap,
   .normal {
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.15rem;
     text-align: justify;
   }
 
@@ -90,16 +90,19 @@
     float: left;
     line-height: 1;
     font-size: clamp(
-      1.5rem,
+      2.0rem,
       2.5vw + 1rem,
       3.5rem
     ); /* 🎯 আল্ট্রা ওয়াইড স্ক্রিনে আর ছোট দেখাবে না */
     color: whitesmoke;
     font-family: var(--font-tarunima), serif;
-    padding: 20px 12px 8px 16px;
+    padding: clamp(1rem, 2.5vw, 2rem); 
     margin-right: 8px;
     margin-top: 8px;
     background: var(--bg-gold);
+display: flex;
+  justify-content: center;   /* ডানে-বায়ে সেন্টারে রাখবে */
+  align-items: center;  
     border-radius: 6px;
   }
 
