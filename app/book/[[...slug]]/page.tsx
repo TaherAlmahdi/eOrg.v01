@@ -261,17 +261,20 @@ export default async function UnifiedBookPage({ params }: UnifiedPageProps) {
         {/* পাঠকেন্দ্রিক মূল আর্টিকেলের অংশ */}
         <section className="order-1 lg:order-2 col-span-1 lg:col-span-9 bg-[#fff2e6] p-3 md:p-6 shadow-sm min-h-screen">
           <header className="mb-6 text-center font-tarunima">
-            <h1 className="mb-2 text-2xl font-semibold text-gray-900 md:text-3xl font-sabrina">
+            <h1 className="mb-2 text-xl font-semibold text-gray-900 md:text-2xl font-sabrina">
               {book.chapter_title || book.currentChapterTitle || book.volume_title || book.currentVolumeTitle || book.title}
             </h1>
-            {(book.chapter_title || book.volume_title) && (
-              <p className="mb-1 text-gray-700 text-md md:text-lg font-tarunima">{book.title}</p>
-            )}
+
             {book.subtitle && (
-              <p className="mb-1 text-lg tracking-wide text-red-900 uppercase opacity-90">
+              <p className="mb-1 text-lg tracking-wide text-red-900 uppercase md:text-xl opacity-90">
                 {book.subtitle}
               </p>
             )}
+
+            {(book.chapter_title || book.volume_title) && (
+              <p className="mb-1 text-lg text-gray-700 md:text-xl font-tarunima">{book.title}</p>
+            )}
+
             <p className="text-lg font-medium text-red-900 font-tarunima">{book.author}</p>
             <div className="w-48 h-0.5 bg-red-900/40 mx-auto mt-3"></div>
           </header>
