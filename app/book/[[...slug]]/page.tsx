@@ -140,7 +140,8 @@ export default async function UnifiedBookPage({ params }: UnifiedPageProps) {
   }
 
   // 📝 ২. শর্টকোড পার্সিং (টিকা ও নোটের জন্য)
-  const { contentHtml, notes } = parseNoteShortcodes(book.content || '');
+  const rawContent = book.content || '';
+  const { contentHtml, notes } = parseNoteShortcodes(rawContent);
 
   // 📂 TableOfContents-এর জন্য সঠিক ডাটা স্ট্রাকচার প্রিপারেশন
   const tocStructure = {
@@ -169,6 +170,40 @@ export default async function UnifiedBookPage({ params }: UnifiedPageProps) {
 
   const currentChapterSlug = chapterSlug || (volumes.length === 0 ? volumeOrChapterSlug : '') || '';
   const currentVolumeSlug = chapterSlug ? volumeOrChapterSlug : (volumes.length > 0 ? volumeOrChapterSlug : '');
+
+  // 🔍 খণ্ড পেজ শনাক্তকরণ ও কনডিটেবল সূচিপত্র লজিক
+  const isVolumePage = Boolean(volumeOrChapterSlug && !chapterSlug && volumes.length > 0);
+  const currentVolumeData = isVolumePage ? volumes.find((v) => v.id === volumeOrChapterSlug) : null;
+  const volumeChapters = currentVolumeData?.chapters || [];
+
+  // toc ফ্লাগ হ্যান্ডলিং (boolean বা string উভয় সাপোর্ট)
+  const rawTocOption = (book as any).toc;
+  const isExplicitTocTrue = rawTocOption === true || rawTocOption === 'true';
+  const isExplicitTocFalse = rawTocOption === false || rawTocOption === 'false';
+  const hasNoContent = !rawContent.trim();
+
+  // খণ্ডের পাতায় কন্টেন্ট বডিতে সূচিপত্র দেখানোর শর্ত
+  const shouldShowVolumeChapterList = 
+    isVolumePage && 
+    volumeChapters.length > 0 && 
+    !isExplicitTocFalse && 
+    (isExplicitTocTrue || hasNoContent);
+
+  // 📌 পেজ ফিল্টারিং লজিক (Strict Page Scoping)
+  const isChapter = Boolean(chapterSlug) || (volumes.length === 0 && Boolean(volumeOrChapterSlug));
+  const isVolume = Boolean(volumeOrChapterSlug && !chapterSlug && volumes.length > 0);
+  const isBookRoot = !volumeOrChapterSlug && !chapterSlug;
+
+  // ব্যাকএন্ডের বিভিন্ন ফিল্ড নেমিং স্ট্রাকচার সেফলি চেক করা
+  let pageNotice: string | null = null;
+
+  if (isChapter) {
+    pageNotice = (book as any).chapter_notice || (book as any).currentChapterNotice || (book as any).pageNotice || null;
+  } else if (isVolume) {
+    pageNotice = (book as any).volume_notice || (book as any).currentVolumeNotice || (book as any).pageNotice || null;
+  } else if (isBookRoot) {
+    pageNotice = book.notice || null;
+  }
 
   return (
     <main className="bg-[#fdfcf8] min-h-screen">
@@ -242,13 +277,41 @@ export default async function UnifiedBookPage({ params }: UnifiedPageProps) {
           </header>
 
           <article className="leading-relaxed prose text-gray-900 lg:xl max-w-none font-tarunima">
-            {book.notice && <Notice message={book.notice} />}
+            {/* নোটিশ রেন্ডারিং (কেবল নির্দিষ্ট পাতার ফ্রন্টমেটারে নোটিশ থাকলেই দেখাবে) */}
+            {pageNotice && <Notice message={pageNotice} />}
 
             {/* বই বা অধ্যায়ের মূল টেক্সট */}
-            <div 
-              className="space-y-4 markdown-body"
-              dangerouslySetInnerHTML={{ __html: contentHtml }}
-            />
+            {contentHtml && (
+              <div 
+                className="space-y-4 markdown-body"
+                dangerouslySetInnerHTML={{ __html: contentHtml }}
+              />
+            )}
+
+            {/* 📂 খণ্ডের পাতায় কনডিটেবল অধ্যায় সূচিপত্র */}
+            {shouldShowVolumeChapterList && (
+              <div className="pt-4 mt-6 border-t border-red-900/20">
+                <h3 className="mb-4 text-xl font-bold text-red-900 font-tarunima">
+                  এই খণ্ডের পরিচ্ছেদসমূহ
+                </h3>
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                  {volumeChapters.map((ch, idx) => (
+                    <Link
+                      key={ch.slug}
+                      href={`/book/${bookSlug}/${volumeOrChapterSlug}/${ch.slug}`}
+                      className="flex items-center gap-3 p-3 transition-colors border rounded-md border-orange-200/80 bg-white/60 hover:bg-white hover:border-red-900 group"
+                    >
+                      <span className="flex items-center justify-center text-xs font-semibold text-red-900 transition-colors bg-orange-100 rounded-full w-7 h-7 group-hover:bg-red-900 group-hover:text-white">
+                        {toBengaliNumber(idx + 1)}
+                      </span>
+                      <span className="font-medium text-gray-800 group-hover:text-red-900">
+                        {ch.title}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* টিকা ও ফুটনোট সেকশন */}
             {notes && notes.length > 0 && (
@@ -283,7 +346,7 @@ export default async function UnifiedBookPage({ params }: UnifiedPageProps) {
           <div className="flex items-center justify-between pt-4 mt-8 border-t border-orange-200 font-tarunima">
             <Link 
               href={prevActionLink} 
-              className="flex items-center text-sm text-gray-700 transition-all md:text-base hover:text-red-900 group whitespace-nowrap"
+              className="bg-red-900 text-white px-4 py-2 rounded font-normal hover:bg-red-800 transition-all flex items-center group shadow-md text-sm md:text-base max-w-[60%]"
             >
               <span className="mr-2 transition-transform transform group-hover:-translate-x-1">←</span> 
               {prevActionLabel}
