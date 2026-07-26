@@ -70,7 +70,7 @@
   .first,
   .dcap,
   .normal {
-    margin-bottom: 0.15rem;
+    margin-bottom: 0.10rem !impotant;
     text-align: justify;
   }
 
