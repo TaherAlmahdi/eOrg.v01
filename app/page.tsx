@@ -59,12 +59,6 @@ export default function Home() {
         </section>
 
         <section data-aos="fade-down" className="relative bg-white">
-          <div className="max-w-full mx-auto">
-            <GenreList />
-          </div>
-        </section>
-
-        <section data-aos="fade-down" className="relative bg-white">
           <div className="max-w-full mx-auto">               
             <SuccessStories />
           </div>

@@ -37,6 +37,7 @@ interface VolumeItem {
 
 interface SplitPage {
   title?: string;
+  subtitle?: string;
   pageNumber: number;
   contentHtml: string;
   notes: any[];
@@ -207,7 +208,19 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
   const currentPageNum = activePageIndex + 1;
   const totalSubPages = splitPages.length;
 
-  const activeSubtitle = currentSubPageData?.title || book.subtitle;
+  let activeSubtitle: string | undefined;
+
+      // বর্তমান md file-এর subtitle
+      const fileSubtitle = book.subtitle?.trim();
+
+      // nextpage title
+      const pageSubtitle = currentSubPageData?.title?.trim();
+
+      if (currentPageNum === 1) {
+        activeSubtitle = fileSubtitle;
+      } else {
+        activeSubtitle = pageSubtitle;
+      }
 
   // মূল পাতার বেস পাথ (পেজ নম্বর ছাড়া)
   const baseSegments = pageNumFromPath !== null ? rawSegments.slice(0, -1) : rawSegments;
@@ -497,7 +510,7 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
         <aside className="order-2 col-span-1 px-3 py-4 space-y-4 lg:order-1 lg:col-span-3">
           <div className="space-y-4 lg:sticky lg:top-6">
             {book.cover_image && (
-              <div className="flex justify-center p-2 bg-white border border-gray-100 rounded shadow-sm">
+              <div className="flex justify-center p-0 bg-white border border-gray-100 rounded shadow-sm">
                 <img 
                   src={book.cover_image} 
                   alt={book.title} 
