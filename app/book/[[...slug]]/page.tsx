@@ -328,7 +328,7 @@ export default async function UnifiedBookPage({ params }: UnifiedPageProps) {
                       className="flex-auto min-w-62.5 mb-1 border-t border-white/60 pt-1 text-justify"
                     >
                       <span className="leading-normal text-gray-800">      
-                        <span className="font-semibold text-blue-600 font-tarunima">{note.label}. </span>
+                        <span className="font-semibold text-blue-600 font-tarunima">{note.label}.</span>
                         <a 
                           href={`#fnref-${note.id}`} 
                           className="inline-block px-1 text-blue-500 transition-all hover:text-red-700 font-tarunima"
