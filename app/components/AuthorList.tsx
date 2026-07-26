@@ -74,7 +74,7 @@ const AuthorList = async () => {
             {authors.map(({ slug, name, count }) => (
               <Link
                 key={slug}
-                href={`https://library.eduliture.org/author/${slug}`}
+                href={`https://library.eduliture.org/${slug}`}
                 className="flex items-center justify-between gap-3 px-4 py-3 rounded mb-1 bg-white/90 text-[#008080] border border-teal-100 shadow-sm transition-all duration-300 backdrop-blur-sm hover:bg-teal-50 hover:shadow-lg hover:border-teal-300 hover:scale-[1.02] shrink-0 grow basis-full sm:basis-[calc(50%-0.75rem)] lg:basis-[calc(33.333%-0.75rem)] xl:basis-[calc(25%-0.75rem)] 2xl:basis-[calc(20%-0.75rem)] max-w-full group cursor-pointer overflow-hidden"
               >
                 {/* বামপাশে লেখকের সিঙ্গেল ইউজার আইকন ও নাম */}
