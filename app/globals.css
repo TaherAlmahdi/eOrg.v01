@@ -90,13 +90,13 @@
     float: left;
     line-height: 1;
     font-size: clamp(
-      2.0rem,
+      2.5rem,
       2.5vw + 1rem,
       3.5rem
     ); /* 🎯 আল্ট্রা ওয়াইড স্ক্রিনে আর ছোট দেখাবে না */
     color: whitesmoke;
     font-family: var(--font-tarunima), serif;
-    padding: clamp(1rem, 2.5vw, 2rem); 
+    padding: clamp(0.7rem, 2.5vw, 1.5rem); 
     margin-right: 8px;
     margin-top: 8px;
     background: var(--bg-gold);
