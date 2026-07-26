@@ -1,0 +1,403 @@
+import Link from 'next/link';
+import { Home } from "lucide-react";
+import Notice from '@/app/components/Notice';
+import TableOfContents from '@/app/components/TableOfContents';
+import { Metadata } from 'next';
+import { headers } from 'next/headers';
+import { getBookBySlug, BookDetail } from '@/app/lib/books';
+import { notFound } from 'next/navigation';
+import { getSubdomainData, buildTabTitle } from '@/app/lib/get-site-data';
+import { parseNoteShortcodes } from '@/app/lib/parse-shortcodes';
+
+interface UnifiedPageProps {
+  params: Promise<{
+    slug?: string[];
+  }>;
+}
+
+// টাইপ ডেফিনিশনসমূহ (TypeScript Safety)
+interface GenreLink {
+  name: string;
+  link: string;
+}
+
+interface ChapterItem {
+  slug: string;
+  title: string;
+}
+
+interface VolumeItem {
+  id: string;
+  title: string;
+  chapters?: ChapterItem[];
+}
+
+// সংখ্যা বাংলায় রূপান্তরের হেল্পার
+const toBengaliNumber = (num?: number | string): string =>
+  num !== undefined && num !== null && num !== ''
+    ? num.toString().replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[parseInt(d, 10)])
+    : '';
+
+// 🏷️ Dynamic Metadata Export
+export async function generateMetadata({ params }: UnifiedPageProps): Promise<Metadata> {
+  const resolvedParams = await params;
+  const slugSegments = resolvedParams.slug || [];
+
+  if (slugSegments.length === 0) return { title: "বই পাওয়া যায়নি" };
+
+  const [bookSlug, volumeOrChapterSlug, chapterSlug] = slugSegments;
+
+  const headersList = await headers();
+  const host = headersList.get('host');
+  const siteData = getSubdomainData(host);
+
+  const book = await getBookBySlug(
+    bookSlug, 
+    siteData.subdomain || 'library', 
+    volumeOrChapterSlug, 
+    chapterSlug
+  );
+
+  if (!book) return { title: "বই পাওয়া যায়নি" };
+
+  const dynamicMetaTitle = buildTabTitle({
+    metaTitle: book.meta_title,
+    currentPageTitle: book.chapter_title || book.currentChapterTitle || null,
+    volumePageTitle: book.volume_title || book.currentVolumeTitle || null,
+    bookTitle: book.title,
+    siteName: siteData.title,
+  });
+
+  const description = book.meta_description || `${book.title} - একটি অমূল্য সৃষ্টি।`;
+  const shareImage = book.og_image || book.cover_image || siteData.ogImage;
+  const currentPath = slugSegments.join('/');
+
+  return {
+    title: dynamicMetaTitle,
+    description,
+    openGraph: {
+      title: dynamicMetaTitle,
+      description,
+      url: `https://${siteData.subdomain ? `${siteData.subdomain}.` : ''}eduliture.org/book/${currentPath}`,
+      siteName: siteData.title,
+      images: shareImage ? [{ url: shareImage, width: 1200, height: 630, alt: book.title }] : [],
+      locale: 'bn_BD',
+      type: 'book',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: dynamicMetaTitle,
+      description,
+      images: shareImage ? [shareImage] : [],
+    },
+  };
+}
+
+// 📖 Main Page Component
+export default async function UnifiedBookPage({ params }: UnifiedPageProps) {
+  const resolvedParams = await params;
+  const slugSegments = resolvedParams.slug || [];
+
+  if (slugSegments.length === 0) {
+    notFound();
+  }
+
+  const [bookSlug, volumeOrChapterSlug, chapterSlug] = slugSegments;
+
+  const headersList = await headers();
+  const host = headersList.get('host');
+  const siteData = getSubdomainData(host);
+
+  const book: BookDetail | null = await getBookBySlug(
+    bookSlug, 
+    siteData.subdomain || 'library', 
+    volumeOrChapterSlug, 
+    chapterSlug
+  );
+
+  if (!book) notFound();
+
+  const volumes: VolumeItem[] = (book.volumes as VolumeItem[]) || [];
+  const directChapters: ChapterItem[] = (book.directChapters as ChapterItem[]) || [];
+
+  // 🧭 ১. নেভিগেশন লিঙ্ক প্রসেসিং
+  let prevActionLink = book.prevLink || "/books";
+  let prevActionLabel = book.prevLabel || "গ্রন্থাগার";
+
+  let nextActionLink = book.nextLink || "/books";
+  let nextActionLabel = book.nextLabel || "গ্রন্থাগার";
+
+  if (!book.nextLink) {
+    if (!volumeOrChapterSlug) {
+      if (volumes.length > 0) {
+        nextActionLink = `/book/${bookSlug}/${volumes[0].id}`;
+        nextActionLabel = volumes[0].title || "প্রথম খণ্ড";
+      } else if (directChapters.length > 0) {
+        nextActionLink = `/book/${bookSlug}/${directChapters[0].slug}`;
+        nextActionLabel = directChapters[0].title || "প্রথম অধ্যায়";
+      }
+    }
+  }
+
+  // 📝 ২. শর্টকোড পার্সিং (টিকা ও নোটের জন্য)
+  const { contentHtml, notes } = parseNoteShortcodes(book.content || '');
+
+  // 📂 TableOfContents-এর জন্য সঠিক ডাটা স্ট্রাকচার প্রিপারেশন
+  const tocStructure = {
+    bookTitle: book.title,
+    metaFiles: book.metaFiles || [],
+    currentVolume: volumeOrChapterSlug || '',
+    items: volumes.length > 0
+      ? volumes.map((v) => ({
+          type: 'volume' as const,
+          id: v.id,
+          title: v.title,
+          chapters: (v.chapters || []).map((c) => ({
+            id: c.slug,
+            slug: c.slug,
+            title: c.title,
+          })),
+        }))
+      : directChapters.map((c) => ({
+          type: 'chapter' as const,
+          id: c.slug,
+          slug: c.slug,
+          volumeId: '',
+          title: c.title,
+        })),
+  };
+
+  const currentChapterSlug = chapterSlug || (volumes.length === 0 ? volumeOrChapterSlug : '') || '';
+  const currentVolumeSlug = chapterSlug ? volumeOrChapterSlug : (volumes.length > 0 ? volumeOrChapterSlug : '');
+
+  return (
+    <main className="bg-[#fdfcf8] min-h-screen">
+      {/* ব্রেডক্রাম্ব নেভিগেশন */}
+      <nav className="w-full bg-[#7575a3] border-b border-gray-200 py-2 px-3 text-white overflow-x-auto no-scrollbar">
+        <div className="flex items-center max-w-full mx-auto text-sm font-tarunima whitespace-nowrap">
+          <Link href="/" className="transition-colors shrink-0 hover:text-red-100">
+            <Home size={16} />
+          </Link>
+          <span className="mx-2 text-white/50 shrink-0">/</span>
+          <Link href="/books" className="transition-colors hover:text-red-100 shrink-0">
+            গ্রন্থাগার
+          </Link>
+          <span className="mx-2 text-white/50 shrink-0">/</span>
+
+          {volumeOrChapterSlug ? (
+            <Link href={`/book/${bookSlug}`} className="transition-colors hover:text-red-100 shrink-0">
+              {book.title}
+            </Link>
+          ) : (
+            <span className="font-medium text-white whitespace-nowrap">{book.title}</span>
+          )}
+
+          {/* খণ্ড/ভলিউম লেভেল */}
+          {volumeOrChapterSlug && (
+            <>
+              <span className="mx-2 text-white/50 shrink-0">/</span>
+              {chapterSlug ? (
+                <Link href={`/book/${bookSlug}/${volumeOrChapterSlug}`} className="transition-colors hover:text-red-100 shrink-0">
+                  {book.volume_title || book.currentVolumeTitle || volumeOrChapterSlug}
+                </Link>
+              ) : (
+                <span className="font-medium text-white whitespace-nowrap">
+                  {book.volume_title || book.currentVolumeTitle || book.chapter_title || book.currentChapterTitle || volumeOrChapterSlug}
+                </span>
+              )}
+            </>
+          )}
+
+          {/* অধ্যায় লেভেল */}
+          {chapterSlug && (
+            <>
+              <span className="mx-2 text-white/50 shrink-0">/</span>
+              <span className="font-medium text-white whitespace-nowrap">
+                {book.chapter_title || book.currentChapterTitle || chapterSlug}
+              </span>
+            </>
+          )}
+        </div>
+      </nav>
+
+      {/* মূল কন্টেন্ট ও সাইডবার লেআউট */}
+      <div className="grid max-w-full grid-cols-1 gap-0 mx-auto lg:grid-cols-12">
+        
+        {/* পাঠকেন্দ্রিক মূল আর্টিকেলের অংশ */}
+        <section className="order-1 lg:order-2 col-span-1 lg:col-span-9 bg-[#fff2e6] p-3 md:p-6 shadow-sm min-h-screen">
+          <header className="mb-6 text-center font-tarunima">
+            <h1 className="mb-2 text-2xl font-semibold text-gray-900 md:text-3xl font-sabrina">
+              {book.chapter_title || book.currentChapterTitle || book.volume_title || book.currentVolumeTitle || book.title}
+            </h1>
+            {(book.chapter_title || book.volume_title) && (
+              <p className="mb-1 text-gray-700 text-md md:text-lg font-tarunima">{book.title}</p>
+            )}
+            {book.subtitle && (
+              <p className="mb-1 text-lg tracking-wide text-red-900 uppercase opacity-90">
+                {book.subtitle}
+              </p>
+            )}
+            <p className="text-lg font-medium text-red-900 font-tarunima">{book.author}</p>
+            <div className="w-48 h-0.5 bg-red-900/40 mx-auto mt-3"></div>
+          </header>
+
+          <article className="leading-relaxed prose text-gray-900 lg:xl max-w-none font-tarunima">
+            {book.notice && <Notice message={book.notice} />}
+
+            {/* বই বা অধ্যায়ের মূল টেক্সট */}
+            <div 
+              className="space-y-4 markdown-body"
+              dangerouslySetInnerHTML={{ __html: contentHtml }}
+            />
+
+            {/* টিকা ও ফুটনোট সেকশন */}
+            {notes && notes.length > 0 && (
+              <div className="pt-4 mt-8 border-t-2 border-orange-200">
+                <h4 className="mb-2 text-xl font-bold text-red-900 font-tarunima">টিকা ও মন্তব্য</h4>
+                <ol className="flex flex-wrap ml-0 text-xs text-gray-700 list-outside not-prose gap-x-4 gap-y-2 md:text-sm">
+                  {notes.map((note) => (
+                    <li 
+                      key={note.id} 
+                      id={`fn-${note.id}`} 
+                      className="flex-auto min-w-62.5 mb-1 border-t border-white/60 pt-1 text-justify"
+                    >
+                      <span className="leading-normal text-gray-800">      
+                        <span className="font-semibold text-blue-600 font-tarunima">{note.label}. </span>
+                        <a 
+                          href={`#fnref-${note.id}`} 
+                          className="inline-block px-1 text-blue-500 transition-all hover:text-red-700 font-tarunima"
+                          title="উপরে ফিরে যান"
+                        >
+                          ↑
+                        </a>      
+                        {typeof note.text === 'string' ? note.text : JSON.stringify(note.text)}
+                      </span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            )}
+          </article>
+
+          {/* নেভিগেশন বাটন */}
+          <div className="flex items-center justify-between pt-4 mt-8 border-t border-orange-200 font-tarunima">
+            <Link 
+              href={prevActionLink} 
+              className="flex items-center text-sm text-gray-700 transition-all md:text-base hover:text-red-900 group whitespace-nowrap"
+            >
+              <span className="mr-2 transition-transform transform group-hover:-translate-x-1">←</span> 
+              {prevActionLabel}
+            </Link>
+
+            <Link
+              href={nextActionLink}
+              className="bg-red-900 text-white px-4 py-2 rounded font-normal hover:bg-red-800 transition-all flex items-center group shadow-md text-sm md:text-base max-w-[60%]"
+            >
+              <span className="truncate whitespace-nowrap">{nextActionLabel}</span>
+              <span className="ml-2 transition-transform transform group-hover:translate-x-1 shrink-0">→</span>
+            </Link>
+          </div>
+        </section>
+
+        {/* সাইডবার (পুস্তক বিবরণী ও সূচিপত্র) */}
+        <aside className="order-2 col-span-1 px-3 py-4 space-y-4 lg:order-1 lg:col-span-3">
+          <div className="space-y-4 lg:sticky lg:top-6">
+            {book.cover_image && (
+              <div className="flex justify-center p-2 bg-white border border-gray-100 rounded shadow-sm">
+                <img 
+                  src={book.cover_image} 
+                  alt={book.title} 
+                  className="object-cover w-full h-auto max-w-xs rounded-sm lg:max-w-full" 
+                />
+              </div>
+            )}
+
+            {/* মেটাডাটা বক্স */}
+            <div className="p-4 bg-white border border-gray-100 rounded shadow-sm font-tarunima">
+              <h3 className="pb-2 mb-3 font-bold tracking-wide text-red-900 uppercase border-b border-gray-200 text-md">
+                পুস্তক বিবরণী
+              </h3>
+              <div className="space-y-2 text-sm text-gray-800">
+                <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
+                  <span className="font-bold">বই</span>
+                  <span className="text-gray-400">:</span>
+                  <span>{book.title}</span>
+                </div>
+                <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
+                  <span className="font-bold">লেখক</span>
+                  <span className="text-gray-400">:</span>
+                  <span>{book.author}</span>
+                </div>
+                {book.pub_medium && (
+                  <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
+                    <span className="font-bold">প্রথম প্রকাশ</span>
+                    <span className="text-gray-400">:</span>
+                    <span>{book.pub_medium}</span>
+                  </div>
+                )}
+                {book.first_published && (
+                  <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
+                    <span className="font-bold">গ্রন্থরূপ</span>
+                    <span className="text-gray-400">:</span>
+                    <span>{toBengaliNumber(book.first_published)}</span>
+                  </div>
+                )}
+                {book.source_book && (
+                  <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
+                    <span className="font-bold">অনুস্মৃতি</span>
+                    <span className="text-gray-400">:</span>
+                    <span>{toBengaliNumber(book.source_book)}</span>
+                  </div>
+                )}
+
+                {book.genre && (
+                  <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
+                    <span className="font-bold">ঘরানা</span>
+                    <span className="text-gray-400">:</span>
+                    <span className="flex flex-wrap gap-x-1">
+                      {Array.isArray(book.genre) ? (
+                        book.genre.map((g: string, index: number) => {
+                          const linkObj = book.genre_links?.find((l: GenreLink) => l.name === g);
+                          const isLast = index === (book.genre as string[]).length - 1;
+                          return (
+                            <span key={index}>
+                              {linkObj ? (
+                                <Link href={linkObj.link} className="text-blue-600 hover:underline">
+                                  {toBengaliNumber(g)}
+                                </Link>
+                              ) : (
+                                toBengaliNumber(g)
+                              )}
+                              {!isLast && <span className="mr-1">,</span>}
+                            </span>
+                          );
+                        })
+                      ) : (
+                        toBengaliNumber(book.genre)
+                      )}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* ডায়নামিক সূচিপত্র (ToC) */}
+            <div className="p-3 bg-white border border-gray-100 rounded shadow-sm font-tarunima">
+              <h3 className="pb-2 mb-3 font-bold text-red-900 border-b border-gray-200 text-md">
+                সূচিপত্র
+              </h3>
+              <TableOfContents 
+                structure={tocStructure} 
+                currentChapter={currentChapterSlug}
+                currentVolume={currentVolumeSlug}
+                slug={bookSlug} 
+              />
+            </div>
+
+          </div>
+        </aside>
+
+      </div>
+    </main>
+  );
+}
