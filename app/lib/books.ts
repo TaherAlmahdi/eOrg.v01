@@ -10,6 +10,9 @@ import matter from 'gray-matter';
 export interface ChapterItem {
   slug: string;
   title: string;
+  genre?: string | string[]; 
+  genres?: string[];         
+  content?: string;
 }
 
 export interface VolumeItem {
@@ -102,6 +105,81 @@ function parseSubdomains(subdomainRaw: unknown, defaultAuthorFolder: string): st
   return [defaultAuthorFolder, 'library'];
 }
 
+/**
+ * যেকোনো ফ্রন্টম্যাটার ডাটা থেকে genre/genres এক্সট্র্যাক্ট করার হেল্পার
+ */
+export function extractGenresFromData(data: any): string[] {
+  const genresSet = new Set<string>();
+
+  if (!data) return [];
+
+  const rawGenre = data.genre || data.genres;
+  if (typeof rawGenre === 'string' && rawGenre.trim()) {
+    genresSet.add(rawGenre.trim());
+  } else if (Array.isArray(rawGenre)) {
+    rawGenre.forEach((g) => {
+      if (typeof g === 'string' && g.trim()) genresSet.add(g.trim());
+    });
+  }
+
+  return Array.from(genresSet);
+}
+
+/**
+ * বইয়ের ফোল্ডার থেকে গভীরে থাকা সকল .md ফাইল (অধ্যায়, কবিতা, গল্প ইত্যাদি) স্ক্যান করে
+ * ডাইনামিকালি সব Genre সংগ্রহ করার ইউনিভার্সাল হেল্পার
+ */
+function collectGenresDeep(data: any, bookFolderPath?: string): string[] {
+  const genresSet = new Set<string>();
+
+  // ১. মূল index.md-এর জনরা যোগ
+  extractGenresFromData(data).forEach((g) => genresSet.add(g));
+
+  // ২. volumes/directChapters অবজেক্টের ভেতরের জনরা যোগ
+  const scanObj = (obj: any) => {
+    if (!obj || typeof obj !== 'object') return;
+    extractGenresFromData(obj).forEach((g) => genresSet.add(g));
+
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key) && typeof obj[key] === 'object') {
+        scanObj(obj[key]);
+      }
+    }
+  };
+
+  if (data.volumes) scanObj(data.volumes);
+  if (data.directChapters) scanObj(data.directChapters);
+
+  // ৩. ফিজিক্যাল ফোল্ডার স্ক্যান করে ভেতরের সব ফাইল থেকে জনরা রিড করা
+  if (bookFolderPath && existsSync(bookFolderPath)) {
+    try {
+      const scanDir = (dirPath: string) => {
+        const entries = readdirSync(dirPath, { withFileTypes: true });
+        for (const entry of entries) {
+          const fullPath = path.join(dirPath, entry.name);
+          if (entry.isDirectory()) {
+            scanDir(fullPath);
+          } else if (entry.isFile() && entry.name.endsWith('.md')) {
+            try {
+              const fileContent = readFileSync(fullPath, 'utf8');
+              const { data: fileData } = matter(fileContent);
+              extractGenresFromData(fileData).forEach((g) => genresSet.add(g));
+            } catch {
+              // ফাইল রিড ট্রাই-ক্যাচ
+            }
+          }
+        }
+      };
+      scanDir(bookFolderPath);
+    } catch {
+      // ডিরেক্টরি ট্রাভার্সাল ট্রাই-ক্যাচ
+    }
+  }
+
+  const result = Array.from(genresSet);
+  return result.length > 0 ? result : ['অন্যান্য'];
+}
+
 // ==========================================
 // 3. Main Data Fetching Functions
 // ==========================================
@@ -133,7 +211,8 @@ export async function getLibraryBooks(currentSubdomain?: string): Promise<{
         if (!bookItem.isDirectory()) continue;
 
         const bookFolderName = bookItem.name;
-        const indexMdPath = path.join(authorFolderPath, bookFolderName, 'index.md');
+        const bookFolderPath = path.join(authorFolderPath, bookFolderName);
+        const indexMdPath = path.join(bookFolderPath, 'index.md');
 
         if (!existsSync(indexMdPath)) continue;
 
@@ -149,11 +228,8 @@ export async function getLibraryBooks(currentSubdomain?: string): Promise<{
             }
           }
 
-          let extractedGenres: string[] = ['অন্যান্য'];
-          if (data.genre || data.genres) {
-            const raw = data.genre || data.genres;
-            extractedGenres = Array.isArray(raw) ? raw : [raw];
-          }
+          // গভীর স্ক্যান সহ সকল জনরা সংগ্রহ করা
+          const extractedGenres = collectGenresDeep(data, bookFolderPath);
 
           const bookSlug = data.slug ? String(data.slug).trim() : bookFolderName;
 
@@ -257,7 +333,7 @@ export async function getBookDirectoryBySlug(bookSlug: string): Promise<string |
 }
 
 /**
- * ৩. বইয়ের হায়ারার্কি স্ক্যান করার আপডেটেড ফাংশন (একক ও বহুখণ্ডের বইয়ের জন্য)
+ * ৩. বইয়ের হায়ারার্কি স্ক্যান করার আপডেটেড ফাংশন (একক ও বহুখণ্ডের বইয়ের জন্য)
  */
 export async function getBookHierarchy(slug: string): Promise<{
   nodes: BookNode[];
@@ -289,7 +365,7 @@ export async function getBookHierarchy(slug: string): Promise<{
   const hasSubVolumes = entries.some(e => e.isDirectory());
 
   if (!hasSubVolumes) {
-    // একক খণ্ডের বইয়ের জন্য (যেমন: ব্যথার দান)
+    // একক খণ্ডের বইয়ের জন্য (যেমন: ব্যথার দান)
     const chapterFiles = entries
       .filter(e => e.isFile() && e.name.endsWith('.md') && e.name !== 'index.md')
       .map(e => e.name)
@@ -300,8 +376,9 @@ export async function getBookHierarchy(slug: string): Promise<{
       const { data } = matter(readFileSync(chapFilePath, 'utf8'));
       const chapSlug = chapFile.replace(/\.md$/, '');
       const title = data.title || chapSlug;
+      const genres = extractGenresFromData(data);
 
-      directChapters.push({ slug: chapSlug, title });
+      directChapters.push({ slug: chapSlug, title, genre: data.genre, genres });
 
       nodes.push({
         type: 'chapter',
@@ -313,7 +390,7 @@ export async function getBookHierarchy(slug: string): Promise<{
       });
     }
   } else {
-    // বহুখণ্ডের বইয়ের জন্য (যেমন: দুর্গেশনন্দিনী)
+    // বহুখণ্ডের বইয়ের জন্য (যেমন: দুর্গেশনন্দিনী)
     const volumeFolders = entries
       .filter(e => e.isDirectory())
       .map(e => e.name)
@@ -321,7 +398,6 @@ export async function getBookHierarchy(slug: string): Promise<{
 
     for (const volFolder of volumeFolders) {
       const volPath = path.join(bookDir, volFolder);
-      const volEntries = readdirSync(volPath, { withFileTypes: true });
 
       const volIndexPath = path.join(volPath, 'index.md');
       let volTitle = volFolder.toUpperCase();
@@ -354,8 +430,9 @@ export async function getBookHierarchy(slug: string): Promise<{
         const { data } = matter(readFileSync(chapFilePath, 'utf8'));
         const chapSlug = chapFile.replace(/\.md$/, '');
         const title = data.title || `পরিচ্ছেদ ${chapSlug}`;
+        const genres = extractGenresFromData(data);
 
-        volChapters.push({ slug: chapSlug, title });
+        volChapters.push({ slug: chapSlug, title, genre: data.genre, genres });
 
         nodes.push({
           type: 'chapter',
@@ -420,14 +497,11 @@ export async function getBookBySlug(
 
           const bookSubdomains = parseSubdomains(mainData.subdomain, authorFolderName);
 
-          let extractedGenres: string[] = ['অন্যান্য'];
-          if (mainData.genre || mainData.genres) {
-            const raw = mainData.genre || mainData.genres;
-            extractedGenres = Array.isArray(raw) ? raw : [raw];
-          }
-
-          // বইয়ের হায়ারার্কি ডাটা ফেচ করা
+          // বইয়ের হায়ারার্কি ডাটা ফেচ করা
           const { nodes, volumes, directChapters } = await getBookHierarchy(fileSlug);
+
+          // সর্বমোট ডাইনামিক জনরা ফেচিং (সকল সাব-ফাইল সহ)
+          const extractedGenres = collectGenresDeep(mainData, bookFolderPath);
 
           let targetFilePath = indexMdPath;
           let currentVolTitle = '';

@@ -156,25 +156,23 @@ display: flex;
   /* ----------------------------------
      ঘ. কবিতা ও শ্লোক (Poem Class)
      ---------------------------------- */
-  .not-prose .poem,
-  .poem {
-    display: block !important;
-    width: fit-content !important;
-    min-width: 250px;
-    max-width: clamp(50%, 40vw + 20%, 95%) !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    margin-top: 0rem;
-    margin-bottom: 0rem;
-    text-align: left;
-    line-height: 1.7;
-    font-size: clamp(1.1rem, 1.1vw + 0.7rem, 1.6rem) !important;
-  }
+.not-prose .poem,
+.poem {
+  display: block !important;
+  width: fit-content !important;
+  max-width: 95% !important; /* স্ক্রিনের বাইরে চলে যাওয়া ঠেকাতে */
+  margin-inline: auto !important; /* ডানে ও বামে সমান মার্জিন (margin-left & margin-right: auto) */
+  margin-block: 0rem; /* উপরে ও নিচে ০ মার্জিন */
+  font-size: clamp(1.0rem, 1.2vw + 0.2rem, 1.3rem) !important;
+  line-height: 1.55;
+  color: var(--text-main);
+}
 
-  .poem span.right {
+  .poem .right {
     display: inline-block;
     width: 100%;
     text-align: right;
+    margin-right: -50px !important;
   }
 
   /* ----------------------------------
@@ -422,4 +420,442 @@ div:has(> .gap) {
   flex: 1 !important;
   display: flex !important;
   justify-content: center !important;
+}
+
+/* Poem CSS */
+
+.space {
+		  content: "♣";
+		padding: 0 15px; 
+		line-height: normal; 
+		opacity: 0.8; 
+}
+
+.kabita0 {
+  margin-left: -5%;
+}
+
+.kabita {
+  text-align: justify;
+}
+
+.kabita1 {
+  text-align: justify;
+  margin-left: 5%;
+}
+
+.kabita2 {
+  text-align: justify;
+  margin-left: 10%;
+}
+
+.kabita3 {
+  text-align: justify;
+  margin-left: 15%;
+}
+
+.kabita4 {
+  text-align: justify;
+  margin-left: 20%;
+}
+
+.kabita5 {
+  text-align: justify;
+  margin-left:25%;
+}
+
+.kabita6 {
+  text-align: justify;
+  margin-left: 30%;
+}
+
+.kabita7 {
+  text-align: justify;
+  margin-left: 35%;
+}
+
+.kabita8 {
+  text-align: justify;
+  margin-left: 40%;
+}
+
+.kabita9 {
+  text-align: justify;
+  margin-left: 45%;
+}
+
+.kabita10 {
+  text-align: justify;
+  margin-left: 50%;
+}
+
+.bgap {
+  padding-bottom: 15px;
+}
+
+.ugap {
+  padding-top: 15px;
+}
+
+.chorus {
+  width: 75%;
+  margin-left: 25%;
+}
+
+.chorus_left {
+  width: 10%;
+  float: left;
+  text-align: left;
+  margin-bottom: 15px;
+}
+
+.chorus_right {
+  padding-left: 3%;
+  width: 75%;
+  float: left;
+  text-align: justify;
+  border-left: 3px solid;
+  margin-bottom: 15px;
+}
+
+.gapkabita {
+  float: left;
+  width: 75%;
+  margin-left: 25%;
+}
+
+.gapkabita_left {
+  margin-right: 0%;
+  width: 10%;
+  float: left;
+  text-align: left;
+}
+
+.gapkabita_right {
+  padding-left: 1%;
+  width: 75%;
+  float: left;
+  text-align: justify;
+}
+
+.gapkabita_full {
+  margin-right: 0%;
+  width: 100%;
+  float: left;
+  text-align: left;
+}
+
+.gapkabita_right1 {
+  padding-left: 11%;
+  width: 75%;
+  float: left;
+  text-align: justify;
+}
+
+.gapkabita_right2 {
+  padding-left: 21%;
+  width: 75%;
+  float: left;
+  text-align: justify;
+}
+
+.gapkabita_right3 {
+  padding-left: 31%;
+  width: 75%;
+  float: left;
+  text-align: justify;
+}
+
+.gapkabita_right4 {
+  margin-left: 41%;
+  width: 75%;
+  float: left;
+  text-align: justify;
+}
+
+.gapkabita_0 {
+  float: left;
+  width: 64%;
+  margin-left: 11%;
+}
+
+.gapkabita_sin {
+  float: left;
+  width: 64%;
+  margin-left: 11%;
+}
+
+.gapkabita_1 {
+  float: left;
+  width: 57%;
+  margin-left: 18%;
+}
+
+.gapkabita_2 {
+  float: left;
+  width: 50%;
+  margin-left: 25%;
+}
+
+.gapkabita_3 {
+  float: left;
+  width: 43%;
+  margin-left: 32%;
+}
+
+/*  Kabita/Gan Five Segnment   */
+
+.gapkabita_5_col {
+  margin: auto;
+  width: 70%;
+}
+
+.col_5_1 {
+  float: left;
+  width: 18%;
+  margin-left: 2%;
+}
+
+.col_5_2 {
+  float: left;
+  width: 18%;
+  margin-left: 2%;
+}
+
+.col_5_3 {
+  float: left;
+  width: 18%;
+  margin-left: 2%;
+}
+
+.col_5_4 {
+  float: left;
+  width: 18%;
+  margin-left: 2%;
+}
+
+.col_5_5 {
+  float: left;
+  width: 18%;
+  margin-left: 2%;
+}
+
+/*  Kabita/Gan Four Segnment   */
+
+.gapkabita_4_col {
+  margin: auto;
+  width: 60%;
+}
+.col_4_1 {
+  float: left;
+  width: 10%;
+  margin-left: 10%;
+}
+
+.col_4_2 {
+  float: left;
+  width: 25%;
+  margin-left: 5%;
+}
+
+.col_4_3 {
+  float: left;
+  width: 10%;
+  margin-left: 10%;
+}
+
+.col_4_4 {
+  float: left;
+  width: 25%;
+  margin-left: 5%;
+}
+
+/*  Kabita/Gan Three Segnment   */
+
+.gapkabita_3_col {
+  margin: auto;
+  width: 100%;
+}
+
+.col_3_1 {
+  float: left;
+  width: 25%;
+  margin-left: 5%;
+}
+
+.col_3_2 {
+  float: left;
+  width: 25%;
+  margin-left: 5%;
+}
+
+.col_3_3 {
+  float: left;
+  width: 25%;
+  margin-left: 5%;
+}
+
+/*  Kabita/Gan Two Segnment   */
+
+.two-col {
+  margin: auto;
+  width: 99%;
+}
+
+.col_left {
+  float: left;
+  width: 47%;
+  margin-right: 2%;
+  text-align: right;
+}
+
+.col_right {
+  float: left;
+  width: 47%;
+  margin-left: 2%;
+  text-align: left;
+}
+
+.fifty {
+  margin: auto;
+  width: 50%;
+}
+
+.gapkabita_2_col {
+  margin: auto;
+  width: 70%;
+}
+
+.col_2_1 {
+  float: left;
+  width: 40%;
+  margin-left: 18%;
+}
+
+.col_2_2 {
+  float: left;
+  width: 40%;
+  margin-left: 2%;
+}
+
+.col_2_0 {
+  width: 70%;
+  margin: auto;
+  text-align: center;
+}
+
+.gks {
+  margin-left: 0%;
+  width: 70%;
+  float: left;
+  text-align: justify;
+}
+
+.gks1 {
+  margin-left: 10%;
+  width: 60%;
+  float: left;
+  text-align: justify;
+}
+
+.gks2 {
+  margin-left: 20%;
+  width: 50%;
+  float: left;
+  text-align: justify;
+}
+
+.gks3 {
+  margin-left: 30%;
+  width: 40%;
+  float: left;
+  text-align: justify;
+}
+
+.gapkabita_rgt {
+  margin-left: 40%;
+  width: 60%;
+  float: left;
+  text-align: justify;
+}
+
+.gapkabita_rgt1 {
+  margin-left: 45%;
+  width: 55%;
+  float: left;
+  text-align: justify;
+}
+
+.gapkabita_rgt2 {
+  margin-left: 50%;
+  width: 50%;
+  float: left;
+  text-align: justify;
+}
+
+.gapkabita_rgt3 {
+  margin-left: 55%;
+  width: 45%;
+  float: left;
+  text-align: justify;
+}
+
+.gapkabita_right1 {
+  width: 65%;
+  float: left;
+  text-align: left;
+  margin-left: 5%;
+}
+
+.gapkabita_sin1 {
+  margin-left: 35%;
+  float: left;
+  text-align: left;
+  width: 65%;
+}
+
+.gapkabita_sin2 {
+  margin-left: 40%;
+  width: 60%;
+  float: left;
+  text-align: left;
+}
+
+.gapkabita_sin3 {
+  margin-left: 45%;
+  width: 55%;
+  float: left;
+  text-align: left;
+}
+
+span.ten {
+  width: 20px;
+  padding: 0 10px;
+}
+
+span.ten::after {
+  content: " &nbsp; ";
+  color: transparent;
+  display: none;
+}
+
+span.twenty {
+  width: 40px;
+  margin: 0 20px;
+}
+
+span.forty {
+  width: 40px;
+  margin: 0 27px;
+}
+
+/* mouse over link */
+
+a:hover {
+  color: hotpink;
+}
+
+
+.main ul, .main ul.disc {
+    list-style: none;
 }

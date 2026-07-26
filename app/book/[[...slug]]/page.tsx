@@ -196,7 +196,7 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
   // নেক্সটপেজে কাস্টম টাইটেল থাকলে তা activeSubtitle-এ যাবে, না থাকলে মূল সাবটাইটেল দেখাবে
   const activeSubtitle = currentSubPageData?.title || book.subtitle;
 
-  // মূল পাতার বেস পাথ (পেজ নম্বর ছাড়া)
+  // মূল পাতার বেস পাথ (পেজ নম্বর ছাড়া)
   const baseSegments = pageNumFromPath !== null ? rawSegments.slice(0, -1) : rawSegments;
   const currentBasePath = `/book/${baseSegments.join('/')}`;
 
@@ -220,7 +220,7 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
     const prevPageObj = splitPages[prevPageNum - 1];
     
     if (prevPageNum === 1) {
-      // ১ নম্বর পেজের ক্ষেত্রে মূল অধ্যায়ের লিঙ্ক ও টাইটেলই প্রাধান্য পাবে (পাতা ১ দেখাবে না)
+      // ১ নম্বর পেজের ক্ষেত্রে মূল অধ্যায়ের লিঙ্ক ও টাইটেলই প্রাধান্য পাবে (পাতা ১ দেখাবে না)
       prevActionLink = currentBasePath;
       prevActionLabel = prevPageObj?.title || book.prevLabel || "আগের পরিচ্ছেদ";
     } else {
@@ -291,18 +291,9 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
     !isExplicitTocFalse && 
     (isExplicitTocTrue || hasNoContent);
 
-  const isChapter = Boolean(chapterSlug) || (volumes.length === 0 && Boolean(volumeOrChapterSlug));
-  const isVolume = Boolean(volumeOrChapterSlug && !chapterSlug && volumes.length > 0);
-  const isBookRoot = !volumeOrChapterSlug && !chapterSlug;
-
-  let pageNotice: string | null = null;
-  if (isChapter) {
-    pageNotice = (book as any).chapter_notice || (book as any).currentChapterNotice || (book as any).pageNotice || null;
-  } else if (isVolume) {
-    pageNotice = (book as any).volume_notice || (book as any).currentVolumeNotice || (book as any).pageNotice || null;
-  } else if (isBookRoot) {
-    pageNotice = book.notice || null;
-  }
+  // 📌 ফ্রন্টমেটার নোটিশ লজিক: 
+  // বর্তমানে লোড হওয়া ফাইল বা পাতার নিজের ফ্রন্টমেটারে `notice` থাকলে শুধু সেটাই দেখাবে।
+  const pageNotice: string | null = (book as any).notice || null;
 
   return (
     <main className="bg-[#fdfcf8] min-h-screen">
@@ -390,7 +381,7 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
           </header>
 
           <article className="leading-relaxed prose text-gray-900 lg:xl max-w-none font-tarunima">
-            {/* নোটিশ রেন্ডারিং */}
+            {/* নোটিশ রেন্ডারিং (কেবলমাত্র এই নির্দিষ্ট পাতার জন্য) */}
             {pageNotice && <Notice message={pageNotice} />}
 
             {/* মূল টেক্সট */}

@@ -26,7 +26,8 @@ import {
   Cross,       // খ্রিষ্টধর্ম (ক্রস)
   Sun,         // হিন্দুধর্ম / সনাতন ভাবধারা (পবিত্র সূর্য/জ্যোতি)
   Flower2,     // বৌদ্ধধর্ম / আধ্যাত্মিকতা (পদ্মফুল)
-  Flame        // সাধারণ ধর্মীয় ও প্রার্থনামূলক সাহিত্য (পবিত্র শিখা)
+  Flame,       // সাধারণ ধর্মীয় ও প্রার্থনামূলক সাহিত্য (পবিত্র শিখা)
+  Music        // গান / সংগীত সাহিত্য
 } from 'lucide-react';
 
 // ১. Lucide standard icons mapping
@@ -38,6 +39,7 @@ const GENRE_ICONS: Record<string, FC<{ className?: string }>> = {
   essay: ({ className }) => <Scroll className={className} />,
   essays: ({ className }) => <Scroll className={className} />,
   story: ({ className }) => <BookOpen className={className} />,
+  stories: ({ className }) => <BookOpen className={className} />,
   drama: ({ className }) => <Layers className={className} />,
   research: ({ className }) => <Search className={className} />,
   article: ({ className }) => <FileText className={className} />,
@@ -47,14 +49,22 @@ const GENRE_ICONS: Record<string, FC<{ className?: string }>> = {
   folklore: ({ className }) => <Compass className={className} />,
   history: ({ className }) => <History className={className} />,
   philosophy: ({ className }) => <GraduationCap className={className} />,
+  song: ({ className }) => <Music className={className} />,
+  songs: ({ className }) => <Music className={className} />,
+  speech: ({ className }) => <FileText className={className} />,
 
-  // ধর্মীয় ভাবপ্রকাশক স্লাগ ও বাংলা নামসমূহ
+  // ধর্মীয় ভাবপ্রকাশক স্লাগ ও বাংলা নামসমূহ
   religious: ({ className }) => <Flame className={className} />,
   islam: ({ className }) => <MoonStar className={className} />,
   hinduism: ({ className }) => <Sun className={className} />,
   buddhism: ({ className }) => <Flower2 className={className} />,
   christianity: ({ className }) => <Cross className={className} />,
 
+  "গল্প": ({ className }) => <BookOpen className={className} />,
+  "ছোটগল্প": ({ className }) => <BookOpen className={className} />,
+  "গল্পগ্রন্থ": ({ className }) => <BookOpen className={className} />,
+  "কবিতা": ({ className }) => <Feather className={className} />,
+  "প্রবন্ধ": ({ className }) => <Scroll className={className} />,
   "ধর্মীয় সাহিত্য": ({ className }) => <Flame className={className} />,
   "ধর্মীয়": ({ className }) => <Flame className={className} />,
   "ইসলাম": ({ className }) => <MoonStar className={className} />,
@@ -63,6 +73,10 @@ const GENRE_ICONS: Record<string, FC<{ className?: string }>> = {
   "সনাতন ধর্ম": ({ className }) => <Sun className={className} />,
   "বৌদ্ধধর্ম": ({ className }) => <Flower2 className={className} />,
   "খ্রিষ্টধর্ম": ({ className }) => <Cross className={className} />,
+  "গান": ({ className }) => <Music className={className} />,
+  "সংগীত": ({ className }) => <Music className={className} />,
+  "অভিভাষণ": ({ className }) => <FileText className={className} />,
+  "বক্তৃতা": ({ className }) => <FileText className={className} />,
 };
 
 // ২. স্মার্ট আইকন ডিটেক্টর ফাংশন
@@ -74,27 +88,100 @@ const getGenreIcon = (slug: string, rawText: string): FC<{ className?: string }>
   if (GENRE_ICONS[cleanSlug]) return GENRE_ICONS[cleanSlug];
   if (GENRE_ICONS[cleanText]) return GENRE_ICONS[cleanText];
 
-  // ধর্মীয় কীওয়ার্ড চেকিং
+  // ধর্মীয় কীওয়ার্ড চেকিং
   if (cleanSlug.includes("islam") || cleanText.includes("ইসলাম")) return GENRE_ICONS.islam;
   if (cleanSlug.includes("hindu") || cleanText.includes("হিন্দু") || cleanText.includes("সনাতন")) return GENRE_ICONS.hinduism;
   if (cleanSlug.includes("buddh") || cleanText.includes("বৌদ্ধ")) return GENRE_ICONS.buddhism;
   if (cleanSlug.includes("christ") || cleanText.includes("খ্রিষ্ট") || cleanText.includes("খ্রিস্ট")) return GENRE_ICONS.christianity;
   if (cleanSlug.includes("religi") || cleanText.includes("ধর্ম")) return GENRE_ICONS.religious;
 
-  // সাধারণ সাহিত্যিক কীওয়ার্ড চেকিং
+  // সাধারণ সাহিত্যিক কীওয়ার্ড চেকিং
   if (cleanSlug.includes("novel") || cleanText.includes("উপন্যাস")) return GENRE_ICONS.novel;
   if (cleanSlug.includes("poem") || cleanSlug.includes("poetry") || cleanText.includes("কবিতা")) return GENRE_ICONS.poetry;
   if (cleanSlug.includes("essay") || cleanText.includes("প্রবন্ধ")) return GENRE_ICONS.essay;
-  if (cleanSlug.includes("story") || cleanText.includes("গল্প")) return GENRE_ICONS.story;
+  if (cleanSlug.includes("story") || cleanSlug.includes("stories") || cleanText.includes("গল্প")) return GENRE_ICONS.story;
   if (cleanSlug.includes("hist") || cleanText.includes("ইতিহাস")) return GENRE_ICONS.history;
+  if (cleanSlug.includes("song") || cleanText.includes("গান") || cleanText.includes("সংগীত")) return GENRE_ICONS.song;
+  if (cleanSlug.includes("speech") || cleanText.includes("অভিভাষণ") || cleanText.includes("বক্তৃতা")) return GENRE_ICONS.speech;
 
-  // কোনোটি না মিললে ডিফল্ট সুন্দর বইয়ের আইকন
+  // কোনোটি না মিললে ডিফল্ট সুন্দর বইয়ের আইকন
   return ({ className }) => <BookText className={className} />;
 };
 
-// সংখ্যাকে বাংলায় রূপান্তর
+// সংখ্যাকে বাংলায় রূপান্তর
 const toBengaliNumber = (num: number | string): string =>
   num.toString().replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[parseInt(d, 10)]);
+
+// 💡 যেকোনো অবজেক্ট থেকে `genre` এবং `genres` উভয় ফিল্ড এক্সট্র্যাক্ট করার সেফ ফাংশন
+const parseGenreField = (item: any): string[] => {
+  const result: string[] = [];
+  if (!item) return result;
+
+  // ১. `genre` যদি স্ট্রিং হয়
+  if (typeof item.genre === 'string' && item.genre.trim()) {
+    result.push(item.genre.trim());
+  } 
+  // ২. `genre` যদি অ্যারে হয়
+  else if (Array.isArray(item.genre)) {
+    item.genre.forEach((g: any) => typeof g === 'string' && g.trim() && result.push(g.trim()));
+  }
+
+  // ৩. `genres` যদি স্ট্রিং হয়
+  if (typeof item.genres === 'string' && item.genres.trim()) {
+    result.push(item.genres.trim());
+  } 
+  // ৪. `genres` যদি অ্যারে হয়
+  else if (Array.isArray(item.genres)) {
+    item.genres.forEach((g: any) => typeof g === 'string' && g.trim() && result.push(g.trim()));
+  }
+
+  return result;
+};
+
+// 💡 রিকার্সিভ ও ব্যাপক স্ক্যানার: মূল বই ও ভিতরের সমস্ত সাব-আইটেম (গল্প, কবিতা, অধ্যায়) স্ক্যান করার জন্য
+const collectAllGenresFromBook = (book: any): string[] => {
+  const genreSet = new Set<string>();
+
+  // ১. মূল বইয়ের জনরা
+  parseGenreField(book).forEach((g) => genreSet.add(g));
+
+  // ২. সম্ভাব্য সমস্ত সাব-অ্যারে স্ট্রাকচার চেক করা
+  const nestedArrays = [
+    book.directChapters,
+    book.chapters,
+    book.stories,     // 👈 গল্পগ্রন্থের গল্পের তালিকা
+    book.items,
+    book.articles,
+    book.contents
+  ];
+
+  nestedArrays.forEach((arr) => {
+    if (Array.isArray(arr)) {
+      arr.forEach((subItem: any) => {
+        parseGenreField(subItem).forEach((g) => genreSet.add(g));
+      });
+    }
+  });
+
+  // ৩. খণ্ডসমূহ (volumes) স্ক্যান করা
+  if (Array.isArray(book.volumes)) {
+    book.volumes.forEach((vol: any) => {
+      parseGenreField(vol).forEach((g) => genreSet.add(g));
+      
+      // খণ্ডের ভেতরের চ্যাপ্টার/গল্প স্ক্যান
+      const volSubArrays = [vol.chapters, vol.stories, vol.items, vol.directChapters];
+      volSubArrays.forEach((arr) => {
+        if (Array.isArray(arr)) {
+          arr.forEach((subItem: any) => {
+            parseGenreField(subItem).forEach((g) => genreSet.add(g));
+          });
+        }
+      });
+    });
+  }
+
+  return Array.from(genreSet);
+};
 
 const GenreList = async () => {
   const allBooks = await getAllBooks();
@@ -102,16 +189,19 @@ const GenreList = async () => {
   const authorSet = new Set<string>();
   const genreMap = new Map<string, { label: string; slug: string; rawGenre: string; count: number }>();
 
-  allBooks.forEach((book) => {
+  allBooks.forEach((book: any) => {
     if (book.author) {
       authorSet.add(book.author);
     }
 
-    const bookGenres = Array.isArray(book.genres) && book.genres.length > 0 
-      ? book.genres 
-      : ['অন্যান্য'];
+    // একটি বই এবং তার ভিতরের সব পেজের সম্পূর্ণ জনরা কালেকশন
+    const bookGenres = collectAllGenresFromBook(book);
 
-    bookGenres.forEach((rawGenre) => {
+    // কোনো জনরা না পাওয়া গেলে ডিফল্ট
+    const finalGenres = bookGenres.length > 0 ? bookGenres : ['অন্যান্য'];
+
+    // জনরা ম্যাপে গণনা যোগ
+    finalGenres.forEach((rawGenre) => {
       const cleanGenre = rawGenre.trim();
       if (!cleanGenre) return;
 
@@ -132,9 +222,7 @@ const GenreList = async () => {
   const totalBooks = allBooks.length;
 
   return (
-    <div
-      className="relative w-full h-auto overflow-x-clip"    
-    >
+    <div className="relative w-full h-auto overflow-x-clip">
       <div className="relative z-20 w-full max-w-none mx-auto">
         {/* টাইটেল হেডার */}
         <div className="flex justify-center">
