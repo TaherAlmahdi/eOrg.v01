@@ -126,7 +126,7 @@ export function extractGenresFromData(data: any): string[] {
 }
 
 /**
- * বইয়ের ফোল্ডার থেকে গভীরে থাকা সকল .md ফাইল (অধ্যায়, কবিতা, গল্প ইত্যাদি) স্ক্যান করে
+ * বইয়ের ফোল্ডার থেকে গভীরে থাকা সকল .md ফাইল (অধ্যায়, কবিতা, গল্প ইত্যাদি) স্ক্যান করে
  * ডাইনামিকালি সব Genre সংগ্রহ করার ইউনিভার্সাল হেল্পার
  */
 function collectGenresDeep(data: any, bookFolderPath?: string): string[] {
@@ -399,12 +399,22 @@ export async function getBookHierarchy(slug: string): Promise<{
     for (const volFolder of volumeFolders) {
       const volPath = path.join(bookDir, volFolder);
 
-      const volIndexPath = path.join(volPath, 'index.md');
+      // 📌 ১. ভলিউমের নিজস্ব ফাইল চেক: v01/v01.md অথবা fallback v01/index.md
+      const namedVolFilePath = path.join(volPath, `${volFolder}.md`);
+      const indexVolFilePath = path.join(volPath, 'index.md');
+      
+      let volIndexPath = '';
+      if (existsSync(namedVolFilePath)) {
+        volIndexPath = namedVolFilePath;
+      } else if (existsSync(indexVolFilePath)) {
+        volIndexPath = indexVolFilePath;
+      }
+
       let volTitle = volFolder.toUpperCase();
 
-      if (existsSync(volIndexPath)) {
+      if (volIndexPath) {
         const { data } = matter(readFileSync(volIndexPath, 'utf8'));
-        volTitle = data.title || volTitle;
+        volTitle = data.title || data.volume_title || volTitle;
 
         nodes.push({
           type: 'volume',
@@ -415,12 +425,13 @@ export async function getBookHierarchy(slug: string): Promise<{
         });
       }
 
+      // 📌 ২. চ্যাপ্টারগুলোর লোকেশন চেক: v01/chapters/ অথবা সরাসরি v01/
       const chaptersDir = path.join(volPath, 'chapters');
       const hasChaptersFolder = existsSync(chaptersDir) && statSync(chaptersDir).isDirectory();
       const targetDir = hasChaptersFolder ? chaptersDir : volPath;
 
       const chapFiles = readdirSync(targetDir)
-        .filter(f => f.endsWith('.md') && f !== 'index.md')
+        .filter(f => f.endsWith('.md') && f !== 'index.md' && f !== `${volFolder}.md`)
         .sort(naturalSort);
 
       const volChapters: ChapterItem[] = [];

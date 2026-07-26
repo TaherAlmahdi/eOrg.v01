@@ -1,192 +1,143 @@
-"use client";
+'use client';
 
-import Link from "next/link";
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { ChevronDown, ChevronRight, FileText, Folder } from 'lucide-react';
 
-export interface TOCChapter {
-  id?: string;
-  slug: string;
-  title: string;
-  subChapters?: TOCChapter[]; // 👈 নেস্টেড সাব-ফোল্ডারের জন্য রেকারসিভ সাপোর্ট
-}
-
-export interface TOCVolume {
-  type: "volume";
-  id: string;
-  title: string;
-  chapters?: TOCChapter[];
-}
-
-export interface TOCDirectChapter {
-  type: "chapter";
-  id?: string;
-  slug: string;
-  volumeId?: string;
-  title: string;
-  chapters?: TOCChapter[]; // 👈 ডাইরেক্ট চ্যাপ্টারের নিচে সাব-ফোল্ডার থাকলে
-}
-
-export interface MetaFile {
-  title: string;
-  slug: string;
-}
-
-export interface TOCStructure {
-  bookTitle?: string;
-  metaFiles?: MetaFile[];
-  items?: (TOCVolume | TOCDirectChapter)[];
-}
-
-interface TableOfContentsProps {
-  structure: TOCStructure;
-  currentChapter?: string;
-  currentVolume?: string;
-  slug: string; // বইয়ের মূল slug
-}
-
-// 🔁 সাব-ফোল্ডার বা নেস্টেড অধ্যায় রেন্ডার করার জন্য হেল্পার কম্পোনেন্ট
-function ChapterTree({
-  chapters,
-  basePath,
-  currentChapter,
-}: {
-  chapters: TOCChapter[];
-  basePath: string;
-  currentChapter?: string;
+export default function TableOfContents({ 
+  structure, 
+  currentChapter, 
+  slug 
+}: { 
+  structure: any, 
+  currentChapter?: string, 
+  slug: string 
 }) {
-  if (!chapters || chapters.length === 0) return null;
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
+
+  // কারেন্ট ভলিউম বা চ্যাপ্টার ওপেন রাখার স্টেট
+  useEffect(() => {
+    if (structure?.currentVolume) {
+      setOpenSections(prev => ({
+        ...prev,
+        [structure.currentVolume]: true
+      }));
+    }
+  }, [structure?.currentVolume]);
+
+  const toggleSection = (id: string) => {
+    setOpenSections(prev => ({ ...prev, [id]: !prev[id] }));
+  };
 
   return (
-    <ul className="pl-2 ml-1.5 space-y-0.5 border-l border-red-200">
-      {chapters.map((ch, idx) => {
-        const chSlug = ch.slug || ch.id || "";
-        const fullPath = `${basePath}/${chSlug}`;
-        const isCurrent = currentChapter === chSlug;
+    <div 
+      className="space-y-1 font-tarunima overflow-y-auto max-h-[75vh] relative no-scrollbar pr-1"
+      style={{ 
+        msOverflowStyle: 'none',  /* IE and Edge */
+        scrollbarWidth: 'none',   /* Firefox */
+      }}
+    >
+      <style jsx>{`
+        div::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
 
-        return (
-          <li key={chSlug || idx} className="my-0">
-            <Link
-              href={fullPath}
-              className={`block text-base py-0.5 px-1 rounded transition-colors leading-tight ${
-                isCurrent
-                  ? "text-red-900 font-medium bg-orange-100"
-                  : "text-gray-600 hover:text-red-900"
-              }`}
-            >
-              {ch.title}
-            </Link>
-
-            {/* সাব-ফোল্ডারের ভেতরে আরও সাব-ফাইল/ফোল্ডার থাকলে তা রেন্ডার করবে */}
-            {ch.subChapters && ch.subChapters.length > 0 && (
-              <ChapterTree
-                chapters={ch.subChapters}
-                basePath={fullPath}
-                currentChapter={currentChapter}
-              />
-            )}
-          </li>
-        );
-      })}
-    </ul>
-  );
-}
-
-export default function TableOfContents({
-  structure,
-  currentChapter,
-  currentVolume,
-  slug,
-}: TableOfContentsProps) {
-  const items = structure?.items || [];
-  const metaFiles = structure?.metaFiles || [];
-
-  return (
-    <nav aria-label="সূচিপত্র" className="text-base max-h-[75vh] overflow-y-auto pr-1">
-      {/* ১. মেটা ফাইলসমূহ (ভূমিকা, নিবেদন ইত্যাদি) */}
-      {metaFiles.length > 0 && (
-        <div className="pb-1 mb-1 border-b border-gray-200">
-          <ul className="space-y-0.5">
-            {metaFiles.map((meta) => (
-              <li key={meta.slug}>
-                <Link
-                  href={`/book/${slug}/${meta.slug}`}
-                  className="block px-1 py-0.5 text-base text-gray-700 transition-colors rounded hover:text-red-900 leading-tight"
-                >
-                  {meta.title}
-                </Link>
-              </li>
-            ))}
-          </ul>
+      {/* মেটা ফাইলসমূহ (যেমন: ভূমিকা) */}
+      {structure?.metaFiles && structure.metaFiles.length > 0 && (
+        <div className="pb-2 mb-2 space-y-1 border-b border-gray-200">
+          {structure.metaFiles.map((meta: any) => {
+            const isActive = meta.slug === currentChapter;
+            return (
+              <Link
+                key={meta.slug}
+                href={`/book/${slug}/${meta.slug}`}
+                className={`flex items-center gap-1.5 text-sm py-1 px-1 rounded transition-colors ${
+                  isActive 
+                    ? 'bg-red-900 text-white font-bold' 
+                    : 'text-gray-700 hover:bg-orange-50'
+                }`}
+              >
+                <FileText size={14} opacity={0.6} />
+                {meta.title}
+              </Link>
+            );
+          })}
         </div>
       )}
 
-      {/* ২. খণ্ড ও অধ্যায়ের তালিকা */}
-      {items.length === 0 ? (
-        <p className="py-1 text-2.1 italic text-gray-500">কোনো সূচিপত্র পাওয়া যায়নি।</p>
-      ) : (
-        <ul className="space-y-1">
-          {items.map((item, index) => {
-            // ক. যদি খণ্ড (Volume) ভিত্তিক হয়
-            if (item.type === "volume") {
-              const isCurrentVol = currentVolume === item.id;
-              const volumeBasePath = `/book/${slug}/${item.id}`;
+      {/* মূল আইটেমস (ভলিউম ও চ্যাপ্টার) */}
+      {structure?.items?.map((vol: any) => { 
+        const isVolume = vol.type === 'volume';
 
-              return (
-                <li key={item.id || index} className="space-y-0.5">
-                  <Link
-                    href={volumeBasePath}
-                    className={`block text-base font-semibold px-1.5 py-0.5 rounded transition-colors leading-tight ${
-                      isCurrentVol
-                        ? "text-red-900 bg-red-100/80"
-                        : "text-gray-800 hover:text-red-900"
-                    }`}
+        return (
+          <div key={vol.id} className="pb-1 border-b border-gray-100 last:border-0">
+            {isVolume ? (
+              <>
+                <div className="flex items-center justify-between w-full px-0 py-0 text-sm font-medium text-red-900 transition-all hover:bg-orange-50 group">
+                  {/* ভলিউম নেম লিংক */}
+                  <Link 
+                    href={`/book/${slug}/${vol.id}`}
+                    className="flex items-center gap-1.5 grow py-1"
                   >
-                    {item.title}
+                    <Folder size={16} className="text-orange-400" />
+                    <span className="hover:underline underline-offset-4 decoration-orange-300">
+                      {vol.title} {/* 👈 সরাসরি vol.title প্রদর্শন করছে */}
+                    </span>
                   </Link>
 
-                  {/* খণ্ডের ভিতরের অধ্যায় ও সাব-ফোল্ডারসমূহ */}
-                  {item.chapters && item.chapters.length > 0 && (
-                    <ChapterTree
-                      chapters={item.chapters}
-                      basePath={volumeBasePath}
-                      currentChapter={currentChapter}
-                    />
+                  {/* টগল বাটন */}
+                  {vol.chapters && vol.chapters.length > 0 && (
+                    <button 
+                      onClick={() => toggleSection(vol.id)}
+                      className="p-1 transition-colors rounded-md hover:bg-orange-100"
+                      aria-label="Toggle Section"
+                    >
+                      {openSections[vol.id] ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                    </button>
                   )}
-                </li>
-              );
-            }
+                </div>
 
-            // খ. যদি সরাসরি অধ্যায় (Direct Chapter) বা সরাসরি কোনো সাব-ফোল্ডার হয়
-            const chSlug = item.slug || item.id || "";
-            const isCurrentDirectCh =
-              currentChapter === chSlug || (!currentChapter && currentVolume === chSlug);
-            const directBasePath = `/book/${slug}/${chSlug}`;
-
-            return (
-              <li key={chSlug || index} className="space-y-0.5">
-                <Link
-                  href={directBasePath}
-                  className={`block text-base px-1.5 py-0.5 rounded transition-colors leading-tight ${
-                    isCurrentDirectCh
-                      ? "text-red-900 font-semibold bg-orange-100"
-                      : "text-gray-700 hover:text-red-900"
-                  }`}
-                >
-                  {item.title}
-                </Link>
-
-                {/* যদি ডাইরেক্ট চ্যাপ্টারের ভেতরেও সাব-ফোল্ডার/ফাইল থাকে */}
-                {item.chapters && item.chapters.length > 0 && (
-                  <ChapterTree
-                    chapters={item.chapters}
-                    basePath={directBasePath}
-                    currentChapter={currentChapter}
-                  />
+                {/* ভলিউমের ভেতরের চ্যাপ্টারসমূহ */}
+                {openSections[vol.id] && vol.chapters && (
+                  <div className="pl-2 mt-0 ml-4 space-y-1 border-l-2 border-orange-100">
+                    {vol.chapters.map((chap: any) => {
+                      const isActive = chap.slug === currentChapter || chap.id === currentChapter;
+                      return (
+                        <Link
+                          key={chap.slug || chap.id}
+                          href={`/book/${slug}/${vol.id}/${chap.slug || chap.id}`}
+                          className={`flex items-center gap-1 text-sm py-1 px-1 border-b border-red-300/30 transition-colors ${
+                            isActive 
+                            ? 'bg-red-900 text-white shadow-sm font-medium' 
+                            : 'text-gray-700 hover:text-red-900 hover:bg-orange-50'
+                          }`}
+                        >
+                          <FileText size={14} opacity={0.5} />
+                          {chap.title}
+                        </Link>
+                      );
+                    })}
+                  </div>
                 )}
-              </li>
-            );
-          })}
-        </ul>
-      )}
-    </nav>
+              </>
+            ) : (
+              /* ডায়রেক্ট চ্যাপ্টার (যদি ভলিউম না থাকে) */
+              <Link
+                href={`/book/${slug}/${vol.slug || vol.id}`}
+                className={`flex items-center gap-1 text-sm py-1 px-1 rounded transition-colors ${
+                  (vol.slug || vol.id) === currentChapter 
+                  ? 'bg-red-900 text-white shadow-sm font-bold' 
+                  : 'text-gray-700 hover:text-red-900 hover:bg-orange-50'
+                }`}
+              >
+                <FileText size={14} />
+                {vol.title}
+              </Link>
+            )}
+          </div>
+        );
+      })}
+    </div>
   );
 }

@@ -31,6 +31,7 @@ interface ChapterItem {
 interface VolumeItem {
   id: string;
   title: string;
+  volume_title?: string;
   chapters?: ChapterItem[];
 }
 
@@ -69,10 +70,15 @@ export async function generateMetadata({ params }: UnifiedPageProps): Promise<Me
 
   if (!book) return { title: "বই পাওয়া যায়নি" };
 
+  // ভলিউম টাইটেল নির্ধারণ
+  const currentVolObj = (book.volumes as VolumeItem[])?.find(v => v.id === volumeOrChapterSlug);
+  const resolvedVolumeTitle = book.volume_title || book.currentVolumeTitle || currentVolObj?.volume_title || currentVolObj?.title || null;
+  const resolvedChapterTitle = book.chapter_title || book.currentChapterTitle || null;
+
   const dynamicMetaTitle = buildTabTitle({
     metaTitle: book.meta_title,
-    currentPageTitle: book.chapter_title || book.currentChapterTitle || null,
-    volumePageTitle: book.volume_title || book.currentVolumeTitle || null,
+    currentPageTitle: resolvedChapterTitle,
+    volumePageTitle: resolvedVolumeTitle,
     bookTitle: book.title,
     siteName: siteData.title,
   });
@@ -145,6 +151,14 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
   const volumes: VolumeItem[] = (book.volumes as VolumeItem[]) || [];
   const directChapters: ChapterItem[] = (book.directChapters as ChapterItem[]) || [];
 
+  // 🔍 সঠিক Volume এবং Chapter এর টাইটেল রেজোলিউশন
+  const currentVolumeSlug = chapterSlug ? volumeOrChapterSlug : (volumes.length > 0 ? volumeOrChapterSlug : '');
+  const currentChapterSlug = chapterSlug || (volumes.length === 0 ? volumeOrChapterSlug : '') || '';
+
+  const currentVolObj = volumes.find(v => v.id === currentVolumeSlug);
+  const displayVolumeTitle = book.volume_title || book.currentVolumeTitle || currentVolObj?.volume_title || currentVolObj?.title || (currentVolumeSlug ? currentVolumeSlug.toUpperCase() : '');
+  const displayChapterTitle = book.chapter_title || book.currentChapterTitle || '';
+
   // 📝 <!--nextpage--> পার্সিং
   const fullContent = book.content || '';
   const pageSegments = fullContent.split(/<!--\s*nextpage(?:\s+([\s\S]*?))?\s*-->/gi);
@@ -193,7 +207,6 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
   const currentPageNum = activePageIndex + 1;
   const totalSubPages = splitPages.length;
 
-  // নেক্সটপেজে কাস্টম টাইটেল থাকলে তা activeSubtitle-এ যাবে, না থাকলে মূল সাবটাইটেল দেখাবে
   const activeSubtitle = currentSubPageData?.title || book.subtitle;
 
   // মূল পাতার বেস পাথ (পেজ নম্বর ছাড়া)
@@ -204,7 +217,6 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
   const getSubPageLabel = (pageData?: SplitPage) => {
     if (!pageData) return '';
     if (pageData.title) return pageData.title;
-    // ১ম পেজের জন্য টাইটেল না থাকলে ফাঁকা (যা পরবর্তীতে ফলব্যাক ব্যবহার করবে), অন্য পেজে "পাতা X"
     return pageData.pageNumber > 1 ? `পাতা ${toBengaliNumber(pageData.pageNumber)}` : '';
   };
 
@@ -220,7 +232,6 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
     const prevPageObj = splitPages[prevPageNum - 1];
     
     if (prevPageNum === 1) {
-      // ১ নম্বর পেজের ক্ষেত্রে মূল অধ্যায়ের লিঙ্ক ও টাইটেলই প্রাধান্য পাবে (পাতা ১ দেখাবে না)
       prevActionLink = currentBasePath;
       prevActionLabel = prevPageObj?.title || book.prevLabel || "আগের পরিচ্ছেদ";
     } else {
@@ -239,7 +250,7 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
     if (!volumeOrChapterSlug) {
       if (volumes.length > 0) {
         nextActionLink = `/book/${bookSlug}/${volumes[0].id}`;
-        nextActionLabel = volumes[0].title || "প্রথম খণ্ড";
+        nextActionLabel = volumes[0].title || volumes[0].volume_title || "প্রথম খণ্ড";
       } else if (directChapters.length > 0) {
         nextActionLink = `/book/${bookSlug}/${directChapters[0].slug}`;
         nextActionLabel = directChapters[0].title || "প্রথম অধ্যায়";
@@ -250,32 +261,35 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
   // 📂 TableOfContents-এর জন্য ডাটা স্ট্রাকচার
   const tocStructure = {
     bookTitle: book.title,
+    currentVolume: currentVolumeSlug,
     metaFiles: book.metaFiles || [],
-    currentVolume: volumeOrChapterSlug || '',
     items: volumes.length > 0
-      ? volumes.map((v) => ({
-          type: 'volume' as const,
-          id: v.id,
-          title: v.title,
-          chapters: (v.chapters || []).map((c) => ({
-            id: c.slug,
-            slug: c.slug,
-            title: c.title,
-          })),
-        }))
+      ? volumes.map((v: VolumeItem) => {
+          const displayTitle = 
+            (v.id === currentVolumeSlug && displayVolumeTitle) 
+            || v.volume_title 
+            || v.title;
+
+          return {
+            type: 'volume' as const,
+            id: v.id,
+            title: displayTitle,
+            chapters: (v.chapters || []).map((c: ChapterItem) => ({
+              id: c.slug,
+              slug: c.slug,
+              title: c.title,
+            })),
+          };
+        })
       : directChapters.map((c) => ({
           type: 'chapter' as const,
           id: c.slug,
           slug: c.slug,
-          volumeId: '',
           title: c.title,
         })),
   };
 
-  const currentChapterSlug = chapterSlug || (volumes.length === 0 ? volumeOrChapterSlug : '') || '';
-  const currentVolumeSlug = chapterSlug ? volumeOrChapterSlug : (volumes.length > 0 ? volumeOrChapterSlug : '');
-
-  // 🔍 খণ্ড পেজ শনাক্তকরণ ও কনডিটেবল সূচিপত্র লজিক
+  // 🔍 খণ্ড পেজ শনাক্তকরণ ও পরিচ্ছেদ তালিকা লজিক
   const isVolumePage = Boolean(volumeOrChapterSlug && !chapterSlug && volumes.length > 0);
   const currentVolumeData = isVolumePage ? volumes.find((v) => v.id === volumeOrChapterSlug) : null;
   const volumeChapters = currentVolumeData?.chapters || [];
@@ -291,9 +305,13 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
     !isExplicitTocFalse && 
     (isExplicitTocTrue || hasNoContent);
 
-  // 📌 ফ্রন্টমেটার নোটিশ লজিক: 
-  // বর্তমানে লোড হওয়া ফাইল বা পাতার নিজের ফ্রন্টমেটারে `notice` থাকলে শুধু সেটাই দেখাবে।
-  const pageNotice: string | null = (book as any).notice || null;
+    // 📌 কেবল বর্তমান ওপেন থাকা ফাইলের (.md) নোটিশ রিড করা
+    const rawNotice = book.rawFrontmatter?.notice;
+
+    const pageNotice: string | null = 
+      (typeof rawNotice === 'string' && rawNotice.trim().length > 0)
+        ? rawNotice.trim()
+        : null;
 
   return (
     <main className="bg-[#fdfcf8] min-h-screen">
@@ -323,11 +341,11 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
               <span className="mx-2 text-white/50 shrink-0">/</span>
               {chapterSlug ? (
                 <Link href={`/book/${bookSlug}/${volumeOrChapterSlug}`} className="transition-colors hover:text-red-100 shrink-0">
-                  {book.volume_title || book.currentVolumeTitle || volumeOrChapterSlug}
+                  {displayVolumeTitle || volumeOrChapterSlug}
                 </Link>
               ) : (
                 <span className="font-medium text-white whitespace-nowrap">
-                  {book.volume_title || book.currentVolumeTitle || book.chapter_title || book.currentChapterTitle || volumeOrChapterSlug}
+                  {displayVolumeTitle || displayChapterTitle || volumeOrChapterSlug}
                 </span>
               )}
             </>
@@ -338,12 +356,12 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
             <>
               <span className="mx-2 text-white/50 shrink-0">/</span>
               <span className="font-medium text-white whitespace-nowrap">
-                {book.chapter_title || book.currentChapterTitle || chapterSlug}
+                {displayChapterTitle || chapterSlug}
               </span>
             </>
           )}
 
-          {/* 💡 ডাইনামিক ব্রেডক্রাম্ব: ২ নম্বর পেজ থেকে টাইটেল বা পাতা নম্বর দেখাবে */}
+          {/* 💡 ডাইনামিক সাব-পেজ ব্রেডক্রাম্ব */}
           {totalSubPages > 1 && currentPageNum > 1 && (
             <>
               <span className="mx-2 text-white/50 shrink-0">/</span>
@@ -361,8 +379,21 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
         {/* কন্টেন্ট সেকশন */}
         <section className="order-1 lg:order-2 col-span-1 lg:col-span-9 bg-[#fff2e6] p-3 md:p-6 shadow-sm min-h-screen">
           <header className="mb-6 text-center font-tarunima">
+            {/* বইয়ের নাম যদি খণ্ড বা চ্যাপ্টার থাকে */}
+            {(displayVolumeTitle || displayChapterTitle) && (
+              <p className="mb-1 text-lg text-red-900 md:text-xl font-tarunima">{book.title}</p>
+            )}
+
+            {/* ভলিউমের নাম */}
+            {displayVolumeTitle && (
+              <p className="mb-1 tracking-wide text-gray-600 uppercase text-md md:text-lg">
+                {displayVolumeTitle}
+              </p>
+            )}
+
+            {/* চ্যাপ্টারের নাম বা মূল টাইটেল */}
             <h1 className="mb-2 text-xl font-semibold text-gray-900 md:text-2xl font-sabrina">
-              {book.chapter_title || book.currentChapterTitle || book.volume_title || book.currentVolumeTitle || book.title}
+              {displayChapterTitle || (!displayVolumeTitle ? book.title : '')}
             </h1>
 
             {/* নেক্সটপেজের কাস্টম টাইটেল অথবা মূল সাবটাইটেল */}
@@ -372,16 +403,12 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
               </p>
             )}
 
-            {(book.chapter_title || book.volume_title) && (
-              <p className="mb-1 text-lg text-gray-700 md:text-xl font-tarunima">{book.title}</p>
-            )}
-
             <p className="text-lg font-medium text-red-900 font-tarunima">{book.author}</p>
             <div className="w-48 h-0.5 bg-red-900/40 mx-auto mt-3"></div>
           </header>
 
           <article className="leading-relaxed prose text-gray-900 lg:xl max-w-none font-tarunima">
-            {/* নোটিশ রেন্ডারিং (কেবলমাত্র এই নির্দিষ্ট পাতার জন্য) */}
+            {/* নোটিশ রেন্ডারিং (যদি শুধু এই চ্যাপ্টার/পাতায় থাকে) */}
             {pageNotice && <Notice message={pageNotice} />}
 
             {/* মূল টেক্সট */}
@@ -446,7 +473,7 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
             )}
           </article>
 
-          {/* 🧭 স্মার্ট মূল নেভিগেশন বাটন */}
+          {/* 🧭 স্মার্ট নেভিগেশন বাটন */}
           <div className="flex items-center justify-between pt-4 mt-8 border-t border-orange-200 font-tarunima">
             <Link 
               href={prevActionLink} 
@@ -551,12 +578,11 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
             {/* ডায়নামিক সূচিপত্র (ToC) */}
             <div className="p-3 bg-white border border-gray-100 rounded shadow-sm font-tarunima">
               <h3 className="pb-2 mb-3 font-bold text-red-900 border-b border-gray-200 text-md">
-                সূচিপত্র
+                {book.title}
               </h3>
               <TableOfContents 
                 structure={tocStructure} 
                 currentChapter={currentChapterSlug}
-                currentVolume={currentVolumeSlug}
                 slug={bookSlug} 
               />
             </div>
