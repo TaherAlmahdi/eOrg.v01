@@ -38,7 +38,7 @@ export interface Book {
   genre_links?: Array<{ name: string; link: string }>;
   volumes?: VolumeItem[];
   directChapters?: ChapterItem[];
-  metaFiles?: MetaFileItem[]; // metaFiles সরাসরি বুক টাইপে যুক্ত করা হলো
+  metaFiles?: MetaFileItem[];
   publishDate?: string;
   published?: string;
   first_published?: string | number;
@@ -61,7 +61,7 @@ export interface Book {
 
 export interface BookDetail extends Book {
   content: string;
-  rawFrontmatter: Record<string, unknown>; // 'any'-এর পরিবর্তে নিরাপদ 'unknown'
+  rawFrontmatter: Record<string, unknown>;
 }
 
 export interface BookNode {
@@ -80,15 +80,21 @@ export interface BookNode {
 const booksDirectory = path.resolve(process.cwd(), 'content', 'books');
 
 /**
- * স্ট্রিম/স্ট্রিং থেকে সাবডোমেন অ্যারে বের করার হেল্পার (Type-safe)
+ * আলফানিউমেরিক বা প্রাকৃতিক ক্রমানুসারে ফাইল/ফোল্ডার সর্টিং
+ */
+const naturalSort = (a: string, b: string) =>
+  a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+
+/**
+ * স্ট্রিম/স্ট্রিং থেকে সাবডোমেন অ্যারে বের করার হেল্পার
  */
 function parseSubdomains(subdomainRaw: unknown, defaultAuthorFolder: string): string[] {
   if (!subdomainRaw) return [defaultAuthorFolder, 'library'];
-  
+
   if (Array.isArray(subdomainRaw)) {
     return subdomainRaw.map((s) => String(s).trim().toLowerCase());
   }
-  
+
   if (typeof subdomainRaw === 'string') {
     return subdomainRaw.split(',').map((s) => s.trim().toLowerCase());
   }
@@ -103,9 +109,9 @@ function parseSubdomains(subdomainRaw: unknown, defaultAuthorFolder: string): st
 /**
  * ১. লাইব্রেরি বা সাবডোমেন ভিত্তিক বইয়ের তালিকা ফেচ করা
  */
-export async function getLibraryBooks(currentSubdomain?: string): Promise<{ 
-  latestBooks: Book[]; 
-  booksByGenre: Record<string, Book[]> 
+export async function getLibraryBooks(currentSubdomain?: string): Promise<{
+  latestBooks: Book[];
+  booksByGenre: Record<string, Book[]>;
 }> {
   const allBooks: Book[] = [];
 
@@ -188,7 +194,7 @@ export async function getLibraryBooks(currentSubdomain?: string): Promise<{
       }
     }
 
-    const sortedBooks = allBooks.sort((a, b) => 
+    const sortedBooks = allBooks.sort((a, b) =>
       (b.publishDate || '').localeCompare(a.publishDate || '')
     );
 
@@ -204,178 +210,6 @@ export async function getLibraryBooks(currentSubdomain?: string): Promise<{
   } catch (error) {
     console.error("Library scanning error:", error);
     return { latestBooks: [], booksByGenre: {} };
-  }
-}
-
-/**
- * ২. নির্দিষ্ট বই, খণ্ড বা অধ্যায় ফেচ করার ফাংশন 
- */
-export async function getBookBySlug(
-  bookSlug: string, 
-  currentSubdomain?: string,
-  volumeOrChapterSlug?: string,
-  chapterSlug?: string
-): Promise<BookDetail | null> {
-  if (!existsSync(booksDirectory)) return null;
-
-  try {
-    const authorItems = await fs.readdir(booksDirectory, { withFileTypes: true });
-
-    for (const authorItem of authorItems) {
-      if (!authorItem.isDirectory()) continue;
-
-      const authorFolderName = authorItem.name;
-      const authorFolderPath = path.join(booksDirectory, authorFolderName);
-      const bookItems = await fs.readdir(authorFolderPath, { withFileTypes: true });
-
-      for (const bookItem of bookItems) {
-        if (!bookItem.isDirectory()) continue;
-
-        const bookFolderName = bookItem.name;
-        const bookFolderPath = path.join(authorFolderPath, bookFolderName);
-        const indexMdPath = path.join(bookFolderPath, 'index.md');
-
-        if (!existsSync(indexMdPath)) continue;
-
-        try {
-          const mainIndexContents = await fs.readFile(indexMdPath, 'utf8');
-          const { data: mainData } = matter(mainIndexContents);
-
-          const fileSlug = mainData.slug ? String(mainData.slug).trim() : bookFolderName;
-
-          if (fileSlug.toLowerCase() !== bookSlug.toLowerCase()) {
-            continue;
-          }
-
-          const bookSubdomains = parseSubdomains(mainData.subdomain, authorFolderName);
-
-          let extractedGenres: string[] = ['অন্যান্য'];
-          if (mainData.genre || mainData.genres) {
-            const raw = mainData.genre || mainData.genres;
-            extractedGenres = Array.isArray(raw) ? raw : [raw];
-          }
-
-          // ৩. হায়ারার্কি নোডসমূহ ফেচ করা
-          const { nodes } = await getBookHierarchy(fileSlug);
-
-          let targetFilePath = indexMdPath;
-          let currentVolTitle = '';
-          let currentChapTitle = '';
-          let targetNodeIndex = -1;
-
-          if (volumeOrChapterSlug) {
-            if (chapterSlug) {
-              const matchedNodeIndex = nodes.findIndex(
-                n => n.type === 'chapter' && n.volId.toLowerCase() === volumeOrChapterSlug.toLowerCase() && n.chapterSlug?.toLowerCase() === chapterSlug.toLowerCase()
-              );
-              if (matchedNodeIndex !== -1) {
-                targetNodeIndex = matchedNodeIndex;
-                targetFilePath = nodes[matchedNodeIndex].filePath;
-                currentChapTitle = nodes[matchedNodeIndex].title;
-                const parentVol = nodes.find(n => n.type === 'volume' && n.volId === nodes[matchedNodeIndex].volId);
-                if (parentVol) currentVolTitle = parentVol.title;
-              }
-            } else {
-              const matchedNodeIndex = nodes.findIndex(
-                n => (n.type === 'volume' && n.volId.toLowerCase() === volumeOrChapterSlug.toLowerCase()) ||
-                     (n.type === 'chapter' && n.chapterSlug?.toLowerCase() === volumeOrChapterSlug.toLowerCase())
-              );
-
-              if (matchedNodeIndex !== -1) {
-                targetNodeIndex = matchedNodeIndex;
-                targetFilePath = nodes[matchedNodeIndex].filePath;
-                if (nodes[matchedNodeIndex].type === 'volume') {
-                  currentVolTitle = nodes[matchedNodeIndex].title;
-                } else {
-                  currentChapTitle = nodes[matchedNodeIndex].title;
-                }
-              }
-            }
-          }
-
-          if (!existsSync(targetFilePath)) {
-            targetFilePath = indexMdPath;
-          }
-
-          const fileContents = await fs.readFile(targetFilePath, 'utf8');
-          const { data: pageData, content } = matter(fileContents);
-
-          // 🎯 নেভিগেশন লিঙ্ক ক্যালকুলেশন
-          let prevLink = "/books";
-          let prevLabel = "গ্রন্থাগার";
-          let nextLink = "/books";
-          let nextLabel = "গ্রন্থাগার";
-
-          if (targetNodeIndex === -1) {
-            if (nodes.length > 0) {
-              nextLink = nodes[0].href;
-              nextLabel = nodes[0].title;
-            }
-          } else {
-            if (targetNodeIndex > 0) {
-              prevLink = nodes[targetNodeIndex - 1].href;
-              prevLabel = nodes[targetNodeIndex - 1].title;
-            } else {
-              prevLink = `/book/${fileSlug}`;
-              prevLabel = mainData.title || 'সূচিপত্র';
-            }
-
-            if (targetNodeIndex < nodes.length - 1) {
-              nextLink = nodes[targetNodeIndex + 1].href;
-              nextLabel = nodes[targetNodeIndex + 1].title;
-            } else {
-              nextLink = "/books";
-              nextLabel = "গ্রন্থাগার";
-            }
-          }
-
-          return {
-            id: fileSlug,
-            slug: fileSlug,
-            title: mainData.title || 'শিরোনামহীন বই',
-            subtitle: pageData.subtitle || mainData.subtitle || '',
-            meta_title: pageData.meta_title || mainData.meta_title || '',
-            meta_description: pageData.meta_description || mainData.meta_description || '',
-            author: mainData.author || 'অজ্ঞাত লেখক',
-            authorSlug: mainData.authorSlug || authorFolderName,
-            subdomains: bookSubdomains,
-            genres: extractedGenres,
-            genre: mainData.genre || extractedGenres,
-            genre_links: mainData.genre_links || [],
-            volumes: mainData.volumes || [],
-            directChapters: mainData.directChapters || [],
-            metaFiles: mainData.metaFiles || [],
-            publishDate: mainData.published ? String(mainData.published) : (mainData.date ? String(mainData.date) : ''),
-            published: mainData.published ? String(mainData.published) : '',
-            first_published: mainData.first_published || '',
-            cover: mainData.cover || mainData.cover_image || '',
-            cover_image: mainData.cover_image || mainData.cover || '',
-            source_book: mainData.source_book || '',
-            pub_medium: mainData.pub_medium ? String(mainData.pub_medium) : '',
-            notice: pageData.notice || mainData.notice ? String(pageData.notice || mainData.notice) : '',
-            og_image: pageData.og_image || mainData.og_image || '',
-            footnotes: pageData.footnotes || mainData.footnotes || [],
-            chapter_title: pageData.chapter_title || currentChapTitle || '',
-            volume_title: pageData.volume_title || currentVolTitle || '',
-            currentChapterTitle: currentChapTitle || pageData.currentChapterTitle || '',
-            currentVolumeTitle: currentVolTitle || pageData.currentVolumeTitle || '',
-            prevLink,
-            prevLabel,
-            nextLink,
-            nextLabel,
-            content,
-            rawFrontmatter: pageData,
-          };
-        } catch {
-          continue;
-        }
-      }
-    }
-
-    return null;
-  } catch (error) {
-    console.error(`Error fetching book with slug ${bookSlug}:`, error);
-    return null;
   }
 }
 
@@ -422,19 +256,26 @@ export async function getBookDirectoryBySlug(bookSlug: string): Promise<string |
   }
 }
 
+/**
+ * ৩. বইয়ের হায়ারার্কি স্ক্যান করার আপডেটেড ফাংশন (একক ও বহুখণ্ডের বইয়ের জন্য)
+ */
 export async function getBookHierarchy(slug: string): Promise<{
   nodes: BookNode[];
   bookTitle: string;
   coverImage: string;
+  volumes: VolumeItem[];
+  directChapters: ChapterItem[];
 }> {
   const bookDir = await getBookDirectoryBySlug(slug);
   const nodes: BookNode[] = [];
+  const volumes: VolumeItem[] = [];
+  const directChapters: ChapterItem[] = [];
 
   let bookTitle = slug;
   let coverImage = '/default-cover.jpg';
 
   if (!bookDir || !existsSync(bookDir)) {
-    return { nodes, bookTitle, coverImage };
+    return { nodes, bookTitle, coverImage, volumes, directChapters };
   }
 
   const indexMdPath = path.join(bookDir, 'index.md');
@@ -444,67 +285,269 @@ export async function getBookHierarchy(slug: string): Promise<{
     coverImage = data.cover_image || data.cover || coverImage;
   }
 
-  const volumes = readdirSync(bookDir)
-    .filter(file => statSync(path.join(bookDir, file)).isDirectory())
-    .sort();
+  const entries = readdirSync(bookDir, { withFileTypes: true });
+  const hasSubVolumes = entries.some(e => e.isDirectory());
 
-  for (const vol of volumes) {
-    const volPath = path.join(bookDir, vol);
+  if (!hasSubVolumes) {
+    // একক খণ্ডের বইয়ের জন্য (যেমন: ব্যথার দান)
+    const chapterFiles = entries
+      .filter(e => e.isFile() && e.name.endsWith('.md') && e.name !== 'index.md')
+      .map(e => e.name)
+      .sort(naturalSort);
 
-    const volFiles = readdirSync(volPath)
-      .filter(f => f.endsWith('.md') && statSync(path.join(volPath, f)).isFile())
-      .sort();
+    for (const chapFile of chapterFiles) {
+      const chapFilePath = path.join(bookDir, chapFile);
+      const { data } = matter(readFileSync(chapFilePath, 'utf8'));
+      const chapSlug = chapFile.replace(/\.md$/, '');
+      const title = data.title || chapSlug;
 
-    let volTitle = vol.toUpperCase();
-    let volFilePath = '';
-    let primaryVolMdName = '';
+      directChapters.push({ slug: chapSlug, title });
 
-    if (volFiles.length > 0) {
-      primaryVolMdName = volFiles[0];
-      volFilePath = path.join(volPath, primaryVolMdName);
-      const { data } = matter(readFileSync(volFilePath, 'utf8'));
-      volTitle = data.title || volTitle;
+      nodes.push({
+        type: 'chapter',
+        href: `/book/${slug}/${chapSlug}`,
+        title,
+        volId: '',
+        chapterSlug: chapSlug,
+        filePath: chapFilePath,
+      });
     }
+  } else {
+    // বহুখণ্ডের বইয়ের জন্য (যেমন: দুর্গেশনন্দিনী)
+    const volumeFolders = entries
+      .filter(e => e.isDirectory())
+      .map(e => e.name)
+      .sort(naturalSort);
 
-    nodes.push({
-      type: 'volume',
-      href: `/book/${slug}/${vol}`,
-      title: volTitle,
-      volId: vol,
-      filePath: volFilePath,
-    });
+    for (const volFolder of volumeFolders) {
+      const volPath = path.join(bookDir, volFolder);
+      const volEntries = readdirSync(volPath, { withFileTypes: true });
 
-    const chaptersDir = path.join(volPath, 'chapters');
-    const hasChaptersFolder = existsSync(chaptersDir) && statSync(chaptersDir).isDirectory();
-    const targetDir = hasChaptersFolder ? chaptersDir : volPath;
+      const volIndexPath = path.join(volPath, 'index.md');
+      let volTitle = volFolder.toUpperCase();
 
-    if (existsSync(targetDir)) {
-      const chapterFiles = readdirSync(targetDir)
-        .filter(f => {
-          const isMd = f.endsWith('.md') && statSync(path.join(targetDir, f)).isFile();
-          if (!hasChaptersFolder) {
-            return isMd && f !== primaryVolMdName;
-          }
-          return isMd;
-        })
-        .sort();
+      if (existsSync(volIndexPath)) {
+        const { data } = matter(readFileSync(volIndexPath, 'utf8'));
+        volTitle = data.title || volTitle;
 
-      for (const chapFile of chapterFiles) {
+        nodes.push({
+          type: 'volume',
+          href: `/book/${slug}/${volFolder}`,
+          title: volTitle,
+          volId: volFolder,
+          filePath: volIndexPath,
+        });
+      }
+
+      const chaptersDir = path.join(volPath, 'chapters');
+      const hasChaptersFolder = existsSync(chaptersDir) && statSync(chaptersDir).isDirectory();
+      const targetDir = hasChaptersFolder ? chaptersDir : volPath;
+
+      const chapFiles = readdirSync(targetDir)
+        .filter(f => f.endsWith('.md') && f !== 'index.md')
+        .sort(naturalSort);
+
+      const volChapters: ChapterItem[] = [];
+
+      for (const chapFile of chapFiles) {
         const chapFilePath = path.join(targetDir, chapFile);
         const { data } = matter(readFileSync(chapFilePath, 'utf8'));
-        const chapSlug = chapFile.replace('.md', '');
+        const chapSlug = chapFile.replace(/\.md$/, '');
+        const title = data.title || `পরিচ্ছেদ ${chapSlug}`;
+
+        volChapters.push({ slug: chapSlug, title });
 
         nodes.push({
           type: 'chapter',
-          href: `/book/${slug}/${vol}/${chapSlug}`,
-          title: data.title || `পরিচ্ছেদ ${chapSlug.replace(/^c/i, '')}`,
-          volId: vol,
+          href: `/book/${slug}/${volFolder}/${chapSlug}`,
+          title,
+          volId: volFolder,
           chapterSlug: chapSlug,
           filePath: chapFilePath,
         });
       }
+
+      volumes.push({
+        id: volFolder,
+        title: volTitle,
+        chapters: volChapters,
+      });
     }
   }
 
-  return { nodes, bookTitle, coverImage };
+  return { nodes, bookTitle, coverImage, volumes, directChapters };
+}
+
+/**
+ * ৪. নির্দিষ্ট বই, খণ্ড বা অধ্যায় ফেচ করার মূল ফাংশন
+ */
+export async function getBookBySlug(
+  bookSlug: string,
+  currentSubdomain?: string,
+  volumeOrChapterSlug?: string,
+  chapterSlug?: string
+): Promise<BookDetail | null> {
+  if (!existsSync(booksDirectory)) return null;
+
+  try {
+    const authorItems = await fs.readdir(booksDirectory, { withFileTypes: true });
+
+    for (const authorItem of authorItems) {
+      if (!authorItem.isDirectory()) continue;
+
+      const authorFolderName = authorItem.name;
+      const authorFolderPath = path.join(booksDirectory, authorFolderName);
+      const bookItems = await fs.readdir(authorFolderPath, { withFileTypes: true });
+
+      for (const bookItem of bookItems) {
+        if (!bookItem.isDirectory()) continue;
+
+        const bookFolderName = bookItem.name;
+        const bookFolderPath = path.join(authorFolderPath, bookFolderName);
+        const indexMdPath = path.join(bookFolderPath, 'index.md');
+
+        if (!existsSync(indexMdPath)) continue;
+
+        try {
+          const mainIndexContents = await fs.readFile(indexMdPath, 'utf8');
+          const { data: mainData } = matter(mainIndexContents);
+
+          const fileSlug = mainData.slug ? String(mainData.slug).trim() : bookFolderName;
+
+          if (fileSlug.toLowerCase() !== bookSlug.toLowerCase()) {
+            continue;
+          }
+
+          const bookSubdomains = parseSubdomains(mainData.subdomain, authorFolderName);
+
+          let extractedGenres: string[] = ['অন্যান্য'];
+          if (mainData.genre || mainData.genres) {
+            const raw = mainData.genre || mainData.genres;
+            extractedGenres = Array.isArray(raw) ? raw : [raw];
+          }
+
+          // বইয়ের হায়ারার্কি ডাটা ফেচ করা
+          const { nodes, volumes, directChapters } = await getBookHierarchy(fileSlug);
+
+          let targetFilePath = indexMdPath;
+          let currentVolTitle = '';
+          let currentChapTitle = '';
+          let targetNodeIndex = -1;
+
+          if (volumeOrChapterSlug) {
+            if (chapterSlug) {
+              const matchedNodeIndex = nodes.findIndex(
+                n => n.type === 'chapter' &&
+                     n.volId.toLowerCase() === volumeOrChapterSlug.toLowerCase() &&
+                     n.chapterSlug?.toLowerCase() === chapterSlug.toLowerCase()
+              );
+              if (matchedNodeIndex !== -1) {
+                targetNodeIndex = matchedNodeIndex;
+                targetFilePath = nodes[matchedNodeIndex].filePath;
+                currentChapTitle = nodes[matchedNodeIndex].title;
+                const parentVol = nodes.find(n => n.type === 'volume' && n.volId === nodes[matchedNodeIndex].volId);
+                if (parentVol) currentVolTitle = parentVol.title;
+              }
+            } else {
+              const matchedNodeIndex = nodes.findIndex(
+                n => (n.type === 'volume' && n.volId.toLowerCase() === volumeOrChapterSlug.toLowerCase()) ||
+                     (n.type === 'chapter' && n.chapterSlug?.toLowerCase() === volumeOrChapterSlug.toLowerCase())
+              );
+
+              if (matchedNodeIndex !== -1) {
+                targetNodeIndex = matchedNodeIndex;
+                targetFilePath = nodes[matchedNodeIndex].filePath;
+                if (nodes[matchedNodeIndex].type === 'volume') {
+                  currentVolTitle = nodes[matchedNodeIndex].title;
+                } else {
+                  currentChapTitle = nodes[matchedNodeIndex].title;
+                }
+              }
+            }
+          }
+
+          if (!existsSync(targetFilePath)) {
+            targetFilePath = indexMdPath;
+          }
+
+          const fileContents = await fs.readFile(targetFilePath, 'utf8');
+          const { data: pageData, content } = matter(fileContents);
+
+          // নেভিগেশন লিঙ্ক নির্ধারণ লজিক
+          let prevLink = "/books";
+          let prevLabel = "গ্রন্থাগার";
+          let nextLink = "/books";
+          let nextLabel = "গ্রন্থাগার";
+
+          if (targetNodeIndex === -1) {
+            if (nodes.length > 0) {
+              nextLink = nodes[0].href;
+              nextLabel = nodes[0].title;
+            }
+          } else {
+            if (targetNodeIndex > 0) {
+              prevLink = nodes[targetNodeIndex - 1].href;
+              prevLabel = nodes[targetNodeIndex - 1].title;
+            } else {
+              prevLink = `/book/${fileSlug}`;
+              prevLabel = mainData.title || 'সূচিপত্র';
+            }
+
+            if (targetNodeIndex < nodes.length - 1) {
+              nextLink = nodes[targetNodeIndex + 1].href;
+              nextLabel = nodes[targetNodeIndex + 1].title;
+            } else {
+              nextLink = "/books";
+              nextLabel = "গ্রন্থাগার";
+            }
+          }
+
+          return {
+            id: fileSlug,
+            slug: fileSlug,
+            title: mainData.title || 'শিরোনামহীন বই',
+            subtitle: pageData.subtitle || mainData.subtitle || '',
+            meta_title: pageData.meta_title || mainData.meta_title || '',
+            meta_description: pageData.meta_description || mainData.meta_description || '',
+            author: mainData.author || 'অজ্ঞাত লেখক',
+            authorSlug: mainData.authorSlug || authorFolderName,
+            subdomains: bookSubdomains,
+            genres: extractedGenres,
+            genre: mainData.genre || extractedGenres,
+            genre_links: mainData.genre_links || [],
+            volumes: volumes.length > 0 ? volumes : (mainData.volumes || []),
+            directChapters: directChapters.length > 0 ? directChapters : (mainData.directChapters || []),
+            metaFiles: mainData.metaFiles || [],
+            publishDate: mainData.published ? String(mainData.published) : (mainData.date ? String(mainData.date) : ''),
+            published: mainData.published ? String(mainData.published) : '',
+            first_published: mainData.first_published || '',
+            cover: mainData.cover || mainData.cover_image || '',
+            cover_image: mainData.cover_image || mainData.cover || '',
+            source_book: mainData.source_book || '',
+            pub_medium: mainData.pub_medium ? String(mainData.pub_medium) : '',
+            notice: pageData.notice || mainData.notice ? String(pageData.notice || mainData.notice) : '',
+            og_image: pageData.og_image || mainData.og_image || '',
+            footnotes: pageData.footnotes || mainData.footnotes || [],
+            chapter_title: pageData.chapter_title || currentChapTitle || '',
+            volume_title: pageData.volume_title || currentVolTitle || '',
+            currentChapterTitle: currentChapTitle || pageData.currentChapterTitle || '',
+            currentVolumeTitle: currentVolTitle || pageData.currentVolumeTitle || '',
+            prevLink,
+            prevLabel,
+            nextLink,
+            nextLabel,
+            content,
+            rawFrontmatter: pageData,
+          };
+        } catch {
+          continue;
+        }
+      }
+    }
+
+    return null;
+  } catch (error) {
+    console.error(`Error fetching book with slug ${bookSlug}:`, error);
+    return null;
+  }
 }

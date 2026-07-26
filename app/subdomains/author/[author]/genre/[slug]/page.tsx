@@ -108,7 +108,7 @@ export default async function GenrePage({ params }: Props) {
           <p className="text-gray-500 text-center mt-2 italic">
             {filteredBooks.length > 0 
               ? `এই ঘরানায় মোট ${toBengaliNumber(filteredBooks.length)}টি বই রয়েছে` 
-              : "এই ঘরানায় বর্তমানে কোনো বই নেই"}
+              : "এই ঘরানায় বর্তমানে কোনও বই নেই"}
           </p>
         </header>
 

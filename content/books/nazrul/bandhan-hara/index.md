@@ -6,7 +6,7 @@ slug: "bandhan-hara"
 subdomain: "library, nazrul"
 first_published: 1922
 published: 01/01/2026
-genre: ["সামাজিক উপন্যাস", "উপন্যাস"]
+genre: ["সামাজিক উপন্যাস", "উপন্যাস", "ইসলাম"]
 genre_links:
   - { name: "সামাজিক উপন্যাস", link: "/genre/social-novel" }
   - { name: "উপন্যাস", link: "/genre/novel" }

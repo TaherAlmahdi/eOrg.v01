@@ -62,7 +62,7 @@
   ul,
   ul.none {
     /* স্ক্রিনের সাইজ অনুযায়ী ফন্ট স্কেল হবে (সর্বনিম্ন 1.15rem থেকে সর্বোচ্চ 1.85rem) */
-    font-size: clamp(1.0rem, 1.2vw + 0.2rem, 1.5rem) !important;
+    font-size: clamp(1.0rem, 1.2vw + 0.2rem, 1.3rem) !important;
     line-height: 1.55;
     color: var(--text-main);
   }
@@ -70,8 +70,14 @@
   .first,
   .dcap,
   .normal {
-    margin-bottom: 0.10rem !impotant;
+    margin-bottom: 0.50rem !important;
     text-align: justify;
+  }
+
+
+    .pc {
+    margin-bottom: 0.10rem !important;
+    
   }
 
   .normal {
@@ -401,4 +407,19 @@ display: flex;
     opacity: 0.6;
     content: url("/theend.png");
   }
+}
+
+
+/* ১. যেসব এলিমেন্টের ভেতরে .gap আছে, সেগুলোকে Flex Container বানানো */
+p:has(> .gap),
+div:has(> .gap) {
+  display: flex !important;
+  width: 100% !important;
+}
+
+/* ২. প্রতিটি .gap কে সমান জায়গা নিয়ে সেন্টারে বসানো */
+.gap {
+  flex: 1 !important;
+  display: flex !important;
+  justify-content: center !important;
 }

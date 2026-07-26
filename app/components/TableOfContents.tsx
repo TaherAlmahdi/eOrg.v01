@@ -51,7 +51,7 @@ export default function TableOfContents({
   const metaFiles = structure?.metaFiles || [];
 
   return (
-    <nav aria-label="সূচিপত্র" className="text-sm space-y-2 max-h-[75vh] overflow-y-auto pr-1">
+    <nav aria-label="সূচিপত্র" className="text-base space-y-2 max-h-[75vh] overflow-y-auto pr-1">
       {/* ১. মেটা ফাইলসমূহ (ভূমিকা, নিবেদন ইত্যাদি) */}
       {metaFiles.length > 0 && (
         <div className="pb-2 mb-2 border-b border-gray-200">
@@ -60,7 +60,7 @@ export default function TableOfContents({
               <li key={meta.slug}>
                 <Link
                   href={`/book/${slug}/${meta.slug}`}
-                  className="block px-2 py-1 text-gray-700 transition-colors rounded hover:text-red-900"
+                  className="block px-1 py-1 text-gray-700 transition-colors rounded hover:text-red-900"
                 >
                   {meta.title}
                 </Link>
@@ -84,7 +84,7 @@ export default function TableOfContents({
                 <li key={item.id || index} className="space-y-1">
                   <Link
                     href={`/book/${slug}/${item.id}`}
-                    className={`block font-bold px-2 py-1 rounded transition-colors ${
+                    className={`block font-normal px-2 py-1 rounded transition-colors ${
                       isCurrentVol
                         ? "text-red-900 bg-red-100/70"
                         : "text-gray-800 hover:text-red-900"
@@ -104,9 +104,9 @@ export default function TableOfContents({
                           <li key={chSlug || chIdx}>
                             <Link
                               href={`/book/${slug}/${item.id}/${chSlug}`}
-                              className={`block text-xs md:text-sm py-1 px-1.5 rounded transition-colors ${
+                              className={`block text-base md:text-base py-1 px-1.5 rounded transition-colors ${
                                 isCurrentCh
-                                  ? "text-red-900 font-semibold bg-orange-100"
+                                  ? "text-red-900 font-normal bg-orange-100"
                                   : "text-gray-600 hover:text-red-900"
                               }`}
                             >
@@ -131,7 +131,7 @@ export default function TableOfContents({
                   href={`/book/${slug}/${chSlug}`}
                   className={`block px-2 py-1 rounded transition-colors ${
                     isCurrentDirectCh
-                      ? "text-red-900 font-semibold bg-orange-100"
+                      ? "text-red-900 font-normal bg-orange-100"
                       : "text-gray-700 hover:text-red-900"
                   }`}
                 >

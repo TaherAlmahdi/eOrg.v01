@@ -29,6 +29,7 @@ export const CONTENT_REGISTRY = {
     "folklore": "লোকগাথা",
     "history": "ইতিহাস",
     "story": "ছোটগল্প",
+    "stories": "গল্পগ্রন্থ",
     "essay": "প্রবন্ধ",
     "drama": "নাটক",
     "letters": "পত্রাবলী",
@@ -38,7 +39,8 @@ export const CONTENT_REGISTRY = {
     "social-novel": "সামাজিক উপন্যাস",
     "hinduism": "হিন্দুধর্ম",
     "philosophy": "দর্শন",
-    "science": "বিজ্ঞান"
+    "science": "বিজ্ঞান",
+    "islam": "ইসলাম"
   } as Record<string, string>,
 
   tags: {

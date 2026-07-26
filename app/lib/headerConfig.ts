@@ -67,7 +67,7 @@ export const headerConfig: Record<string, DomainConfig> = {
 
   // লাইব্রেরি সাবডোমেন (library.eduliture.org)
   library: {
-    siteName: "এডুলিচার লাইব্রেরি",
+    siteName: "এডুলিচার পাঠশালা",
     tagline: "একটি এডুলিচার বিশুদ্ধজ্ঞান প্রকল্প",
     logo: "/logo/library.png",
     favicon: "/favicon/library.ico",
