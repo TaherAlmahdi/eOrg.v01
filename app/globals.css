@@ -849,13 +849,3 @@ span.forty {
   margin: 0 27px;
 }
 
-/* mouse over link */
-
-a:hover {
-  color: hotpink;
-}
-
-
-.main ul, .main ul.disc {
-    list-style: none;
-}
