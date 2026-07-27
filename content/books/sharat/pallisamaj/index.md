@@ -1,5 +1,5 @@
 ---
-title: "পল্লীসমাজ"
+title: "পল্লী সমাজ"
 slug: "palli-samaj"
 author: "শরৎচন্দ্র চট্টোপাধ্যায়"
 type: "book_index"
