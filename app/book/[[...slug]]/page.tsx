@@ -9,6 +9,9 @@ import { notFound } from 'next/navigation';
 import { getSubdomainData, buildTabTitle } from '@/app/lib/get-site-data';
 import { parseNoteShortcodes } from '@/app/lib/parse-shortcodes';
 
+import BookCover from '@/app/components/BookCover';
+import BookDetails from '@/app/components/BookDetails';
+
 interface UnifiedPageProps {
   params: Promise<{
     slug?: string[];
@@ -35,12 +38,18 @@ interface VolumeItem {
   chapters?: ChapterItem[];
 }
 
+interface NoteItem {
+  id: string | number;
+  label: string;
+  text: unknown;
+}
+
 interface SplitPage {
   title?: string;
   subtitle?: string;
   pageNumber: number;
   contentHtml: string;
-  notes: any[];
+  notes: NoteItem[];
 }
 
 // সংখ্যা বাংলায় রূপান্তরের হেল্পার
@@ -56,7 +65,7 @@ export async function generateMetadata({ params }: UnifiedPageProps): Promise<Me
 
   if (slugSegments.length === 0) return { title: "বই পাওয়া যায়নি" };
 
-  let [bookSlug, volumeOrChapterSlug, chapterSlug] = slugSegments;
+  const [bookSlug, volumeOrChapterSlug, chapterSlug] = slugSegments;
 
   const headersList = await headers();
   const host = headersList.get('host');
@@ -114,7 +123,7 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
   const resolvedParams = await params;
   const resolvedSearchParams = await searchParams;
   
-  let rawSegments = resolvedParams.slug || [];
+  const rawSegments = resolvedParams.slug || [];
 
   if (rawSegments.length === 0) {
     notFound();
@@ -140,7 +149,7 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
     chapterSlug = pathWithoutPage[2];
   }
 
-  let book: BookDetail | null = await getBookBySlug(
+  const book: BookDetail | null = await getBookBySlug(
     bookSlug, 
     siteData.subdomain || 'library', 
     volumeOrChapterSlug, 
@@ -210,17 +219,17 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
 
   let activeSubtitle: string | undefined;
 
-      // বর্তমান md file-এর subtitle
-      const fileSubtitle = book.subtitle?.trim();
+  // বর্তমান md file-এর subtitle
+  const fileSubtitle = book.subtitle?.trim();
 
-      // nextpage title
-      const pageSubtitle = currentSubPageData?.title?.trim();
+  // nextpage title
+  const pageSubtitle = currentSubPageData?.title?.trim();
 
-      if (currentPageNum === 1) {
-        activeSubtitle = fileSubtitle;
-      } else {
-        activeSubtitle = pageSubtitle;
-      }
+  if (currentPageNum === 1) {
+    activeSubtitle = fileSubtitle;
+  } else {
+    activeSubtitle = pageSubtitle;
+  }
 
   // মূল পাতার বেস পাথ (পেজ নম্বর ছাড়া)
   const baseSegments = pageNumFromPath !== null ? rawSegments.slice(0, -1) : rawSegments;
@@ -307,7 +316,7 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
   const currentVolumeData = isVolumePage ? volumes.find((v) => v.id === volumeOrChapterSlug) : null;
   const volumeChapters = currentVolumeData?.chapters || [];
 
-  const rawTocOption = (book as any).toc;
+  const rawTocOption = (book as unknown as Record<string, unknown>).toc;
   const isExplicitTocTrue = rawTocOption === true || rawTocOption === 'true';
   const isExplicitTocFalse = rawTocOption === false || rawTocOption === 'false';
   const hasNoContent = !fullContent.trim();
@@ -318,13 +327,13 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
     !isExplicitTocFalse && 
     (isExplicitTocTrue || hasNoContent);
 
-    // 📌 কেবল বর্তমান ওপেন থাকা ফাইলের (.md) নোটিশ রিড করা
-    const rawNotice = book.rawFrontmatter?.notice;
+  // 📌 কেবল বর্তমান ওপেন থাকা ফাইলের (.md) নোটিশ রিড করা
+  const rawNotice = book.rawFrontmatter?.notice;
 
-    const pageNotice: string | null = 
-      (typeof rawNotice === 'string' && rawNotice.trim().length > 0)
-        ? rawNotice.trim()
-        : null;
+  const pageNotice: string | null = 
+    (typeof rawNotice === 'string' && rawNotice.trim().length > 0)
+      ? rawNotice.trim()
+      : null;
 
   return (
     <main className="bg-[#fdfcf8] min-h-screen">
@@ -509,85 +518,13 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
         {/* সাইডবার */}
         <aside className="order-2 col-span-1 px-3 py-4 space-y-4 lg:order-1 lg:col-span-3">
           <div className="space-y-4 lg:sticky lg:top-6">
-            {book.cover_image && (
-              <div className="flex justify-center p-0 bg-white border border-gray-100 rounded shadow-sm">
-                <img 
-                  src={book.cover_image} 
-                  alt={book.title} 
-                  className="object-cover w-full h-auto max-w-xs rounded-sm lg:max-w-full" 
-                />
-              </div>
-            )}
 
-            {/* মেটাডাটা বক্স */}
-            <div className="p-4 bg-white border border-gray-100 rounded shadow-sm font-tarunima">
-              <h3 className="pb-2 mb-3 font-bold tracking-wide text-red-900 uppercase border-b border-gray-200 text-md">
-                পুস্তক বিবরণী
-              </h3>
-              <div className="space-y-2 text-sm text-gray-800">
-                <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
-                  <span className="font-bold">বই</span>
-                  <span className="text-gray-400">:</span>
-                  <span>{book.title}</span>
-                </div>
-                <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
-                  <span className="font-bold">লেখক</span>
-                  <span className="text-gray-400">:</span>
-                  <span>{book.author}</span>
-                </div>
-                {book.pub_medium && (
-                  <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
-                    <span className="font-bold">প্রথম প্রকাশ</span>
-                    <span className="text-gray-400">:</span>
-                    <span>{book.pub_medium}</span>
-                  </div>
-                )}
-                {book.first_published && (
-                  <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
-                    <span className="font-bold">গ্রন্থরূপ</span>
-                    <span className="text-gray-400">:</span>
-                    <span>{toBengaliNumber(book.first_published)}</span>
-                  </div>
-                )}
-                {book.source_book && (
-                  <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
-                    <span className="font-bold">অনুস্মৃতি</span>
-                    <span className="text-gray-400">:</span>
-                    <span>{toBengaliNumber(book.source_book)}</span>
-                  </div>
-                )}
+            {/* ১. কভার ইমেজ শো/হাইড কমপোনেন্ট */}
+            
 
-                {book.genre && (
-                  <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
-                    <span className="font-bold">ঘরানা</span>
-                    <span className="text-gray-400">:</span>
-                    <span className="flex flex-wrap gap-x-1">
-                      {Array.isArray(book.genre) ? (
-                        book.genre.map((g: string, index: number) => {
-                          const linkObj = book.genre_links?.find((l: GenreLink) => l.name === g);
-                          const isLast = index === (book.genre as string[]).length - 1;
-                          return (
-                            <span key={index}>
-                              {linkObj ? (
-                                <Link href={linkObj.link} className="text-blue-600 hover:underline">
-                                  {toBengaliNumber(g)}
-                                </Link>
-                              ) : (
-                                toBengaliNumber(g)
-                              )}
-                              {!isLast && <span className="mr-1">,</span>}
-                            </span>
-                          );
-                        })
-                      ) : (
-                        toBengaliNumber(book.genre)
-                      )}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-
+            {/* ২. পুস্তক বিবরণী কমপোনেন্ট */}
+            <BookDetails book={book} />
+            
             {/* ডায়নামিক সূচিপত্র (ToC) */}
             <div className="p-3 bg-white border border-gray-100 rounded shadow-sm font-tarunima">
               <h3 className="pb-2 mb-3 font-bold text-red-900 border-b border-gray-200 text-md">
@@ -596,7 +533,8 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
               <TableOfContents 
                 structure={tocStructure} 
                 currentChapter={currentChapterSlug}
-                slug={bookSlug} 
+                slug={bookSlug}
+                bookTitle={book?.title} 
               />
             </div>
 

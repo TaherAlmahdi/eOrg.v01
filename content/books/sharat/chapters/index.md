@@ -1,6 +1,6 @@
 ---
 title: "পল্লীসমাজ"
-slug: "palli-samaj"
+slug: "pallisamaj"
 author: "শরৎচন্দ্র চট্টোপাধ্যায়"
 type: "book_index"
 subdomain: "library, sharat"

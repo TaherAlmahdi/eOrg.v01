@@ -1,45 +1,51 @@
 'use client';
-import { useState } from 'react';
-import { Book, Eye, EyeOff, List } from 'lucide-react';
 
-export default function BookCover({ coverImage, title }: { coverImage: string; title: string }) {
-  const [showCover, setShowCover] = useState(true);
+import { useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
+
+interface BookCoverProps {
+  coverImage?: string;
+  title: string;
+}
+
+export default function BookCover({ coverImage, title }: BookCoverProps) {
+  const [showCover, setShowCover] = useState(false);
 
   if (!coverImage) return null;
 
   return (
-    // items-start ব্যবহার করা হয়েছে যাতে প্রচ্ছদ হাইড হলেও কন্টেন্ট বাম দিকেই স্থির থাকে
-    <div className="flex flex-col items-start w-full">
-
-      {/* কন্ডিশনাল রেন্ডারিং */}
+    <div className="space-y-3 font-tarunima">
+      {/* ১. প্রচ্ছদ ছবির ফুল-ওয়াইড আলাদা বর্ডার কার্ড (উপরে থাকবে) */}
       {showCover && (
-        <div className="w-full flex justify-center transition-all duration-500 ease-in-out mb-2">
-          <img 
-            src={coverImage} 
-            alt={title} 
-            className="w-full max-w-sm lg:max-w-full h-auto object-contain shadow-sm" 
+        <div className="p-0 border border-gray-100 rounded shadow-sm overflow-hidden bg-white transition-all duration-300 ease-in-out">
+          <img
+            src={coverImage}
+            alt={title}
+            className="w-full h-auto block object-cover"
           />
         </div>
       )}
-      
-      {/* বইয়ের নাম এবং শো/হাইড বাটন ইনলাইনে */}
-      <div className="w-full flex items-center justify-between border-b border-red-300 pb-1">
-        <h3 className="text-md font-bold text-red-900 flex items-center gap-2">
-          <Book size={18} /> {title}
-        </h3>
 
-        {/* শো/হাইড কন্ট্রোল বাটন */}
+      {/* ২. হেডার ও টগল বাটনের আলাদা বক্স (নিচে থাকবে) */}
+      <div className="p-3 bg-white border border-gray-100 rounded shadow-sm flex items-center justify-between">
+        <span className="font-bold px-1 tracking-wide text-red-900 uppercase text-md">
+          পুস্তক বিবরণী
+        </span>
+        
         <button
+          type="button"
           onClick={() => setShowCover(!showCover)}
-          className="flex items-center gap-2 text-[14px] uppercase tracking-wider font-normal text-gray-400 hover:text-red-900 transition-colors shrink-0"
+          className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-red-900 transition-colors rounded bg-orange-50 hover:bg-orange-100"
         >
           {showCover ? (
             <>
-              <EyeOff size={14} /> প্রচ্ছদ লুকান
+              <EyeOff size={14} />
+              <span>প্রচ্ছদ লুকান</span>
             </>
           ) : (
             <>
-              <Eye size={14} /> প্রচ্ছদ দেখুন
+              <Eye size={14} />
+              <span>প্রচ্ছদ দেখুন</span>
             </>
           )}
         </button>
