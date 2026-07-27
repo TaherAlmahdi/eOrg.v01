@@ -587,11 +587,20 @@ export async function getBookBySlug(
             }
           }
 
+          // সাবটাইটেল এবং নোটিশ শুধুমাত্র নির্দিষ্ট ফাইলে থাকলে দেখাবে (Fallback ওভাররাইড বন্ধ করা হয়েছে)
+          const resolvedSubtitle = pageData.subtitle 
+            ? String(pageData.subtitle) 
+            : (targetNodeIndex === -1 && mainData.subtitle ? String(mainData.subtitle) : '');
+
+          const resolvedNotice = pageData.notice 
+            ? String(pageData.notice) 
+            : (targetNodeIndex === -1 && mainData.notice ? String(mainData.notice) : '');
+
           return {
             id: fileSlug,
             slug: fileSlug,
             title: mainData.title || 'শিরোনামহীন বই',
-            subtitle: pageData.subtitle || mainData.subtitle || '',
+            subtitle: resolvedSubtitle,
             meta_title: pageData.meta_title || mainData.meta_title || '',
             meta_description: pageData.meta_description || mainData.meta_description || '',
             author: mainData.author || 'অজ্ঞাত লেখক',
@@ -610,7 +619,7 @@ export async function getBookBySlug(
             cover_image: mainData.cover_image || mainData.cover || '',
             source_book: mainData.source_book || '',
             pub_medium: mainData.pub_medium ? String(mainData.pub_medium) : '',
-            notice: pageData.notice || mainData.notice ? String(pageData.notice || mainData.notice) : '',
+            notice: resolvedNotice,
             og_image: pageData.og_image || mainData.og_image || '',
             footnotes: pageData.footnotes || mainData.footnotes || [],
             chapter_title: pageData.chapter_title || currentChapTitle || '',

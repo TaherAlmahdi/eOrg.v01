@@ -461,15 +461,15 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
             {currentSubPageData?.notes && currentSubPageData.notes.length > 0 && (
               <div className="pt-4 mt-8 border-t-2 border-orange-200">
                 <h4 className="mb-2 text-xl font-bold text-red-900 font-tarunima">টিকা ও মন্তব্য</h4>
-                <ol className="flex flex-wrap ml-0 text-xs text-gray-700 list-outside not-prose gap-x-4 gap-y-2 md:text-sm">
+                <ol className="flex flex-wrap ml-0 text-xs text-gray-700 list-outside not-prose gap-x-2 gap-y-2 md:text-sm">
                   {currentSubPageData.notes.map((note) => (
                     <li 
                       key={note.id} 
                       id={`fn-${note.id}`} 
-                      className="flex-auto min-w-62.5 mb-1 border-t border-white/60 pt-1 text-justify"
+                      className="flex-auto min-w-62.5 mb-0 border-t border-white/60 pt-1 text-justify"
                     >
                       <span className="leading-normal text-gray-800">      
-                        <span className="font-semibold text-blue-600 font-tarunima">{note.label}.</span>
+                        <span className="font-normal text-blue-600 font-tarunima">{note.label}.</span>
                         <a 
                           href={`#fnref-${note.id}`} 
                           className="inline-block px-1 text-blue-500 transition-all hover:text-red-700 font-tarunima"
