@@ -40,7 +40,8 @@ export const CONTENT_REGISTRY = {
     "hinduism": "হিন্দুধর্ম",
     "philosophy": "দর্শন",
     "science": "বিজ্ঞান",
-    "islam": "ইসলাম"
+    "islam": "ইসলাম",
+    "psychological-novel": "মনস্তাত্ত্বিক উপন্যাস"
   } as Record<string, string>,
 
   tags: {
