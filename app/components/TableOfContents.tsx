@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { ChevronDown, ChevronRight, FileText, Folder } from 'lucide-react';
 
@@ -14,6 +14,9 @@ export default function TableOfContents({
   slug: string 
 }) {
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
+  
+  // ১. রেফারেন্স রাখার জন্য useRef
+  const activeItemRef = useRef<HTMLAnchorElement | null>(null);
 
   // কারেন্ট ভলিউম বা চ্যাপ্টার ওপেন রাখার স্টেট
   useEffect(() => {
@@ -24,6 +27,16 @@ export default function TableOfContents({
       }));
     }
   }, [structure?.currentVolume]);
+
+  // ২. এক্টিভ আইটেমটি নিজের ডিভের ভেতরে উপরে স্ক্রোল হওয়ার এফেক্ট
+  useEffect(() => {
+    if (activeItemRef.current) {
+      activeItemRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest', // এটি নিশ্চিত করে যে স্ক্রোলটি শুধু এই কন্টেইনারের ভেতরেই থাকবে
+      });
+    }
+  }, [currentChapter, openSections]);
 
   const toggleSection = (id: string) => {
     setOpenSections(prev => ({ ...prev, [id]: !prev[id] }));
@@ -51,6 +64,7 @@ export default function TableOfContents({
             return (
               <Link
                 key={meta.slug}
+                ref={isActive ? activeItemRef : null} // 👈 এক্টিভ হলে ref সেট হবে
                 href={`/book/${slug}/${meta.slug}`}
                 className={`flex items-center gap-1.5 text-sm py-1 px-1 rounded transition-colors ${
                   isActive 
@@ -69,6 +83,7 @@ export default function TableOfContents({
       {/* মূল আইটেমস (ভলিউম ও চ্যাপ্টার) */}
       {structure?.items?.map((vol: any) => { 
         const isVolume = vol.type === 'volume';
+        const isVolumeActive = vol.id === currentChapter || vol.slug === currentChapter;
 
         return (
           <div key={vol.id} className="pb-1 border-b border-gray-100 last:border-0">
@@ -77,12 +92,13 @@ export default function TableOfContents({
                 <div className="flex items-center justify-between w-full px-0 py-0 text-sm font-medium text-red-900 transition-all hover:bg-orange-50 group">
                   {/* ভলিউম নেম লিংক */}
                   <Link 
+                    ref={isVolumeActive ? activeItemRef : null} // 👈 ভলিউম এক্টিভ হলে ref সেট হবে
                     href={`/book/${slug}/${vol.id}`}
                     className="flex items-center gap-1.5 grow py-1"
                   >
                     <Folder size={16} className="text-orange-400" />
                     <span className="hover:underline underline-offset-4 decoration-orange-300">
-                      {vol.title} {/* 👈 সরাসরি vol.title প্রদর্শন করছে */}
+                      {vol.title}
                     </span>
                   </Link>
 
@@ -106,6 +122,7 @@ export default function TableOfContents({
                       return (
                         <Link
                           key={chap.slug || chap.id}
+                          ref={isActive ? activeItemRef : null} // 👈 চ্যাপ্টার এক্টিভ হলে ref সেট হবে
                           href={`/book/${slug}/${vol.id}/${chap.slug || chap.id}`}
                           className={`flex items-center gap-1 text-sm py-1 px-1 border-b border-red-300/30 transition-colors ${
                             isActive 
@@ -122,8 +139,9 @@ export default function TableOfContents({
                 )}
               </>
             ) : (
-              /* ডায়রেক্ট চ্যাপ্টার (যদি ভলিউম না থাকে) */
+              /* ডায়রেক্ট চ্যাপ্টার (যদি ভলিউম না থাকে) */
               <Link
+                ref={(vol.slug || vol.id) === currentChapter ? activeItemRef : null} // 👈 এক্টিভ হলে ref সেট হবে
                 href={`/book/${slug}/${vol.slug || vol.id}`}
                 className={`flex items-center gap-1 text-sm py-1 px-1 rounded transition-colors ${
                   (vol.slug || vol.id) === currentChapter 
