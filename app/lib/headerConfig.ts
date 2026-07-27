@@ -43,7 +43,7 @@ export const headerConfig: Record<string, DomainConfig> = {
           { label: "বিদ্যাসাগর রচনাবলী", url: "goto:vidyasagar:", icon: "BookMarked", desc: "ঈশ্বরচন্দ্র বিদ্যাসাগর রচিত সাহিত্য সংগ্রহ" },
           { label: "বঙ্কিম রচনাবলী", url: "goto:bankim:", icon: "BookMarked", desc: "বঙ্কিমচন্দ্র চট্টোপাধ্যায় রচিত সাহিত্য সংগ্রহ" },
           { label: "রবীন্দ্র রচনাবলী", url: "goto:rabindra:", icon: "BookMarked", desc: "রবীন্দ্রনাথ ঠাকুর রচিত সাহিত্য সংগ্রহ" },
-          { label: "শরৎ রচনাবলী", url: "goto:sharat:", icon: "BookMarked", desc: "শরৎচন্দ্র চট্টোপাধ্যায় রচিত সাহিত্য সংগ্রহ" },
+          { label: "শরৎ রচনাবলী", url: "goto:sarat:", icon: "BookMarked", desc: "শরৎচন্দ্র চট্টোপাধ্যায় রচিত সাহিত্য সংগ্রহ" },
           { label: "নজরুল রচনাবলী", url: "goto:nazrul:", icon: "BookMarked", desc: "কাজী নজরুল ইসলাম রচিত সাহিত্য সংগ্রহ" },
           { label: "জীবনানন্দ রচনাবলী", url: "goto:jibanananda:", icon: "BookMarked", desc: "জীবনানন্দ দাশ রচিত সাহিত্য সংগ্রহ" }
         ]
@@ -139,20 +139,23 @@ export const headerConfig: Record<string, DomainConfig> = {
     ]
   },
 
-  // শরৎ রচনাবলী সাবডোমেন (sharat.eduliture.org)
-  sharat: {
+  // শরৎ রচনাবলী সাবডোমেন (sarat.eduliture.org)
+  sarat: {
     siteName: "শরৎ রচনাবলী",
     tagline: "একটি এডুলিচার বিশুদ্ধজ্ঞান প্রকল্প",
-    logo: "/logo/sharat.png",
-    favicon: "/favicon/sharat.ico",
-    siteUrl: "https://sharat.eduliture.org",
+    logo: "/logo/sarat.png",
+    favicon: "/favicon/sarat.ico",
+    siteUrl: "https://sarat.eduliture.org",
     bgColor: "bg-[#fdfaff]", 
     themeColor: "purple",
     menu: [
-      { label: "আলয়", url: "goto:main:", icon: "Home", desc: "প্রধান ওয়েবসাইট" },
-      { label: "উপন্যাস সমগ্র", url: "/genre/novels", icon: "BookOpen", desc: "দেবদাস, চরিত্রহীন ও অন্যান্য উপন্যাস" },
-      { label: "ছোটগল্প", url: "/genre/stories", icon: "Feather", desc: "শরৎচন্দ্রের কালজয়ী গল্পসমূহ" },
-      { label: "প্রবন্ধ", url: "/genre/essays", icon: "History", desc: "সমাজ ও সাহিত্য বিষয়ক প্রবন্ধ" }
+      { label: "আলয়", url: "goto:sarat:", icon: "Home", desc: "রচনাবলী প্রবেশক" },
+      { label: "রচনাবলী", url: "/books", icon: "Book", desc: "শরৎচন্দ্রের সকল বই" },
+      { label: "উপন্যাস সমগ্র", url: "/genre/novel", icon: "BookOpen", desc: "শরৎচন্দ্রের সকল উপন্যাস" },
+      { label: "গল্প সমগ্র", url: "/genre/stories", icon: "Feather", desc: "শরৎচন্দ্রের গল্পসমূহ" },
+      { label: "প্রবন্ধাবলী", url: "/genre/essays", icon: "History", desc: "শরৎচন্দ্রের প্রবন্ধাবলী" },
+      { label: "শরৎ জীবনী", url: "/biography", icon: "User", desc: "শরৎচন্দ্রের জীবন ও কর্ম" },
+      { label: "এডুলিচার", url: "goto:main:", icon: "Home", desc: "প্রধান প্রবেশক" },      
     ]
   },
 

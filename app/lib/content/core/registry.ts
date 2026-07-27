@@ -14,7 +14,7 @@ export const CONTENT_REGISTRY = {
     "rabindranath-tagore": "রবীন্দ্রনাথ ঠাকুর",
     "kazi-nazrul-islam": "কাজী নজরুল ইসলাম",
     "jibananda-dash": "জীবনানন্দ দাশ",
-    "sharat-chandra-chattopadhyay": "শরৎচন্দ্র চট্টোপাধ্যায়",
+    "sarat-chandra-chattopadhyay": "শরৎচন্দ্র চট্টোপাধ্যায়",
   } as Record<string, string>,
 
   // English Slug -> Bengali Value

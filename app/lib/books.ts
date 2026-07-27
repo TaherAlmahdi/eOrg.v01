@@ -45,6 +45,7 @@ export interface Book {
   publishDate?: string;
   published?: string;
   first_published?: string | number;
+  publisher?: string;
   cover?: string;
   cover_image?: string;
   source_book?: string | number;
@@ -252,6 +253,7 @@ export async function getLibraryBooks(currentSubdomain?: string): Promise<{
             publishDate: data.published ? String(data.published) : (data.date ? String(data.date) : ''),
             published: data.published ? String(data.published) : '',
             first_published: data.first_published || '',
+            publisher: data.publisher ? String(data.publisher) : '',
             cover: data.cover || data.cover_image || '',
             cover_image: data.cover_image || data.cover || '',
             source_book: data.source_book || '',
@@ -587,7 +589,7 @@ export async function getBookBySlug(
             }
           }
 
-          // সাবটাইটেল এবং নোটিশ শুধুমাত্র নির্দিষ্ট ফাইলে থাকলে দেখাবে (Fallback ওভাররাইড বন্ধ করা হয়েছে)
+          // সাবটাইটেল এবং নোটিশ শুধুমাত্র নির্দিষ্ট ফাইলে থাকলে দেখাবে (Fallback ওভাররাইড বন্ধ করা হয়েছে)
           const resolvedSubtitle = pageData.subtitle 
             ? String(pageData.subtitle) 
             : (targetNodeIndex === -1 && mainData.subtitle ? String(mainData.subtitle) : '');
@@ -615,6 +617,7 @@ export async function getBookBySlug(
             publishDate: mainData.published ? String(mainData.published) : (mainData.date ? String(mainData.date) : ''),
             published: mainData.published ? String(mainData.published) : '',
             first_published: mainData.first_published || '',
+            publisher: mainData.publisher ? String(mainData.publisher) : '',
             cover: mainData.cover || mainData.cover_image || '',
             cover_image: mainData.cover_image || mainData.cover || '',
             source_book: mainData.source_book || '',

@@ -3,7 +3,7 @@ title: "পল্লীসমাজ"
 slug: "pallisamaj"
 author: "শরৎচন্দ্র চট্টোপাধ্যায়"
 type: "book_index"
-subdomain: "library, sharat"
+subdomain: "library, sarat"
 first_published: 1922
 published: 01/01/2026
 genre: ["সামাজিক উপন্যাস", "উপন্যাস"]

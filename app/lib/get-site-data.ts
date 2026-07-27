@@ -16,7 +16,7 @@ export const siteMap: Record<string, { title: string; image: string }> = {
     title: 'রবীন্দ্র রচনাবলী',
     image: 'tagore.jpg',
   },
-  sharat: {
+  sarat: {
     title: 'শরৎ রচনাবলী',
     image: 'bankim.jpg',
   },

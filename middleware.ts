@@ -1,3 +1,4 @@
+// middleware.ts
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
@@ -5,7 +6,7 @@ export function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
   const hostname = request.headers.get('host') || '';
 
-  // ১. ডোমেন থেকে পোর্ট সরিয়ে ফেলা (e.g., eduliture.org:3000 -> eduliture.org)
+  // ১. ডোমেন থেকে পোর্ট সরিয়ে ফেলা
   const hostWithoutPort = hostname.split(':')[0];
   const parts = hostWithoutPort.split('.');
 
@@ -13,24 +14,20 @@ export function middleware(request: NextRequest) {
 
   // ২. সাবডোমেন শনাক্তকরণ লজিক
   if (hostWithoutPort.includes('localhost')) {
-    // লোকালহোস্ট হ্যান্ডলিং (e.g., bankim.localhost)
     if (parts.length > 1 && parts[0] !== 'localhost') {
       subdomain = parts[0];
     }
   } else if (hostWithoutPort.endsWith('.vercel.app')) {
-    // ভার্সেল প্রিভিউ ডোমেন হ্যান্ডলিং
-    // e-org-v02-xxx.vercel.app টাইপ প্রিভিউ ইউআরএলে যেন ভুল সাবডোমেন না ধরে
     if (parts.length > 3 && !hostWithoutPort.includes('-projects')) {
       subdomain = parts[0];
     }
   } else {
-    // কাস্টম প্রডাকশন ডোমেন হ্যান্ডলিং (e.g., bankim.eduliture.org)
     if (parts.length > 2 && parts[0] !== 'www') {
       subdomain = parts[0];
     }
   }
 
-  // ৩. যদি সাবডোমেন না থাকে (অর্থাৎ মেইন ডোমেন/www)
+  // ৩. যদি সাবডোমেন না থাকে
   if (!subdomain) {
     return NextResponse.next();
   }
@@ -42,13 +39,22 @@ export function middleware(request: NextRequest) {
 
   const pathname = url.pathname;
 
-  // ৫. ডাইনামিক পাথম্যাপিং (লাইব্রেরি নাকি অথর সাবডোমেন)
-  // লুপ বা ডাবল প্রিফিক্স রোধ করতে নিশ্চিত করা
+  // ৫. ডাইনামিক পাথম্যাপিং
   if (subdomain === 'library') {
     if (!pathname.startsWith('/subdomains/library')) {
       url.pathname = `/subdomains/library${pathname === '/' ? '' : pathname}`;
     }
   } else {
+    // /biography রাউটের জন্য বিশেষ বাইপাস
+    if (pathname === '/biography') {
+      // এটি app/biography/page.tsx ব্যবহার করবে
+      return NextResponse.next({
+        request: {
+          headers: requestHeaders,
+        },
+      });
+    }
+
     if (!pathname.startsWith('/subdomains/author')) {
       url.pathname = `/subdomains/author/${subdomain}${pathname === '/' ? '' : pathname}`;
     }
@@ -63,16 +69,6 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * নিচের ফাইল, ডিরেক্টরি এবং এক্সটেনশনগুলোতে মিডলওয়্যার রান হবে না (Bypass/Skip করবে):
-     * - api (API রাউট)
-     * - _next/static, _next/image (Next.js এর অভ্যন্তরীণ ফাইল)
-     * - assets, images (আপনার পাবলিক অ্যাসেট ফোল্ডার)
-     * - favicon, favicon.ico, sw.js
-     * - robots.txt, sitemap.xml (SEO ফাইলসমূহ)
-     * - সমস্ত ইমেজ ও আইকন ফাইল এক্সটেনশন (.png, .jpg, .svg, ইত্যাদি)
-     */
     '/((?!api|_next/static|_next/image|assets|images|favicon|robots\\.txt|sitemap\\.xml|sw\\.js|.*\\.(?:ico|png|webp|svg|jpg|jpeg|gif)$).*)',
   ],
 };
-

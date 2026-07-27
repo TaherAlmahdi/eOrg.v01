@@ -129,8 +129,8 @@ export default async function RootLayout({
     currentDomainKey = 'bankim';
   } else if (hostname.includes('rabindra.localhost')) {
     currentDomainKey = 'rabindra';
-  } else if (hostname.includes('sharat.localhost')) {
-    currentDomainKey = 'sharat';
+  } else if (hostname.includes('sarat.localhost')) {
+    currentDomainKey = 'sarat';
   } else if (hostname.includes('nazrul.localhost')) {
     currentDomainKey = 'nazrul';
   } else if (hostname.includes('jibanananda.localhost')) {

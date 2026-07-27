@@ -61,6 +61,17 @@ export default function BookDetails({ book }: BookDetailsProps) {
             </div>
           )}
 
+          {/* প্রকাশক */}
+          {book.publisher && (
+            <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
+              <span className="font-bold">প্রকাশক</span>
+              <span className="text-gray-400">:</span>
+              <span>{book.publisher}</span>
+            </div>
+          )}
+
+
+
           {/* অনুস্মৃতি */}
           {book.source_book && (
             <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
