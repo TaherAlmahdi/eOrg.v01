@@ -62,8 +62,8 @@ export function parseNoteShortcodes(content: string): ParsedShortcodeResult {
       text: noteText,
     });
 
-    // HTML স্ট্রাকচারে ইনলাইন নোট রেন্ডার করা
-    const noteRefHtml = `<sup class="inline font-tarunima text-base ml-0.5 leading-none select-none"><a href="#fn-${currentId}" id="fnref-${currentId}" class="text-blue-600 hover:text-red-700 font-normal no-underline inline">[${label}]</a></sup>`;
+    // ✅ সংশোধন: class এর জায়গায় className ব্যবহার করা হয়েছে
+    const noteRefHtml = `<sup className="inline font-tarunima text-base ml-0.5 leading-none select-none"><a href="#fn-${currentId}" id="fnref-${currentId}" className="text-blue-600 hover:text-red-700 font-normal no-underline inline">[${label}]</a></sup>`;
     htmlString += noteRefHtml;
 
     // React Component পার্টসে পুশ করা
