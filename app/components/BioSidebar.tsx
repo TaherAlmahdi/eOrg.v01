@@ -49,7 +49,7 @@ export default function BioSidebar({ image, name, infoFields, children }: BioSid
       <div className="flex flex-col md:flex-row gap-6 items-start relative">
         {/* সাইডবার (এখন পুরোপুরি স্টিকি) */}
         {showSidebar && (
-          <aside className="w-full md:w-1/3 lg:w-1/4 shrink-0 transition-all duration-300 relative sticky top-6 self-start">
+          <aside className="w-full md:w-1/3 lg:w-1/4 shrink-0 transition-all duration-300 sticky top-6 self-start">
             {/* ডেস্কটপ টগল বাটন: সাইডবারের ডানপাশে (EyeOff) */}
             <button
               onClick={() => setShowSidebar(false)}
