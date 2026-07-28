@@ -55,6 +55,16 @@ export function middleware(request: NextRequest) {
       });
     }
 
+    // /about রাউটের জন্য বিশেষ বাইপাস
+    if (pathname === '/about') {
+      // এটি app/about/page.tsx ব্যবহার করবে
+      return NextResponse.next({
+        request: {
+          headers: requestHeaders,
+        },
+      });
+    }
+
     if (!pathname.startsWith('/subdomains/author')) {
       url.pathname = `/subdomains/author/${subdomain}${pathname === '/' ? '' : pathname}`;
     }

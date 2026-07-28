@@ -16,7 +16,7 @@ interface StoryItem {
 
 // MDX ফাইল থেকে ডাটা রিড করার ফাংশন
 async function getSuccessStories(): Promise<StoryItem[]> {
-  const targetDir = path.join(process.cwd(), 'content', 'pages', 'about');
+  const targetDir = path.join(process.cwd(), 'content', 'pages', 'sucsess');
   
   // যদি ফোল্ডারটি না থাকে তবে খালি অ্যারে রিটার্ন করবে
   if (!fs.existsSync(targetDir)) return [];

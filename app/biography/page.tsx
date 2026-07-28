@@ -1,5 +1,3 @@
-// app/biography/page.tsx
-
 import React from 'react';
 import fs from 'fs';
 import path from 'path';
@@ -9,7 +7,9 @@ import { notFound } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
+import { Metadata } from 'next';
 import BioSidebar, { InfoField } from '@/app/components/BioSidebar';
+import { getSubdomainData, buildTabTitle } from '@/app/lib/get-site-data';
 
 interface BioFrontmatter {
   title?: string;
@@ -33,9 +33,13 @@ interface BioFrontmatter {
   signature?: string;
   website?: string;
   website_name?: string;
+  meta_title?: string;
+  meta_description?: string;
+  og_image?: string;
   [key: string]: any;
 }
 
+// ১. সাবডোমেন বের করার হেল্পার
 async function getOnlySubdomain(): Promise<string | null> {
   const headersList = await headers();
   const host = headersList.get('host') || '';
@@ -53,6 +57,7 @@ async function getOnlySubdomain(): Promise<string | null> {
   return null; 
 }
 
+// ২. লোকাল ফাইল থেকে বায়োগ্রাফি ডাটা লোড করা
 function getBioData(subdomain: string | null) {
   if (!subdomain) return null;
 
@@ -70,41 +75,59 @@ function getBioData(subdomain: string | null) {
   };
 }
 
-export async function generateMetadata() {
+// ৩. 🏷️ Dynamic Metadata Export
+export async function generateMetadata(): Promise<Metadata> {
+  const headersList = await headers();
+  const host = headersList.get('host');
+  const siteData = getSubdomainData(host);
+
   const subdomain = await getOnlySubdomain();
-  const bioData = getBioData(subdomain);
-
-  const mainSiteTitle = "এডুলিটেরেচার"; // মেইন সাইটের নাম
-  
-  // ১. পেজ টাইটেল (Frontmatter-এর title বা name, না থাকলে ডিফল্ট 'জীবনী')
-  const pageTitle = bioData?.frontmatter.title || bioData?.frontmatter.name || 'জীবনী';
-  
-  // ২. কারেন্ট সাবডোমেন টাইটেল (Frontmatter-এর name অথবা Capitalized Subdomain)
-  const subdomainTitle = subdomain 
-    ? bioData?.frontmatter.name || (subdomain.charAt(0).toUpperCase() + subdomain.slice(1))
-    : 'জীবনী';
-
-  // পেজ টাইটেল - সাবডোমেন টাইটেল - মেইন সাইট টাইটেল
-  return {
-    title: `${pageTitle} | ${subdomainTitle} | ${mainSiteTitle}`,
-  };
-}
-
-export default async function BiographyPage() {
-  const subdomain = await getOnlySubdomain();
-
-  if (!subdomain) {
-    notFound();
-  }
-
   const bioData = getBioData(subdomain);
 
   if (!bioData) {
-    notFound();
+    return {
+      title: 'জীবনী খুঁজে পাওয়া যায়নি',
+    };
   }
 
-  const { frontmatter, content } = bioData;
+  const { frontmatter } = bioData;
+  const currentPageTitle = frontmatter.title || frontmatter.name || 'জীবনী';
 
+  // 💡 buildTabTitle দিয়ে প্রথম কোডের মতো টাইটেল জেনারেট করা হচ্ছে
+  const dynamicMetaTitle = buildTabTitle({
+    metaTitle: frontmatter.meta_title,
+    currentPageTitle: currentPageTitle,
+    siteName: siteData.title,
+  });
+
+  const description = frontmatter.meta_description || `${currentPageTitle}-এর জীবনী ও সংক্ষিপ্ত পরিচিতি।`;
+  const shareImage = frontmatter.og_image || frontmatter.image || siteData.ogImage;
+
+  return {
+    title: dynamicMetaTitle,
+    description: description,
+    openGraph: {
+      title: dynamicMetaTitle,
+      description: description,
+      images: shareImage ? [{ url: shareImage }] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: dynamicMetaTitle,
+      description: description,
+      images: shareImage ? [shareImage] : [],
+    },
+  };
+}
+
+// ৪. কন্টেন্ট রেন্ডারার কম্পোনেন্ট (UI Layout Component)
+function BiographyContent({ 
+  frontmatter, 
+  content 
+}: { 
+  frontmatter: BioFrontmatter; 
+  content: string 
+}) {
   const birthInfo = frontmatter.birth_date 
     ? `${frontmatter.birth_date}${frontmatter.birth_place ? ` (${frontmatter.birth_place})` : ''}` 
     : undefined;
@@ -154,7 +177,7 @@ export default async function BiographyPage() {
         name={frontmatter.name}
         infoFields={infoFields}
       >
-        <h1 className="text-xl md:text-2xl font-bold mb-6 border-b pb-3 font-tarunima text-gray-900 dark:text-gray-100">
+        <h1 className="title mb-6 border-b pb-3 font-tarunima text-gray-900 dark:text-gray-100">
           {frontmatter.title || frontmatter.name}
         </h1>
 
@@ -168,5 +191,27 @@ export default async function BiographyPage() {
         </div>
       </BioSidebar>
     </main>
+  );
+}
+
+// ৫. মেইন পেজ কম্পোনেন্ট (Server Page Controller)
+export default async function BiographyPage() {
+  const subdomain = await getOnlySubdomain();
+
+  if (!subdomain) {
+    notFound();
+  }
+
+  const bioData = getBioData(subdomain);
+
+  if (!bioData) {
+    notFound();
+  }
+
+  return (
+    <BiographyContent 
+      frontmatter={bioData.frontmatter} 
+      content={bioData.content} 
+    />
   );
 }
