@@ -13,7 +13,7 @@ genre: ["উপন্যাস", "সামাজিক উপন্যাস"]
 genre_links:
   - { name: "উপন্যাস", link: "/genre/novel" }
   - { name: "সামাজিক উপন্যাস", link: "/genre/social-novel" }
-cover_image: "/cover/krissna-charitra.webp"
+cover_image: "/cover/jiban-chariita.webp"
 meta_description: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়ের অনন্য সৃষ্টি 'কৃষ্ণচরিত্র'। মহাভারত ও পুরাণের তথ্য বিশ্লেষণের মাধ্যমে শ্রীকৃষ্ণের ঈশ্বরত্ব নয়, বরং আদর্শ মানুষ ও শ্রেষ্ঠ রাজনীতিবিদের রূপটি যুক্তিনিষ্ঠভাবে তুলে ধরা হয়েছে।"
 tags:
   [
