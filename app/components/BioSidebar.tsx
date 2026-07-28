@@ -46,10 +46,11 @@ export default function BioSidebar({ image, name, infoFields, children }: BioSid
         </button>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-6 items-start relative">
-        {/* সাইডবার (এখন পুরোপুরি স্টিকি) */}
+      {/* প্যারেন্ট ফ্লেক্স কন্টেইনার থেকে items-start তুলে দেওয়া হয়েছে যাতে sticky সঠিকভাবে স্ক্রল হাইট পায় */}
+      <div className="flex flex-col md:flex-row gap-6 relative">
+        {/* সাইডবার (ডেস্কটপে sticky, মোবাইলে নরমাল flow) */}
         {showSidebar && (
-          <aside className="w-full md:w-1/3 lg:w-1/4 shrink-0 transition-all duration-300 sticky top-6 self-start">
+          <aside className="w-full md:w-1/3 lg:w-1/4 shrink-0 transition-all duration-300 md:sticky md:top-6 self-start">
             {/* ডেস্কটপ টগল বাটন: সাইডবারের ডানপাশে (EyeOff) */}
             <button
               onClick={() => setShowSidebar(false)}
@@ -60,10 +61,10 @@ export default function BioSidebar({ image, name, infoFields, children }: BioSid
               <EyeOff size={14} />
             </button>
 
-            {/* মেইন কন্টেইনার: হালকা ব্যাকগ্রাউন্ড, রাউন্ডেড কর্নার এবং কোনো অতিরিক্ত বর্ডার ছাড়া */}
+            {/* মেইন কন্টেইনার */}
             <div className="bg-slate-80 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 rounded shadow-sm overflow-hidden">
               
-              {/* প্রধান ছবি: কোনো বর্ডার, প্যাডিং বা মার্জিন নেই */}
+              {/* প্রধান ছবি */}
               {image && (
                 <div className="w-full overflow-hidden border-b border-slate-200/80 dark:border-slate-700/60">
                   <img
@@ -74,7 +75,7 @@ export default function BioSidebar({ image, name, infoFields, children }: BioSid
                 </div>
               )}
 
-              {/* ইনফরমেশন এরিয়া: পরিমিত প্যাডিং দেওয়া হয়েছে */}
+              {/* ইনফরমেশন এরিয়া */}
               <div className="p-3 md:p-4">
                 <h2 className="text-lg font-bold mb-3 pb-1.5 border-b border-slate-200 dark:border-slate-700 text-gray-900 dark:text-white font-tarunima">
                   সংক্ষিপ্ত তথ্য
@@ -107,7 +108,7 @@ export default function BioSidebar({ image, name, infoFields, children }: BioSid
           </aside>
         )}
 
-        {/* সাইডবার হাইড অবস্থায় ডেস্কটপ টগল বাটন: কন্টেন্টের বাম পাশে সুন্দরভাবে পজিশন করা */}
+        {/* সাইডবার হাইড অবস্থায় ডেস্কটপ টগল বাটন */}
         {!showSidebar && (
           <button
             onClick={() => setShowSidebar(true)}
@@ -119,7 +120,7 @@ export default function BioSidebar({ image, name, infoFields, children }: BioSid
           </button>
         )}
 
-        {/* প্রধান কন্টেন্ট: সাইডবার হাইড হলে বামপাশে প্রয়োজনীয় প্যাডিং দেওয়া হয়েছে যাতে বাটন ও কন্টেন্ট গ গায়ে না লাগে */}
+        {/* প্রধান কন্টেন্ট */}
         <article className={`w-full ${showSidebar ? 'md:w-2/3 lg:w-3/4 md:pl-0' : 'w-full md:pl-3'} grow transition-all duration-300`}>
           {children}
         </article>
