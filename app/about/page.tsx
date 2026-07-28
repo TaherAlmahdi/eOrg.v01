@@ -77,7 +77,7 @@ export default async function AboutPage() {
   return (
     <>
       {/* ১. স্বাভাবিক হেডার কম্পোনেন্ট */}
-      <Header />
+  
 
       {/* ২. এমডি ফাইলের কন্টেন্ট রেন্ডার */}
       <main className="max-w-4xl mx-auto px-4 py-8">
