@@ -81,27 +81,29 @@ export default function BioSidebar({ image, name, infoFields, children }: BioSid
                   সংক্ষিপ্ত তথ্য
                 </h2>
 
-                <dl className="space-y-2.5 text-sm font-tarunima">
-                  {validFields.map((field, index) => (
-                    <div 
-                      key={index} 
-                      className="grid grid-cols-[1fr_auto_1.8fr] gap-x-2 gap-y-1 border-b border-slate-200/60 dark:border-slate-700/50 pb-2 last:border-0 items-baseline"
-                    >
-                      {/* ১. লেবেল কলাম */}
-                      <dt className="font-semibold text-gray-600 dark:text-gray-400">
-                        {field.label}
-                      </dt>
+                  <dl className="table w-full text-sm font-tarunima border-separate border-spacing-y-2.5">
+                    {validFields.map((field, index) => (
+                      <div 
+                        key={index} 
+                        className="table-row border-b border-slate-200/60 dark:border-slate-700/50"
+                      >
+                        {/* ১. লেবেল কলাম (সবচেয়ে বড় লেবেলের সাইজ অনুযায়ী সব রো সমান প্রস্থ পাবে) */}
+                        <dt className="table-cell whitespace-nowrap font-semibold text-gray-600 dark:text-gray-400 pr-2 pb-0">
+                          {field.label}
+                        </dt>
 
-                      {/* ২. আলাদা কোলন কলাম */}
-                      <span className="text-gray-500 dark:text-gray-400 select-none">:</span>
+                        {/* ২. আলাদা কোলন কলাম */}
+                        <span className="table-cell whitespace-nowrap text-gray-500 dark:text-gray-400 select-none pr-3 pb-0 align-top">
+                          :
+                        </span>
 
-                      {/* ৩. মান কলাম */}
-                      <dd className="text-gray-900 dark:text-gray-100 font-medium wrap-break-word min-w-0">
-                        {renderFieldValue(field)}
-                      </dd>
-                    </div>
-                  ))}
-                </dl>
+                        {/* ৩. মান কলাম (বাকি পুরো উইডথ নিবে ও লেখা বড় হলে একাধিক লাইনে র‍্যাপ হবে) */}
+                        <dd className="table-cell w-full text-gray-900 dark:text-gray-100 font-medium break-word pb-0 align-top">
+                          {renderFieldValue(field)}
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
               </div>
 
             </div>

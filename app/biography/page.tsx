@@ -74,16 +74,19 @@ export async function generateMetadata() {
   const subdomain = await getOnlySubdomain();
   const bioData = getBioData(subdomain);
 
-  const mainSiteTitle = "এডুলিটেরেচার"; // আপনার মেইন সাইটের নাম
+  const mainSiteTitle = "এডুলিটেরেচার"; // মেইন সাইটের নাম
+  
+  // ১. পেজ টাইটেল (Frontmatter-এর title বা name, না থাকলে ডিফল্ট 'জীবনী')
   const pageTitle = bioData?.frontmatter.title || bioData?.frontmatter.name || 'জীবনী';
   
-  // সাবডোমেন থেকে সাইটের নাম সুন্দর করে তৈরি করা (যেমন: bankim -> ব্যাংকিম)
-  const siteTitle = subdomain 
-    ? bioData?.frontmatter.name || subdomain.charAt(0).toUpperCase() + subdomain.slice(1) 
+  // ২. কারেন্ট সাবডোমেন টাইটেল (Frontmatter-এর name অথবা Capitalized Subdomain)
+  const subdomainTitle = subdomain 
+    ? bioData?.frontmatter.name || (subdomain.charAt(0).toUpperCase() + subdomain.slice(1))
     : 'জীবনী';
 
+  // পেজ টাইটেল - সাবডোমেন টাইটেল - মেইন সাইট টাইটেল
   return {
-    title: `${pageTitle} | ${siteTitle} | ${mainSiteTitle}`,
+    title: `${pageTitle} | ${subdomainTitle} | ${mainSiteTitle}`,
   };
 }
 
