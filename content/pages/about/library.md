@@ -1,5 +1,5 @@
 ---
-title: এডুলিচার পাঠশালা
+title: এডুলিচার পাঠশালার কথা
 slug: eduliture-library
 
 icon: "/favicon/library.ico"

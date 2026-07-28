@@ -38,6 +38,15 @@ export function middleware(request: NextRequest) {
   url.searchParams.set('subdomain', subdomain);
 
   const pathname = url.pathname;
+      // /about রাউটের জন্য বিশেষ বাইপাস
+    if (pathname === '/about') {
+      // এটি app/about/page.tsx ব্যবহার করবে
+      return NextResponse.next({
+        request: {
+          headers: requestHeaders,
+        },
+      });
+    }
 
   // ৫. ডাইনামিক পাথম্যাপিং
   if (subdomain === 'library') {
