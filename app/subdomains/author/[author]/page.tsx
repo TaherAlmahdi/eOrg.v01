@@ -23,7 +23,7 @@ export default async function AuthorHomePage({ params }: AuthorHomePageProps) {
     process.cwd(),
     'content',
     'pages',
-    'about',
+    'sucsess',
     `${author}.md`
   );
 
