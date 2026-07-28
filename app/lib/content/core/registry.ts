@@ -41,7 +41,11 @@ export const CONTENT_REGISTRY = {
     "philosophy": "দর্শন",
     "science": "বিজ্ঞান",
     "islam": "ইসলাম",
-    "psychological-novel": "মনস্তাত্ত্বিক উপন্যাস"
+    "psychological-novel": "মনস্তাত্ত্বিক উপন্যাস",
+    "childrens-literature": "শিশুসাহিত্য",
+    "fables": "নীতিকথা",
+    "translation": "অনুবাদ",
+    
   } as Record<string, string>,
 
   tags: {
