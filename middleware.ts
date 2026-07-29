@@ -39,8 +39,15 @@ export function middleware(request: NextRequest) {
   const pathname = url.pathname;
 
   // 🔴 গ্লোবাল বাইপাস: যেসব রাউট সব সাবডোমেনের জন্য সরাসরি মূল app/ রুট ব্যবহার করবে
-  // (এখানে /authors যুক্ত করা হয়েছে)
-  const globalBypassRoutes = ['/about', '/biography', '/genres', '/books', '/authors'];
+  // 🔹 সংশোধন: '/author' এবং '/authors' দুটিই যুক্ত করা হয়েছে
+  const globalBypassRoutes = [
+    '/about', 
+    '/biography', 
+    '/genres', 
+    '/books', 
+    '/book', 
+    '/authors', 
+  ];
 
   if (globalBypassRoutes.some(route => pathname.startsWith(route))) {
     return NextResponse.next({
@@ -50,7 +57,7 @@ export function middleware(request: NextRequest) {
     });
   }
 
-  // ৫. ডাইনামিক পাথম্যাপিং
+  // ৫. ডাইনামিক পাথম্যাপিং (শুধুমাত্র বাইপাস রাউট ব্যতীত অন্য সব পেজের জন্য)
   if (subdomain === 'library') {
     if (!pathname.startsWith('/subdomains/library')) {
       url.pathname = `/subdomains/library${pathname === '/' ? '' : pathname}`;

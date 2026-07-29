@@ -1,16 +1,16 @@
 ---
-title: "পল্লীসমাজ"
-slug: "pallisamaj"
-author: "শরৎচন্দ্র চট্টোপাধ্যায়"
+title: "বিন্দুর ছেলে"
+slug: "bindur-chele"
+author: "শরৎচন্দ্র চট্টোপাধ্যায়"
 type: "book_index"
 subdomain: "library, sarat"
 first_published: 1922
 published: 01/01/2026
-genre: ["সামাজিক উপন্যাস", "উপন্যাস"]
+genre: ["ছোটগল্প"]
 genre_links:
-  - { name: "সামাজিক উপন্যাস", link: "/genre/social-novel" }
-  - { name: "উপন্যাস", link: "/genre/novel" }
-cover_image: "/cover/palli-samaj.webp"
+  - { name: "ছোটগল্প", link: "/genre/short-story" }
+
+cover_image: "/cover/bindur-chele.webp"
 meta_description: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়ের কালজয়ী সামাজিক উপন্যাস 'কৃষ্ণকান্তের উইল'। গোবিন্দলাল, ভ্রমর ও রোহিণীর ত্রিভুজ প্রেমের জটিল মনস্তত্ত্ব এবং সামাজিক নৈতিকতার এক অনন্য আখ্যান।"
 tags:
   [
