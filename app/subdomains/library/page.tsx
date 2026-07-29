@@ -55,10 +55,10 @@ export default async function LibraryHomePage() {
 
   return (
     <div 
-      className="relative w-full h-auto bg-cover bg-center bg-no-repeat bg-fixed py-3 px-2 md:px-3 overflow-x-clip"
+      className="relative w-full h-auto bg-cover bg-center bg-no-repeat bg-fixed py-2 px-2 md:px-2 overflow-x-clip"
       style={{ backgroundImage: "url('/bg01.png')" }}
     >
-      <div className="px-4 py-6 space-y-16 font-tarunima">
+      <div className="px-2 py-3 space-y-16 font-tarunima">
         
         {/* 🆕 ১. নতুন বই সেকশন */}
         <section aria-labelledby="latest-books-heading">
@@ -73,7 +73,7 @@ export default async function LibraryHomePage() {
             {/* ডানপাশে সকল বইয়ের লিংক */}
             <Link 
               href="/books" 
-              className="text-sm font-medium text-emerald-600 hover:text-emerald-700 flex items-center gap-0.5 transition-colors group mb-1 font-sans"
+              className="text-sm font-medium font-tarunima text-emerald-600 hover:text-emerald-700 flex items-center gap-0.5 transition-colors group mb-1 font-sans"
             >
               সকল বই 
               <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
@@ -83,7 +83,7 @@ export default async function LibraryHomePage() {
           {sortedLatestBooks.length === 0 ? (
             <p className="text-sm text-slate-500 py-6">কোনো নতুন বই পাওয়া যায়নি।</p>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-6 gap-5">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-8 gap-3">
               {sortedLatestBooks.map((book) => {
                 const item = book as unknown as Record<string, unknown>;
                 const rawBookSlug = item.slug || book.id;
