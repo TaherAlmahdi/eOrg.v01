@@ -1,4 +1,3 @@
-// middleware.ts
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
@@ -38,15 +37,18 @@ export function middleware(request: NextRequest) {
   url.searchParams.set('subdomain', subdomain);
 
   const pathname = url.pathname;
-      // /about রাউটের জন্য বিশেষ বাইপাস
-    if (pathname === '/about') {
-      // এটি app/about/page.tsx ব্যবহার করবে
-      return NextResponse.next({
-        request: {
-          headers: requestHeaders,
-        },
-      });
-    }
+
+  // 🔴 গ্লোবাল বাইপাস: যেসব রাউট সব সাবডোমেনের জন্য সরাসরি মূল app/ রুট ব্যবহার করবে
+  // (এখানে /authors যুক্ত করা হয়েছে)
+  const globalBypassRoutes = ['/about', '/biography', '/genres', '/books', '/authors'];
+
+  if (globalBypassRoutes.some(route => pathname.startsWith(route))) {
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    });
+  }
 
   // ৫. ডাইনামিক পাথম্যাপিং
   if (subdomain === 'library') {
@@ -54,26 +56,6 @@ export function middleware(request: NextRequest) {
       url.pathname = `/subdomains/library${pathname === '/' ? '' : pathname}`;
     }
   } else {
-    // /biography রাউটের জন্য বিশেষ বাইপাস
-    if (pathname === '/biography') {
-      // এটি app/biography/page.tsx ব্যবহার করবে
-      return NextResponse.next({
-        request: {
-          headers: requestHeaders,
-        },
-      });
-    }
-
-    // /about রাউটের জন্য বিশেষ বাইপাস
-    if (pathname === '/about') {
-      // এটি app/about/page.tsx ব্যবহার করবে
-      return NextResponse.next({
-        request: {
-          headers: requestHeaders,
-        },
-      });
-    }
-
     if (!pathname.startsWith('/subdomains/author')) {
       url.pathname = `/subdomains/author/${subdomain}${pathname === '/' ? '' : pathname}`;
     }

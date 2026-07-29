@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import GenreList from '@/app/components/GenreList';
 import AuthorList from '@/app/components/AuthorList';
-import { Calendar, ChevronRight } from 'lucide-react';
+import { Calendar, ChevronRight, Layers, Users } from 'lucide-react';
 import { getLibraryBooks } from '../../lib/books';
 import { getSlug, getAuthorSlugFromTitle } from '../../lib/content/core/registry';
 
@@ -80,7 +80,7 @@ export default async function LibraryHomePage() {
                 const authorSlug = getAuthorSlug(item);
 
                 const responsiveVisibilityClass = 
-                  index >= 12 
+                  index >= 16 
                     ? "block sm:hidden xl:block"           
                     : index >= 8 
                       ? "block sm:hidden md:block"         
@@ -132,12 +132,28 @@ export default async function LibraryHomePage() {
 
         {/* ২. ঘরানা নির্ঘণ্ট সেকশন */}
         <section data-aos="fade-up" className="relative">
-          <GenreList />
+         <div className="flex justify-center mb-0 mt-5">
+          <div className="inline-flex items-center justify-center gap-3 px-8 py-5 rounded bg-teal-50/90 text-[#008080] mb-8 border border-teal-100 shadow-xs text-center backdrop-blur-md">
+            <Layers size={24} className="shrink-0 animate-pulse" />
+            <h1 className="text-xl md:text-2xl font-tarunima font-black text-gray-900 leading-none tracking-tight">
+              <span className="text-[#008080]">একনজরে</span> এডুলিচার <span className="text-[#cc7a00]">পাঠশালা</span>
+            </h1>
+          </div>
+        </div>
+          <GenreList limit={20} />
         </section>
 
         {/* ৩. লেখক নির্ঘণ্ট সেকশন */}
         <section data-aos="fade-down" className="relative">
-          <AuthorList />
+          <div className="flex justify-center mb-5 mt-5">
+            <div className="inline-flex items-center justify-center gap-3 px-8 py-5 rounded bg-teal-50/90 text-[#008080] border border-teal-100 shadow-xs text-center backdrop-blur-md">
+              <Users size={24} className="shrink-0 animate-pulse" />
+                <h1 className="text-xl md:text-2xl font-tarunima font-black text-gray-900 leading-none tracking-tight">
+                  <span className="text-[#008080]">সম্মানিত</span> লেখক <span className="text-[#cc7a00]">তালিকা</span>
+                </h1>
+              </div>
+          </div>
+            <AuthorList limit={20} />
         </section>
 
       </div>
