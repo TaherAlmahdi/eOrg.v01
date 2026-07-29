@@ -44,7 +44,7 @@ export default async function BooksPage() {
       </nav>
 
       {/* বইয়ের গ্রিড */}
-      <div className="max-w-8xl mx-auto py-3 px-3">
+      <div className="max-w-8xl mx-auto py-2 px-2">
         <div className="mb-2 border-b border-orange-200 pb-2">
           <h2 className="text-2xl text-center font-bold font-sabrina text-gray-800">গ্রন্থাগার</h2>
           <p className="text-gray-500 mt-2 text-center italic font-tarunima">
@@ -54,12 +54,12 @@ export default async function BooksPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-6 gap-2 border-b border-red-100">
+        <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-6 xl:grid-cols-8 gap-2 border-b border-red-100">
           {allBooks.map((book) => (
             <Link 
               key={book.slug} 
               href={`/book/${book.slug}`}
-              className="group flex flex-col h-full"
+              className="group font-tarunima flex flex-col h-full"
             >
               {/* কভার ইমেজ কার্ড */}
               <div className="relative aspect-2/3 overflow-hidden rounded shadow-lg bg-white border border-gray-100 transition-transform duration-300 group-hover:-translate-y-2 group-hover:shadow-2xl">
