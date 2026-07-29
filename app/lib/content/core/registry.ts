@@ -20,11 +20,12 @@ export const CONTENT_REGISTRY = {
   // English Slug -> Bengali Value
   genres: {
     "novel": "উপন্যাস",
-    "novella": "অনু-উপন্যাস", 
+    "novella": "উপন্যাসিকা", 
     "humor": "রম্য সাহিত্য",
     "religious": "ধর্মীয় সাহিত্য",
     "essays": "প্রবন্ধাবলী",
-    "poetry": "কবিতা",
+    "poetry": "কাব্য",
+    "poem": "কবিতা",
     "classic": "ধ্রুপদী সাহিত্য",
     "folklore": "লোকগাথা",
     "history": "ইতিহাস",
@@ -45,6 +46,7 @@ export const CONTENT_REGISTRY = {
     "childrens-literature": "শিশুসাহিত্য",
     "fables": "নীতিকথা",
     "translation": "অনুবাদ",
+    "supernatural-fiction": "অলৌকিক গল্প"
     
   } as Record<string, string>,
 

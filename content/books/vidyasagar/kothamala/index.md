@@ -8,12 +8,13 @@ first_published: 1856
 published: 28/09/2026
 notice: "এই পাতা মূল গ্রন্থের অন্তর্ভুক্ত নয়!"
 source_book: "চতুশ্চত্বারিংশ সংস্করণ; কলিকাতা, সংস্কৃত যন্ত্র; ১৯৪১ সংবৎ।"
-genre: ["শিশুসাহিত্য", "নীতিকথা", "অনুবাদ"]
+genre: ["শিশুসাহিত্য", "নীতিকথা", "অনুবাদ", "পাঠ্যপুস্তক"]
 
 genre_links:
   - { name: "শিশুসাহিত্য", link: "/genre/childrens-literature" }
   - { name: "নীতিকথা", link: "/genre/fables" }
   - { name: "অনুবাদ", link: "/genre/translation" }
+  - { name: "পাঠ্যপুস্তক", link: "/genre/textbook" }
 
 cover_image: "/cover/kothamala.webp"
 

@@ -83,7 +83,7 @@
   }
 
   .first::first-letter {
-    color: #a7373d;
+    color: inherit;
   }
 
   /* ----------------------------------
@@ -888,4 +888,70 @@ span.forty {
 .dark .info::before {
   background-color: #38bdf8;
   color: #0f172a;
+}
+
+
+/************* Modern CSS Grid / Flex Layout *************/
+
+/* ১. প্যারেন্ট অটো-কন্টেইনার (লেআউট ভেঙে যাওয়া সম্পূর্ণ রোধ করতে) */
+.fleft,
+.float-left,
+.fright,
+.float-right {
+  font-size: clamp(1rem, 1.2vw + 0.2rem, 1.2rem) !important;
+  line-height: 1.55;
+  color: var(--text-main);
+  box-sizing: border-box;
+  margin: 0.5rem 0;
+}
+
+/* ২. মোবাইল/ছোট স্ক্রিন (ডিফল্ট: ডানের ভাগ আগে আসবে) */
+.fleft,
+.float-left {
+  order: 2; /* মোবাইলে বামের ভাগটি নিচে থাকবে */
+  text-align: left;
+  width: 100%;
+}
+
+.fright,
+.float-right {
+  order: 1; /* মোবাইলে ডানের ভাগটি উপরে/প্রথমে থাকবে */
+  text-align: left;
+  width: 100%;
+}
+
+/* ৩. বড় স্ক্রিন (Tablet / Desktop - min-width: 640px) */
+@media (min-width: 640px) {
+  .fleft,
+  .float-left {
+    order: 1; /* বড় স্ক্রিনে সাধারণ নিয়ম অনুযায়ী বামে থাকবে */
+    float: left;
+    width: calc(50% - 0.75rem);
+    text-align: left;
+  }
+
+  .fright,
+  .float-right {
+    order: 2; /* বড় স্ক্রিনে ডানে থাকবে */
+    float: right;
+    width: calc(50% - 0.75rem);
+    text-align: right;
+  }
+}
+
+/* ৪. আধুনিক আইসোলেশন ও অটো-ক্লিনআপ (যাতে আগের ও পরের কোড কোনোভাবে না ভাঙে) */
+.fleft::after,
+.float-left::after,
+.fright::after,
+.float-right::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* প্যারেন্ট ডিভকে ডিসপ্লে ব্লক/ফ্লেক্স দিয়ে আইসোলেট করে ফেলা */
+.letter-footer {
+  display: flow-root; /* আধুনিক সিএসএস: এটি নিখুঁতভাবে সব ফ্লট ক্লিয়ার করে দেয় */
+  width: 100%;
+  margin-bottom: 1rem;
 }
