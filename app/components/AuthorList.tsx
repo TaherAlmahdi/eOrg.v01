@@ -70,7 +70,7 @@ const AuthorList = async () => {
             কোনো লেখকের তথ্য পাওয়া যায়নি।
           </div>
         ) : (
-          <div className="flex flex-wrap gap-3 justify-start items-stretch relative z-20 w-full">
+          <div className="flex flex-wrap md:gap-3 justify-start items-stretch relative z-20 w-full">
             {authors.map(({ slug, name, count }) => (
               <Link
                 key={slug}
@@ -79,7 +79,7 @@ const AuthorList = async () => {
               >
                 {/* বামপাশে লেখকের সিঙ্গেল ইউজার আইকন ও নাম */}
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="p-2.5 rounded-lg bg-orange-50 text-[#cc7a00] group-hover:bg-[#cc7a00] group-hover:text-white transition-colors duration-300 shrink-0">
+                  <div className="p-2.5 rounded bg-orange-50 text-[#cc7a00] group-hover:bg-[#cc7a00] group-hover:text-white transition-colors duration-300 shrink-0">
                     <User className="w-5 h-5 md:w-6 md:h-6 shrink-0" />
                   </div>
                   <h3 className="text-[#008080] group-hover:text-[#cc7a00] text-base md:text-lg font-semibold leading-snug font-tarunima truncate transition-colors">
@@ -88,7 +88,7 @@ const AuthorList = async () => {
                 </div>
 
                 {/* ডানপাশে রাইট এলাইন্ড গ্রন্থ সংখ্যা */}
-                <div className="text-right shrink-0 flex items-center gap-1.5 bg-teal-50 text-[#008080] border border-teal-100 px-3 py-1 rounded-full text-xs md:text-sm font-semibold">
+                <div className="text-right shrink-0 flex items-center gap-1.5 bg-teal-50 text-[#008080] border border-teal-100 px-3 py-1 rounded text-xs md:text-sm font-semibold">
                   <BookOpen size={14} className="shrink-0" />
                   <span>{toBengaliNumber(count)} টি</span>
                 </div>
