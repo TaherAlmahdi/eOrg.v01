@@ -8,13 +8,13 @@ first_published: 1873
 sn: 06
 source_book: "একাদশ পর্ষদ সংস্করণ, জ্যৈষ্ঠ ১‍৩৯১"
 notice: "এই পাতা মূল গ্রন্থের অন্তর্ভুক্ত নয়!"
-genre: ["সামাজিক উপন্যাস", "উপন্যাস", "অনু-উপন্যাস"]
+genre: ["সামাজিক উপন্যাস", "উপন্যাস", "উপন্যাসিকা"]
 genre_links:
   - name: "সামাজিক উপন্যাস"
     link: "/genre/social-novel"
   - name: "উপন্যাস"
     link: "/genre/novel"
-  - name: "অনু-উপন্যাস"
+  - name: "উপন্যাসিকা"
     link: "novella"
 cover_image: "/cover/indira.webp"
 

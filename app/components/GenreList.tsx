@@ -112,25 +112,25 @@ const getGenreIcon = (slug: string, rawText: string): FC<{ className?: string }>
 const toBengaliNumber = (num: number | string): string =>
   num.toString().replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[parseInt(d, 10)]);
 
-// 💡 যেকোনো অবজেক্ট থেকে `genre` এবং `genres` উভয় ফিল্ড এক্সট্র্যাক্ট করার সেফ ফাংশন
+// 💡 যেকোনো অবজেক্ট থেকে `genre` এবং `genres` উভয় ফিল্ড এক্সট্র্যাক্ট করার সেফ ফাংশন
 const parseGenreField = (item: any): string[] => {
   const result: string[] = [];
   if (!item) return result;
 
-  // ১. `genre` যদি স্ট্রিং হয়
+  // ১. `genre` যদি স্ট্রিং হয়
   if (typeof item.genre === 'string' && item.genre.trim()) {
     result.push(item.genre.trim());
   } 
-  // ২. `genre` যদি অ্যারে হয়
+  // ২. `genre` যদি অ্যারে হয়
   else if (Array.isArray(item.genre)) {
     item.genre.forEach((g: any) => typeof g === 'string' && g.trim() && result.push(g.trim()));
   }
 
-  // ৩. `genres` যদি স্ট্রিং হয়
+  // ৩. `genres` যদি স্ট্রিং হয়
   if (typeof item.genres === 'string' && item.genres.trim()) {
     result.push(item.genres.trim());
   } 
-  // ৪. `genres` যদি অ্যারে হয়
+  // ৪. `genres` যদি অ্যারে হয়
   else if (Array.isArray(item.genres)) {
     item.genres.forEach((g: any) => typeof g === 'string' && g.trim() && result.push(g.trim()));
   }
@@ -138,11 +138,11 @@ const parseGenreField = (item: any): string[] => {
   return result;
 };
 
-// 💡 রিকার্সিভ ও ব্যাপক স্ক্যানার: মূল বই ও ভিতরের সমস্ত সাব-আইটেম (গল্প, কবিতা, অধ্যায়) স্ক্যান করার জন্য
+// 💡 রিকার্সিভ ও ব্যাপক স্ক্যানার: মূল বই ও ভিতরের সমস্ত সাব-আইটেম (গল্প, কবিতা, অধ্যায়) স্ক্যান করার জন্য
 const collectAllGenresFromBook = (book: any): string[] => {
   const genreSet = new Set<string>();
 
-  // ১. মূল বইয়ের জনরা
+  // ১. মূল বইয়ের জনরা
   parseGenreField(book).forEach((g) => genreSet.add(g));
 
   // ২. সম্ভাব্য সমস্ত সাব-অ্যারে স্ট্রাকচার চেক করা
@@ -197,7 +197,7 @@ const GenreList = async () => {
     // একটি বই এবং তার ভিতরের সব পেজের সম্পূর্ণ জনরা কালেকশন
     const bookGenres = collectAllGenresFromBook(book);
 
-    // কোনো জনরা না পাওয়া গেলে ডিফল্ট
+    // কোনো জনরা না পাওয়া গেলে ডিফল্ট
     const finalGenres = bookGenres.length > 0 ? bookGenres : ['অন্যান্য'];
 
     // জনরা ম্যাপে গণনা যোগ
@@ -225,8 +225,8 @@ const GenreList = async () => {
     <div className="relative w-full h-auto overflow-x-clip">
       <div className="relative z-20 w-full max-w-none mx-auto">
         {/* টাইটেল হেডার */}
-        <div className="flex justify-center">
-          <div className="inline-flex items-center justify-center gap-3 px-5 py-2 rounded bg-teal-50/90 text-[#008080] mb-8 border border-teal-100 shadow-xs text-center backdrop-blur-md">
+        <div className="flex justify-center mb-0 mt-5">
+          <div className="inline-flex items-center justify-center gap-3 px-8 py-5 rounded bg-teal-50/90 text-[#008080] mb-8 border border-teal-100 shadow-xs text-center backdrop-blur-md">
             <Layers size={24} className="shrink-0 animate-pulse" />
             <h1 className="text-xl md:text-2xl font-tarunima font-black text-gray-900 leading-none tracking-tight">
               <span className="text-[#008080]">একনজরে</span> এডুলিচার <span className="text-[#cc7a00]">পাঠশালা</span>
@@ -235,10 +235,10 @@ const GenreList = async () => {
         </div>
 
         {/* ১. স্ট্যাটাস কার্ড */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-8 w-full">
-          <div className="flex items-center justify-between p-6 bg-white/90 backdrop-blur-md rounded-2xl border border-white/60 shadow-sm hover:shadow-md transition-all duration-300">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 mb-5 w-full p-2">
+          <div className="flex items-center justify-between p-6 bg-white/90 backdrop-blur-md rounded border border-white/60 shadow-sm hover:shadow-md transition-all duration-300">
             <div className="flex items-center gap-4">
-              <div className="p-3.5 rounded-xl bg-teal-50 text-[#008080] border border-teal-100/50">
+              <div className="p-3.5 rounded bg-teal-50 text-[#008080] border border-teal-100/50">
                 <Users size={32} className="shrink-0" />
               </div>
               <div>
@@ -250,9 +250,9 @@ const GenreList = async () => {
             </div>
           </div>
 
-          <div className="flex items-center justify-between p-6 bg-white/90 backdrop-blur-md rounded-2xl border border-white/60 shadow-sm hover:shadow-md transition-all duration-300">
+          <div className="flex items-center justify-between p-6 bg-white/90 backdrop-blur-md rounded border border-white/60 shadow-sm hover:shadow-md transition-all duration-300">
             <div className="flex items-center gap-4">
-              <div className="p-3.5 rounded-xl bg-amber-50 text-[#cc7a00] border border-amber-100/50">
+              <div className="p-3.5 rounded bg-amber-50 text-[#cc7a00] border border-amber-100/50">
                 <Library size={32} className="shrink-0" />
               </div>
               <div>
@@ -267,11 +267,12 @@ const GenreList = async () => {
 
         {/* ২. জনরা কার্ড কন্টেইনার */}
         {genres.length === 0 ? (
-          <div className="text-center p-8 bg-white/80 rounded-xl text-gray-600 w-full">
+          <div className="text-center p-8 bg-white/80 rounded text-gray-600 w-full">
             কোনো বই বা জনরা পাওয়া যায়নি।
           </div>
         ) : (
-          <div className="flex flex-wrap gap-3 justify-start items-stretch relative z-20 w-full">
+          /* p-0.5 এবং gap-2.5 দিয়ে দুপাশের সাইড-স্পেস কমানো হয়েছে */
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 p-2">
             {genres.map(({ slug, label, rawGenre, count }) => {
               const IconComponent = getGenreIcon(slug, rawGenre);
 
@@ -279,10 +280,11 @@ const GenreList = async () => {
                 <Link
                   key={slug}
                   href={`https://library.eduliture.org/genre/${slug}`}
-                  className="flex items-center justify-between gap-3 px-4 py-3 rounded mb-1 bg-white/90 text-[#008080] border border-teal-100 shadow-sm transition-all duration-300 backdrop-blur-sm hover:bg-teal-50 hover:shadow-lg hover:border-teal-300 hover:scale-[1.02] shrink-0 grow basis-full sm:basis-[calc(50%-0.75rem)] lg:basis-[calc(33.333%-0.75rem)] xl:basis-[calc(25%-0.75rem)] 2xl:basis-[calc(20%-0.75rem)] max-w-full group cursor-pointer overflow-hidden"
+                  /* basis-* ক্যালকুলেশনে মাইনাস মার্জিন কমানো হয়েছে যাতে দুপাশের কলাম স্ক্রিনের প্রান্তের কাছে যায় */
+                  className="flex items-center justify-between gap-2.5 px-3.5 py-3 rounded bg-white/90 text-[#008080] border border-teal-100 shadow-sm transition-all duration-300 backdrop-blur-sm hover:bg-teal-50 hover:shadow-lg hover:border-teal-300 hover:scale-[1.02] shrink-0 grow basis-full sm:basis-[calc(50%-0.35rem)] lg:basis-[calc(33.333%-0.45rem)] xl:basis-[calc(25%-0.5rem)] 2xl:basis-[calc(20%-0.5rem)] max-w-full group cursor-pointer"
                 >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="p-2.5 rounded-lg bg-orange-50 text-[#cc7a00] group-hover:bg-[#cc7a00] group-hover:text-white transition-colors duration-300 shrink-0">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="p-2.5 rounded bg-orange-50 text-[#cc7a00] group-hover:bg-[#cc7a00] group-hover:text-white transition-colors duration-300 shrink-0">
                       <IconComponent className="w-5 h-5 md:w-6 md:h-6 shrink-0" />
                     </div>
                     <h3 className="text-[#008080] group-hover:text-[#cc7a00] text-base md:text-lg font-semibold leading-snug font-tarunima truncate transition-colors">
@@ -290,7 +292,7 @@ const GenreList = async () => {
                     </h3>
                   </div>
 
-                  <div className="text-right shrink-0 flex items-center gap-1.5 bg-teal-50 text-[#008080] border border-teal-100 px-3 py-1 rounded-full text-xs md:text-sm font-semibold">
+                  <div className="text-right shrink-0 flex items-center gap-1.5 bg-teal-50 text-[#008080] border border-teal-100 px-2.5 py-1 rounded text-xs md:text-sm font-semibold">
                     <BookOpen size={14} className="shrink-0" />
                     <span>{toBengaliNumber(count)} টি</span>
                   </div>

@@ -6,11 +6,11 @@ slug: "yugalanguriya"
 first_published: 1874
 sn: 07
 notice: "এই পাতাটি মূল উপন্যাসের অংশ নয়!"
-genre: ["ঐতিহাসিক উপন্যাস", "উপন্যাস", "অনু-উপন্যাস"]
+genre: ["ঐতিহাসিক উপন্যাস", "উপন্যাস", "উপন্যাসিকা"]
 genre_links: 
   - { name: "ঐতিহাসিক উপন্যাস", link: "/genre/historical-novel" }
   - { name: "উপন্যাস", link: "/genre/novel" }
-  - { name: "অনু-উপন্যাস", link: "/genre/novella" }
+  - { name: "উপন্যাসিকা", link: "/genre/novella" }
 cover_image: "/cover/yugalangurya.webp"
 meta_title: "যুগলাঙ্গুরীয়"
 meta_description: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়ের ঐতিহাসিক অনু-উপন্যাস 'যুগলাঙ্গুরীয়'। হিরন্ময়ী ও পুরন্দরের বিরহ-মিলন এবং যুগল আংটির রহস্যময় আখ্যান। বঙ্গদর্শন পত্রিকায় প্রথম প্রকাশিত এই ধ্রুপদী সাহিত্যটি অনলাইনে পড়ুন।"
