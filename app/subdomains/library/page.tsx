@@ -73,7 +73,7 @@ export default async function LibraryHomePage() {
             {/* ডানপাশে সকল বইয়ের লিংক */}
             <Link 
               href="/books" 
-              className="text-sm font-medium font-tarunima text-emerald-600 hover:text-emerald-700 flex items-center gap-0.5 transition-colors group mb-1 font-sans"
+              className="text-sm font-medium font-tarunima text-emerald-600 hover:text-emerald-700 flex items-center gap-0.5 transition-colors group mb-1"
             >
               সকল বই 
               <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
@@ -83,7 +83,7 @@ export default async function LibraryHomePage() {
           {sortedLatestBooks.length === 0 ? (
             <p className="text-sm text-slate-500 py-6">কোনো নতুন বই পাওয়া যায়নি।</p>
           ) : (
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-8 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-8 gap-3">
               {sortedLatestBooks.map((book) => {
                 const item = book as unknown as Record<string, unknown>;
                 const rawBookSlug = item.slug || book.id;
@@ -139,7 +139,7 @@ export default async function LibraryHomePage() {
         </section>
 
         {/* 📚 ২. ঘরানা নির্ঘণ্ট সেকশন */}
-        <section data-aos="fade-down" className="relative pb-2">
+        <section data-aos="fade-up" className="relative pb-2">
           <div className="max-w-full mx-auto">
             <GenreList />
           </div>
