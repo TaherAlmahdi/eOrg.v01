@@ -568,7 +568,7 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
             <BookDetails book={book} />
             
             <div className="p-3 bg-white border border-gray-100 rounded shadow-sm font-tarunima">
-              <h3 className="pb-2 mb-3 font-bold text-red-900 border-b border-gray-200 text-md">
+              <h3 className="hidden pb-2 mb-3 font-bold text-red-900 border-b border-gray-200 text-md">
                 {book.title}
               </h3>
               <TableOfContents 
