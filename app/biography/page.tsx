@@ -93,11 +93,11 @@ export async function generateMetadata(): Promise<Metadata> {
   const { frontmatter } = bioData;
   const currentPageTitle = frontmatter.title || frontmatter.name || 'জীবনী';
 
-  // 💡 buildTabTitle দিয়ে প্রথম কোডের মতো টাইটেল জেনারেট করা হচ্ছে
+  // 🔹 siteTitle সরিয়ে siteName ব্যবহার করা হলো
   const dynamicMetaTitle = buildTabTitle({
     metaTitle: frontmatter.meta_title,
     currentPageTitle: currentPageTitle,
-    siteTitle: siteData?.siteTitle,
+    siteName: siteData?.title,
   });
 
   const description = frontmatter.meta_description || `${currentPageTitle}-এর জীবনী ও সংক্ষিপ্ত পরিচিতি।`;

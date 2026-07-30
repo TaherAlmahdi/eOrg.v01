@@ -8,7 +8,7 @@ import { buildTabTitle } from '@/app/lib/get-site-data';
 export async function generateMetadata(): Promise<Metadata> {
   const dynamicMetaTitle = buildTabTitle({
     currentPageTitle: 'লেখক',
-    siteTitle: 'এডুলিচার', // 👈 মূল সাইট টাইটেল ফিক্সড পাস করা হলো
+    siteName: 'এডুলিচার', // 👈 siteTitle বদলে siteName ব্যবহার করা হলো
   });
 
   return {

@@ -65,9 +65,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const displayAuthorName = authorName || fallbackName;
 
   // ১.৩ ডাইনামিক ট্যাব টাইটেল বিল্ড করা
+  // 🔹 siteTitle-এর বদলে siteName ব্যবহার করা হলো এবং siteData?.title পাস করা হলো
   const dynamicMetaTitle = buildTabTitle({
-    currentPageTitle: displayAuthorName,          // 👈 ডাইনামিক লেখকের নাম
-    siteTitle: siteData?.siteTitle || 'এডুলিচার', // 👈 ডাইনামিক সাইট টাইটেল (সাবডোমেন অনুযায়ী স্বয়ংক্রিয়ভাবে পরিবর্তিত হবে)
+    currentPageTitle: displayAuthorName,
+    siteName: siteData?.title || 'এডুলিচার',
   });
 
   return {

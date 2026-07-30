@@ -72,7 +72,7 @@ function getAboutData(subdomain: string): AboutData {
 }
 
 function extractToc(markdownContent: string): TocItem[] {
-  // মার্কডাউন (যেমন: ## Title) এবং HTML ট্যাগ (যেমন: <h2>Title</h2>) উভয়ই ম্যাচ করবে
+  // মার্কডাউন (যেমন: ## Title) এবং HTML ট্যাগ (যেমন: <h2>Title</h2>) উভয়ই ম্যাচ করবে
   const combinedRegex = /^(#{1,6})\s+(.+)$|<h([1-6])(?:\s+[^>]*)?>(.*?)<\/h\3>/gim;
 
   const toc: TocItem[] = [];
@@ -133,15 +133,16 @@ export async function generateMetadata(): Promise<Metadata> {
 
   const currentPageTitle = frontmatter.title || 'আমাদের সম্পর্কে';
 
+  // siteTitle সরিয়ে siteName ব্যবহার করা হলো
   const dynamicMetaTitle = buildTabTitle({
     metaTitle: frontmatter.meta_title,
     currentPageTitle,
-    siteTitle: siteData.siteTitle,
+    siteName: siteData.title,
   });
 
   const description =
     frontmatter.meta_description ||
-    `${siteData.siteTitle}-এর 'আমাদের সম্পর্কে' পেজ।`;
+    `${siteData.title}-এর 'আমাদের সম্পর্কে' পেজ।`;
 
   const shareImage = frontmatter.og_image || siteData.ogImage;
 
