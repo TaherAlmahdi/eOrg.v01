@@ -8,7 +8,7 @@ export default function TableOfContents({
   structure, 
   currentChapter, 
   slug,
-  bookTitle // বইয়ের নাম পাওয়ার জন্য নতুন প্রপ
+  bookTitle // বইয়ের নাম পাওয়ার জন্য প্রপ
 }: { 
   structure: any, 
   currentChapter?: string, 
@@ -155,7 +155,12 @@ export default function TableOfContents({
     <>
       {/* ১. ডেক্সটপ ভিউ: স্বাভাবিক সাইডবার */}
       <div className="hidden lg:block">
-        {renderTocContent()}
+        <div className="p-3 bg-white border border-gray-100 rounded shadow-sm font-tarunima">
+          <h3 className="pb-2 mb-3 font-bold text-red-900 border-b border-gray-200 text-md truncate">
+            {bookTitle || structure?.title || 'সূচিপত্র'}
+          </h3>
+          {renderTocContent()}
+        </div>
       </div>
 
       {/* ২. মোবাইল ভিউ: ভাসমান (Floating) বাটন */}
@@ -176,7 +181,7 @@ export default function TableOfContents({
               className="w-full max-w-lg p-4 bg-white rounded shadow-2xl max-h-[80vh] flex flex-col font-tarunima"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* ড্রয়ারের হেডার: এখানে সূচিপত্রের বদলে বইয়ের টাইটেল দেখানো হচ্ছে */}
+              {/* ড্রয়ারের হেডার */}
               <div className="flex items-center justify-between pb-3 mb-2 border-b border-gray-200">
                 <h3 className="font-bold text-red-900 text-md truncate pr-2">
                   {bookTitle || structure?.title || 'সূচিপত্র'}

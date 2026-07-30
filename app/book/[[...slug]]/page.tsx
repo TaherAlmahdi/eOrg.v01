@@ -513,29 +513,50 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
             )}
 
             {/* টিকা ও ফুটনোট সেকশন */}
+            
             {currentSubPageData?.notes && currentSubPageData.notes.length > 0 && (
-              <div className="pt-4 mt-8 border-t-2 border-orange-200">
-                <h4 className="mb-2 text-xl font-bold text-red-900 font-tarunima">টিকা ও মন্তব্য</h4>
-                <ol className="flex flex-wrap ml-0 text-xs text-gray-700 list-outside not-prose gap-x-2 gap-y-2 md:text-sm">
-                  {currentSubPageData.notes.map((note) => (
-                    <li 
-                      key={note.id} 
-                      id={`fn-${note.id}`} 
-                      className="flex-auto min-w-62.5 mb-0 border-t border-white/60 pt-1 text-justify"
-                    >
-                      <span className="leading-normal text-gray-800">      
-                        <span className="font-normal text-blue-600 font-tarunima">{note.label}.</span>
+              <div className="pt-6 mt-10 border-t-2 border-orange-200/80">
+                {/* হেডার */}
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="w-2 h-2 rounded-full bg-red-900"></span>
+                  <h4 className="text-lg md:text-xl font-bold text-red-900 font-tarunima">
+                    টিকা ও মন্তব্য
+                  </h4>
+                </div>
+
+                {/* টিকার তালিকা */}
+                <ol className="flex flex-wrap ml-0 text-xs text-gray-700 list-outside not-prose gap-x-2 gap-y-1 md:text-sm">
+                  {currentSubPageData.notes.map((note) => {
+                    const noteHtmlContent = typeof note.text === 'string' ? note.text : JSON.stringify(note.text);
+                    
+                    return (
+                      <li 
+                        key={note.id} 
+                        id={`fn-${note.id}`} 
+                        className="flex-auto min-w-62.5 p-3 bg-white/70 hover:bg-white not-prose rounded border border-orange-100 hover:border-orange-300 shadow-xs hover:shadow-md transition-all duration-200 text-xs md:text-sm text-gray-800 flex items-start gap-1 font-tarunima"
+                      >
+                        {/* ১. টিকার নম্বর ব্যাজ */}
+                        <span className="shrink-0 px-2 py-0.5 text-xs font-semibold text-blue-900 bg-blue-50 border border-blue-200/60 rounded transition-colors">
+                          {note.label}.
+                        </span>
+
+                        {/* 🎯 ২. লেবেলের ঠিক পাশে রিটার্ন এরো বাটন */}
                         <a 
                           href={`#fnref-${note.id}`} 
-                          className="inline-block px-1 text-blue-500 transition-all hover:text-red-700 font-tarunima"
-                          title="উপরে ফিরে যান"
+                          className="shrink-0 w-2 h-5 flex items-center justify-center text-blue-600 hover:text-red-700 hover:bg-red-50 rounded transition-all text-sm font-bold"
+                          title="উপরে পাঠ্যের টিকায় ফিরে যান"
                         >
                           ↑
-                        </a>      
-                        {typeof note.text === 'string' ? note.text : JSON.stringify(note.text)}
-                      </span>
-                    </li>
-                  ))}
+                        </a>
+
+                        {/* ৩. HTML রেন্ডারিং মূল টেক্সট (যেখানে ডানপাশের অতিরিক্ত প্যাডিং প্রয়োজন নেই) */}
+                        <div 
+                          className="flex-1 leading-relaxed text-justify markdown-body [&_a]:text-blue-600 [&_a]:underline hover:[&_a]:text-red-700"
+                          dangerouslySetInnerHTML={{ __html: noteHtmlContent }}
+                        />
+                      </li>
+                    );
+                  })}
                 </ol>
               </div>
             )}
@@ -567,17 +588,12 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
             
             <BookDetails book={book} />
             
-            <div className="hidden p-3 bg-white border border-gray-100 rounded shadow-sm font-tarunima">
-              <h3 className="pb-2 mb-3 font-bold text-red-900 border-b border-gray-200 text-md">
-                {book.title}
-              </h3>
-              <TableOfContents 
-                structure={tocStructure} 
-                currentChapter={currentChapterSlug}
-                slug={bookSlug}
-                bookTitle={book?.title} 
-              />
-            </div>
+            <TableOfContents 
+              structure={tocStructure} 
+              currentChapter={currentChapterSlug}
+              slug={bookSlug}
+              bookTitle={book?.title} 
+            />
           </div>
         </aside>
 
