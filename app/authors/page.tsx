@@ -1,25 +1,18 @@
 import Link from 'next/link';
 import { Home, Users } from "lucide-react";
-import { headers } from 'next/headers';
 import type { Metadata } from 'next';
-import AuthorList from "@/app/components/AuthorList"; // আপনার প্রজেক্টের সঠিক পাথ অনুযায়ী ইমপোর্ট করুন
+import AuthorList from "@/app/components/AuthorList";
+import { buildTabTitle } from '@/app/lib/get-site-data';
 
 // 🔹 ডাইনামিক মেটাডেটা ফাংশন
 export async function generateMetadata(): Promise<Metadata> {
-  const headersList = await headers();
-  const host = headersList.get('host') || '';
-
-  // সাবডোমেন বা হোস্টনেম অনুযায়ী সাইটের নাম ঠিক করার লজিক
-  let siteName = 'এডুলিচার';
-
-  if (host.includes('library.eduliture.org') || host.includes('library.')) {
-    siteName = 'এডুলিচার পাঠশালা';
-  } else if (host.includes('banglakosh.eduliture.org') || host.includes('banglakosh.')) {
-    siteName = 'বাংলাকোষ';
-  }
+  const dynamicMetaTitle = buildTabTitle({
+    currentPageTitle: 'লেখক',
+    siteTitle: 'এডুলিচার', // 👈 মূল সাইট টাইটেল ফিক্সড পাস করা হলো
+  });
 
   return {
-    title: `লেখক | ${siteName}`,
+    title: dynamicMetaTitle, // আউটপুট: "লেখক ❀ এডুলিচার"
   };
 }
 
@@ -48,7 +41,7 @@ export default async function AuthorsPage() {
 
       {/* লেখক সেকশন */}
       <div className="max-w-8xl mx-auto py-2 px-2">
-        {/* AuthorList কম্পোনেন্ট: কোনো limit না দেওয়ায় সব লেখক শো করবে */}
+        {/* AuthorList কম্পোনেন্ট */}
         <AuthorList sortBy="alphabetical" />
       </div>
     </main>

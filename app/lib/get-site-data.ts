@@ -1,4 +1,3 @@
-// ১. siteMap-এর সামনে 'export' যুক্ত করে দিন
 export const siteMap: Record<string, { title: string; image: string }> = {
   library: {
     title: 'এডুলিচার পাঠশালা',
@@ -30,7 +29,6 @@ export const siteMap: Record<string, { title: string; image: string }> = {
   },
 };
 
-// আপনার বিদ্যমান getSubdomainData ফাংশন
 export function getSubdomainData(host: string | null) {
   const mainDomainTitle = 'এডুলিচার';
   const defaultTitle = 'বিশুদ্ধজ্ঞানের শিক্ষা বিষয়ক প্রতিষ্ঠান';
@@ -59,7 +57,7 @@ export function getSubdomainData(host: string | null) {
   if (subdomain && siteMap[subdomain]) {
     const site = siteMap[subdomain];
     return {
-      title: `${site.title} ❀ ${mainDomainTitle}`,
+      title: `${site.title}`,
       ogImage: `/og/site/${site.image}`,
       subdomain,
     };
@@ -81,13 +79,12 @@ export function getSubdomainData(host: string | null) {
   };
 }
 
-// ২. ফাইলের নিচে এই নতুন হেলপার ফাংশনটি যুক্ত করে দিন
 interface DynamicTitleOptions {
   metaTitle?: string | null;
   currentPageTitle?: string | null;
   volumePageTitle?: string | null;
   bookTitle?: string | null;
-  siteName: string;
+  siteName?: string | null;
 }
 
 export function buildTabTitle({
@@ -97,18 +94,16 @@ export function buildTabTitle({
   bookTitle,
   siteName,
 }: DynamicTitleOptions): string {
-  // শর্ত ১: meta_title নির্দিষ্ট থাকলে সরাসরি সেটাই রিটার্ন করবে
   if (metaTitle) {
     return metaTitle;
   }
 
-  // শর্ত ২: কারেন্ট পেজ | ভলিউম পেজ | বুক পেজ | সাইট টাইটেল
   const titleParts = [
     currentPageTitle,
     volumePageTitle,
     bookTitle,
     siteName,
-  ].filter(Boolean); // null/undefined বাদ দেবে
+  ].filter(Boolean);
 
-  return titleParts.join(' | ');
+  return titleParts.join(' ❀ ');
 }

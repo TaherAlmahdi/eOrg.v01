@@ -1,4 +1,3 @@
-// app/layout.tsx
 import fs from 'fs';
 import path from 'path';
 import { headers } from 'next/headers';
@@ -70,13 +69,13 @@ export async function generateMetadata(): Promise<Metadata> {
   const defaultTitle = siteData?.title || 'এডুলিচার';
   const mainDomainTitle = 'এডুলিচার';
   const dynamicTitle = subdomain ? `${defaultTitle}` : mainDomainTitle;
-  const ogImageUrl = siteData?.ogImage || '/og/site/default.jpg';
+  const ogImageUrl = siteData?.ogImage || '/og/site/default.webp';
 
-  // ৫. টাইটেল টেমপ্লেট সহ রিটার্ন অবজেক্ট (সাব-পেজের ডাইনামিক টাইটেল সাপোর্ট করার জন্য)
+  // ৫. সঠিকভাবে টাইটেল টেমপ্লেট কনফিগারেশন
   return {
     title: {
-      template: `%s`,           // 👈 এটি থাকলে সাব-পেজের ডাইনামিক মেটা-টাইটেল সরাসরি ট্যাবে দেখাবে
-      default: dynamicTitle,    // 👈 রুট হোমপেজে এই ডিফল্ট টাইটেলটিই থাকবে
+      template: '%s',
+      default: dynamicTitle,
     },
     description: `${defaultTitle} ❀ বিশুদ্ধজ্ঞানের শিক্ষা বিষয়ক প্রতিষ্ঠান`,
     metadataBase: new URL(siteUrl),
@@ -113,28 +112,17 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const headersList = await headers();
-  const hostname = headersList.get('host') || '';
-
-  // সাবডোমেন স্ল্যাগ বের করা (যেমন: library, bankim ইত্যাদি)
-  let currentDomainKey = 'main';
+  const host = headersList.get('host') || '';
+  const hostname = host.split(':')[0];
   const parts = hostname.split('.');
-  
-  if (parts.length > 2 && parts[0] !== 'www' && parts[0] !== 'localhost') {
+
+  // ডাইনামিকভাবে সাবডোমেন বা ডোমেন কি এক্সট্র্যাক্ট করা
+  let currentDomainKey = 'main';
+
+  if (parts.length > 2 && parts[0] !== 'www') {
     currentDomainKey = parts[0]; 
-  } else if (hostname.includes('library.localhost')) {
-    currentDomainKey = 'library';
-  } else if (hostname.includes('vidyasagar.localhost')) {
-    currentDomainKey = 'vidyasagar';    
-  } else if (hostname.includes('bankim.localhost')) {
-    currentDomainKey = 'bankim';
-  } else if (hostname.includes('rabindra.localhost')) {
-    currentDomainKey = 'rabindra';
-  } else if (hostname.includes('sarat.localhost')) {
-    currentDomainKey = 'sarat';
-  } else if (hostname.includes('nazrul.localhost')) {
-    currentDomainKey = 'nazrul';
-  } else if (hostname.includes('jibanananda.localhost')) {
-    currentDomainKey = 'jibanananda';                
+  } else if (parts.length === 2 && hostname.includes('localhost') && parts[0] !== 'localhost') {
+    currentDomainKey = parts[0];
   }
 
   return (

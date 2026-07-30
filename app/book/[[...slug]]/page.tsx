@@ -9,7 +9,7 @@ import { notFound } from 'next/navigation';
 import { getSubdomainData, buildTabTitle } from '@/app/lib/get-site-data';
 import { parseNoteShortcodes } from '@/app/lib/parse-shortcodes';
 
-import BookCover from '@/app/components/BookCover';
+
 import BookDetails from '@/app/components/BookDetails';
 
 interface UnifiedPageProps {
@@ -19,11 +19,6 @@ interface UnifiedPageProps {
   searchParams: Promise<{
     page?: string;
   }>;
-}
-
-interface GenreLink {
-  name: string;
-  link: string;
 }
 
 interface ChapterItem {
@@ -58,14 +53,76 @@ const toBengaliNumber = (num?: number | string): string =>
     ? num.toString().replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[parseInt(d, 10)])
     : '';
 
+// 🔹 হেলপার: কন্টেন্ট থেকে সাব-পেজ বিভাজন পার্সিং
+function parseBookSubPages(fullContent: string): SplitPage[] {
+  if (!fullContent) return [];
+
+  const pageSegments = fullContent.split(/<!--\s*nextpage(?:\s+([\s\S]*?))?\s*-->/gi);
+  const splitPages: SplitPage[] = [];
+
+  // ১ম পেজ
+  const firstChunk = pageSegments[0] || '';
+  const parsedFirst = parseNoteShortcodes(firstChunk);
+  splitPages.push({
+    title: undefined,
+    pageNumber: 1,
+    contentHtml: parsedFirst.contentHtml,
+    notes: parsedFirst.notes,
+  });
+
+  // পরবর্তী পেজসমূহ
+  let pageCounter = 2;
+  for (let i = 1; i < pageSegments.length; i += 2) {
+    const pageTitle = pageSegments[i] ? pageSegments[i].trim() : undefined;
+    const pageBody = pageSegments[i + 1] || '';
+    const parsed = parseNoteShortcodes(pageBody);
+
+    splitPages.push({
+      title: pageTitle,
+      pageNumber: pageCounter,
+      contentHtml: parsed.contentHtml,
+      notes: parsed.notes,
+    });
+    pageCounter++;
+  }
+
+  return splitPages;
+}
+
+// 🔹 হেলপার: স্লাগ পাথ থেকে স্লাগ টিউন ও বর্তমান পেজ নম্বর বিশ্লেষণ
+function resolveRouteSegments(rawSegments: string[]) {
+  let bookSlug = rawSegments[0] || '';
+  let volumeOrChapterSlug = rawSegments[1] || '';
+  let chapterSlug = rawSegments[2] || '';
+  let pageNumFromPath: number | null = null;
+
+  const lastSegment = rawSegments[rawSegments.length - 1];
+
+  if (/^\d+$/.test(lastSegment) && rawSegments.length > 1) {
+    pageNumFromPath = parseInt(lastSegment, 10);
+    const pathWithoutPage = rawSegments.slice(0, -1);
+    bookSlug = pathWithoutPage[0] || '';
+    volumeOrChapterSlug = pathWithoutPage[1] || '';
+    chapterSlug = pathWithoutPage[2] || '';
+  }
+
+  return {
+    bookSlug,
+    volumeOrChapterSlug,
+    chapterSlug,
+    pageNumFromPath,
+  };
+}
+
 // 🏷️ Dynamic Metadata Export
-export async function generateMetadata({ params }: UnifiedPageProps): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: UnifiedPageProps): Promise<Metadata> {
   const resolvedParams = await params;
-  const slugSegments = resolvedParams.slug || [];
+  const resolvedSearchParams = await searchParams;
+  const rawSegments = resolvedParams.slug || [];
 
-  if (slugSegments.length === 0) return { title: "বই পাওয়া যায়নি" };
+  if (rawSegments.length === 0) return { title: "বই পাওয়া যায়নি" };
 
-  const [bookSlug, volumeOrChapterSlug, chapterSlug] = slugSegments;
+  const { bookSlug, volumeOrChapterSlug, chapterSlug, pageNumFromPath } = resolveRouteSegments(rawSegments);
 
   const headersList = await headers();
   const host = headersList.get('host');
@@ -80,22 +137,60 @@ export async function generateMetadata({ params }: UnifiedPageProps): Promise<Me
 
   if (!book) return { title: "বই পাওয়া যায়নি" };
 
-  // ভলিউম টাইটেল নির্ধারণ
-  const currentVolObj = (book.volumes as VolumeItem[])?.find(v => v.id === volumeOrChapterSlug);
-  const resolvedVolumeTitle = book.volume_title || book.currentVolumeTitle || currentVolObj?.volume_title || currentVolObj?.title || null;
+  // সাব-পেজ প্রসেসিং
+  const splitPages = parseBookSubPages(book.content || '');
+  let activePageIndex = 0;
+
+  if (pageNumFromPath !== null && pageNumFromPath > 0 && pageNumFromPath <= splitPages.length) {
+    activePageIndex = pageNumFromPath - 1;
+  } else if (resolvedSearchParams.page) {
+    const queryNum = parseInt(resolvedSearchParams.page, 10);
+    if (!isNaN(queryNum) && queryNum > 0 && queryNum <= splitPages.length) {
+      activePageIndex = queryNum - 1;
+    }
+  }
+
+  const currentSubPage = splitPages[activePageIndex];
+  const currentPageNum = activePageIndex + 1;
+
+  // খণ্ড ও চ্যাপ্টার রেজোলিউশন
+  const volumes: VolumeItem[] = (book.volumes as VolumeItem[]) || [];
+  const currentVolumeSlug = chapterSlug ? volumeOrChapterSlug : (volumes.length > 0 ? volumeOrChapterSlug : '');
+  const currentVolObj = volumes.find(v => v.id === currentVolumeSlug);
+  
+  const displayVolumeTitle = book.volume_title || book.currentVolumeTitle || currentVolObj?.volume_title || currentVolObj?.title || '';
   const resolvedChapterTitle = book.chapter_title || book.currentChapterTitle || null;
 
+  // সম্পূর্ণ পেজ টাইটেল চেইন গঠন
+  const titleParts: string[] = [];
+  
+  if (resolvedChapterTitle) {
+    titleParts.push(resolvedChapterTitle);
+  }
+  
+  if (displayVolumeTitle) {
+    titleParts.push(displayVolumeTitle);
+  }
+
+  if (currentSubPage?.title) {
+    titleParts.unshift(currentSubPage.title);
+  } else if (currentPageNum > 1) {
+    titleParts.push(`পাতা ${toBengaliNumber(currentPageNum)}`);
+  }
+
+  const pageDisplayTitle = titleParts.join(' ❀ ');
+
+  // 🎯 ট্যাব টাইটেল তৈরি
   const dynamicMetaTitle = buildTabTitle({
     metaTitle: book.meta_title,
-    currentPageTitle: resolvedChapterTitle,
-    volumePageTitle: resolvedVolumeTitle,
+    currentPageTitle: pageDisplayTitle || undefined,
     bookTitle: book.title,
-    siteName: siteData.title,
+    siteName: siteData?.title || 'এডুলিচার',
   });
 
   const description = book.meta_description || `${book.title} - একটি অমূল্য সৃষ্টি।`;
   const shareImage = book.og_image || book.cover_image || siteData.ogImage;
-  const currentPath = slugSegments.join('/');
+  const currentPath = rawSegments.join('/');
 
   return {
     title: dynamicMetaTitle,
@@ -133,21 +228,7 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
   const host = headersList.get('host');
   const siteData = getSubdomainData(host);
 
-  let bookSlug = rawSegments[0];
-  let volumeOrChapterSlug = rawSegments[1];
-  let chapterSlug = rawSegments[2];
-
-  let pageNumFromPath: number | null = null;
-  const lastSegment = rawSegments[rawSegments.length - 1];
-
-  // চেক করা হচ্ছে শেষ স্লাগটি পেজ নম্বর (/2, /3) কি না
-  if (/^\d+$/.test(lastSegment) && rawSegments.length > 1) {
-    pageNumFromPath = parseInt(lastSegment, 10);
-    const pathWithoutPage = rawSegments.slice(0, -1);
-    bookSlug = pathWithoutPage[0];
-    volumeOrChapterSlug = pathWithoutPage[1];
-    chapterSlug = pathWithoutPage[2];
-  }
+  const { bookSlug, volumeOrChapterSlug, chapterSlug, pageNumFromPath } = resolveRouteSegments(rawSegments);
 
   const book: BookDetail | null = await getBookBySlug(
     bookSlug, 
@@ -166,40 +247,11 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
   const currentChapterSlug = chapterSlug || (volumes.length === 0 ? volumeOrChapterSlug : '') || '';
 
   const currentVolObj = volumes.find(v => v.id === currentVolumeSlug);
-  const displayVolumeTitle = book.volume_title || book.currentVolumeTitle || currentVolObj?.volume_title || currentVolObj?.title || (currentVolumeSlug ? currentVolumeSlug.toUpperCase() : '');
+  const displayVolumeTitle = book.volume_title || book.currentVolumeTitle || currentVolObj?.volume_title || currentVolObj?.title || '';
   const displayChapterTitle = book.chapter_title || book.currentChapterTitle || '';
 
   // 📝 <!--nextpage--> পার্সিং
-  const fullContent = book.content || '';
-  const pageSegments = fullContent.split(/<!--\s*nextpage(?:\s+([\s\S]*?))?\s*-->/gi);
-  
-  const splitPages: SplitPage[] = [];
-  
-  // প্রথম অংশের কন্টেন্ট (Page 1)
-  const firstChunk = pageSegments[0] || '';
-  const parsedFirst = parseNoteShortcodes(firstChunk);
-  splitPages.push({
-    title: undefined,
-    pageNumber: 1,
-    contentHtml: parsedFirst.contentHtml,
-    notes: parsedFirst.notes,
-  });
-
-  // পরবর্তী পেজসমূহ
-  let pageCounter = 2;
-  for (let i = 1; i < pageSegments.length; i += 2) {
-    const pageTitle = pageSegments[i] ? pageSegments[i].trim() : undefined;
-    const pageBody = pageSegments[i + 1] || '';
-    const parsed = parseNoteShortcodes(pageBody);
-
-    splitPages.push({
-      title: pageTitle,
-      pageNumber: pageCounter,
-      contentHtml: parsed.contentHtml,
-      notes: parsed.notes,
-    });
-    pageCounter++;
-  }
+  const splitPages = parseBookSubPages(book.content || '');
 
   // বর্তমান সাব-পেজ নির্বাচন
   let activePageIndex = 0;
@@ -218,11 +270,7 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
   const totalSubPages = splitPages.length;
 
   let activeSubtitle: string | undefined;
-
-  // বর্তমান md file-এর subtitle
   const fileSubtitle = book.subtitle?.trim();
-
-  // nextpage title
   const pageSubtitle = currentSubPageData?.title?.trim();
 
   if (currentPageNum === 1) {
@@ -319,7 +367,7 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
   const rawTocOption = (book as unknown as Record<string, unknown>).toc;
   const isExplicitTocTrue = rawTocOption === true || rawTocOption === 'true';
   const isExplicitTocFalse = rawTocOption === false || rawTocOption === 'false';
-  const hasNoContent = !fullContent.trim();
+  const hasNoContent = !(book.content || '').trim();
 
   const shouldShowVolumeChapterList = 
     isVolumePage && 
@@ -327,9 +375,8 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
     !isExplicitTocFalse && 
     (isExplicitTocTrue || hasNoContent);
 
-  // 📌 কেবল বর্তমান ওপেন থাকা ফাইলের (.md) নোটিশ রিড করা
+  // 📌 নোটিশ রিড করা
   const rawNotice = book.rawFrontmatter?.notice;
-
   const pageNotice: string | null = 
     (typeof rawNotice === 'string' && rawNotice.trim().length > 0)
       ? rawNotice.trim()
@@ -401,39 +448,38 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
         {/* কন্টেন্ট সেকশন */}
         <section className="order-1 lg:order-2 col-span-1 lg:col-span-9 bg-[#fff2e6] p-3 md:p-6 shadow-sm min-h-screen">
           <header className="mb-6 text-center font-tarunima">
-            {/* বইয়ের নাম যদি খণ্ড বা চ্যাপ্টার থাকে */}
+            {/* ১. মূল বইয়ের নাম দেখাবে যদি আমরা কোনো খণ্ড বা পরিচ্ছেদে থাকি */}
             {(displayVolumeTitle || displayChapterTitle) && (
               <p className="mb-1 text-lg text-red-900 md:text-xl font-tarunima">{book.title}</p>
             )}
 
-            {/* ভলিউমের নাম */}
+            {/* ২. খণ্ডের শিরোনাম দেখাবে (যদি থাকে) */}
             {displayVolumeTitle && (
               <p className="mb-1 tracking-wide text-gray-600 uppercase text-md md:text-lg">
                 {displayVolumeTitle}
               </p>
             )}
 
-            {/* চ্যাপ্টারের নাম বা মূল টাইটেল */}
+            {/* ৩. প্রধান হেডার টাইটেল (পরিচ্ছেদের নাম, না থাকলে খণ্ডের নাম, তা না থাকলে বইয়ের নাম) */}
             <h1 className="mb-2 text-xl font-semibold text-gray-900 md:text-2xl font-sabrina">
-              {displayChapterTitle || (!displayVolumeTitle ? book.title : '')}
+              {displayChapterTitle || displayVolumeTitle || book.title}
             </h1>
 
-            {/* নেক্সটপেজের কাস্টম টাইটেল অথবা মূল সাবটাইটেল */}
+            {/* ৪. সাবটাইটেল */}
             {activeSubtitle && (
               <p className="mb-1 text-lg tracking-wide text-red-900 uppercase md:text-xl opacity-90">
                 {activeSubtitle}
               </p>
             )}
 
+            {/* ৫. লেখকের নাম */}
             <p className="text-lg font-medium text-red-900 font-tarunima">{book.author}</p>
             <div className="w-48 h-0.5 bg-red-900/40 mx-auto mt-3"></div>
           </header>
 
           <article className="leading-relaxed prose text-gray-900 lg:xl max-w-none font-tarunima">
-            {/* নোটিশ রেন্ডারিং (যদি শুধু এই চ্যাপ্টার/পাতায় থাকে) */}
             {pageNotice && <Notice message={pageNotice} />}
 
-            {/* মূল টেক্সট */}
             {currentSubPageData?.contentHtml && (
               <div 
                 className="space-y-4 markdown-body"
@@ -518,14 +564,9 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
         {/* সাইডবার */}
         <aside className="order-2 col-span-1 px-3 py-4 space-y-4 lg:order-1 lg:col-span-3">
           <div className="space-y-4 lg:sticky lg:top-6">
-
-            {/* ১. কভার ইমেজ শো/হাইড কমপোনেন্ট */}
             
-
-            {/* ২. পুস্তক বিবরণী কমপোনেন্ট */}
             <BookDetails book={book} />
             
-            {/* ডায়নামিক সূচিপত্র (ToC) */}
             <div className="p-3 bg-white border border-gray-100 rounded shadow-sm font-tarunima">
               <h3 className="pb-2 mb-3 font-bold text-red-900 border-b border-gray-200 text-md">
                 {book.title}
@@ -537,7 +578,6 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
                 bookTitle={book?.title} 
               />
             </div>
-
           </div>
         </aside>
 

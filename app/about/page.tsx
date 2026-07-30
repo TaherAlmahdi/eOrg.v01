@@ -15,7 +15,7 @@ interface AboutFrontmatter {
   meta_title?: string;
   meta_description?: string;
   og_image?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface AboutData {
@@ -26,7 +26,7 @@ interface AboutData {
 async function getOnlySubdomain(): Promise<string> {
   const headersList = await headers();
   const host = headersList.get('host') || '';
-  
+
   const hostWithoutPort = host.split(':')[0];
   const parts = hostWithoutPort.split('.');
 
@@ -36,8 +36,8 @@ async function getOnlySubdomain(): Promise<string> {
       return firstPart;
     }
   }
-  
-  return 'www'; 
+
+  return 'www';
 }
 
 function getAboutData(subdomain: string): AboutData {
@@ -61,7 +61,7 @@ function getAboutData(subdomain: string): AboutData {
 
     return {
       frontmatter: data as AboutFrontmatter,
-      content: content,
+      content,
     };
   } catch (error) {
     return {
@@ -72,28 +72,28 @@ function getAboutData(subdomain: string): AboutData {
 }
 
 function extractToc(markdownContent: string): TocItem[] {
-  // ১. মার্কডাউন (যেমন: ## Title) এবং ২. HTML ট্যাগ (যেমন: <h2 class="...">Title</h2>) উভয়ই ম্যাচ করবে
+  // মার্কডাউন (যেমন: ## Title) এবং HTML ট্যাগ (যেমন: <h2>Title</h2>) উভয়ই ম্যাচ করবে
   const combinedRegex = /^(#{1,6})\s+(.+)$|<h([1-6])(?:\s+[^>]*)?>(.*?)<\/h\3>/gim;
-  
+
   const toc: TocItem[] = [];
   const slugTracker: Record<string, number> = {};
-  let match;
+  let match: RegExpExecArray | null;
 
   while ((match = combinedRegex.exec(markdownContent)) !== null) {
     let level: number;
     let rawText: string;
 
     if (match[1]) {
-      // Markdown matching
+      // Markdown
       level = match[1].length;
       rawText = match[2];
     } else {
-      // HTML Tag matching (<h1-6>)
+      // HTML Tag
       level = parseInt(match[3], 10);
       rawText = match[4];
     }
 
-    // টেক্সট থেকে HTML ও Markdown ফরম্যাটিং স্ট্রিপ করা
+    // HTML ও Markdown ফরম্যাটিং স্ট্রিপ
     const cleanText = rawText
       .replace(/<[^>]*>/g, '')
       .replace(/[*_~`]/g, '')
@@ -125,7 +125,7 @@ function extractToc(markdownContent: string): TocItem[] {
 export async function generateMetadata(): Promise<Metadata> {
   const headersList = await headers();
   const host = headersList.get('host');
-  
+
   const siteData = getSubdomainData(host);
   const subdomain = await getOnlySubdomain();
 
@@ -135,28 +135,28 @@ export async function generateMetadata(): Promise<Metadata> {
 
   const dynamicMetaTitle = buildTabTitle({
     metaTitle: frontmatter.meta_title,
-    currentPageTitle: currentPageTitle,
-    siteName: siteData.title,
+    currentPageTitle,
+    siteTitle: siteData.siteTitle,
   });
 
   const description =
     frontmatter.meta_description ||
-    `${siteData.title || 'এডুলিচার'}-এর 'আমাদের সম্পর্কে' পেজ।`;
+    `${siteData.siteTitle}-এর 'আমাদের সম্পর্কে' পেজ।`;
 
   const shareImage = frontmatter.og_image || siteData.ogImage;
 
   return {
     title: dynamicMetaTitle,
-    description: description,
+    description,
     openGraph: {
       title: dynamicMetaTitle,
-      description: description,
+      description,
       images: shareImage ? [{ url: shareImage }] : [],
     },
     twitter: {
       card: 'summary_large_image',
       title: dynamicMetaTitle,
-      description: description,
+      description,
       images: shareImage ? [shareImage] : [],
     },
   };
@@ -169,23 +169,18 @@ export default async function AboutPage() {
 
   return (
     <main className="w-full px-4 py-8">
-      {/* 
-        ১. w-full দিয়ে পুরো স্ক্রিন বা কন্টেইনার ফুল-ওয়াইড করা হয়েছে।
-        ২. items-start বজায় রাখায় স্টিকি পজিশনিং কাজ করবে।
-      */}
       <div className="flex flex-col lg:flex-row gap-8 items-start w-full">
-        
-        {/* ডাইনামিক উইডথের বামপাশের সাইডবার */}
+        {/* টেবিল অফ কন্টেন্টস সাইডবার */}
         <TOCAbout items={tocItems} />
 
-        {/* ডানপাশের মূল কন্টেন্ট (অবশিষ্ট সম্পূর্ণ জায়গা নিয়ে থাকবে) */}
-        <article className="flex-1 w-full min-w-0 prose lg:prose-xl font-tarunima text-gray-900 dark:text-gray-100 max-w-none">
-          <h1 className="title mb-6 border-b pb-3 font-tarunima">
+        {/* মূল আর্টিকেলের কন্টেন্ট */}
+        <article className="flex-1 w-full min-w-0 font-tarunima text-gray-900 dark:text-gray-100 max-w-none">
+          <h1 className="title mb-6 border-b pb-3 text-3xl font-bold font-tarunima">
             {aboutData.frontmatter.title || 'আমাদের সম্পর্কে'}
           </h1>
 
           <div className="prose prose-lg dark:prose-invert max-w-none font-tarunima leading-relaxed text-gray-800 dark:text-gray-200">
-            <ReactMarkdown 
+            <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               rehypePlugins={[rehypeRaw, rehypeSlug]}
             >
@@ -193,7 +188,6 @@ export default async function AboutPage() {
             </ReactMarkdown>
           </div>
         </article>
-
       </div>
     </main>
   );

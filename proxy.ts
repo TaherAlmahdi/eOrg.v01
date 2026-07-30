@@ -1,7 +1,9 @@
+// proxy.ts
+
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const url = request.nextUrl.clone();
   const hostname = request.headers.get('host') || '';
 
@@ -39,7 +41,6 @@ export function middleware(request: NextRequest) {
   const pathname = url.pathname;
 
   // 🔴 গ্লোবাল বাইপাস: যেসব রাউট সব সাবডোমেনের জন্য সরাসরি মূল app/ রুট ব্যবহার করবে
-  // 🔹 সংশোধন: '/author' এবং '/authors' দুটিই যুক্ত করা হয়েছে
   const globalBypassRoutes = [
     '/about', 
     '/biography', 

@@ -97,7 +97,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const dynamicMetaTitle = buildTabTitle({
     metaTitle: frontmatter.meta_title,
     currentPageTitle: currentPageTitle,
-    siteName: siteData.title,
+    siteTitle: siteData?.siteTitle,
   });
 
   const description = frontmatter.meta_description || `${currentPageTitle}-এর জীবনী ও সংক্ষিপ্ত পরিচিতি।`;

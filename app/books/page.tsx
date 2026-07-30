@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Home } from "lucide-react";
 import { headers } from 'next/headers';
+import { Metadata } from 'next';
 import { getSubdomainData } from '@/app/lib/get-site-data';
 import { getAllBooks } from '@/app/lib/books'; // আপনার lib/books.ts থেকে হেল্পার
 
@@ -13,9 +14,25 @@ const toBengaliNumber = (num: number | string) => {
   return num.toString().replace(/\d/g, (digit) => englishToBengali[digit] || digit);
 };
 
-export const metadata = {
-  title: 'লাইব্রেরি | সকল বইয়ের তালিকা',
-};
+// 🏷️ ডাইনামিক মেটাডেটা প্রসেসিং (সাইটের নাম পাইপ সেপারেটর সহ যুক্ত করবে)
+export async function generateMetadata(): Promise<Metadata> {
+  const headersList = await headers();
+  const host = headersList.get('host');
+  const siteData = getSubdomainData(host);
+
+  const siteName = siteData?.title || 'এডুলিচার';
+  const pageTitle = `গ্রন্থাগার | ${siteName}`;
+
+  return {
+    title: pageTitle,
+    openGraph: {
+      title: pageTitle,
+    },
+    twitter: {
+      title: pageTitle,
+    }
+  };
+}
 
 export default async function BooksPage() {
   // ১. বর্তমান সাবডোমেন সনাক্তকরণ
@@ -24,10 +41,10 @@ export default async function BooksPage() {
   const siteData = getSubdomainData(host);
   const currentSubdomain = siteData.subdomain || 'library';
 
-  // ২. সেন্ট্রাল হেল্পার থেকে সাবডোমেন অনুযায়ী বই ফেচ করা
+  // ২. সেন্ট্রাল হেল্পার থেকে সাবডোমেন অনুযায়ী বই ফেচ করা
   const booksData = await getAllBooks(currentSubdomain);
 
-  // ৩. বাংলা শিরোনাম অনুযায়ী বর্ণানুক্রমিক (A-Z / অ-হ) সাজানো
+  // ৩. বাংলা শিরোনাম অনুযায়ী বর্ণানুক্রমিক (A-Z / অ-হ) সাজানো
   const allBooks = [...booksData].sort((a, b) => 
     (a.title || '').localeCompare(b.title || '', 'bn')
   );
@@ -46,7 +63,9 @@ export default async function BooksPage() {
       {/* বইয়ের গ্রিড */}
       <div className="max-w-8xl mx-auto py-2 px-2">
         <div className="mb-2 border-b border-orange-200 pb-2">
-          <h2 className="text-2xl text-center font-bold font-sabrina text-gray-800">গ্রন্থাগার</h2>
+          <h2 className="text-2xl text-center font-bold font-sabrina text-[#996633]">
+             {siteData?.title || 'এডুলিচার'} গ্রন্থাগার
+          </h2>
           <p className="text-gray-500 mt-2 text-center italic font-tarunima">
             {allBooks.length > 0 
               ? `মোট ${toBengaliNumber(allBooks.length)}টি বই রয়েছে; আপনার পছন্দের বইটি বেছে নিন` 

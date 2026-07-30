@@ -193,4 +193,4 @@ export const headerConfig: Record<string, DomainConfig> = {
       { label: "প্রকল্প পরিচয়", url: "/about", icon: "Info", desc: "বিশুদ্ধজ্ঞান প্রকল্পের লক্ষ্য ও উদ্দেশ্য", color: "gray" }
     ]
   }
-};
+}; 
