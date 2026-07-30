@@ -62,7 +62,7 @@
   ul,
   ul.none {
     /* স্ক্রিনের সাইজ অনুযায়ী ফন্ট স্কেল হবে (সর্বনিম্ন 1.15rem থেকে সর্বোচ্চ 1.85rem) */
-    font-size: clamp(1rem, 1.2vw + 0.2rem, 1.2rem) !important;
+    font-size: clamp(1rem, 1.2vw + 0.2rem, 1.3rem) !important;
     line-height: 1.55;
     color: var(--text-main);
   }
@@ -154,7 +154,7 @@
   /* ----------------------------------
      ঘ. কবিতা ও শ্লোক (Poem Class)
      ---------------------------------- */
-  .not-prose .poem,
+  .prose .poem,
   .poem {
     display: block !important;
     width: fit-content !important;
@@ -363,26 +363,26 @@
   /* ----------------------------------
      জ. নোট ও ফুটনোট ওভাররাইড
      ---------------------------------- */
-  .not-prose .right,
-  .not-prose .poem,
-  .not-prose .first,
-  .not-prose .pc,
-  .not-prose .normal {
-    font-size: inherit !important;
-    color: inherit !important;
-    text-align: inherit;
-  }
 
   ol.not-prose .right,
   ol.not-prose .pc,
   ol.not-prose .first,
   ol.not-prose .normal,
   ol.not-prose .poem {
-    color: #374151 !important;
     font-size: inherit !important;
     margin: 0 !important;
     padding: 0 !important;
   }
+
+  ol.not-prose .poem {
+  display: table !important;
+  width: fit-content !important;
+  max-width: 95% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  text-align: left; /* কবিতার লাইনগুলোর বাম দিক সোজা রাখার জন্য */
+}
+
 
   .not-prose .right {
     display: block !important;
