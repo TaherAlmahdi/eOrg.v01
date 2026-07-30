@@ -446,8 +446,9 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
       <div className="grid max-w-full grid-cols-1 gap-0 mx-auto lg:grid-cols-12">
         
         {/* কন্টেন্ট সেকশন */}
-        <section className="order-1 lg:order-2 col-span-1 lg:col-span-9 bg-[#fff2e6] p-3 md:p-6 shadow-sm min-h-screen">
-          <header className="mb-6 text-center font-tarunima">
+
+        <section className="order-1 lg:order-2 col-span-1 lg:col-span-9 bg-[#fff2e6] shadow-sm min-h-screen">
+          <header className="mb-6 text-center font-tarunima bg-[#f0f0f5] p-3 md:p-6">
             {/* ১. মূল বইয়ের নাম দেখাবে যদি আমরা কোনো খণ্ড বা পরিচ্ছেদে থাকি */}
             {(displayVolumeTitle || displayChapterTitle) && (
               <p className="mb-1 text-lg text-red-900 md:text-xl font-tarunima">{book.title}</p>
@@ -477,7 +478,7 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
             <div className="w-48 h-0.5 bg-red-900/40 mx-auto mt-3"></div>
           </header>
 
-          <article className="leading-relaxed prose text-gray-900 lg:xl max-w-none font-tarunima">
+          <article className="leading-relaxed prose text-gray-900 lg:xl max-w-none p-3 md:px-6 md:py-3 font-tarunima">
             {pageNotice && <Notice message={pageNotice} />}
 
             {currentSubPageData?.contentHtml && (
@@ -533,10 +534,10 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
                       <li 
                         key={note.id} 
                         id={`fn-${note.id}`} 
-                        className="flex-auto min-w-62.5 p-3 bg-white/70 hover:bg-white not-prose rounded border border-orange-100 hover:border-orange-300 shadow-xs hover:shadow-md transition-all duration-200 text-xs md:text-sm text-gray-800 flex items-start gap-1 font-tarunima"
+                        className="flex-auto min-w-62.5 p-2 bg-white/70 hover:bg-white not-prose rounded border border-orange-100 hover:border-orange-300 shadow-xs hover:shadow-md transition-all duration-200 text-xs md:text-sm text-gray-800 flex items-start gap-1 font-tarunima"
                       >
                         {/* ১. টিকার নম্বর ব্যাজ */}
-                        <span className="shrink-0 px-2 py-0.5 text-xs font-semibold text-blue-900 bg-blue-50 border border-blue-200/60 rounded transition-colors">
+                        <span className="shrink-0 px-1 py-0.5 text-xs font-semibold text-blue-900 bg-blue-50 border border-blue-200/60 rounded transition-colors">
                           {note.label}.
                         </span>
 
@@ -563,7 +564,7 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
           </article>
 
           {/* 🧭 স্মার্ট নেভিগেশন বাটন */}
-          <div className="flex items-center justify-between pt-4 mt-8 border-t border-orange-200 font-tarunima">
+          <div className="flex items-center justify-between p-3 md:p-6 mt-8 border-t border-orange-200 font-tarunima">
             <Link 
               href={prevActionLink} 
               className="bg-red-900 text-white px-4 py-2 rounded font-normal hover:bg-red-800 transition-all flex items-center group shadow-md text-sm md:text-base max-w-[60%]"
