@@ -68,6 +68,21 @@
     color: var(--text-main);
   }
 
+  .quote {
+    font-size: clamp(0.8rem, 1.2vw + 0.2rem, 1.1rem) !important;
+    line-height: 1.55;
+    color: var(--text-main);
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 0px;
+    padding: 5px 3px;
+    background-color: #f0f9ff; /* হালকা নীল ব্যাকগ্রাউন্ড */
+    border-left: 4px solid #0284c7 !important; /* বামের নীল বর্ডার */
+    color: #0f172a;
+    text-align: justify;
+  }
+
   .first,
   .dcap,
   .normal {
@@ -97,7 +112,7 @@
     font-size: clamp(
       1.5rem,
       1.3vw + 1rem,
-      2.0rem
+      2rem
     ); /* 🎯 আল্ট্রা ওয়াইড স্ক্রিনে আর ছোট দেখাবে না */
     color: whitesmoke;
     font-family: var(--font-tarunima), serif;
@@ -165,7 +180,7 @@
     font-size: clamp(1rem, 1.2vw + 0.2rem, 1.3rem) !important;
     line-height: 1.55;
     color: var(--text-main);
-  } 
+  }
 
   .poem .right {
     display: inline-block;
@@ -376,14 +391,13 @@
   }
 
   ol.not-prose .poem {
-  display: table !important;
-  width: fit-content !important;
-  max-width: 95% !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-  text-align: left; /* কবিতার লাইনগুলোর বাম দিক সোজা রাখার জন্য */
-}
-
+    display: table !important;
+    width: fit-content !important;
+    max-width: 95% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    text-align: left; /* কবিতার লাইনগুলোর বাম দিক সোজা রাখার জন্য */
+  }
 
   .not-prose .right {
     display: block !important;
@@ -891,7 +905,6 @@ span.forty {
   color: #0f172a;
 }
 
-
 /************* Modern CSS Grid / Flex Layout *************/
 
 /* ১. প্যারেন্ট অটো-কন্টেইনার (লেআউট ভেঙে যাওয়া সম্পূর্ণ রোধ করতে) */
@@ -956,7 +969,6 @@ span.forty {
   width: 100%;
 }
 
-
 table {
   width: fit-content !important;
   max-width: 100% !important; /* স্ক্রিনের বাইরে চলে যাওয়া রোধ করতে */
@@ -969,15 +981,45 @@ table {
 table th,
 table td {
   text-align: inherit;
-  padding: 0.0rem 0.5ch;
+  padding: 0rem 0.5ch;
   color: inherit;
 }
 
 table th a,
 table td a {
   text-align: inherit;
-  padding: 0.0rem 0.5ch;
+  padding: 0rem 0.5ch;
   color: inherit;
 }
 
-sup {color: var(--accent-red);}
+sup {
+  color: var(--accent-red);
+}
+
+/* গ্যাপ ও মার্জিন */
+.hgap {
+  margin: 0 10%;
+}
+.pgap {
+  margin: 0 50px;
+}
+.ngap {
+  margin: 0 15px;
+}
+.pcg {
+  margin: 25px 0 5px 0;
+  font-size: 1.1em;
+  text-align: center;
+  color: var(--accent-blue);
+}
+
+.hr150 {
+  display: block !important;
+  width: 150px !important;
+  max-width: 150px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  border: none;
+  height: 2px;
+  background-color: #008080;
+}

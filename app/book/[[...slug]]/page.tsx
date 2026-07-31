@@ -448,7 +448,7 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
         {/* কন্টেন্ট সেকশন */}
 
         <section className="order-1 lg:order-2 col-span-1 lg:col-span-9 bg-[#fff2e6] shadow-sm min-h-screen">
-          <header className="mb-6 text-center font-tarunima bg-[#f0f0f5] p-3 md:p-6">
+          <header className="mb-0 text-center font-tarunima bg-[#f0f0f5] p-3 md:p-6">
             {/* ১. মূল বইয়ের নাম দেখাবে যদি আমরা কোনো খণ্ড বা পরিচ্ছেদে থাকি */}
             {(displayVolumeTitle || displayChapterTitle) && (
               <p className="mb-1 text-lg text-red-900 md:text-xl font-tarunima">{book.title}</p>
