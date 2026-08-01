@@ -4,32 +4,110 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ChevronDown, ChevronRight, FileText, Folder, List, X } from 'lucide-react';
 
+interface SubPageItem {
+  pageNumber: number;
+  title?: string;
+}
+
+interface ChapterItem {
+  id?: string;
+  slug: string;
+  title: string;
+  subPages?: SubPageItem[];
+}
+
+interface VolumeItem {
+  type: 'volume' | 'chapter';
+  id: string;
+  slug?: string;
+  title: string;
+  chapters?: ChapterItem[];
+  subPages?: SubPageItem[];
+}
+
+interface MetaItem {
+  slug: string;
+  title: string;
+  subPages?: SubPageItem[];
+}
+
+interface TocStructure {
+  title?: string;
+  bookTitle?: string;
+  currentVolume?: string;
+  metaFiles?: MetaItem[];
+  items?: VolumeItem[];
+}
+
 export default function TableOfContents({ 
   structure, 
   currentChapter, 
+  currentPageNum = 1,
   slug,
-  bookTitle // বইয়ের নাম পাওয়ার জন্য প্রপ
+  bookTitle
 }: { 
-  structure: any, 
+  structure: TocStructure, 
   currentChapter?: string, 
+  currentPageNum?: number,
   slug: string,
   bookTitle?: string
 }) {
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
-  // কারেন্ট ভলিউম বা চ্যাপ্টার অটো-ওপেন রাখার লজিক
+  // কারেন্ট ভলিউম বা চ্যাপ্টার/সাব-পেজ সেকশন অটো-ওপেন রাখার লজিক
   useEffect(() => {
+    const initialOpenState: Record<string, boolean> = {};
+
     if (structure?.currentVolume) {
-      setOpenSections(prev => ({
-        ...prev,
-        [structure.currentVolume]: true
-      }));
+      initialOpenState[structure.currentVolume] = true;
     }
-  }, [structure?.currentVolume]);
+
+    // কারেন্ট চ্যাপ্টারে যদি সাব-পেজ থাকে, তাহলে সেই চ্যাপ্টারের ড্রপডাউন অটো-ওপেন রাখা
+    if (currentChapter) {
+      initialOpenState[`chap-${currentChapter}`] = true;
+      initialOpenState[currentChapter] = true;
+    }
+
+    setOpenSections(prev => ({
+      ...prev,
+      ...initialOpenState
+    }));
+  }, [structure?.currentVolume, currentChapter]);
 
   const toggleSection = (id: string) => {
     setOpenSections(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  // 🔹 সাব-পেজের তালিকা রেন্ডার করার হেলপার ফাংশন
+  const renderSubPages = (subPages: SubPageItem[], basePath: string) => {
+    if (!subPages || subPages.length <= 1) return null;
+
+    return (
+      <div className="pl-2 mt-0 ml-4 space-y-1 border-l-2 border-orange-100/70">
+        {subPages.map((subPage) => {
+          const isSubActive = subPage.pageNumber === currentPageNum;
+          const pagePath = subPage.pageNumber === 1 ? basePath : `${basePath}/${subPage.pageNumber}`;
+          const displayLabel = subPage.title || `পাতা ${subPage.pageNumber}`;
+
+          return (
+            <Link
+              key={subPage.pageNumber}
+              href={pagePath}
+              onClick={() => setIsMobileOpen(false)}
+              className={`flex items-center gap-1 text-xs py-1 px-2 rounded transition-colors ${
+                isSubActive
+                  ? 'bg-red-800 text-white font-medium shadow-xs'
+                  : 'text-gray-600 hover:text-red-900 hover:bg-orange-50'
+              }`}
+            >
+              <FileText size={12} opacity={0.6} />
+              <span>{displayLabel}</span>
+            </Link>
+          );
+        })}
+      </div>
+    );
   };
 
   // সূচিপত্রের মূল তালিকা
@@ -47,34 +125,59 @@ export default function TableOfContents({
         }
       `}</style>
 
-      {/* মেটা ফাইলসমূহ (যেমন: ভূমিকা) */}
+      {/* মেটা ফাইলসমূহ (যেমন: ভূমিকা, ভূমিকা-সাবপেজ) */}
       {structure?.metaFiles && structure.metaFiles.length > 0 && (
         <div className="pb-2 mb-2 space-y-1 border-b border-gray-200">
-          {structure.metaFiles.map((meta: any) => {
+          {structure.metaFiles.map((meta) => {
             const isActive = meta.slug === currentChapter;
+            const metaBasePath = `/book/${slug}/${meta.slug}`;
+            const hasSubPages = meta.subPages && meta.subPages.length > 1;
+            const sectionKey = `meta-${meta.slug}`;
+
             return (
-              <Link
-                key={meta.slug}
-                href={`/book/${slug}/${meta.slug}`}
-                onClick={() => setIsMobileOpen(false)}
-                className={`flex items-center gap-1.5 text-sm py-1.5 px-2 rounded transition-colors ${
-                  isActive 
-                    ? 'bg-red-900 text-white font-bold' 
-                    : 'text-gray-700 hover:bg-orange-50'
-                }`}
-              >
-                <FileText size={14} opacity={0.6} />
-                {meta.title}
-              </Link>
+              <div key={meta.slug} className="space-y-0.5">
+                <div className="flex items-center justify-between w-full">
+                  <Link
+                    href={metaBasePath}
+                    onClick={() => setIsMobileOpen(false)}
+                    className={`flex items-center gap-1.5 grow text-sm py-1.5 px-2 rounded transition-colors ${
+                      isActive && currentPageNum === 1
+                        ? 'bg-red-900 text-white font-bold' 
+                        : 'text-gray-700 hover:bg-orange-50'
+                    }`}
+                  >
+                    <FileText size={14} opacity={0.6} />
+                    <span>{meta.title}</span>
+                  </Link>
+
+                  {hasSubPages && (
+                    <button
+                      type="button"
+                      onClick={() => toggleSection(sectionKey)}
+                      className="p-1.5 transition-colors rounded-md hover:bg-orange-100 text-gray-600"
+                      aria-label="Toggle Subpages"
+                    >
+                      {openSections[sectionKey] ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                    </button>
+                  )}
+                </div>
+
+                {/* সাব-পেজসমূহ */}
+                {hasSubPages && (isActive || openSections[sectionKey]) && 
+                  renderSubPages(meta.subPages!, metaBasePath)
+                }
+              </div>
             );
           })}
         </div>
       )}
 
-      {/* মূল আইটেমস (ভলিউম ও চ্যাপ্টার) */}
-      {structure?.items?.map((vol: any) => { 
+      {/* মূল আইটেমস (ভলিউম, চ্যাপ্টার এবং সাব-পেজ) */}
+      {structure?.items?.map((vol) => { 
         const isVolume = vol.type === 'volume';
+        const volBasePath = `/book/${slug}/${vol.id}`;
         const isVolumeActive = vol.id === currentChapter || vol.slug === currentChapter;
+        const volHasSubPages = vol.subPages && vol.subPages.length > 1;
 
         return (
           <div key={vol.id} className="pb-1 border-b border-gray-100 last:border-0">
@@ -83,7 +186,7 @@ export default function TableOfContents({
                 <div className="flex items-center justify-between w-full px-0 py-0 text-sm font-medium text-red-900 transition-all hover:bg-orange-50 group">
                   {/* ভলিউম নেম লিংক */}
                   <Link 
-                    href={`/book/${slug}/${vol.id}`}
+                    href={volBasePath}
                     onClick={() => setIsMobileOpen(false)}
                     className="flex items-center gap-1.5 grow py-1.5 px-1"
                   >
@@ -94,7 +197,7 @@ export default function TableOfContents({
                   </Link>
 
                   {/* টগল বাটন */}
-                  {vol.chapters && vol.chapters.length > 0 && (
+                  {((vol.chapters && vol.chapters.length > 0) || volHasSubPages) && (
                     <button 
                       type="button"
                       onClick={() => toggleSection(vol.id)}
@@ -106,25 +209,54 @@ export default function TableOfContents({
                   )}
                 </div>
 
-                {/* ভলিউমের ভেতরের চ্যাপ্টারসমূহ */}
+                {/* ১. ভলিউমের নিজস্ব সাব-পেজ (যদি থাকে) */}
+                {openSections[vol.id] && volHasSubPages && isVolumeActive && (
+                  renderSubPages(vol.subPages!, volBasePath)
+                )}
+
+                {/* ২. ভলিউমের ভেতরের চ্যাপ্টারসমূহ */}
                 {openSections[vol.id] && vol.chapters && (
                   <div className="pl-2 mt-0 ml-4 space-y-1 border-l-2 border-orange-100">
-                    {vol.chapters.map((chap: any) => {
-                      const isActive = chap.slug === currentChapter || chap.id === currentChapter;
+                    {vol.chapters.map((chap) => {
+                      const chapSlug = chap.slug || chap.id || '';
+                      const isChapActive = chapSlug === currentChapter;
+                      const chapBasePath = `/book/${slug}/${vol.id}/${chapSlug}`;
+                      const chapHasSubPages = chap.subPages && chap.subPages.length > 1;
+                      const chapKey = `chap-${chapSlug}`;
+
                       return (
-                        <Link
-                          key={chap.slug || chap.id}
-                          href={`/book/${slug}/${vol.id}/${chap.slug || chap.id}`}
-                          onClick={() => setIsMobileOpen(false)}
-                          className={`flex items-center gap-1 text-sm py-1.5 px-2 border-b border-red-300/30 transition-colors ${
-                            isActive 
-                            ? 'bg-red-900 text-white shadow-sm font-medium' 
-                            : 'text-gray-700 hover:text-red-900 hover:bg-orange-50'
-                          }`}
-                        >
-                          <FileText size={14} opacity={0.5} />
-                          {chap.title}
-                        </Link>
+                        <div key={chapSlug} className="space-y-0.5">
+                          <div className="flex items-center justify-between w-full">
+                            <Link
+                              href={chapBasePath}
+                              onClick={() => setIsMobileOpen(false)}
+                              className={`flex items-center gap-1 grow text-sm py-1.5 px-2 border-b border-red-300/30 transition-colors ${
+                                isChapActive && currentPageNum === 1
+                                ? 'bg-red-900 text-white shadow-sm font-medium' 
+                                : 'text-gray-700 hover:text-red-900 hover:bg-orange-50'
+                              }`}
+                            >
+                              <FileText size={14} opacity={0.5} />
+                              <span>{chap.title}</span>
+                            </Link>
+
+                            {chapHasSubPages && (
+                              <button
+                                type="button"
+                                onClick={() => toggleSection(chapKey)}
+                                className="p-1 transition-colors rounded hover:bg-orange-100 text-gray-600"
+                                aria-label="Toggle Chapter Subpages"
+                              >
+                                {openSections[chapKey] ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                              </button>
+                            )}
+                          </div>
+
+                          {/* চ্যাপ্টারের ভেতরে সাব-পেজসমূহ */}
+                          {chapHasSubPages && (isChapActive || openSections[chapKey]) && 
+                            renderSubPages(chap.subPages!, chapBasePath)
+                          }
+                        </div>
                       );
                     })}
                   </div>
@@ -132,18 +264,48 @@ export default function TableOfContents({
               </>
             ) : (
               /* ডায়রেক্ট চ্যাপ্টার (যদি ভলিউম না থাকে) */
-              <Link
-                href={`/book/${slug}/${vol.slug || vol.id}`}
-                onClick={() => setIsMobileOpen(false)}
-                className={`flex items-center gap-1 text-sm py-1.5 px-2 rounded transition-colors ${
-                  (vol.slug || vol.id) === currentChapter 
-                  ? 'bg-red-900 text-white shadow-sm font-bold' 
-                  : 'text-gray-700 hover:text-red-900 hover:bg-orange-50'
-                }`}
-              >
-                <FileText size={14} />
-                {vol.title}
-              </Link>
+              (() => {
+                const chapSlug = vol.slug || vol.id;
+                const isChapActive = chapSlug === currentChapter;
+                const chapBasePath = `/book/${slug}/${chapSlug}`;
+                const chapHasSubPages = vol.subPages && vol.subPages.length > 1;
+                const chapKey = `direct-${chapSlug}`;
+
+                return (
+                  <div className="space-y-0.5">
+                    <div className="flex items-center justify-between w-full">
+                      <Link
+                        href={chapBasePath}
+                        onClick={() => setIsMobileOpen(false)}
+                        className={`flex items-center gap-1 grow text-sm py-1.5 px-2 rounded transition-colors ${
+                          isChapActive && currentPageNum === 1
+                          ? 'bg-red-900 text-white shadow-sm font-bold' 
+                          : 'text-gray-700 hover:text-red-900 hover:bg-orange-50'
+                        }`}
+                      >
+                        <FileText size={14} />
+                        <span>{vol.title}</span>
+                      </Link>
+
+                      {chapHasSubPages && (
+                        <button
+                          type="button"
+                          onClick={() => toggleSection(chapKey)}
+                          className="p-1.5 transition-colors rounded hover:bg-orange-100 text-gray-600"
+                          aria-label="Toggle Subpages"
+                        >
+                          {openSections[chapKey] ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                        </button>
+                      )}
+                    </div>
+
+                    {/* সাব-পেজসমূহ */}
+                    {chapHasSubPages && (isChapActive || openSections[chapKey]) && 
+                      renderSubPages(vol.subPages!, chapBasePath)
+                    }
+                  </div>
+                );
+              })()
             )}
           </div>
         );

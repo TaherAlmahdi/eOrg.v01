@@ -4,6 +4,7 @@ author: "বঙ্কিমচন্দ্র চট্টোপাধ্যা�
 type: "book_index"
 slug: "rajshingha"
 first_published: 1882
+subdomain: "library, bankim"
 pub_medium: "প্রথম সংস্করণ বঙ্গদর্শন চৈত্র ১২৮৪ – ভাদ্র ১২৮৫"
 notice: "এই পাতাটি মূলগ্রন্থের অংশ নয়!"
 source_book: "পর্ষদ সংস্করণ একাদশ প্রকাশ জ্যৈষ্ঠ ১৩৯১"

@@ -4,6 +4,7 @@ author: "বঙ্কিমচন্দ্র চট্টোপাধ্যা�
 type: "book_index"
 slug: "samya"
 first_published: 1875
+subdomain: "library, bankim"
 source_book: "বঙ্গীয়-সাহিত্য-পরিষৎ জন্মশতবার্ষিক সংস্করণ, আষাঢ় ১৩৪৫"
 genre: ["প্রবন্ধাবলী", "প্রবন্ধ"]
 genre_links: 

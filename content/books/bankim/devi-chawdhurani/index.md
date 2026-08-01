@@ -3,6 +3,7 @@ title: "দেবী চৌধুরাণী"
 author: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়"
 type: "book_index"
 slug: "devi-chaudhurani"
+subdomain: "library, bankim"
 first_published: 1884
 pub_medium: "বঙ্গদর্শন, বৈশাখ, ১২৮৯ থেকে কার্তিক ১২৯০"
 source_book: "১৮৯১ খ্রিষ্টাব্দে মুদ্রিত ষষ্ঠ সংস্করণ, ভূমিকা–পরিষৎ সংস্করণ।"

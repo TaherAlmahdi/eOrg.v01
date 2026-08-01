@@ -2,6 +2,7 @@
 title: "ধর্ম্মতত্ত্ব"
 subtitle: "(অনুশীলন)"
 author: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়"
+subdomain: "library, bankim"
 type: "book_index"
 slug: "dharmatattwa"
 pub_medium: "১২৯১ বঙ্গাব্দের শ্রাবণ মাস থেকে ধর্ম্মতত্ত্ব ধারাবাহিকভাবে ছাপা হতে শুরু করে।"

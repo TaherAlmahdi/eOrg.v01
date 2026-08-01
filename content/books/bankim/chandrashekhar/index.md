@@ -3,6 +3,7 @@ title: "চন্দ্রশেখর"
 author: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়"
 type: "book_index"
 slug: "chandrashekhar"
+subdomain: "library, bankim"
 first_published: 1875
 sn: 08
 pub_medium: "বঙ্গ দর্শন, শ্রাবণ ১২৮০ – ভাদ্র, ১২৮১, পুস্তকাকারে প্রথম প্রকাশ ১৮৭৫ শেষ সংস্করণ ১৮৮৯"

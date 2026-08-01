@@ -3,6 +3,7 @@ title: "বিবিধ প্রবন্ধ"
 author: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়"
 type: "book_index"
 slug: "bibidha-prabandha"
+subdomain: "library, bankim"
 first_published: 1887
 genre: ["প্রবন্ধাবলী", "প্রবন্ধ"]
 genre_links:

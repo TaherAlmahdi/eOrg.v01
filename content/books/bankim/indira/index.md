@@ -4,6 +4,7 @@ author: "বঙ্কিমচন্দ্র চট্টোপাধ্যা�
 type: "book_index"
 slug: "indira"
 pub_medium: "বঙ্গদর্শন চৈত্র, ১২৭৯"
+subdomain: "library, bankim"
 first_published: 1873
 sn: 06
 source_book: "একাদশ পর্ষদ সংস্করণ, জ্যৈষ্ঠ ১‍৩৯১"

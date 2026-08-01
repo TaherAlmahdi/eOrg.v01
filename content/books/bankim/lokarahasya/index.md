@@ -4,6 +4,7 @@ author: "বঙ্কিমচন্দ্র চট্টোপাধ্যা�
 type: "book_index"
 slug: "lok-rahasya"
 first_published: 1874
+subdomain: "library, bankim"
 source_book: "পর্ষদ সংস্করণ, সংশোধিত দ্বাদশ মুদ্রণঃ আশ্বিন ১৪০১"
 genre: ["প্রবন্ধাবলী", "রম্য সাহিত্য"]
 genre_links: 

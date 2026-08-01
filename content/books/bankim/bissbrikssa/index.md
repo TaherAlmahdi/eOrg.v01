@@ -3,6 +3,7 @@ title: "বিষবৃক্ষ"
 author: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়"
 type: "book_index"
 slug: "bissbrikssa"
+subdomain: "library, bankim"
 first_published: 1873
 sn: 05
 pub_medium: "বঙ্গদর্শন বৈশাখ ১২৭৯"

@@ -9,7 +9,6 @@ import { notFound } from 'next/navigation';
 import { getSubdomainData, buildTabTitle } from '@/app/lib/get-site-data';
 import { parseNoteShortcodes } from '@/app/lib/parse-shortcodes';
 
-
 import BookDetails from '@/app/components/BookDetails';
 
 interface UnifiedPageProps {
@@ -95,15 +94,16 @@ function resolveRouteSegments(rawSegments: string[]) {
   let volumeOrChapterSlug = rawSegments[1] || '';
   let chapterSlug = rawSegments[2] || '';
   let pageNumFromPath: number | null = null;
+  let cleanSegments = [...rawSegments];
 
   const lastSegment = rawSegments[rawSegments.length - 1];
 
   if (/^\d+$/.test(lastSegment) && rawSegments.length > 1) {
     pageNumFromPath = parseInt(lastSegment, 10);
-    const pathWithoutPage = rawSegments.slice(0, -1);
-    bookSlug = pathWithoutPage[0] || '';
-    volumeOrChapterSlug = pathWithoutPage[1] || '';
-    chapterSlug = pathWithoutPage[2] || '';
+    cleanSegments = rawSegments.slice(0, -1);
+    bookSlug = cleanSegments[0] || '';
+    volumeOrChapterSlug = cleanSegments[1] || '';
+    chapterSlug = cleanSegments[2] || '';
   }
 
   return {
@@ -111,6 +111,7 @@ function resolveRouteSegments(rawSegments: string[]) {
     volumeOrChapterSlug,
     chapterSlug,
     pageNumFromPath,
+    cleanSegments,
   };
 }
 
@@ -228,7 +229,7 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
   const host = headersList.get('host');
   const siteData = getSubdomainData(host);
 
-  const { bookSlug, volumeOrChapterSlug, chapterSlug, pageNumFromPath } = resolveRouteSegments(rawSegments);
+  const { bookSlug, volumeOrChapterSlug, chapterSlug, pageNumFromPath, cleanSegments } = resolveRouteSegments(rawSegments);
 
   const book: BookDetail | null = await getBookBySlug(
     bookSlug, 
@@ -279,45 +280,76 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
     activeSubtitle = pageSubtitle;
   }
 
-  // মূল পাতার বেস পাথ (পেজ নম্বর ছাড়া)
-  const baseSegments = pageNumFromPath !== null ? rawSegments.slice(0, -1) : rawSegments;
-  const currentBasePath = `/book/${baseSegments.join('/')}`;
+  // 🎯 সঠিক পরিচ্ছেদ/ফাইলের মূল বেস পাথ (যা থেকে সাব-পেজের ইউআরএল তৈরি হবে)
+  const currentBasePath = `/book/${cleanSegments.join('/')}`;
+
+  // মূল চলতি ফাইলের টাইটেল (যা সাব-পেজ ১-এর জন্য নাম হিসেবে ব্যবহৃত হবে)
+  const currentFileTitle = displayChapterTitle || displayVolumeTitle || book.title;
 
   // 🧭 ডাইনামিক সাব-পেজ লেবেল প্রসেসর
   const getSubPageLabel = (pageData?: SplitPage) => {
     if (!pageData) return '';
+    
+    // ১ম পেজের জন্য লজিক: সাবটাইটেল থাকলে সাবটাইটেল, না থাকলে মূল ফাইলের টাইটেল
+    if (pageData.pageNumber === 1) {
+      return fileSubtitle || currentFileTitle;
+    }
+    
+    // পরবর্তী পেজগুলোর জন্য লজিক
     if (pageData.title) return pageData.title;
-    return pageData.pageNumber > 1 ? `পাতা ${toBengaliNumber(pageData.pageNumber)}` : '';
+    return `পাতা ${toBengaliNumber(pageData.pageNumber)}`;
   };
 
+  // 👈 ১. পূর্ববর্তী (Previous) বাটনের সম্পূর্ণ ফিক্সড লজিক
   let prevActionLink = book.prevLink || "/books";
   let prevActionLabel = book.prevLabel || "গ্রন্থাগার";
 
-  let nextActionLink = book.nextLink || "/books";
-  let nextActionLabel = book.nextLabel || "গ্রন্থাগার";
-
-  // 👈 পূর্ববর্তী বাটনের ডাইনামিক লজিক
   if (currentPageNum > 1) {
+    // 🅰️ আমরা যদি চলতি ফাইলেরই ২, ৩, ৪... নম্বর সাব-পেজে থাকি
     const prevPageNum = currentPageNum - 1;
     const prevPageObj = splitPages[prevPageNum - 1];
     
     if (prevPageNum === 1) {
+      // ২ নম্বর পেজ থেকে ১ নম্বর পেজে যাওয়ার সময়
       prevActionLink = currentBasePath;
-      prevActionLabel = prevPageObj?.title || book.prevLabel || "আগের পরিচ্ছেদ";
+      prevActionLabel = getSubPageLabel(prevPageObj); 
     } else {
+      // ৩, ৪... নম্বর পেজ থেকে তার আগের সাব-পেজে ফেরত যাওয়া
       prevActionLink = `${currentBasePath}/${prevPageNum}`;
       prevActionLabel = getSubPageLabel(prevPageObj);
     }
+  } else {
+    // 🅱️ আমরা ১ নম্বর পেজে আছি, তাই আগের ফাইল/অধ্যায়ে যাবে
+    if (book.prevLink) {
+      const prevFileTotalPages = (book as unknown as Record<string, unknown>).prevTotalPages as number | undefined;
+
+      if (prevFileTotalPages && prevFileTotalPages > 1) {
+        prevActionLink = `${book.prevLink}/${prevFileTotalPages}`;
+      } else {
+        prevActionLink = book.prevLink;
+      }
+      
+      prevActionLabel = book.prevLabel || "আগের পরিচ্ছেদ";
+    } else {
+      prevActionLink = "/books";
+      prevActionLabel = "গ্রন্থাগার";
+    }
   }
 
-  // 👉 পরবর্তী বাটনের ডাইনামিক লজিক
+  // 👉 ২. পরবর্তী (Next) বাটনের সম্পূর্ণ ফিক্সড লজিক
+  let nextActionLink = book.nextLink || "/books";
+  let nextActionLabel = book.nextLabel || "গ্রন্থাগার";
+
   if (currentPageNum < totalSubPages) {
     const nextPageNum = currentPageNum + 1;
     const nextPageObj = splitPages[nextPageNum - 1];
     nextActionLink = `${currentBasePath}/${nextPageNum}`;
     nextActionLabel = getSubPageLabel(nextPageObj);
-  } else if (!book.nextLink) {
-    if (!volumeOrChapterSlug) {
+  } else {
+    if (book.nextLink) {
+      nextActionLink = book.nextLink;
+      nextActionLabel = book.nextLabel || "পরবর্তী পরিচ্ছেদ";
+    } else if (!volumeOrChapterSlug) {
       if (volumes.length > 0) {
         nextActionLink = `/book/${bookSlug}/${volumes[0].id}`;
         nextActionLabel = volumes[0].title || volumes[0].volume_title || "প্রথম খণ্ড";
@@ -328,11 +360,20 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
     }
   }
 
-  // 📂 TableOfContents-এর জন্য ডাটা স্ট্রাকচার
+  // 📂 TableOfContents-এর জন্য ডাটা স্ট্রাকচার (সাব-পেজ ডাটা ইনজেক্ট করা হয়েছে)
+  const currentSubPagesData = totalSubPages > 1 
+    ? splitPages.map(p => ({ pageNumber: p.pageNumber, title: getSubPageLabel(p) })) 
+    : [];
+
   const tocStructure = {
     bookTitle: book.title,
     currentVolume: currentVolumeSlug,
-    metaFiles: book.metaFiles || [],
+    metaFiles: (book.metaFiles || []).map((meta: { slug: string; title: string; subPages?: { pageNumber: number; title?: string }[] }) => ({
+      ...meta,
+      subPages: (meta.slug === volumeOrChapterSlug || meta.slug === chapterSlug) 
+        ? currentSubPagesData 
+        : []
+    })),
     items: volumes.length > 0
       ? volumes.map((v: VolumeItem) => {
           const displayTitle = 
@@ -340,23 +381,36 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
             || v.volume_title 
             || v.title;
 
+          const isThisVolumeActive = v.id === currentVolumeSlug || v.id === volumeOrChapterSlug;
+
           return {
             type: 'volume' as const,
             id: v.id,
             title: displayTitle,
-            chapters: (v.chapters || []).map((c: ChapterItem) => ({
-              id: c.slug,
-              slug: c.slug,
-              title: c.title,
-            })),
+            subPages: (isThisVolumeActive && !chapterSlug) ? currentSubPagesData : [],
+            chapters: (v.chapters || []).map((c: ChapterItem) => {
+              const isThisChapterActive = c.slug === chapterSlug || c.slug === volumeOrChapterSlug;
+
+              return {
+                id: c.slug,
+                slug: c.slug,
+                title: c.title,
+                subPages: isThisChapterActive ? currentSubPagesData : []
+              };
+            }),
           };
         })
-      : directChapters.map((c) => ({
-          type: 'chapter' as const,
-          id: c.slug,
-          slug: c.slug,
-          title: c.title,
-        })),
+      : directChapters.map((c) => {
+          const isThisChapterActive = c.slug === volumeOrChapterSlug || c.slug === chapterSlug;
+
+          return {
+            type: 'chapter' as const,
+            id: c.slug,
+            slug: c.slug,
+            title: c.title,
+            subPages: isThisChapterActive ? currentSubPagesData : []
+          };
+        }),
   };
 
   // 🔍 খণ্ড পেজ শনাক্তকরণ ও পরিচ্ছেদ তালিকা লজিক
@@ -449,7 +503,7 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
 
         <section className="order-1 lg:order-2 col-span-1 lg:col-span-9 bg-[#fff2e6] shadow-sm min-h-screen">
           <header className="mb-0 text-center font-tarunima bg-[#f0f0f5] p-3 md:p-6">
-            {/* ১. মূল বইয়ের নাম দেখাবে যদি আমরা কোনো খণ্ড বা পরিচ্ছেদে থাকি */}
+            {/* ১. মূল বইয়ের নাম দেখাবে যদি আমরা কোনো খণ্ড বা পরিচ্ছেদে থাকি */}
             {(displayVolumeTitle || displayChapterTitle) && (
               <p className="mb-1 text-lg text-red-900 md:text-xl font-tarunima">{book.title}</p>
             )}
@@ -461,7 +515,7 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
               </p>
             )}
 
-            {/* ৩. প্রধান হেডার টাইটেল (পরিচ্ছেদের নাম, না থাকলে খণ্ডের নাম, তা না থাকলে বইয়ের নাম) */}
+            {/* ৩. প্রধান হেডার টাইটেল (পরিচ্ছেদের নাম, না থাকলে খণ্ডের নাম, তা না থাকলে বইয়ের নাম) */}
             <h1 className="mb-2 text-xl font-semibold text-gray-900 md:text-2xl font-sabrina">
               {displayChapterTitle || displayVolumeTitle || book.title}
             </h1>
@@ -550,7 +604,7 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
                           ↑
                         </a>
 
-                        {/* ৩. HTML রেন্ডারিং মূল টেক্সট (যেখানে ডানপাশের অতিরিক্ত প্যাডিং প্রয়োজন নেই) */}
+                        {/* ৩. HTML রেন্ডারিং মূল টেক্সট */}
                         <div 
                           className="flex-1 leading-relaxed text-justify markdown-body [&_a]:text-blue-600 [&_a]:underline hover:[&_a]:text-red-700"
                           dangerouslySetInnerHTML={{ __html: noteHtmlContent }}
@@ -591,7 +645,8 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
             
             <TableOfContents 
               structure={tocStructure} 
-              currentChapter={currentChapterSlug}
+              currentChapter={currentChapterSlug || currentVolumeSlug}
+              currentPageNum={currentPageNum}
               slug={bookSlug}
               bookTitle={book?.title} 
             />

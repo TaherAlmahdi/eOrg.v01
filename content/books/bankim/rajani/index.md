@@ -4,6 +4,7 @@ author: "বঙ্কিমচন্দ্র চট্টোপাধ্যা�
 type: "book_index"
 slug: "rajani"
 first_published: 1877
+subdomain: "library, bankim"
 sn: 10
 language: "bn"
 pub_medium: "বঙ্গদর্শন, ১২৮১-১২৮২"

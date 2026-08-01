@@ -5,6 +5,7 @@ type: "book_index"
 slug: "rajmohaner-stree"
 pub_medium: "সাময়িক পত্রে প্রকাশিত হয়নি"
 first_published: 1918
+subdomain: "library, bankim"
 source_book: "পরিষৎ প্রকাশিত জন্মশতবার্ষিক সঙ্কলন"
 genre: ["সামাজিক উপন্যাস", "উপন্যাস", "অপ্রকাশিত রচনা", "বিবিধ"]
 genre_links: 

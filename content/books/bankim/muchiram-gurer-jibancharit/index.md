@@ -4,6 +4,7 @@ author: "বঙ্কিমচন্দ্র চট্টোপাধ্যা�
 type: "book_index"
 slug: "muchiram-gurer-jiban-charit"
 first_published: 1884
+subdomain: "library, bankim"
 genre: ["ব্যঙ্গাত্মক উপন্যাস", "রম্য সাহিত্য", "উপন্যাস"]
 pub_medium: "১২৮৭ বঙ্গাব্দের আশ্বিন মাসে (১৮৮০ খ্রীষ্টাব্দের সেপ্টেম্বরে) ‘বঙ্গদর্শন’"
 source_book: "১২৯০ বঙ্গাব্দে মুদ্রিত প্রথম সংস্করণ হতে"

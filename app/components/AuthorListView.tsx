@@ -109,7 +109,7 @@ export const AuthorListView: FC<AuthorListViewProps> = ({
           {filteredAuthors.map(({ slug, name, count }) => (
             <Link
               key={slug}
-              href={`https://library.eduliture.org/author/${slug}`}
+              href={`/author/${slug}`}
               className="flex items-center justify-between gap-3 px-3.5 py-2.5 rounded bg-white/90 text-[#008080] border border-teal-100 shadow-sm transition-all duration-300 backdrop-blur-sm hover:bg-teal-50 hover:shadow-md hover:border-teal-300 hover:-translate-y-0.5 group cursor-pointer w-full"
             >
               <div className="flex items-center gap-2.5 min-w-0">

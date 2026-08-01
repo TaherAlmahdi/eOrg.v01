@@ -4,6 +4,7 @@ author: "বঙ্কিমচন্দ্র চট্টোপাধ্যা�
 type: "book_index"
 slug: "radharani"
 first_published: 1876
+subdomain: "library, bankim"
 sn: 09
 language: "bn"
 pub_medium: "বঙ্গদর্শন, কার্ত্তিক–অগ্রহায়ণ ১২৮২"

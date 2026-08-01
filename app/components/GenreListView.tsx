@@ -164,7 +164,7 @@ export const GenreListView: FC<GenreListViewProps> = ({
             return (
               <Link
                 key={slug}
-                href={`https://library.eduliture.org/genre/${slug}`}
+                href={`/genre/${slug}`}
                 className="flex items-center justify-between gap-2.5 px-3.5 py-3 rounded bg-white/90 text-[#008080] border border-teal-100 shadow-sm transition-all duration-300 backdrop-blur-sm hover:bg-teal-50 hover:shadow-lg hover:border-teal-300 hover:scale-[1.02] shrink-0 grow basis-full sm:basis-[calc(50%-0.35rem)] lg:basis-[calc(33.333%-0.45rem)] xl:basis-[calc(25%-0.5rem)] 2xl:basis-[calc(20%-0.5rem)] max-w-full group cursor-pointer"
               >
                 <div className="flex items-center gap-2.5 min-w-0">

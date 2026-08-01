@@ -4,6 +4,7 @@ author: "বঙ্কিমচন্দ্র চট্টোপাধ্যা�
 type: "book_index"
 slug: "kamalakanta"
 first_published: 1875
+subdomain: "library, bankim"
 pub_medium: "বঙ্গদর্শন চৈত্র, ১২৮৭ – জ্যৈষ্ঠ ১২৮৯"
 
 genre: ["রম্য সাহিত্য", "প্রবন্ধাবলী"]

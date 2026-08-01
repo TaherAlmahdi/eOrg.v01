@@ -4,6 +4,7 @@ author: "বঙ্কিমচন্দ্র চট্টোপাধ্যা�
 type: "book_index"
 slug: "krishnakanter-will"
 first_published: 1878
+subdomain: "library, bankim"
 sn: 11
 genre: ["সামাজিক উপন্যাস", "উপন্যাস"]
 genre_links: 

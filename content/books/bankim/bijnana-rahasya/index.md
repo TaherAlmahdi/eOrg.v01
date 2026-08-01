@@ -2,6 +2,7 @@
 title: "বিজ্ঞানরহস্য"
 subtitle: "ভূমিকা"
 author: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়"
+subdomain: "library, bankim"
 type: "book_index"
 slug: "bijnan-rahasya"
 first_published: 1875
