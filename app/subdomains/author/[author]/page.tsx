@@ -4,15 +4,81 @@ import Link from 'next/link';
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
+import { Metadata } from 'next';
+import { headers } from 'next/headers';
 import { Sparkles } from 'lucide-react';
 import { getLibraryBooks } from '../../../lib/books';
 import { getSlug } from '../../../lib/content/core/registry';
+import { getSubdomainData, buildTabTitle } from '@/app/lib/get-site-data';
+import { headerConfig } from '../../../lib/headerConfig';
 
 interface AuthorHomePageProps {
   params: Promise<{
     author: string;
     slug: string;
   }>;
+}
+
+// 🏷️ Dynamic Metadata Export for Tab Title
+export async function generateMetadata({ params }: AuthorHomePageProps): Promise<Metadata> {
+  const { author } = await params;
+  const headersList = await headers();
+  const host = headersList.get('host') || '';
+
+  // সাবডোমেন ডাটা ও হেডার কনফিগারেশন এক্সট্যাক্ট করা
+  const siteData = getSubdomainData(host);
+  const subdomain = siteData.subdomain || 'library';
+  const currentConfig = headerConfig[subdomain] || headerConfig.library || headerConfig.main;
+
+  // লেখক পরিচিতি ফাইল থেকে Title বের করা
+  const mdFilePath = path.join(
+    process.cwd(),
+    'content',
+    'pages',
+    'sucsess',
+    `${author}.md`
+  );
+
+  let pageTitle = '';
+  if (fs.existsSync(mdFilePath)) {
+    try {
+      const fileSource = fs.readFileSync(mdFilePath, 'utf8');
+      const { data } = matter(fileSource);
+      if (data?.title) {
+        pageTitle = data.title;
+      }
+    } catch (err) {
+      console.error('Metadata MD parsing error:', err);
+    }
+  }
+
+  const fullTitle = pageTitle || (author ? author.charAt(0).toUpperCase() + author.slice(1) : '');
+
+  // 🔹 ট্যাব টাইটেল: সাবডোমেন টাইটেল ❀ সাবডোমেন ট্যাগলাইন (mainDomainTitle বাদ দেওয়া হয়েছে)
+  const dynamicMetaTitle = buildTabTitle({
+    
+    siteName: currentConfig.siteName,
+    tagline: currentConfig.tagline,
+  });
+
+  const description = `${fullTitle}-এর জীবন, সাহিত্য ও সমস্ত রচনার ডিজিটাল নির্ঘণ্ট দেখুন এডুলিচার পাঠশালায়।`;
+  const shareImage = siteData?.ogImage;
+
+  return {
+    title: dynamicMetaTitle,
+    description: description,
+    openGraph: {
+      title: dynamicMetaTitle,
+      description: description,
+      images: shareImage ? [{ url: shareImage }] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: dynamicMetaTitle,
+      description: description,
+      images: shareImage ? [shareImage] : [],
+    },
+  };
 }
 
 export default async function AuthorHomePage({ params }: AuthorHomePageProps) {
@@ -33,7 +99,7 @@ export default async function AuthorHomePage({ params }: AuthorHomePageProps) {
   if (fs.existsSync(mdFilePath)) {
     const fileSource = fs.readFileSync(mdFilePath, 'utf8');
     try {
-      // gray-matter দিয়ে frontmatter এবং কন্টেন্ট আলাদা করা
+      // gray-matter দিয়ে frontmatter এবং কন্টেন্ট আলাদা করা
       const { content, data } = matter(fileSource);
       
       mdHtmlContent = content;

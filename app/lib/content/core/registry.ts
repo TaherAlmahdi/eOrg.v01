@@ -10,11 +10,26 @@ export const CONTENT_REGISTRY = {
   } as Record<string, string>,
 
   authors: {
+    "abu-ishaque": "আবু ইসহাক",
     "bankim-chandra-chatterjee": "বঙ্কিমচন্দ্র চট্টোপাধ্যায়",
-    "rabindranath-tagore": "রবীন্দ্রনাথ ঠাকুর",
-    "kazi-nazrul-islam": "কাজী নজরুল ইসলাম",
+    "bibhutibhushan-bandyopadhyay": "বিভূতিভূষণ বন্দ্যোপাধ্যায়",
+    "bibhutibhushan-mukhopadhyay": "বিভূতিভূষণ মুখোপাধ্যায়",
+    "humayun-ahmed": "হুমায়ূন আহমেদ",
     "jibananda-dash": "জীবনানন্দ দাশ",
+    "kazi-nazrul-islam": "কাজী নজরুল ইসলাম",
+    "muhammad-lutfar-rahman": "মুহম্মদ লুৎফর রহমান",
+    "muhammad-nazibur-rahman": "মুহম্মদ নাজিবুর রহমান",
+    "muhammad-zafar-iqbal": "মুহম্মদ জাফর ইকবাল",
+    "others": "অন্যান্য",
+    "rabindranath-tagore": "রবীন্দ্রনাথ ঠাকুর",
     "sarat-chandra-chattopadhyay": "শরৎচন্দ্র চট্টোপাধ্যায়",
+    "satyajit-ray": "সত্যজিৎ রায়",
+    "shamsur-rahman": "শামসুর রহমান",
+    "sufia-kamal": "সুফিয়া কামাল",
+    "syed-mujtaba-ali": "সৈয়দ মুজতবা আলী",
+    "syed-shamsul-haque": "সৈয়দ শামসুল হক",
+    "syed-waliullah": "সৈয়দ ওয়ালীউল্লাহ",
+
   } as Record<string, string>,
 
   // English Slug -> Bengali Value

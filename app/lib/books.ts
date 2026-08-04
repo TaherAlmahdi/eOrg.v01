@@ -404,7 +404,7 @@ export async function getBookHierarchy(slug: string): Promise<{
       // 📌 ১. ভলিউমের নিজস্ব ফাইল চেক: v01/v01.md অথবা fallback v01/index.md
       const namedVolFilePath = path.join(volPath, `${volFolder}.md`);
       const indexVolFilePath = path.join(volPath, 'index.md');
-      
+
       let volIndexPath = '';
       if (existsSync(namedVolFilePath)) {
         volIndexPath = namedVolFilePath;

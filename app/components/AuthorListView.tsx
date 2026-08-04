@@ -66,15 +66,23 @@ export const AuthorListView: FC<AuthorListViewProps> = ({
       {/* 🔹 লেখক পেজের জন্য সার্চ বার ও আদ্যক্ষর ফিল্টার বার */}
       {!isHomePage && (
         <div className="mb-6 p-4 bg-white/90 backdrop-blur-md rounded border border-teal-100 shadow-sm space-y-4">
+
+          {/* অথর শিরোনাম */}
+          <div className="text-center font-tarunima">
+            <h2 className="text-lg md:text-xl font-bold text-[#008080]">
+              লেখকবৃন্দ ({toBengaliNumber(totalAuthorsCount)} জন)
+            </h2>
+          </div>
+
           {/* সার্চ ইনপুট */}
           <div className="relative max-w-md mx-auto">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-teal-600 w-5 h-5" />
             <input
               type="text"
-              placeholder="লেখকের নাম দিয়ে খুঁজুন..."
+              placeholder="লেখকের নাম দিয়ে খুঁজুন..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#008080] font-tarunima text-sm bg-teal-50/30 text-gray-800"
+              className="w-full pl-10 pr-4 py-2 border border-teal-200 rounded focus:outline-none focus:ring-2 focus:ring-[#008080] font-tarunima text-sm bg-teal-50/30 text-gray-800"
             />
           </div>
 

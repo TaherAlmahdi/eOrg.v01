@@ -6,6 +6,7 @@ type: "book_index"
 slug: "anandamoth"
 genre: ["উপন্যাস", "ঐতিহাসিক উপন্যাস"]
 first_published: 1882
+published: 2026-08-04
 pub_medium: "বঙ্গদর্শন (চৈত্র, ১২৮৭ – জ্যৈষ্ঠ, ১২৮৯)"
 source_book: "পঞ্চম সংস্করণ, ১৮৯২"
 notice: "এই পাতাটি মূলগ্রন্থের অংশ নয়, এটি একটি উইকিপিডিয়া নিবন্ধ।"

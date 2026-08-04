@@ -85,6 +85,8 @@ interface DynamicTitleOptions {
   volumePageTitle?: string | null;
   bookTitle?: string | null;
   siteName?: string | null;
+  tagline?: string | null;          // 🔹 নতুন ফিল্ড
+  mainDomainTitle?: string | null;  // 🔹 নতুন ফিল্ড
 }
 
 export function buildTabTitle({
@@ -93,6 +95,8 @@ export function buildTabTitle({
   volumePageTitle,
   bookTitle,
   siteName,
+  tagline,
+  mainDomainTitle,
 }: DynamicTitleOptions): string {
   if (metaTitle) {
     return metaTitle;
@@ -103,6 +107,8 @@ export function buildTabTitle({
     volumePageTitle,
     bookTitle,
     siteName,
+    tagline,
+    mainDomainTitle,
   ].filter(Boolean);
 
   return titleParts.join(' ❀ ');

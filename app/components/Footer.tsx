@@ -41,14 +41,14 @@ const Footer = () => {
                 </span>
               </Link>
               <p className="text-[10px] font-tarunima text-gray-500 font-normal mt-1 tracking-widest leading-none">
-                বিশুদ্ধজ্ঞানের শিক্ষা বিষয়ক প্রতিষ্ঠান
+                বিশুদ্ধজ্ঞানের শিক্ষামূলক প্রতিষ্ঠান
               </p>
             </div>
           </div>
 
           {/* ডানপাশ: কপিরাইট (বড় স্ক্রিনে ডানে, মোবাইলে নিচে) */}
           <div className="md:text-right font-tarunima border-t md:border-t-0 border-gray-300 pt-1 md:pt-0 w-full md:w-auto">
-            <p className="text-base text-gray-600 leading-relaxed">
+            <p className="text-sm text-gray-600 leading-relaxed">
               © ১৯৯৯ - {getBengaliYear()} এডুলিচার কর্তৃক সমস্ত অধিকার সংরক্ষিত।
             </p>
           </div>

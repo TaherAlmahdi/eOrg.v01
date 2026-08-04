@@ -1,11 +1,54 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Metadata } from 'next';
+import { headers } from 'next/headers';
 import GenreList from '@/app/components/GenreList';
 import AuthorList from '@/app/components/AuthorList';
 import { Calendar, ChevronRight, Layers, Users } from 'lucide-react';
 import { getLibraryBooks } from '../../lib/books';
 import { getSlug, getAuthorSlugFromTitle } from '../../lib/content/core/registry';
+import { getSubdomainData, buildTabTitle } from '@/app/lib/get-site-data';
+import { headerConfig } from '../../lib/headerConfig';
+
+// 🏷️ Dynamic Metadata Export
+export async function generateMetadata(): Promise<Metadata> {
+  const headersList = await headers();
+  const host = headersList.get('host') || '';
+
+  // 🔹 getSubdomainData থেকেই সেফলি সাবডোমেন এক্সট্র্যাক্ট করা
+  const siteData = getSubdomainData(host);
+  const subdomain = siteData.subdomain || 'library';
+  
+  // 🔹 headerConfig থেকে সঠিক ডাটা রিট্রিভ করা
+  const currentConfig = headerConfig[subdomain] || headerConfig.library || headerConfig.main;
+
+  // 🔹 ট্যাব টাইটেল: সাইট নেম ❀ ট্যাগলাইন ❀ মেইন ডোমেন টাইটেল (যেমন: এডুলিচার পাঠশালা ❀ একটি এডুলিচার বিশুদ্ধজ্ঞান প্রকল্প ❀ এডুলিচার)
+  const dynamicMetaTitle = buildTabTitle({
+    siteName: currentConfig.siteName,
+    tagline: currentConfig.tagline,
+    
+  });
+
+  const description = `${currentConfig.siteName}-এর পাঠশালায় নতুন প্রকাশিত বই, লেখক এবং বিভিন্ন ঘরানার সমৃদ্ধ সংগ্রহ দেখুন।`;
+  const shareImage = siteData?.ogImage;
+
+  return {
+    title: dynamicMetaTitle,
+    description: description,
+    openGraph: {
+      title: dynamicMetaTitle,
+      description: description,
+      images: shareImage ? [{ url: shareImage }] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: dynamicMetaTitle,
+      description: description,
+      images: shareImage ? [shareImage] : [],
+    },
+  };
+}
 
 export default async function LibraryHomePage() {
   const { latestBooks } = await getLibraryBooks();
@@ -31,14 +74,21 @@ export default async function LibraryHomePage() {
 
   const sortedLatestBooks = [...latestBooks]
     .sort((a, b) => {
-      const pubA = a.published || (a as unknown as Record<string, unknown>).first_published;
-      const pubB = b.published || (b as unknown as Record<string, unknown>).first_published;
+      const pubA = a.published || (a as unknown as Record<string, unknown>).published;
+      const pubB = b.published || (b as unknown as Record<string, unknown>).published;
 
-      if (pubA && pubB) {
-        return new Date(String(pubB)).getTime() - new Date(String(pubA)).getTime();
+      const timeA = pubA ? new Date(Date.parse(String(pubA))).getTime() : 0;
+      const timeB = pubB ? new Date(Date.parse(String(pubB))).getTime() : 0;
+
+      const validA = !isNaN(timeA) && timeA > 0;
+      const validB = !isNaN(timeB) && timeB > 0;
+
+      if (validA && validB) {
+        return timeB - timeA;
       }
-      if (pubA) return -1;
-      if (pubB) return 1;
+      if (validA) return -1;
+      if (validB) return 1;
+
       return (a.title || '').localeCompare(b.title || '', 'bn');
     })
     .slice(0, 16);
@@ -81,7 +131,7 @@ export default async function LibraryHomePage() {
 
                 const responsiveVisibilityClass = 
                   index >= 16 
-                    ? "block sm:hidden xl:block"           
+                    ? "block sm:hidden xl:block"         
                     : index >= 8 
                       ? "block sm:hidden md:block"         
                       : "block";                          
@@ -132,14 +182,14 @@ export default async function LibraryHomePage() {
 
         {/* ২. ঘরানা নির্ঘণ্ট সেকশন */}
         <section data-aos="fade-up" className="relative">
-         <div className="flex justify-center mb-0 mt-5">
-          <div className="inline-flex items-center justify-center gap-3 px-8 py-5 rounded bg-teal-50/90 text-[#008080] mb-8 border border-teal-100 shadow-xs text-center backdrop-blur-md">
-            <Layers size={24} className="shrink-0 animate-pulse" />
-            <h1 className="text-xl md:text-2xl font-tarunima font-black text-gray-900 leading-none tracking-tight">
-              <span className="text-[#008080]">একনজরে</span> এডুলিচার <span className="text-[#cc7a00]">পাঠশালা</span>
-            </h1>
+          <div className="flex justify-center mb-0 mt-5">
+            <div className="inline-flex items-center justify-center gap-3 px-8 py-5 rounded bg-teal-50/90 text-[#008080] mb-8 border border-teal-100 shadow-xs text-center backdrop-blur-md">
+              <Layers size={24} className="shrink-0 animate-pulse" />
+              <h1 className="text-xl md:text-2xl font-tarunima font-black text-gray-900 leading-none tracking-tight">
+                <span className="text-[#008080]">একনজরে</span> এডুলিচার <span className="text-[#cc7a00]">পাঠশালা</span>
+              </h1>
+            </div>
           </div>
-        </div>
           <GenreList limit={20} />
         </section>
 
@@ -148,12 +198,12 @@ export default async function LibraryHomePage() {
           <div className="flex justify-center mb-5 mt-5">
             <div className="inline-flex items-center justify-center gap-3 px-8 py-5 rounded bg-teal-50/90 text-[#008080] border border-teal-100 shadow-xs text-center backdrop-blur-md">
               <Users size={24} className="shrink-0 animate-pulse" />
-                <h1 className="text-xl md:text-2xl font-tarunima font-black text-gray-900 leading-none tracking-tight">
-                  <span className="text-[#008080]">সম্মানিত</span> লেখক <span className="text-[#cc7a00]">তালিকা</span>
-                </h1>
-              </div>
+              <h1 className="text-xl md:text-2xl font-tarunima font-black text-gray-900 leading-none tracking-tight">
+                <span className="text-[#008080]">সম্মানিত</span> লেখক <span className="text-[#cc7a00]">তালিকা</span>
+              </h1>
+            </div>
           </div>
-            <AuthorList limit={20} />
+          <AuthorList limit={20} />
         </section>
 
       </div>

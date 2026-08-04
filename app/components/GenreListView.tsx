@@ -123,10 +123,10 @@ export const GenreListView: FC<GenreListViewProps> = ({
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-teal-600 w-5 h-5" />
             <input
               type="text"
-              placeholder="জনরা বা বিষয়ের নাম দিয়ে খুঁজুন..."
+              placeholder="ঘরানার নাম দিয়ে খুঁজুন..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#008080] font-tarunima text-sm bg-teal-50/30 text-gray-800"
+              className="w-full pl-10 pr-4 py-2 border border-teal-200 rounded focus:outline-none focus:ring-2 focus:ring-[#008080] font-tarunima text-sm bg-teal-50/30 text-gray-800"
             />
           </div>
 

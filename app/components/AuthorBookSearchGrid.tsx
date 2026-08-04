@@ -5,17 +5,37 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Search, Book, X } from 'lucide-react';
 
+const toBengaliNumber = (num: number | string): string =>
+  num.toString().replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[parseInt(d, 10)]);
+
 interface BookItem {
   id?: string;
   title: string;
   slug?: string;
+  author?: string;
   coverImage?: string;
   cover?: string;
 }
 
-export default function AuthorBookSearchGrid({ books = [] }: { books?: BookItem[] }) {
+export default function AuthorBookSearchGrid({
+  books = [],
+  siteName = 'এডুলিচার পাঠশালা',
+}: {
+  books?: BookItem[];
+  siteName?: string;
+}) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLetter, setSelectedLetter] = useState('সব');
+
+  // 🔹 ডাইনামিক লেখকের নাম ও বইয়ের সংখ্যা বের করা
+  const { authorName, totalBooksCount } = useMemo(() => {
+    const safeBooks = Array.isArray(books) ? books : [];
+    const firstAuthor = safeBooks.find((b) => b && b.author)?.author || '';
+    return {
+      authorName: firstAuthor,
+      totalBooksCount: safeBooks.length,
+    };
+  }, [books]);
 
   // 🔹 ১. বইয়ের নাম থেকে ডাইনামিকভাবে (Dynamically) আদ্যক্ষরের তালিকা তৈরি
   const dynamicLetters = useMemo(() => {
@@ -65,14 +85,24 @@ export default function AuthorBookSearchGrid({ books = [] }: { books?: BookItem[
 
   return (
     <div className="space-y-5 w-full">
-      {/* 🔹 ১. সার্চ ইনপুট (মোবাইলে ফুল উইডথ, বড় স্ক্রিনে সেন্টারে) */}
+      {/* 🔹 ডাইনামিক হেডার (লেখকের নাম ও গ্রন্থাবলী) */}
+      <div className="text-center font-tarunima mb-2">
+        <h2 className="text-lg md:text-xl font-bold text-[#008080]">
+          {authorName ? authorName : 'গ্রন্থাবলী'}
+        </h2>  
+        <p className="text-gray-600 text-sm">
+          {siteName ? `${siteName}য়` : ''} প্রকাশিত গ্রন্থ সংখ্যা: {toBengaliNumber(totalBooksCount)} টি
+        </p>
+      </div>
+
+      {/* 🔹 ১. সার্চ ইনপুট (মোবাইলে ফুল উইডথ, বড় স্ক্রিনে সেন্টারে) */}
       <div className="relative w-full md:w-96 md:mx-auto">
         <input
           type="text"
           placeholder="বইয়ের নাম দিয়ে খুঁজুন..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-10 pr-10 py-2.5 text-sm bg-white border border-teal-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#008080]/30 focus:border-[#008080] transition-all shadow-xs"
+          className="w-full pl-10 pr-10 py-2.5 text-sm bg-white border border-teal-200 rounded focus:outline-none focus:ring-2 focus:ring-[#008080]/30 focus:border-[#008080] transition-all shadow-xs"
         />
         <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
         {searchQuery && (
@@ -87,7 +117,7 @@ export default function AuthorBookSearchGrid({ books = [] }: { books?: BookItem[
 
       {/* 🔹 ২. ডাইনামিক আদ্যক্ষর ফিল্টার বার (শুধুমাত্র যেসব অক্ষরের বই আছে সেগুলোই দেখাবে) */}
       {dynamicLetters.length > 1 && (
-        <div className="w-full bg-white/70 backdrop-blur-xs p-2.5 rounded-xl border border-teal-100/80 shadow-xs">
+        <div className="w-full bg-white/70 backdrop-blur-xs p-2.5 rounded border border-teal-100/80 shadow-xs">
           <div className="flex flex-wrap items-center justify-center gap-1.5">
             {dynamicLetters.map((letter) => {
               const isActive = selectedLetter === letter;
@@ -95,7 +125,7 @@ export default function AuthorBookSearchGrid({ books = [] }: { books?: BookItem[
                 <button
                   key={letter}
                   onClick={() => setSelectedLetter(letter)}
-                  className={`px-3 py-1 text-xs md:text-sm font-semibold rounded-md transition-all duration-200 ${
+                  className={`px-3 py-1 text-xs md:text-sm font-semibold rounded transition-all duration-200 ${
                     isActive
                       ? 'bg-[#008080] text-white shadow-xs scale-105'
                       : 'bg-teal-50/60 text-teal-900 hover:bg-teal-100/80 border border-teal-100'
@@ -111,7 +141,7 @@ export default function AuthorBookSearchGrid({ books = [] }: { books?: BookItem[
 
       {/* 🔹 ৩. ফিল্টার করা গ্রিড (বই না পাওয়া গেলে মেসেজ) */}
       {filteredBooks.length === 0 ? (
-        <div className="text-center py-12 bg-white/50 rounded-lg border border-dashed border-gray-300">
+        <div className="text-center py-12 bg-white/50 rounded border border-dashed border-gray-300">
           <p className="text-gray-500 text-sm">
             {searchQuery.trim() !== ''
               ? `${searchQuery} নামে কোন বই পাওয়া যায়নি।`
@@ -132,7 +162,7 @@ export default function AuthorBookSearchGrid({ books = [] }: { books?: BookItem[
           )}
         </div>
       ) : (
-        /* 🔹 ৪. বইয়ের রেসপন্সিভ গ্রিড */
+        /* 🔹 ৪. বইয়ের রেসপন্সিভ গ্রিড */
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3 md:gap-4 w-full">
           {filteredBooks.map((book) => {
             const bookSlug =
@@ -165,7 +195,7 @@ export default function AuthorBookSearchGrid({ books = [] }: { books?: BookItem[
                   )}
                 </div>
 
-                {/* বইয়ের নাম */}
+                {/* বইয়ের নাম */}
                 <div className="p-2.5 flex-1 flex items-start justify-center text-center font-tarunima">
                   <h3 className="text-xs md:text-sm font-medium text-gray-800 group-hover:text-[#008080] transition-colors leading-snug line-clamp-2">
                     {book.title}

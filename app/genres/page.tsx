@@ -3,13 +3,14 @@ import { Home, Layers } from "lucide-react";
 import { headers } from 'next/headers';
 import type { Metadata } from 'next';
 import GenreList from "@/app/components/GenreList"; // আপনার প্রজেক্টের সঠিক পাথ অনুযায়ী ইমপোর্ট করুন
+import { buildTabTitle } from '@/app/lib/get-site-data';
 
 // 🔹 ডাইনামিক মেটাডেটা ফাংশন
 export async function generateMetadata(): Promise<Metadata> {
   const headersList = await headers();
   const host = headersList.get('host') || '';
 
-  // সাবডোমেন বা হোস্টনেম অনুযায়ী সাইটের নাম ঠিক করার লজিক
+  // সাবডোমেন বা হোস্টনেম অনুযায়ী সাইটের নাম ঠিক করার লজিক
   let siteName = 'এডুলিচার';
 
   if (host.includes('library.eduliture.org') || host.includes('library.')) {
@@ -18,8 +19,13 @@ export async function generateMetadata(): Promise<Metadata> {
     siteName = 'বাংলাকোষ';
   }
 
+  const dynamicMetaTitle = buildTabTitle({
+    currentPageTitle: 'ঘরানা',
+    siteName: siteName,
+  });
+
   return {
-    title: `ঘরানা | ${siteName}`,
+    title: dynamicMetaTitle,
   };
 }
 

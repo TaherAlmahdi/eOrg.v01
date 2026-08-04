@@ -156,7 +156,8 @@
     color: var(--accent-red);
     font-size: clamp(1.5rem, 1.2vw + 0.2rem, 2.15rem);
     font-weight: 700;
-    border-bottom: 1px solid #eee;
+    line-height: normal !important;
+    margin: 0.5rem 0;
   }
 
   .title {
@@ -1022,4 +1023,11 @@ sup {
   border: none;
   height: 2px;
   background-color: #008080;
+}
+
+.bgap {
+  padding-bottom: 15px;
+}
+.ugap {
+  padding-top: 15px;
 }
