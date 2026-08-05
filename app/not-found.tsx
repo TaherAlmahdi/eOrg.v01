@@ -75,21 +75,29 @@ export default async function NotFound() {
       <div className="absolute inset-0 bg-[#ffcc66]/20 z-10 pointer-events-none backdrop-blur-[1px]" />
 
       {/* 🟢 ১. কারেন্ট ডোমেনের হেডার সেকশন */}
-      <header className="relative z-20 w-full max-w-full flex flex-col items-center text-center pt-4">
-
-      </header>
+<header className="relative z-20 w-full max-w-full flex flex-col items-center text-center pt-4">
+  {/* 🟢 404 GIF Image Container */}
+  <div className="relative w-full max-w-[280px] sm:max-w-[480px] md:max-w-[480px] aspect-[509/337] mx-auto mb-2 overflow-hidden">
+    <Image
+      src="/404.gif" // আপনার জিফ ফাইলের সঠিক পাথ (public/images/404.gif বা public/404.gif অনুযায়ী দিন)
+      alt="404 Page Not Found"
+      fill
+      className="object-contain"
+      unoptimized // GIF অ্যানিমেশন যেন আটকে না যায় বা কোয়ালিটি লস না হয় তার জন্য
+      priority
+    />
+  </div>
+ 
+</header>
 
       {/* 🟢 ২. মূল ৪-০-৪ কন্টেন্ট */}
       <main className="relative z-20 w-full max-w-full text-center py-6 px-2 my-auto">
-        <h2 className="text-7xl md:text-9xl font-black text-red-600 tracking-widest drop-shadow-md">
-          404
-        </h2>
 
         <h3 className="text-2xl md:text-3xl font-bold mt-2 text-gray-900 font-tarunima">
           আপনি যা চাচ্ছেন তা পাওয়া যায়নি!
         </h3>
         <p className="text-gray-800 text-sm md:text-lg mt-2 mb-6 max-w-2xl mx-auto font-medium font-tarunima">
-          অনুগ্রহ করে এডুলিচার মূলপাতায় অথবা নিচের প্রকল্পগুলোতে খোঁজ করুন।
+          অনুগ্রহ করে এডুলিচার বিশুদ্ধজ্ঞান প্রকল্পগুলোতে খোঁজ করুন।
         </p>
 
         {/* 🟢 ৩. সাবডোমেন সাইটের তালিকা */}
