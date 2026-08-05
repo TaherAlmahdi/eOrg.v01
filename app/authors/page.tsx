@@ -1,15 +1,23 @@
 import Link from 'next/link';
+import { headers } from 'next/headers';
 import { Home, Users } from "lucide-react";
 import type { Metadata } from 'next';
 import AuthorList from "@/app/components/AuthorList";
-import { buildTabTitle } from '@/app/lib/get-site-data';
+import { getSubdomainData, buildTabTitle } from '@/app/lib/get-site-data';
 
 // 🔹 ডাইনামিক মেটাডেটা ফাংশন
 export async function generateMetadata(): Promise<Metadata> {
+  const headersList = await headers();
+  const host = headersList.get('host');
+  const siteData = getSubdomainData(host);
+  const siteName = siteData?.title || 'এডুলিচার';
+
   const dynamicMetaTitle = buildTabTitle({
     currentPageTitle: 'লেখক',
-    siteName: 'এডুলিচার', // 👈 siteTitle বদলে siteName ব্যবহার করা হলো
+    siteName, // 👈 siteTitle বদলে siteName ব্যবহার করা হলো
   });
+
+  
 
   return {
     title: dynamicMetaTitle, // আউটপুট: "লেখক ❀ এডুলিচার"
