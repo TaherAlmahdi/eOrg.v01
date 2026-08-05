@@ -51,6 +51,13 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function LibraryHomePage() {
+  const headersList = await headers();
+  const host = headersList.get('host') || '';
+
+  const siteData = getSubdomainData(host);
+  const subdomain = siteData.subdomain || 'library';
+  const currentConfig = headerConfig[subdomain] || headerConfig.library || headerConfig.main;
+
   const { latestBooks } = await getLibraryBooks();
 
   const getAuthorSlug = (bookItem: Record<string, unknown>): string => {
@@ -93,11 +100,59 @@ export default async function LibraryHomePage() {
     })
     .slice(0, 16);
 
+  // 🌐 JSON-LD Structured Data (WebSite + CollectionPage)
+  const currentUrl = `https://${siteData.subdomain ? `${siteData.subdomain}.` : ''}eduliture.org`;
+  const jsonLdData = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      'name': currentConfig.siteName || siteData.title || 'এডুলিচার',
+      'url': currentUrl,
+      'description': `${currentConfig.siteName}-এর পাঠশালায় নতুন প্রকাশিত বই, লেখক এবং বিভিন্ন ঘরানার সমৃদ্ধ সংগ্রহ দেখুন।`,
+      'inLanguage': 'bn'
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      'name': currentConfig.siteName || 'এডুলিচার পাঠশালা',
+      'url': currentUrl,
+      'mainEntity': {
+        '@type': 'ItemList',
+        'itemListElement': sortedLatestBooks.map((book, idx) => {
+          const item = book as unknown as Record<string, unknown>;
+          const rawBookSlug = item.slug || book.id;
+          const bookSlug = String(rawBookSlug);
+          
+          return {
+            '@type': 'ListItem',
+            'position': idx + 1,
+            'item': {
+              '@type': 'Book',
+              'name': book.title || 'শিরোনামহীন',
+              'author': {
+                '@type': 'Person',
+                'name': book.author || 'অজানা লেখক'
+              },
+              'url': `${currentUrl}/book/${encodeURIComponent(bookSlug)}`,
+              'image': book.cover || undefined
+            }
+          };
+        })
+      }
+    }
+  ];
+
   return (
     <div 
       className="relative w-full min-h-screen bg-cover bg-center bg-no-repeat bg-fixed py-4 px-2 sm:px-4"
       style={{ backgroundImage: "url('/bg01.png')" }}
     >
+      {/* 🚀 JSON-LD Structured Data Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }}
+      />
+
       <div className="relative w-full h-auto overflow-x-clip mt-2 font-tarunima">
         
         {/* ১. নতুন বই সেকশন */}

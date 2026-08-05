@@ -1,6 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import { headers } from 'next/headers';
+import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import Header from './components/Header';
 import Footer from './components/Footer';
 import { getSubdomainData } from '@/app/lib/get-site-data';
@@ -70,23 +72,42 @@ export async function generateMetadata(): Promise<Metadata> {
   const mainDomainTitle = 'এডুলিচার';
   const dynamicTitle = subdomain ? `${defaultTitle}` : mainDomainTitle;
   const ogImageUrl = siteData?.ogImage || '/og/site/default.webp';
+  const siteDescription = `${defaultTitle} ❀ শিক্ষা, সাহিত্য ও সংস্কৃতি বিষয়ক বিশুদ্ধজ্ঞান প্ল্যাটফর্ম`;
 
-  // ৫. সঠিকভাবে টাইটেল টেমপ্লেট কনফিগারেশন
+  // ৫. SEO, Metadata & Open Graph সম্পূর্ণ কনফিগারেশন
   return {
     title: {
       template: '%s',
       default: dynamicTitle,
     },
-    description: `${defaultTitle} ❀ বিশুদ্ধজ্ঞানের শিক্ষা বিষয়ক প্রতিষ্ঠান`,
+    description: siteDescription,
     metadataBase: new URL(siteUrl),
+    alternates: {
+      canonical: siteUrl, // 🔹 Canonical URL যুক্ত করা হয়েছে
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
     icons: {
       icon: iconPath,
+      shortcut: iconPath,
+      apple: iconPath,
     },
     openGraph: {
       title: dynamicTitle,
-      description: `${defaultTitle} ❀ বিশুদ্ধজ্ঞানের শিক্ষা বিষয়ক প্রতিষ্ঠান`,
+      description: siteDescription,
       url: siteUrl,
       siteName: mainDomainTitle,
+      locale: 'bn_BD',
+      type: 'website',
       images: [
         {
           url: ogImageUrl,
@@ -95,12 +116,11 @@ export async function generateMetadata(): Promise<Metadata> {
           alt: defaultTitle,
         },
       ],
-      locale: 'bn_BD',
-      type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
       title: dynamicTitle,
+      description: siteDescription,
       images: [ogImageUrl],
     },
   };
@@ -140,22 +160,21 @@ export default async function RootLayout({
           strategy="lazyOnload" 
         />
 
+        {/* Google tag (gtag.js) */}
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-MYTW1KXYEG"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
 
-{/* Google tag (gtag.js) */}
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-MYTW1KXYEG"></script>
-<script
-  dangerouslySetInnerHTML={{
-    __html: `
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-MYTW1KXYEG');
-    `,
-  }}
-/>
-
-
+            gtag('config', 'G-MYTW1KXYEG');
+          `}
+        </Script>
       </head>
       <body className="min-h-full flex flex-col bg-[#fdfdf7] text-gray-900 font-tarunima">
         <AOSProvider />
@@ -168,6 +187,8 @@ export default async function RootLayout({
         </main>
         
         <Footer />
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

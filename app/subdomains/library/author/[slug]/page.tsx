@@ -81,10 +81,44 @@ export default async function SingleAuthorPage({ params }: PageProps) {
   const resolvedParams = await params;
   const rawSlug = decodeURIComponent(resolvedParams.slug);
 
-  const { authorBooks } = await getAuthorDataAndBooks(rawSlug);
+  const headersList = await headers();
+  const host = headersList.get('host') || '';
+  const siteData = getSubdomainData(host);
+
+  const { authorBooks, authorName } = await getAuthorDataAndBooks(rawSlug);
+
+  const fallbackName = rawSlug
+    .replace(/-/g, ' ')
+    .replace(/\b\w/g, (l) => l.toUpperCase());
+
+  const displayAuthorName = authorName || fallbackName;
+  const currentFullUrl = `https://${siteData.subdomain ? `${siteData.subdomain}.` : ''}eduliture.org/author/${encodeURIComponent(rawSlug)}`;
+
+  // 🌐 JSON-LD (Structured Data) তৈরি
+  const jsonLdData = {
+    '@context': 'https://schema.org',
+    '@type': 'ProfilePage',
+    'mainEntity': {
+      '@type': 'Person',
+      'name': displayAuthorName,
+      'url': currentFullUrl,
+      'jobTitle': 'Author',
+      'workExample': authorBooks.map((book: any) => ({
+        '@type': 'Book',
+        'name': book.title || 'শিরোনামহীন বই',
+        'url': book.slug ? `https://${siteData.subdomain ? `${siteData.subdomain}.` : ''}eduliture.org/book/${book.slug}` : undefined,
+        'image': book.cover_image || book.og_image || undefined
+      }))
+    }
+  };
 
   return (
     <div className="w-full min-h-screen py-3 px-2 mx-auto font-tarunima">
+      {/* 🚀 JSON-LD Structured Data Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }}
+      />
       <AuthorBookSearchGrid books={authorBooks as any} />
     </div>
   );

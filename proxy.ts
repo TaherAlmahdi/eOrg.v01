@@ -28,6 +28,16 @@ export function proxy(request: NextRequest) {
     }
   }
 
+  // 🔴 স্পেশাল স্ট্যাটিক ফাইল বাইপাস (sitemap.xml, robots.txt, favicon ইত্যাদি)
+  const pathname = url.pathname;
+  if (
+    pathname === '/sitemap.xml' ||
+    pathname === '/robots.txt' ||
+    pathname === '/favicon.ico'
+  ) {
+    return NextResponse.next();
+  }
+
   // ৩. যদি সাবডোমেন না থাকে
   if (!subdomain) {
     return NextResponse.next();
@@ -37,8 +47,6 @@ export function proxy(request: NextRequest) {
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set('x-subdomain', subdomain);
   url.searchParams.set('subdomain', subdomain);
-
-  const pathname = url.pathname;
 
   // 🔴 গ্লোবাল বাইপাস: যেসব রাউট সব সাবডোমেনের জন্য সরাসরি মূল app/ রুট ব্যবহার করবে
   const globalBypassRoutes = [
@@ -78,6 +86,6 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|assets|images|favicon|robots\\.txt|sitemap\\.xml|sw\\.js|.*\\.(?:ico|png|webp|svg|jpg|jpeg|gif)$).*)',
+    '/((?!api|_next/static|_next/image|assets|images|favicon\\.ico|robots\\.txt|sitemap\\.xml|sw\\.js|.*\\.(?:ico|png|webp|svg|jpg|jpeg|gif)$).*)',
   ],
 };

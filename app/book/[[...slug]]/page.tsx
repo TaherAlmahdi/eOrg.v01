@@ -360,7 +360,7 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
     }
   }
 
-  // 📂 TableOfContents-এর জন্য ডাটা স্ট্রাকচার (সাব-পেজ ডাটা ইনজেক্ট করা হয়েছে)
+  // 📂 TableOfContents-এর জন্য ডাটা স্ট্রাকচার (সাব-পেজ ডাটা ইনজেক্ট করা হয়েছে)
   const currentSubPagesData = totalSubPages > 1 
     ? splitPages.map(p => ({ pageNumber: p.pageNumber, title: getSubPageLabel(p) })) 
     : [];
@@ -436,8 +436,39 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
       ? rawNotice.trim()
       : null;
 
+  // 🌐 JSON-LD (Structured Data) তৈরি
+  const currentFullUrl = `https://${siteData.subdomain ? `${siteData.subdomain}.` : ''}eduliture.org/book/${rawSegments.join('/')}`;
+  const jsonLdData = {
+    '@context': 'https://schema.org',
+    '@type': 'Book',
+    'name': book.title,
+    'author': {
+      '@type': 'Person',
+      'name': book.author || 'অজানা লেখক',
+    },
+    'url': currentFullUrl,
+    'image': book.og_image || book.cover_image || siteData.ogImage,
+    'description': book.meta_description || `${book.title} - একটি অমূল্য সৃষ্টি।`,
+    'inLanguage': 'bn',
+    'publisher': {
+      '@type': 'Organization',
+      'name': siteData.title || 'এডুলিচার',
+      'url': `https://${siteData.subdomain ? `${siteData.subdomain}.` : ''}eduliture.org`
+    },
+    'mainEntityOfPage': {
+      '@type': 'WebPage',
+      '@id': currentFullUrl
+    }
+  };
+
   return (
     <main className="bg-[#fdfcf8] min-h-screen">
+      {/* 🚀 JSON-LD Structured Data Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }}
+      />
+
       {/* ব্রেডক্রাম্ব নেভিগেশন */}
       <nav className="w-full bg-[#7575a3] border-b border-gray-200 py-2 px-3 text-white overflow-x-auto no-scrollbar">
         <div className="flex items-center max-w-full mx-auto text-sm font-tarunima whitespace-nowrap">
