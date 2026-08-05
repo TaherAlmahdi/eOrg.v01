@@ -3,7 +3,8 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export function proxy(request: NextRequest) {
+// 🔴 default export হিসেবে proxy ফাংশনটি এক্সপোর্ট করা হয়েছে
+export default function proxy(request: NextRequest) {
   const url = request.nextUrl.clone();
   const hostname = request.headers.get('host') || '';
 
