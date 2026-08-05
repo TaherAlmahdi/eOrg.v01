@@ -67,12 +67,7 @@ export const AuthorListView: FC<AuthorListViewProps> = ({
       {!isHomePage && (
         <div className="mb-6 p-4 bg-white/90 backdrop-blur-md rounded border border-teal-100 shadow-sm space-y-4">
 
-          {/* অথর শিরোনাম */}
-          <div className="text-center font-tarunima">
-            <h2 className="text-lg md:text-xl font-bold text-[#008080]">
-              লেখকবৃন্দ ({toBengaliNumber(totalAuthorsCount)} জন)
-            </h2>
-          </div>
+
 
           {/* সার্চ ইনপুট */}
           <div className="relative max-w-md mx-auto">
