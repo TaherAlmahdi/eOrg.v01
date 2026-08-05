@@ -143,14 +143,19 @@ export default async function RootLayout({
         />
 
 {/* Google tag (gtag.js) */}
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-MYTW1KXYEG"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+<Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-MYTW1KXYEG"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
 
-  gtag('config', 'G-MYTW1KXYEG');
-</script>
+            gtag('config', 'G-MYTW1KXYEG');
+          `}
+        </Script>
       </head>
       <body className="min-h-full flex flex-col bg-[#fdfdf7] text-gray-900 font-tarunima">
         <AOSProvider />
