@@ -9,6 +9,8 @@ import localFont from 'next/font/local';
 import Script from 'next/script';
 import AOSProvider from './components/AOSProvider';
 import "./globals.css";
+import Script from 'next/script';
+
 
 // ফন্ট কনফিগারেশন
 const mallika = localFont({
@@ -140,7 +142,7 @@ export default async function RootLayout({
           strategy="lazyOnload" 
         />
 
-<!-- Google tag (gtag.js) -->
+{/* Google tag (gtag.js) */}
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-MYTW1KXYEG"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
