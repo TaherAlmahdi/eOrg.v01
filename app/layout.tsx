@@ -139,6 +139,16 @@ export default async function RootLayout({
           crossOrigin="anonymous"
           strategy="lazyOnload" 
         />
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-MYTW1KXYEG"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-MYTW1KXYEG');
+</script>
       </head>
       <body className="min-h-full flex flex-col bg-[#fdfdf7] text-gray-900 font-tarunima">
         <AOSProvider />
