@@ -52,6 +52,7 @@
   .pr,
   .natok,
   .n-normal,
+  .shabda,
   .alap,
   .alap-sin,
   .alap-n,
@@ -254,6 +255,14 @@
     text-indent: 30px;
   }
 
+  .shabda::before {
+    content: "→ ";
+    color: #bd2e2e !important;
+  }
+
+
+
+  .shabda,
   .alap {
     margin-top: 4px;
     margin-bottom: 4px;
@@ -262,6 +271,7 @@
     text-indent: calc(clamp(20px, 2.5vw, 50px) * -1);
   }
 
+  .shabda::first-letter,
   .alap::first-letter {
     color: #bd2e2e !important;
   }
@@ -1075,3 +1085,56 @@ sup {
 .ugap {
   padding-top: 15px;
 }
+
+/* ==========================================
+   Responsive Multi-Column Layout
+   ========================================== */
+
+/* ১. মোবাইল স্ক্রিন (ডিফল্ট: সর্বোচ্চ 767px পর্যন্ত)
+   মোবাইলে ৫ বা ৬ কলাম থাকলে টেক্সট ভেঙে যায়, তাই সর্বোচ্চ ২ কলাম রাখা ভালো */
+.two   { columns: 2; }
+.three { columns: 2; }
+.four  { columns: 2; }
+.five  { columns: 2; }
+.six   { columns: 2; }
+
+/* ২. ট্যাবলেট স্ক্রিন (Min-width: 768px)
+   ট্যাবলেটের চওড়া অনুযায়ী ৩ কলাম পর্যন্ত পারফেক্ট দেখায় */
+@media (min-width: 768px) {
+  .two   { columns: 2; }
+  .three { columns: 3; }
+  .four  { columns: 3; }
+  .five  { columns: 3; }
+  .six   { columns: 3; }
+}
+
+/* ৩. স্ট্যান্ডার্ড ডেস্কটপ (Min-width: 1024px)
+   ডেস্কটপের স্ক্রিনে মূল ক্লাস অনুযায়ী কলাম বিভাজন হবে */
+@media (min-width: 1024px) {
+  .two   { columns: 2; }
+  .three { columns: 3; }
+  .four  { columns: 4; }
+  .five  { columns: 5; }
+  .six   { columns: 6; }
+}
+
+/* ৪. আল্ট্রাওয়াইড স্ক্রিন (Min-width: 1600px)
+   অনেক চওড়া স্ক্রিনে কলামের টেক্সট যেন খুব বেশি পাতলা বা আঁটসাঁট না হয়ে যায় */
+@media (min-width: 1600px) {
+  .two   { columns: 2; }
+  .three { columns: 3; }
+  .four  { columns: 4; }
+  .five  { columns: 5; }
+  .six   { columns: 6; }
+}
+
+/* ৫. কলাম স্পেসিং ও ভেঙে যাওয়া রোধের অতিরিক্ত গাইডলাইন (ঐচ্ছিক কিন্তু সহায়ক) */
+.two, .three, .four, .five, .six {
+  column-gap: 1.5rem; /* কলামগুলোর মাঝের খালি জায়গা */
+}
+
+/* কলামের ভেতর কোনো আইটেম/প্যারাগ্রাফ যেন মাঝপথে কেটে না যায় */
+.two > *, .three > *, .four > *, .five > *, .six > * {
+  break-inside: avoid;
+}
+
