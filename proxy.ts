@@ -3,7 +3,20 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-// 🔴 default export হিসেবে proxy ফাংশনটি এক্সপোর্ট করা হয়েছে
+// 🟢 ১. অনুমোদিত সাবডোমেনগুলোর তালিকা (লাইব্রেরি + লেখক স্লাগ)
+const ALLOWED_SUBDOMAINS = new Set([
+  'library',
+  'vidyasagar',
+  'bankim',
+  'rabindra',
+  'nazrul',
+  'sarat',
+  'jibananda',
+  'sukanta',
+  // আপনার নতুন নতুন লেখকদের সাবডোমেন স্লাগগুলো এখানে যুক্ত করবেন
+]);
+
+// 🔴 default export হিসেবে proxy ফাংশনটি এক্সপোর্ট করা হয়েছে
 export default function proxy(request: NextRequest) {
   const url = request.nextUrl.clone();
   const hostname = request.headers.get('host') || '';
@@ -44,19 +57,37 @@ export default function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // 🔴 ৩.১ ওয়াইল্ডকার্ড প্রতিরোধ: অননুমোদিত / ভুল সাবডোমেন হলে মেইন ডোমেনে রিডাইরেক্ট
+  if (!ALLOWED_SUBDOMAINS.has(subdomain)) {
+    const protocol = request.headers.get('x-forwarded-proto') || 'http';
+    
+    // Localhost এবং Production ডোমেন আলাদাভাবে নির্ধারণ
+    if (hostWithoutPort.includes('localhost')) {
+      const port = url.port ? `:${url.port}` : '';
+      return NextResponse.redirect(`${protocol}://localhost${port}/`, 307);
+    } else if (hostWithoutPort.endsWith('.vercel.app')) {
+      // Vercel Preview/Deployment URL-এর মূল ডোমেন
+      const mainVercelHost = parts.slice(-3).join('.');
+      return NextResponse.redirect(`${protocol}://${mainVercelHost}/`, 307);
+    } else {
+      // প্রোডাকশন মূল ডোমেন (eduliture.org)
+      return NextResponse.redirect(`https://www.eduliture.org/`, 307);
+    }
+  }
+
   // ৪. সাবডোমেন থাকলে হেডার ও কোয়েরি প্যারাম সেট করা
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set('x-subdomain', subdomain);
   url.searchParams.set('subdomain', subdomain);
 
   // 🔴 গ্লোবাল বাইপাস: যেসব রাউট সব সাবডোমেনের জন্য সরাসরি মূল app/ রুট ব্যবহার করবে
+  // (নোট: /authors এখান থেকে বাদ দেওয়া হয়েছে যেন সাবডোমেনে মূল পেজ ওভারল্যাপ না করে)
   const globalBypassRoutes = [
     '/about', 
     '/biography', 
     '/genres', 
     '/books', 
     '/book', 
-    '/authors', 
   ];
 
   if (globalBypassRoutes.some(route => pathname.startsWith(route))) {
@@ -69,11 +100,23 @@ export default function proxy(request: NextRequest) {
 
   // ৫. ডাইনামিক পাথম্যাপিং (শুধুমাত্র বাইপাস রাউট ব্যতীত অন্য সব পেজের জন্য)
   if (subdomain === 'library') {
+    // 🔴 /authors শুধুমাত্র library সাবডোমেনে থাকলে মূল app/authors/page.tsx থেকেই দেখাবে
+    if (pathname.startsWith('/authors')) {
+      return NextResponse.next({
+        request: {
+          headers: requestHeaders,
+        },
+      });
+    }
+
     if (!pathname.startsWith('/subdomains/library')) {
       url.pathname = `/subdomains/library${pathname === '/' ? '' : pathname}`;
     }
   } else {
-    if (!pathname.startsWith('/subdomains/author')) {
+    // 🔴 লেখকদের সাবডোমেনে কেউ /authors-এ ঢুকলে 404 পেজে পাঠাবে
+    if (pathname.startsWith('/authors')) {
+      url.pathname = '/404';
+    } else if (!pathname.startsWith('/subdomains/author')) {
       url.pathname = `/subdomains/author/${subdomain}${pathname === '/' ? '' : pathname}`;
     }
   }
