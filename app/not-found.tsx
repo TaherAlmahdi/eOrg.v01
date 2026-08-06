@@ -141,7 +141,7 @@ export default async function NotFound() {
             href={currentConfig.siteUrl}
             className="w-full sm:w-auto px-6 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded transition-colors shadow-md text-center font-tarunima"
           >
-            {currentConfig.siteName}-এর হোমে ফিরে যান
+            {currentConfig.siteName}র হোমে ফিরে যান
           </a>
 
           {/* মূল এডুলিচার মেইন সাইটের হোমে ফেরার লিংক */}
@@ -149,7 +149,7 @@ export default async function NotFound() {
             href={mainConfig.siteUrl}
             className="w-full sm:w-auto px-6 py-2.5 text-sm font-semibold text-[#008080] bg-white hover:bg-teal-50 border border-teal-200 rounded transition-colors shadow-md text-center font-tarunima"
           >
-            মেইন সাইটে ফিরে যান
+            এডুলিচার মূল সাইটে ফিরে যান
           </a>
         </div>
       </main>
