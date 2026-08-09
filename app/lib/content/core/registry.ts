@@ -52,7 +52,7 @@ export const CONTENT_REGISTRY = {
     "essay": "প্রবন্ধ",
     "drama": "নাটক",
     "letters": "পত্রাবলী",
-    "others": "বিবিধ",
+    "miscellaneous": "বিবিধ",
     "romantic-novel": "রোমান্টিক উপন্যাস",
     "historical-novel": "ঐতিহাসিক উপন্যাস",
     "social-novel": "সামাজিক উপন্যাস",
