@@ -54,9 +54,8 @@ export async function generateMetadata({ params }: AuthorHomePageProps): Promise
 
   const fullTitle = pageTitle || (author ? author.charAt(0).toUpperCase() + author.slice(1) : '');
 
-  // 🔹 ট্যাব টাইটেল: সাবডোমেন টাইটেল ❀ সাবডোমেন ট্যাগলাইন (mainDomainTitle বাদ দেওয়া হয়েছে)
+  // 🔹 ট্যাব টাইটেল: সাবডোমেন টাইটেল ❀ সাবডোমেন ট্যাগলাইন
   const dynamicMetaTitle = buildTabTitle({
-    
     siteName: currentConfig.siteName,
     tagline: currentConfig.tagline,
   });
@@ -137,15 +136,24 @@ export default async function AuthorHomePage({ params }: AuthorHomePageProps) {
     return formattedBookAuthor === author.toLowerCase() || book.author.includes(authorFirstName);
   });
 
-  // ৩. 'genres' প্রপার্টি ব্যবহার করে ইউনিক ঘরানা তালিকা বের করা
-  const extractedGenres = Array.from(
-    new Set(
-      authorBooks.flatMap((book) => {
-        if (Array.isArray(book.genres)) return book.genres;
-        if (typeof book.genres === 'string') return [book.genres];
-        return [];
-      }).filter(Boolean)
-    )
+  // ৩. ঘরানাভিত্তিক বইয়ের সংখ্যা হিসাব করে ক্রমানুসারে (Descending) সর্ট করা
+  const genreCounts: Record<string, number> = {};
+
+  authorBooks.forEach((book) => {
+    const genres = Array.isArray(book.genres)
+      ? book.genres
+      : typeof book.genres === 'string'
+      ? [book.genres]
+      : [];
+
+    genres.filter(Boolean).forEach((genre) => {
+      genreCounts[genre] = (genreCounts[genre] || 0) + 1;
+    });
+  });
+
+  // সবচেয়ে বেশি বই থাকা ঘরানা প্রথমে থাকবে
+  const extractedGenres = Object.keys(genreCounts).sort(
+    (a, b) => genreCounts[b] - genreCounts[a]
   );
 
   return (

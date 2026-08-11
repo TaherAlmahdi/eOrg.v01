@@ -11,12 +11,15 @@ source_book: "১৯০২ খ্রিষ্টাব্দের নবেম�
 genre:
   - "ধর্মীয় সাহিত্য"
   - "হিন্দুধর্ম"
+  - "ধর্মতত্ত্ব"
 
 genre_links:
   - name: "ধর্মীয় সাহিত্য"
     link: "/genre/religious"
   - name: "হিন্দুধর্ম"
     link: "/genre/hinduism"
+  - name: "ধর্মতত্ত্ব"
+  - link: "/genre/theology"
 
 cover_image: "/cover/srimad-bhagavad-gita.webp"
 
