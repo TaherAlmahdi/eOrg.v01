@@ -9,15 +9,18 @@ export const viewport: Viewport = {
   maximumScale: 1,
 };
 
-// 🟢 ২. Library PWA-এর জন্য প্রয়োজনীয় Metadata
+// 🟢 ২. Library PWA-এর জন্য প্রয়োজনীয় Metadata
 export const metadata: Metadata = {
-  title: 'eLibrary',
-  description: 'বাংলা ভাষায় সর্বাধিক গ্রন্থের সমাহার',
+  title: {
+    default: 'eLibrary | Eduliture', // ডিফল্ট বা হোম পেজে যা দেখাবে
+    template: '%s | Eduliture',     // অন্য পেজের জন্য (যেমন: "বইয়ের নাম | Eduliture")
+  },
+  description: 'বাংলা ভাষায় সর্বাধিক গ্রন্থের সমাহার',
   manifest: '/manifest.webmanifest',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'eLibrary',
+    title: 'eLibrary', // ইনস্টল করা অ্যাপের নাম
   },
   formatDetection: {
     telephone: false,
