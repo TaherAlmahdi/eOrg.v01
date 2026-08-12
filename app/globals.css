@@ -1194,3 +1194,10 @@ sup {
   display: inline-block;
   width: 50px !important;
 }
+
+p.alap span.right,
+span.right {
+  display: block;
+  float: right;
+  text-align: right!important;
+}
