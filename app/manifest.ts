@@ -4,7 +4,7 @@ import { MetadataRoute } from 'next';
 export default async function manifest(): Promise<MetadataRoute.Manifest> {
   const headersList = await headers();
   const rawHost = headersList.get('host') || '';
-  const host = rawHost.split(':')[0]; // পোর্ট নম্বর বাদ দেওয়া হলো
+  const host = rawHost.split(':')[0]; // পোর্ট নম্বর বাদ দেওয়া হলো
 
   // library.eduliture.org এবং লোকালহোস্টে টেস্ট করার শর্ত
   const isLibrarySubdomain = 
@@ -36,7 +36,19 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
         src: '/icons/library-192.png',
         sizes: '192x192',
         type: 'image/png',
+        purpose: 'any',
+      },
+      {
+        src: '/icons/library-192.png',
+        sizes: '192x192',
+        type: 'image/png',
         purpose: 'maskable',
+      },
+      {
+        src: '/icons/library-512.png',
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'any',
       },
       {
         src: '/icons/library-512.png',

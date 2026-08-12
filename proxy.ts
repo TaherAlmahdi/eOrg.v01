@@ -42,12 +42,15 @@ export default function proxy(request: NextRequest) {
     }
   }
 
-  // 🔴 স্পেশাল স্ট্যাটিক ফাইল বাইপাস (sitemap.xml, robots.txt, favicon ইত্যাদি)
+  // 🔴 স্পেশাল স্ট্যাটিক ফাইল ও PWA ফাইল বাইপাস (sitemap, manifest, sw, icons ইত্যাদি)
   const pathname = url.pathname;
   if (
     pathname === '/sitemap.xml' ||
     pathname === '/robots.txt' ||
-    pathname === '/favicon.ico'
+    pathname === '/favicon.ico' ||
+    pathname === '/manifest.webmanifest' ||
+    pathname === '/sw.js' ||
+    pathname.startsWith('/icons/')
   ) {
     return NextResponse.next();
   }
@@ -81,7 +84,6 @@ export default function proxy(request: NextRequest) {
   url.searchParams.set('subdomain', subdomain);
 
   // 🔴 গ্লোবাল বাইপাস: যেসব রাউট সব সাবডোমেনের জন্য সরাসরি মূল app/ রুট ব্যবহার করবে
-  // (নোট: /authors এখান থেকে বাদ দেওয়া হয়েছে যেন সাবডোমেনে মূল পেজ ওভারল্যাপ না করে)
   const globalBypassRoutes = [
     '/about', 
     '/biography', 
@@ -113,7 +115,7 @@ export default function proxy(request: NextRequest) {
       url.pathname = `/subdomains/library${pathname === '/' ? '' : pathname}`;
     }
   } else {
-    // 🔴 লেখকদের সাবডোমেনে কেউ /authors-এ ঢুকলে 404 পেজে পাঠাবে
+    // লেখকদের সাবডোমেনে কেউ /authors-এ ঢুকলে 404 পেজে পাঠাবে
     if (pathname.startsWith('/authors')) {
       url.pathname = '/404';
     } else if (!pathname.startsWith('/subdomains/author')) {
@@ -130,6 +132,6 @@ export default function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|assets|images|favicon\\.ico|robots\\.txt|sitemap\\.xml|sw\\.js|.*\\.(?:ico|png|webp|svg|jpg|jpeg|gif)$).*)',
+    '/((?!api|_next/static|_next/image|assets|images|icons|favicon\\.ico|robots\\.txt|sitemap\\.xml|manifest\\.webmanifest|sw\\.js|.*\\.(?:ico|png|webp|svg|jpg|jpeg|gif)$).*)',
   ],
 };
