@@ -35,6 +35,7 @@ export const CONTENT_REGISTRY = {
     "anowar-pasha": "আনোয়ার পাশা",
     "uttam-kumar-chatterjee": "উত্তমকুমার চট্টোপাধ্যায়",
     "kasem-bin-abu-bakar": "কাসেম বিন আবু বাকার",
+    "charu-chandra-chakraborty": "জরাসন্ধ (চারুচন্দ্র চক্রবর্তী)",
 
   } as Record<string, string>,
 
