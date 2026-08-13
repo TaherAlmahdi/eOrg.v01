@@ -71,7 +71,7 @@ export default function BooksPageClient({ initialBooks = [], siteTitle }: BooksP
     });
   }, [sortedBooks, searchQuery, selectedLetter]);
 
-  // 🏷️ ৪. buildTabTitle ব্যবহার করে ডায়নামিক ব্রাউজার ট্যাবটাইটেল আপডেট
+  // 🏷️ ৪. buildTabTitle ব্যবহার করে ডায়নামিক ব্রাউজার ট্যাবটাইটেল আপডেট
   useEffect(() => {
     let currentPageTitle = 'গ্রন্থাগার';
 
@@ -99,24 +99,24 @@ export default function BooksPageClient({ initialBooks = [], siteTitle }: BooksP
       </nav>
 
       {/* বইয়ের গ্রিড ও ফিল্টার হেডার */}
-      <div className="max-w-8xl mx-auto py-2 px-2">
+      <div className="max-w-full mx-auto py-2 px-2">
         <div className="mb-2 border-b border-orange-200 pb-2">
           <h2 className="text-2xl text-center font-bold font-sabrina text-[#996633]">
             {siteTitle} গ্রন্থাগার
           </h2>
           <p className="text-gray-500 mt-2 text-center italic font-tarunima">
             {filteredBooks.length > 0
-              ? `মোট ${toBengaliNumber(filteredBooks.length)}টি বই পাওয়া গিয়েছে; আপনার পছন্দের বইটি বেছে নিন`
+              ? `প্রকাশিত বইয়ের সংখ্যা ${toBengaliNumber(filteredBooks.length)}টি; আপনার পছন্দের বইটি বেছে নিন`
               : "এই মুহূর্তে কোনো বই পাওয়া যায়নি"}
           </p>
 
-          {/* 🔍 সার্চ ও অটোমেটিক ডায়নামিক ফিল্টার সেকশন */}
-          <div className="mt-4 max-w-4xl mx-auto space-y-3 font-tarunima">
-            {/* সার্চ বার */}
-            <div className="relative flex items-center">
+          {/* 🔍 সার্চ ও অটোমেটিক ডায়নামিক ফিল্টার সেকশন */}
+          <div className="mt-4 w-full space-y-3 font-tarunima">
+            {/* সার্চ বার: ৩ গুণ প্রশস্ত (max-w-3xl) এবং স্ক্রিনের মাঝে (mx-auto) সেটার করা */}
+            <div className="relative w-full max-w-2xl mx-auto flex items-center">
               <input
                 type="text"
-                placeholder="বই অথবা লেখকের নাম দিয়ে খুঁজুন..."
+                placeholder="বই অথবা লেখকের নাম দিয়ে খুঁজুন..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full px-4 py-2 pl-10 text-sm bg-white border border-orange-200 rounded shadow-xs focus:outline-hidden focus:ring-1 focus:ring-[#996633] focus:border-[#996633] text-gray-800"
@@ -132,9 +132,9 @@ export default function BooksPageClient({ initialBooks = [], siteTitle }: BooksP
               )}
             </div>
 
-            {/* ডায়নামিক আদ্যক্ষর ফিল্টার বাটন (যে বর্ণের বই আছে কেবল সেগুলিই দেখাবে) */}
+            {/* ডায়নামিক আদ্যক্ষর ফিল্টার বাটন: ফুল ওয়াইড (w-full) এবং রেসপনসিভ ডাইনামিক ফন্ট সাইজিং (text-xs sm:text-sm md:text-base lg:text-lg) */}
             {availableAlphabets.length > 1 && (
-              <div className="flex flex-wrap items-center justify-center gap-1.5 py-1 px-2 bg-orange-50/50 rounded border border-orange-100 text-lg font-tarunima shadow-xs">
+              <div className="w-full flex flex-wrap items-center justify-center gap-0.5 py-1 px-2 bg-orange-50/50 rounded border border-orange-100 text-xs sm:text-sm md:text-base lg:text-lg font-tarunima shadow-xs">
                 {availableAlphabets.map((letter) => (
                   <button
                     key={letter}

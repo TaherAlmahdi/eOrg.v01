@@ -5,7 +5,6 @@ const withPWA = withPWAInit({
   dest: "public",
   disable: process.env.NODE_ENV === "development",
   register: true,
-  // skipWaiting লাইনটি বাদ দেওয়া হয়েছে
 });
 
 const nextConfig: NextConfig = {
