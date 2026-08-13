@@ -88,7 +88,7 @@ export default function AuthorBookSearchGrid({
       {/* 🔹 ডাইনামিক হেডার (লেখকের নাম ও গ্রন্থাবলী) */}
       <div className="text-center font-tarunima mb-2">
         <h2 className="text-lg md:text-xl font-bold text-[#008080]">
-          {authorName ? authorName : 'গ্রন্থাবলী'}
+          {authorName ? `${authorName} রচনাবলী` : 'গ্রন্থাবলী'}
         </h2>  
         <p className="text-gray-600 text-sm">
           {siteName ? `${siteName}য়` : ''} প্রকাশিত গ্রন্থ সংখ্যা: {toBengaliNumber(totalBooksCount)} টি

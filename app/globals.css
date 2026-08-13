@@ -115,7 +115,11 @@
   .center,
   .right,
   .pl,
-  .pr {
+  .pr,
+  .dan,
+  .bam,
+  .rgt,
+  .lft{
     font-size: clamp(1rem, 1.2vw + 0.2rem, 1.3rem) !important;
     line-height: 1;
     color: var(--text-main);
@@ -1245,4 +1249,28 @@ span.right {
   width: 25%;
   float: left;
   font-size: inherit !important;
+}
+
+.pub {
+  color: goldenrod;
+}
+
+.lft {
+  float: left;
+  text-align: left;
+}
+
+.rgt {
+  float: right;
+  text-align: right;
+}
+
+.vgap::before {
+  content: " ❀ ";
+  text-align: center;
+  color: green;
+  opacity: 0.6; /* 0.1 খুব বেশি হালকা, তাই 0.5-0.7 ব্যবহার করা ভালো */
+  line-height: 1.5;
+  display: block;
+  margin: 10px 0;
 }

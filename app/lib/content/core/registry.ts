@@ -20,7 +20,7 @@ export const CONTENT_REGISTRY = {
     "muhammad-lutfar-rahman": "মুহম্মদ লুৎফর রহমান",
     "muhammad-nazibur-rahman": "মুহম্মদ নাজিবুর রহমান",
     "muhammad-zafar-iqbal": "মুহম্মদ জাফর ইকবাল",
-    "others": "অন্যান্য",
+    "al-mahmud": "আল মাহমুদ",
     "rabindranath-tagore": "রবীন্দ্রনাথ ঠাকুর",
     "sarat-chandra-chattopadhyay": "শরৎচন্দ্র চট্টোপাধ্যায়",
     "satyajit-ray": "সত্যজিৎ রায়",
@@ -32,6 +32,7 @@ export const CONTENT_REGISTRY = {
     "abanindranath-tagore": "অবনীন্দ্রনাথ ঠাকুর",
     "zahir-raihan": "জহির রায়হান",
     "ishwar-chandra-vidyasagar": "ঈশ্বরচন্দ্র বিদ্যাসাগর",
+    "anowar-pasha": "আনোয়ার পাশা",
 
   } as Record<string, string>,
 
@@ -104,6 +105,7 @@ export const CONTENT_REGISTRY = {
     "uncollected-works": "অগ্রন্থিত রচনা",
     "unpublished-works": "অপ্রকাশিত রচনা",
     "epistolary-novel": "পত্রোপন্যাস",
+    "liberation-war-novel": "মুক্তিযুদ্ধের উপন্যাস"
 
         
   } as Record<string, string>,
