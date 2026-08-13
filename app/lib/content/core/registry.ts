@@ -103,6 +103,7 @@ export const CONTENT_REGISTRY = {
     "travelogue": "ভ্রমণকাহিনী",
     "uncollected-works": "অগ্রন্থিত রচনা",
     "unpublished-works": "অপ্রকাশিত রচনা",
+    "epistolary-novel": "পত্রোপন্যাস",
 
         
   } as Record<string, string>,
