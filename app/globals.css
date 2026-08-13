@@ -121,7 +121,7 @@
   .rgt,
   .lft{
     font-size: clamp(1rem, 1.2vw + 0.2rem, 1.3rem) !important;
-    line-height: 1;
+    line-height: 1.55;
     color: var(--text-main);
   }
 
@@ -1053,7 +1053,11 @@ table td {
   text-align: inherit;
   padding: 0rem 0.5ch;
   color: inherit;
+  border: 1px solid ivory;
+  padding: 0.5rem 1rem;
 }
+
+table th {background-color: #d4edda; border: 1px solid ivory;}
 
 table th a,
 table td a {
