@@ -7,7 +7,8 @@ const withPWA = withPWAInit({
   register: true,
 });
 
-const nextConfig: NextConfig = {
+const nextConfig = {
+  turbo: {}, // Turbopack ফ্ল্যাগ এরর বাইপাস করার জন্য
   images: {
     remotePatterns: [
       {
@@ -24,6 +25,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-};
+} as NextConfig;
 
 export default withPWA(nextConfig);
