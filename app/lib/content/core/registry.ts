@@ -34,6 +34,7 @@ export const CONTENT_REGISTRY = {
     "ishwar-chandra-vidyasagar": "ঈশ্বরচন্দ্র বিদ্যাসাগর",
     "anowar-pasha": "আনোয়ার পাশা",
     "uttam-kumar-chatterjee": "উত্তমকুমার চট্টোপাধ্যায়",
+    "kasem-bin-abu-bakar": "কাসেম বিন আবু বাকার",
 
   } as Record<string, string>,
 
@@ -69,6 +70,7 @@ export const CONTENT_REGISTRY = {
     "literary-essay": "সাহিত্য প্রবন্ধ",
     "literary-fiction": "সাহিত্যিক কাহিনী",
     "literary-translation": "সাহিত্য অনুবাদ",
+    "love-story": "প্রেম কাহিনী",
     "memoir": "স্মৃতিকথা",
     "miscellaneous": "বিবিধ",
     "mythology": "পুরাণ",
