@@ -12,8 +12,8 @@ export const viewport: Viewport = {
 // 🟢 ২. Library PWA-এর জন্য প্রয়োজনীয় Metadata
 export const metadata: Metadata = {
   title: {
-    default: 'eLibrary | Eduliture', // ডিফল্ট বা হোম পেজে যা দেখাবে
-    template: '%s | Eduliture',     // অন্য পেজের জন্য (যেমন: "বইয়ের নাম | Eduliture")
+    default: 'eLibrary | এডুলিচার', // ডিফল্ট বা হোম পেজে যা দেখাবে
+    template: '%s | এডুলিচার',     // অন্য পেজের জন্য (যেমন: "বইয়ের নাম | এডুলিচার")
   },
   description: 'বাংলা ভাষায় সর্বাধিক গ্রন্থের সমাহার',
   manifest: '/manifest.webmanifest',
