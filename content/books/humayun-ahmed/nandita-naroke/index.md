@@ -1,12 +1,12 @@
 ---
-title: "বাবরনামা"
-author: "মুহম্মদ জালালউদ্দীন বিশ্বাস, সম্রাট জহির উদ্দিন বাবর"
+title: "নন্দিত নরকে"
+author: "হুমায়ূন আহমেদ"
 type: "book_index"
-slug: "babornama"
+slug: "nandita-naroke"
 subdomain: "library"
 
 first_published: 1961
-published: "2026-08-14"
+published: "2026-08-16"
 
 genre:
   - "স্মৃতিকথা"
@@ -14,7 +14,7 @@ genre:
 genre_links:
   - { name: "স্মৃতিকথা", link: "/genre/memoir" }
 
-cover_image: "/cover/babornama.webp"
+cover_image: "/cover/nandita-naroke.webp"
 
 meta_description: "জসীম উদ্‌দীনের স্মৃতিকথামূলক গদ্যগ্রন্থ ‘ঠাকুরবাড়ির আঙিনায়’। রবীন্দ্রনাথ ঠাকুর, অবনীন্দ্রনাথ ঠাকুর এবং ঠাকুর পরিবারের অন্যান্য সদস্যদের সঙ্গে লেখকের পরিচয়, সাক্ষাৎ ও সান্নিধ্যের স্মৃতি এই গ্রন্থের প্রধান বিষয়। ব্যক্তিগত স্মৃতির পাশাপাশি তৎকালীন সাহিত্যিক ও সাংস্কৃতিক পরিবেশেরও একটি জীবন্ত চিত্র এতে ফুটে উঠেছে।"
 
