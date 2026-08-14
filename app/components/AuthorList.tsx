@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import { getAllBooks } from "@/app/lib/books"; 
+import { getAllBooks, type Book } from "@/app/lib/books"; 
 import { CONTENT_REGISTRY, getSlug, getAuthorSlugFromTitle } from "@/app/lib/content/core/registry";
 import { AuthorListView } from "./AuthorListView";
 
@@ -12,23 +12,47 @@ const AuthorList: FC<AuthorListProps> = async ({ sortBy, limit }) => {
   const allBooks = await getAllBooks();
   const authorMap = new Map<string, { name: string; slug: string; count: number }>();
 
-  allBooks.forEach((book) => {
-    const rawAuthor = book.author?.trim();
-    if (!rawAuthor) return;
-
-    const authorSlug = getAuthorSlugFromTitle(rawAuthor) || getSlug("authors", rawAuthor);
-    const displayName = CONTENT_REGISTRY.authors[authorSlug] || rawAuthor;
-
-    if (authorMap.has(authorSlug)) {
-      const current = authorMap.get(authorSlug)!;
-      authorMap.set(authorSlug, { ...current, count: current.count + 1 });
-    } else {
-      authorMap.set(authorSlug, {
-        name: displayName,
-        slug: authorSlug,
-        count: 1,
-      });
+  // যেকোনো মানকে সেফলি String Array-তে রূপান্তর করার হেলপার ফাংশন
+  const normalizeNames = (value: unknown): string[] => {
+    if (Array.isArray(value)) {
+      return value
+        .map((item) => (typeof item === "string" ? item.trim() : ""))
+        .filter(Boolean);
     }
+    if (typeof value === "string") {
+      const trimmed = value.trim();
+      return trimmed ? [trimmed] : [];
+    }
+    return [];
+  };
+
+  allBooks.forEach((book: Book) => {
+    // ১. টাইপ-সেফ উপায়ে author, translator, এবং editor—তিনটি ফিল্ড থেকেই নামগুলো একত্রিত করা
+    const rawAuthors = [
+      ...normalizeNames(book.author),
+      ...normalizeNames(book.translator),
+      ...normalizeNames(book.editor),
+    ];
+
+    // ২. একটি বইয়ে একাধিক ভূমিকায় একই ব্যক্তির নাম থাকলে তা ফিল্টার করে ইউনিক রাখা
+    const uniqueContributors = Array.from(new Set(rawAuthors));
+
+    // ৩. প্রতিটি ব্যক্তির জন্য কাউন্ট ও ডেটা আপডেট করা
+    uniqueContributors.forEach((rawAuthor) => {
+      const authorSlug = getAuthorSlugFromTitle(rawAuthor) || getSlug("authors", rawAuthor);
+      const displayName = CONTENT_REGISTRY.authors[authorSlug] || rawAuthor;
+
+      if (authorMap.has(authorSlug)) {
+        const current = authorMap.get(authorSlug)!;
+        authorMap.set(authorSlug, { ...current, count: current.count + 1 });
+      } else {
+        authorMap.set(authorSlug, {
+          name: displayName,
+          slug: authorSlug,
+          count: 1,
+        });
+      }
+    });
   });
 
   const effectiveSortBy = sortBy || (limit ? "count" : "alphabetical");

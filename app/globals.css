@@ -1272,7 +1272,7 @@ span.right {
 }
 
 .vgap::before {
-  content: " ❀ ❀ ❀";
+  content: " ❀ ";
   text-align: center;
   color: green;
   opacity: 0.6; /* 0.1 খুব বেশি হালকা, তাই 0.5-0.7 ব্যবহার করা ভালো */
@@ -1282,7 +1282,7 @@ span.right {
   letter-spacing: 20px;
 }
 
-.star::before {
+.star2::before {
   content: "❀  ❀  ❀  ❀";
   display: block;
   width: 100%;
@@ -1296,7 +1296,7 @@ span.right {
   white-space: nowrap;
 }
 
-.star2::before {
+.star::before {
   content: "❀ ❀ ❀ ❀";
   display: block;
   width: 100%;

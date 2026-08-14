@@ -35,6 +35,10 @@ export interface Book {
   meta_description?: string;
   author: string;
   authorSlug: string;
+  translator?: string;
+  translatorSlug?: string;
+  editor?: string;
+  editorSlug?: string;
   subdomains: string[];
   genres: string[];
   genre?: string | string[];
@@ -243,6 +247,10 @@ export async function getLibraryBooks(currentSubdomain?: string): Promise<{
             meta_description: data.meta_description || '',
             author: data.author || 'অজ্ঞাত লেখক',
             authorSlug: data.authorSlug || authorFolderName,
+            translator: data.translator || '',
+            translatorSlug: data.translatorSlug || '',
+            editor: data.editor || '',
+            editorSlug: data.editorSlug || '',
             subdomains: bookSubdomains,
             genres: extractedGenres,
             genre: data.genre || extractedGenres,
@@ -605,8 +613,12 @@ export async function getBookBySlug(
             subtitle: resolvedSubtitle,
             meta_title: pageData.meta_title || mainData.meta_title || '',
             meta_description: pageData.meta_description || mainData.meta_description || '',
-            author: mainData.author || 'অজ্ঞাত লেখক',
-            authorSlug: mainData.authorSlug || authorFolderName,
+            author: pageData.author || mainData.author || 'অজ্ঞাত লেখক',
+            authorSlug: pageData.authorSlug || mainData.authorSlug || authorFolderName,
+            translator: pageData.translator || mainData.translator || '',
+            translatorSlug: pageData.translatorSlug || mainData.translatorSlug || '',
+            editor: pageData.editor || mainData.editor || '',
+            editorSlug: pageData.editorSlug || mainData.editorSlug || '',
             subdomains: bookSubdomains,
             genres: extractedGenres,
             genre: mainData.genre || extractedGenres,

@@ -12,36 +12,64 @@ interface PageProps {
   }>;
 }
 
-// 🔹 হেলপার ফাংশন: লেখক সংক্রান্ত ডাটা ও বই ফিল্টার করা
+// 🔹 হেলপার ফাংশন: যেকোনো নামের (লেখক/অনুবাদক/সম্পাদক) স্ল্যাগ বের করার নিয়ম
+function resolveRoleSlug(nameVal: unknown, slugVal: unknown): { name: string; slug: string } {
+  const name = String(nameVal || '').trim();
+  let slug = '';
+
+  if (name) {
+    slug = getAuthorSlugFromTitle(name) || getSlug('authors', name) || '';
+  }
+
+  if (!slug && slugVal) {
+    slug = String(slugVal).trim();
+  }
+
+  if (!slug && name) {
+    slug = name.toLowerCase().replace(/\s+/g, '-');
+  }
+
+  return { name, slug };
+}
+
+// 🔹 হেলপার ফাংশন: লেখক, অনুবাদক ও সম্পাদক সংক্রান্ত ডাটা এবং সংশ্লিষ্ট বই ফিল্টার করা
 async function getAuthorDataAndBooks(rawSlug: string) {
   const libraryData = await getLibraryBooks();
   const booksToFilter = (libraryData as any)?.allBooks || (libraryData as any)?.latestBooks || [];
 
+  let matchedPersonName: string | null = null;
+
   const authorBooks = booksToFilter.filter((book: any) => {
     const item = book as Record<string, unknown>;
-    const authorName = String(item.author || '').trim();
 
-    let calculatedSlug = '';
-    if (authorName) {
-      calculatedSlug = getAuthorSlugFromTitle(authorName) || getSlug('authors', authorName) || '';
+    // ১. লেখক (Author) ডাটা চেক
+    const authorData = resolveRoleSlug(item.author, item.authorSlug);
+    // ২. অনুবাদক (Translator) ডাটা চেক
+    const translatorData = resolveRoleSlug(item.translator, item.translatorSlug);
+    // ৩. সম্পাদক (Editor) ডাটা চেক
+    const editorData = resolveRoleSlug(item.editor, item.editorSlug);
+
+    // স্ল্যাগ বা নামের সাথে ম্যাচ করছে কিনা তা যাচাই
+    const isAuthorMatch = authorData.slug === rawSlug || authorData.name === rawSlug;
+    const isTranslatorMatch = translatorData.slug === rawSlug || translatorData.name === rawSlug;
+    const isEditorMatch = editorData.slug === rawSlug || editorData.name === rawSlug;
+
+    // যদি যেকোনো একটি ভূমিকায় ম্যাচ করে
+    if (isAuthorMatch || isTranslatorMatch || isEditorMatch) {
+      if (!matchedPersonName) {
+        if (isAuthorMatch && authorData.name) matchedPersonName = authorData.name;
+        else if (isTranslatorMatch && translatorData.name) matchedPersonName = translatorData.name;
+        else if (isEditorMatch && editorData.name) matchedPersonName = editorData.name;
+      }
+      return true;
     }
 
-    if (!calculatedSlug && item.authorSlug) {
-      calculatedSlug = String(item.authorSlug);
-    }
-
-    if (!calculatedSlug && authorName) {
-      calculatedSlug = authorName.toLowerCase().replace(/\s+/g, '-');
-    }
-
-    return calculatedSlug === rawSlug || authorName === rawSlug;
+    return false;
   });
-
-  const matchedAuthorName = authorBooks.length > 0 ? (authorBooks[0] as any)?.author?.trim() : null;
 
   return {
     authorBooks,
-    authorName: matchedAuthorName,
+    authorName: matchedPersonName,
   };
 }
 
@@ -55,7 +83,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const host = headersList.get('host') || '';
   const siteData = getSubdomainData(host);
 
-  // ১.২ লেখকের নাম বের করা
+  // ১.২ ব্যক্তির নাম বের করা
   const { authorName } = await getAuthorDataAndBooks(rawSlug);
 
   const fallbackName = rawSlug
@@ -65,7 +93,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const displayAuthorName = authorName || fallbackName;
 
   // ১.৩ ডাইনামিক ট্যাব টাইটেল বিল্ড করা
-  // 🔹 siteTitle-এর বদলে siteName ব্যবহার করা হলো এবং siteData?.title পাস করা হলো
   const dynamicMetaTitle = buildTabTitle({
     currentPageTitle: displayAuthorName,
     siteName: siteData?.title || 'এডুলিচার',
@@ -102,7 +129,7 @@ export default async function SingleAuthorPage({ params }: PageProps) {
       '@type': 'Person',
       'name': displayAuthorName,
       'url': currentFullUrl,
-      'jobTitle': 'Author',
+      'jobTitle': 'Author / Contributor',
       'workExample': authorBooks.map((book: any) => ({
         '@type': 'Book',
         'name': book.title || 'শিরোনামহীন বই',
@@ -119,7 +146,12 @@ export default async function SingleAuthorPage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }}
       />
-      <AuthorBookSearchGrid books={authorBooks as any} />
+      {/* 🔹 প্রপস হিসেবে সঠিক ব্যক্তির নাম এবং সাইট নেম পাস করা হলো */}
+      <AuthorBookSearchGrid 
+        books={authorBooks as any} 
+        personName={displayAuthorName}
+        siteName={siteData?.title || 'এডুলিচার পাঠশালা'}
+      />
     </div>
   );
 }

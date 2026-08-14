@@ -36,6 +36,9 @@ export const CONTENT_REGISTRY = {
     "uttam-kumar-chatterjee": "উত্তমকুমার চট্টোপাধ্যায়",
     "kasem-bin-abu-bakar": "কাসেম বিন আবু বাকার",
     "charu-chandra-chakraborty": "জরাসন্ধ (চারুচন্দ্র চক্রবর্তী)",
+    "jahiruddin-babar": "জহির উদ্দীন বাবর",
+    "muhammad-jalaluddin-biswas": "মুহম্মদ জালালউদ্দীন বিশ্বাস",
+    "abhik-chatterjee": "অভীক চট্টোপাধ্যায়",
 
   } as Record<string, string>,
 
