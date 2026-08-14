@@ -14,11 +14,11 @@ source_book: "লৌহকপাটের প্রামাণ্য অখণ�
 
 genre:
   - "উপন্যাস"
-  - "কারাজীবনভিত্তিক উপন্যাস"
+  - "কারা কাহিনী"
 
 genre_links:
   - { name: "উপন্যাস", link: "/genre/novel" }
-  - { name: "কারাজীবনভিত্তিক উপন্যাস", link: "/genre/social-novel" }
+  - { name: "কারা কাহিনী", link: "/genre/prison-story" }
 
 cover_image: "/cover/lauhakopat.webp"
 

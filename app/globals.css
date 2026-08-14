@@ -103,25 +103,24 @@
   .intro,
   .intro_right,
   ul,
-  ul.none {
-    /* স্ক্রিনের সাইজ অনুযায়ী ফন্ট স্কেল হবে (সর্বনিম্ন 1.15rem থেকে সর্বোচ্চ 1.85rem) */
-    font-size: clamp(1rem, 1.2vw + 0.2rem, 1.3rem) !important;
-    line-height: 1.55;
-    color: var(--text-main);
-  }
-
+  ul.none,
   .pc,
   .pcb,
   .center,
-  .right,
   .pl,
   .pr,
   .dan,
   .bam,
   .rgt,
-  .lft{
+  .lft {
     font-size: clamp(1rem, 1.2vw + 0.2rem, 1.3rem) !important;
     line-height: 1.55;
+    color: var(--text-main);
+  }
+
+  .right {
+    font-size: clamp(1rem, 1.2vw + 0.2rem, 1.3rem) !important;
+    line-height: 1.15;
     color: var(--text-main);
   }
 
@@ -1057,7 +1056,10 @@ table td {
   padding: 0.5rem 1rem;
 }
 
-table th {background-color: #d4edda; border: 1px solid ivory;}
+table th {
+  background-color: #d4edda;
+  border: 1px solid ivory;
+}
 
 table th a,
 table td a {
@@ -1270,11 +1272,65 @@ span.right {
 }
 
 .vgap::before {
-  content: " ❀ ";
+  content: " ❀ ❀ ❀";
   text-align: center;
   color: green;
   opacity: 0.6; /* 0.1 খুব বেশি হালকা, তাই 0.5-0.7 ব্যবহার করা ভালো */
   line-height: 1.5;
   display: block;
   margin: 10px 0;
+  letter-spacing: 20px;
+}
+
+.star::before {
+  content: "❀  ❀  ❀  ❀";
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  color: green;
+  opacity: 0.7;
+  line-height: 1.5;
+  letter-spacing: 25px;
+  margin: 10px 0;
+  white-space: nowrap;
+}
+
+.star2::before {
+  content: "❀ ❀ ❀ ❀";
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  color: green;
+  opacity: 0.7;
+  line-height: 1.5;
+  margin: 10px;
+  text-align: justify;
+  text-align-last: justify;
+  white-space: nowrap;
+  padding: 0 15%;
+}
+
+.lcard,
+.card-left {
+  font-size: clamp(1rem, 1.2vw + 0.2rem, 1.3rem) !important;
+  line-height: 1.55;
+  color: var(--text-main);
+  margin-left: 0;
+  margin-right: auto;
+  width: fit-content;
+  text-align: center;
+  display: block;
+}
+
+.rcard,
+.card-right {
+  font-size: clamp(1rem, 1.2vw + 0.2rem, 1.3rem) !important;
+  line-height: 1.55;
+  color: var(--text-main);
+  margin-left: auto;
+  margin-right: 0;
+  width: fit-content;
+  text-align: center;
+  display: block;
 }
