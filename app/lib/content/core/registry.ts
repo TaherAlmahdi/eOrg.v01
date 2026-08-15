@@ -123,8 +123,11 @@ export const CONTENT_REGISTRY = {
     "feluda": "ফেলুদা সিরিজ",
     "byomkesh": "ব্যোমকেশ সমগ্র",
     "kakababu": "কাকাবাবু সিরিজ",
-    "humayun-ahmed-rachanabali": "হুমায়ূন আহমেদ রচনাবলী",
-    "himu": "হিমু সমগ্র",
+    "humayun-rachanabali": "হুমায়ূন রচনাবলী",
+    "himu-samagra": "হিমু সমগ্র",
+    "misir-ali-omnibus": "মিসির আলী অমনিবাস",
+
+    
   } as Record<string, string>,
 
   // English Slug -> Bengali Value

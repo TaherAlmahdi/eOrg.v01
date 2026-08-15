@@ -16,9 +16,9 @@ genre_links:
   - { name: "উপন্যাস", link: "/genre/novel" }
   - { name: "সামাজিক উপন্যাস", link: "/genre/social-novel" }
 
-series: "হুমায়ূন আহমেদ রচনাবলী"
+series: "হুমায়ূন রচনাবলী"
 series_slug: "humayun-ahmed-rachanabali"
-series_link: "/series/humayun-ahmed-rachanabali"
+series_link: "/series/humayun-rachanabali"
 
 cover_image: "/cover/nandita-naroke.webp"
 
