@@ -7,31 +7,40 @@ export const alt = 'Book Preview';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
-export default async function Image({ params }) {
+// 🔹 params-এর টাইপ ইন্টারফেস যুক্ত করা হয়েছে
+interface ImageProps {
+  params: Promise<{
+    slug?: string[];
+  }>;
+}
+
+export default async function Image({ params }: ImageProps) {
   const resolvedParams = await params;
   // [[...slug]] এর ক্ষেত্রে params.slug একটি Array হয়
-  const slugArray = resolvedParams?.slug; 
+  const slugArray = resolvedParams?.slug;
 
-  // ১. ফন্ট লোড (নিরাপদ ট্রাই-ক্যাচ সহ)
-  let fontData;
+  // ১. ফন্ট লোড (ArrayBuffer কনভার্সন সহ)
+  let fontData: ArrayBuffer | null = null;
   try {
-    fontData = await readFile(join(process.cwd(), 'public/fonts/tarunima.ttf'));
+    const buffer = await readFile(join(process.cwd(), 'public/fonts/tarunima.ttf'));
+    // Buffer কে ArrayBuffer-এ রূপান্তর
+    fontData = buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
   } catch (err) {
     console.error('Font load error:', err);
   }
 
   // ২. ডাইনামিক টাইটেল ও ডাটা হ্যান্ডলিং
-  let pageTitle = 'বইয়ের লাইব্রেরি ও বুক কালেকশন';
+  let pageTitle = 'বইয়ের লাইব্রেরি ও বুক কালেকশন';
   let dynamicCategory = 'এডুলিচার বুকস';
 
   if (slugArray && slugArray.length > 0) {
     // Array-এর শেষ অংশটি সাধারণত মূল বই বা চ্যাপ্টারের নাম নির্দেশ করে
     const rawSlug = slugArray[slugArray.length - 1];
-    
+
     try {
-      // আপনার API কল (প্রয়োজন অনুযায়ী এন্ডপয়েন্ট টিউন করুন)
+      // আপনার API কল
       const res = await fetch(`https://eduliture.com/api/books/${rawSlug}`, {
-        next: { revalidate: 3600 }
+        next: { revalidate: 3600 },
       });
 
       if (res.ok) {
@@ -39,7 +48,7 @@ export default async function Image({ params }) {
         pageTitle = book.title || pageTitle;
         dynamicCategory = book.author || book.category || dynamicCategory;
       } else {
-        // API না থাকলে ইউআরএল থেকে টাইটেল সুন্দর করে সাজিয়ে নেওয়া
+        // API না থাকলে ইউআরএল থেকে টাইটেল সুন্দর করে সাজিয়ে নেওয়া
         pageTitle = decodeURIComponent(rawSlug).replace(/-/g, ' ');
       }
     } catch {
@@ -120,11 +129,6 @@ export default async function Image({ params }) {
               color: '#ffffff',
               margin: 0,
               lineHeight: 1.3,
-              textShadow: '0 4px 12px rgba(0,0,0,0.5)',
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
               maxWidth: '1000px',
             }}
           >
