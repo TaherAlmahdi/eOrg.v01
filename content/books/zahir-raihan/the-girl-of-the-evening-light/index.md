@@ -16,6 +16,9 @@ genre_links:
   - { name: "উপন্যাস", link: "/genre/novel" }
   - { name: "রোমান্টিক উপন্যাস", link: "/genre/romantic-novel" }
 
+series: "জহির রায়হান রচনাবলী"
+series_link: "/series/zahir-raihan-rachanabali"
+
 cover_image: "/cover/the-girl-of-the-evening-light.webp"
 
 meta_description: "জহির রায়হানের ‘শেষ বিকেলের মেয়ে’ প্রেম, মানবিক সম্পর্ক, স্বপ্ন, আবেগ ও মধ্যবিত্ত জীবনের টানাপোড়েন নিয়ে রচিত তাঁর অন্যতম জনপ্রিয় রোমান্টিক উপন্যাস।"

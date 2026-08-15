@@ -126,8 +126,10 @@ export const CONTENT_REGISTRY = {
     "humayun-rachanabali": "হুমায়ূন রচনাবলী",
     "himu-samagra": "হিমু সমগ্র",
     "misir-ali-omnibus": "মিসির আলী অমনিবাস",
+    "zahir-raihan-rachanabali": "জহির রায়হান রচনাবলী",
+    "sukanta-samagra": "সুকান্ত সমগ্র",
 
-    
+
   } as Record<string, string>,
 
   // English Slug -> Bengali Value
