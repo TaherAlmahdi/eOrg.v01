@@ -23,15 +23,18 @@ export async function generateMetadata(): Promise<Metadata> {
   // 🔹 headerConfig থেকে সঠিক ডাটা রিট্রিভ করা
   const currentConfig = headerConfig[subdomain] || headerConfig.library || headerConfig.main;
 
-  // 🔹 ট্যাব টাইটেল: সাইট নেম ❀ ট্যাগলাইন ❀ মেইন ডোমেন টাইটেল (যেমন: এডুলিচার পাঠশালা ❀ একটি এডুলিচার বিশুদ্ধজ্ঞান প্রকল্প ❀ এডুলিচার)
+  // 🔹 ট্যাব টাইটেল: সাইট নেম ❀ ট্যাগলাইন ❀ মেইন ডোমেন টাইটেল
   const dynamicMetaTitle = buildTabTitle({
     siteName: currentConfig.siteName,
     tagline: currentConfig.tagline,
-    
   });
 
   const description = `${currentConfig.siteName}-এর পাঠশালায় নতুন প্রকাশিত বই, লেখক এবং বিভিন্ন ঘরানার সমৃদ্ধ সংগ্রহ দেখুন।`;
-  const shareImage = siteData?.ogImage;
+  
+  // 🖼️ ডাইনামিক OG Image বা সাইট ডাটার প্রচ্ছদ
+  const ogTitle = currentConfig.siteName || 'এডুলিচার পাঠশালা';
+  const dynamicOgImage = `https://eduliture.org/api/og?title=${encodeURIComponent(ogTitle)}&tagline=${encodeURIComponent('অনলাইন লাইব্রেরি ও পাঠশালা')}`;
+  const shareImage = siteData?.ogImage || dynamicOgImage;
 
   return {
     title: dynamicMetaTitle,
@@ -150,7 +153,9 @@ export default async function LibraryHomePage() {
       {/* 🚀 JSON-LD Structured Data Schema */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLdData).replace(/</g, '\\u003c'),
+        }}
       />
 
       <div className="relative w-full h-auto overflow-x-clip mt-2 font-tarunima">

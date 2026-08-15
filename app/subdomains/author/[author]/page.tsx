@@ -19,23 +19,24 @@ interface AuthorHomePageProps {
   }>;
 }
 
-// 🏷️ Dynamic Metadata Export for Tab Title
+// 🏷️ Dynamic Metadata Export for Tab Title & OG Image
 export async function generateMetadata({ params }: AuthorHomePageProps): Promise<Metadata> {
   const { author } = await params;
   const headersList = await headers();
   const host = headersList.get('host') || '';
 
-  // সাবডোমেন ডাটা ও হেডার কনফিগারেশন এক্সট্যাক্ট করা
+  // সাবডোমেন ডাটা ও হেডার কনফিগারেশন এক্সট্র্যাক্ট করা
   const siteData = getSubdomainData(host);
   const subdomain = siteData.subdomain || 'library';
   const currentConfig = headerConfig[subdomain] || headerConfig.library || headerConfig.main;
 
   // লেখক পরিচিতি ফাইল থেকে Title বের করা
+  // 📌 নোট: sucsess এর বানান ফোল্ডারের প্রকৃত নাম অনুযায়ী মিলিয়ে নিন (উদাহরণ: success)
   const mdFilePath = path.join(
     process.cwd(),
     'content',
     'pages',
-    'sucsess',
+    'success',
     `${author}.md`
   );
 
@@ -61,21 +62,30 @@ export async function generateMetadata({ params }: AuthorHomePageProps): Promise
   });
 
   const description = `${fullTitle}-এর জীবন, সাহিত্য ও সমস্ত রচনার ডিজিটাল নির্ঘণ্ট দেখুন এডুলিচার পাঠশালায়।`;
-  const shareImage = siteData?.ogImage;
+
+  // 🖼️ ডাইনামিক OG Image API Call (সাবডোমেন ও অথর ভিত্তিক)
+  const ogImageUrl = `https://eduliture.org/api/og?title=${encodeURIComponent(fullTitle)}&tagline=${encodeURIComponent('লেখক ও সাহিত্যিক সংকলন')}`;
 
   return {
     title: dynamicMetaTitle,
     description: description,
     openGraph: {
-      title: dynamicMetaTitle,
+      title: `${fullTitle} - এডুলিচার`,
       description: description,
-      images: shareImage ? [{ url: shareImage }] : [],
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: fullTitle,
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
-      title: dynamicMetaTitle,
+      title: `${fullTitle} - এডুলিচার`,
       description: description,
-      images: shareImage ? [shareImage] : [],
+      images: [ogImageUrl],
     },
   };
 }
@@ -83,12 +93,12 @@ export async function generateMetadata({ params }: AuthorHomePageProps): Promise
 export default async function AuthorHomePage({ params }: AuthorHomePageProps) {
   const { author } = await params;
 
-  // ১. লেখক পরিচিতির জন্য মার্কডাউন ফাইল পড়া (MDX মুক্ত বিশুদ্ধ HTML প্রসেসিং)
+  // ১. লেখক পরিচিতির জন্য মার্কডাউন ফাইল পড়া
   const mdFilePath = path.join(
     process.cwd(),
     'content',
     'pages',
-    'sucsess',
+    'success',
     `${author}.md`
   );
 
@@ -96,9 +106,8 @@ export default async function AuthorHomePage({ params }: AuthorHomePageProps) {
   let pageTitle = '';
 
   if (fs.existsSync(mdFilePath)) {
-    const fileSource = fs.readFileSync(mdFilePath, 'utf8');
     try {
-      // gray-matter দিয়ে frontmatter এবং কন্টেন্ট আলাদা করা
+      const fileSource = fs.readFileSync(mdFilePath, 'utf8');
       const { content, data } = matter(fileSource);
       
       mdHtmlContent = content;
@@ -117,7 +126,6 @@ export default async function AuthorHomePage({ params }: AuthorHomePageProps) {
   const imageRelativePath = `/authors/${author}.webp`;
   const absoluteImagePath = path.join(process.cwd(), 'public', 'authors', `${author}.webp`);
   
-  // যদি নির্দিষ্টলেখকের ফাইল না থাকে, তবে ডিফল্ট ইমেজ দেখাবে
   const authorImageSrc = fs.existsSync(absoluteImagePath) 
     ? imageRelativePath 
     : '/authors/default.webp';
@@ -125,7 +133,6 @@ export default async function AuthorHomePage({ params }: AuthorHomePageProps) {
   // ২. লাইব্রেরি থেকে বইয়ের ডাটা আনা
   const { latestBooks } = await getLibraryBooks();
 
-  // টাইটেল বা স্ল্যাগ থেকে প্রথমাংশ নেওয়া
   const fullTitle = pageTitle || (author ? author.charAt(0).toUpperCase() + author.slice(1) : '');
   const authorFirstName = fullTitle.split(' ')[0] || fullTitle;
 
@@ -136,7 +143,7 @@ export default async function AuthorHomePage({ params }: AuthorHomePageProps) {
     return formattedBookAuthor === author.toLowerCase() || book.author.includes(authorFirstName);
   });
 
-  // ৩. ঘরানাভিত্তিক বইয়ের সংখ্যা হিসাব করে ক্রমানুসারে (Descending) সর্ট করা
+  // ৩. ঘরানাভিত্তিক বইয়ের সংখ্যা হিসাব করে ক্রমানুসারে সর্ট করা
   const genreCounts: Record<string, number> = {};
 
   authorBooks.forEach((book) => {
@@ -151,7 +158,6 @@ export default async function AuthorHomePage({ params }: AuthorHomePageProps) {
     });
   });
 
-  // সবচেয়ে বেশি বই থাকা ঘরানা প্রথমে থাকবে
   const extractedGenres = Object.keys(genreCounts).sort(
     (a, b) => genreCounts[b] - genreCounts[a]
   );
@@ -174,7 +180,8 @@ export default async function AuthorHomePage({ params }: AuthorHomePageProps) {
         </div>
 
         <div className="w-full text-slate-800 leading-relaxed">
-          <div className="w-full aspect-2/3 mb-3 md:float-left md:mr-3 md:mb-2 md:w-64 md:h-96 relative bg-slate-100 rounded border border-slate-200 overflow-hidden shadow-sm p-0 flex items-center justify-center">
+          {/* 📌 কাস্টম aspect ratio সংশোধন করা হয়েছে: aspect-[2/3] */}
+          <div className="w-full aspect-[2/3] mb-3 md:float-left md:mr-3 md:mb-2 md:w-64 md:h-96 relative bg-slate-100 rounded border border-slate-200 overflow-hidden shadow-sm p-0 flex items-center justify-center">
             <Image
               src={authorImageSrc}
               alt={fullTitle ? `${fullTitle}-এর ছবি` : 'লেখকের ছবি'}
@@ -185,7 +192,7 @@ export default async function AuthorHomePage({ params }: AuthorHomePageProps) {
             />
           </div>
 
-          {/* ⚡ dangerouslySetInnerHTML ব্যবহারের কারণে <p class="..."> নিখুঁতভাবে চলবে */}
+          {/* ⚡ কন্টেন্ট রেন্ডারিং কাস্টম টাইপোগ্রাফি ডাইনামিক স্টাইলিং */}
           <div 
             className="space-y-4 leading-relaxed [&_h1]:text-3xl [&_h1]:md:text-4xl [&_h1]:font-black [&_h1]:mb-4 [&_h1]:mt-6 [&_h1]:text-slate-900 [&_h2]:text-2xl [&_h2]:md:text-3xl [&_h2]:font-bold [&_h2]:mb-3 [&_h2]:mt-5 [&_h2]:text-slate-900 [&_ul]:list-disc [&_ul]:list-inside [&_ul]:mb-4 [&_ul]:space-y-1 [&_ul]:text-xl [&_ul]:md:text-2xl [&_ol]:list-decimal [&_ol]:list-inside [&_ol]:mb-4 [&_ol]:space-y-1 [&_ol]:text-xl [&_ol]:md:text-2xl"
             dangerouslySetInnerHTML={{ __html: mdHtmlContent }}
@@ -208,7 +215,9 @@ export default async function AuthorHomePage({ params }: AuthorHomePageProps) {
 
           {extractedGenres.length === 0 ? (
             <div className="inline-flex items-center justify-center gap-4 px-5 py-2 rounded bg-teal-50 text-[#008080] mb-8 animate-pulse border border-teal-100 shadow-sm text-center">
-              <p className="text-lg text-slate-500 py-4 font-tarunima font-medium italic text-center"><span className="text-[#008080]">এডুলিচার</span> বিশুদ্ধজ্ঞান প্রকল্প <span className="text-[#cc7a00]">{fullTitle}</span>র নির্মাণের কাজ চলমান রয়েছে, অনুগ্রহ করে পরে আবার চেষ্টা করুন। আমাদের প্রকল্প উন্নয়ন কর্মীগণ চেষ্টা করছেন যতদূর সম্ভব দ্রুত আপনাদের সম্পূর্ণ <span className="text-[#cc7a00]">{fullTitle}</span> উপহার দেওয়ার জন্য। সাথে থাকার জন্য ধন্যবাদ।</p>
+              <p className="text-lg text-slate-500 py-4 font-tarunima font-medium italic text-center">
+                <span className="text-[#008080]">এডুলিচার</span> বিশুদ্ধজ্ঞান প্রকল্প <span className="text-[#cc7a00]">{fullTitle}</span>র নির্মাণের কাজ চলমান রয়েছে, অনুগ্রহ করে পরে আবার চেষ্টা করুন। আমাদের প্রকল্প উন্নয়ন কর্মীগণ চেষ্টা করছেন যতদূর সম্ভব দ্রুত আপনাদের সম্পূর্ণ <span className="text-[#cc7a00]">{fullTitle}</span> উপহার দেওয়ার জন্য। সাথে থাকার জন্য ধন্যবাদ।
+              </p>
             </div>
           ) : (
             <div className="flex flex-wrap gap-2 w-full">

@@ -2,57 +2,54 @@ import { ImageResponse } from 'next/og';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
-// Node.js রানটাইম ব্যবহার করা হয়েছে
 export const runtime = 'nodejs';
-
-export const alt = 'Site Preview';
-export const size = {
-  width: 1200,
-  height: 630,
-};
+export const alt = 'Book Preview';
+export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
-// params ব্যবহারের মাধ্যমে প্রতিটি পেজের ইউআরএল ডাইনামিক করা হয়েছে
 export default async function Image({ params }) {
-  // ১. ডাইনামিক স্ラグ (slug) বের করা
   const resolvedParams = await params;
-  const slug = resolvedParams?.slug;
+  // [[...slug]] এর ক্ষেত্রে params.slug একটি Array হয়
+  const slugArray = resolvedParams?.slug; 
 
-  // ২. কাস্টম Tarunima ফন্ট লোড করা
-  const fontData = await readFile(
-    join(process.cwd(), 'public/fonts/Tarunima.ttf')
-  );
+  // ১. ফন্ট লোড (নিরাপদ ট্রাই-ক্যাচ সহ)
+  let fontData;
+  try {
+    fontData = await readFile(join(process.cwd(), 'public/fonts/tarunima.ttf'));
+  } catch (err) {
+    console.error('Font load error:', err);
+  }
 
-  // ৩. ডাইনামিক ডাটা ফেচিং (আপনার API/Database অনুযায়ী ডাটা সেট হবে)
-  let pageTitle = 'আমাদের ওয়েবসাইটে আপনাকে স্বাগতম';
-  let dynamicTagline = 'সহজ ভাষায় সকল বই ও অনুচ্ছেদ পড়ুন';
+  // ২. ডাইনামিক টাইটেল ও ডাটা হ্যান্ডলিং
+  let pageTitle = 'বইয়ের লাইব্রেরি ও বুক কালেকশন';
+  let dynamicCategory = 'এডুলিচার বুকস';
 
-  if (slug) {
+  if (slugArray && slugArray.length > 0) {
+    // Array-এর শেষ অংশটি সাধারণত মূল বই বা চ্যাপ্টারের নাম নির্দেশ করে
+    const rawSlug = slugArray[slugArray.length - 1];
+    
     try {
-      // আপনার অরিজিনাল API এন্ডপয়েন্ট বা ডাটাবেজ কল দিন
-      const res = await fetch(`https://eduliture.com/api/posts/${slug}`, {
-        next: { revalidate: 3600 } // ক্যাশিং
+      // আপনার API কল (প্রয়োজন অনুযায়ী এন্ডপয়েন্ট টিউন করুন)
+      const res = await fetch(`https://eduliture.com/api/books/${rawSlug}`, {
+        next: { revalidate: 3600 }
       });
 
       if (res.ok) {
-        const post = await res.json();
-        // পোস্টের টাইটেল ও ক্যাটাগরি বা ট্যাগলাইন সেট করা
-        pageTitle = post.title || pageTitle;
-        dynamicTagline = post.category || post.tagline || dynamicTagline;
+        const book = await res.json();
+        pageTitle = book.title || pageTitle;
+        dynamicCategory = book.author || book.category || dynamicCategory;
       } else {
-        // API না থাকলে স্ラグ (Slug) থেকে সুন্দর করে টাইটেল তৈরি করা
-        pageTitle = decodeURIComponent(slug).replace(/-/g, ' ');
+        // API না থাকলে ইউআরএল থেকে টাইটেল সুন্দর করে সাজিয়ে নেওয়া
+        pageTitle = decodeURIComponent(rawSlug).replace(/-/g, ' ');
       }
     } catch {
-      // এরর হলে স্ラグ থেকে টাইটেল ব্যাকআপ হিসেবে রাখা
-      pageTitle = decodeURIComponent(slug).replace(/-/g, ' ');
+      pageTitle = decodeURIComponent(rawSlug).replace(/-/g, ' ');
     }
   }
 
-  // ৪. সাইটের গ্লোবাল কনফিগারেশন
   const siteConfig = {
     siteName: 'এডুলিচার',
-    siteHeader: 'অনলাইন জ্ঞানকোষ ও লাইব্রেরি',
+    siteHeader: 'অনলাইন বই ও সাহিত্য লাইব্রেরি',
     logoUrl: 'https://eduliture.com/logo.png',
     bgImageUrl: 'https://eduliture.com/og-bg-pattern.png',
   };
@@ -71,7 +68,7 @@ export default async function Image({ params }) {
           position: 'relative',
           backgroundColor: '#0f172a',
           color: '#ffffff',
-          fontFamily: 'Tarunima',
+          fontFamily: fontData ? 'Tarunima' : 'sans-serif',
         }}
       >
         {/* ব্যাকগ্রাউন্ড ইমেজ */}
@@ -90,7 +87,7 @@ export default async function Image({ params }) {
           }}
         />
 
-        {/* ব্যাকগ্রাউন্ড ডার্ক ওভারলে */}
+        {/* ডার্ক ওভারলে */}
         <div
           style={{
             position: 'absolute',
@@ -103,7 +100,7 @@ export default async function Image({ params }) {
           }}
         />
 
-        {/* ডাইনামিক পেজ টাইটেল */}
+        {/* টাইটেল সেকশন */}
         <div
           style={{
             display: 'flex',
@@ -135,7 +132,7 @@ export default async function Image({ params }) {
           </h1>
         </div>
 
-        {/* ফুটার: সাইট নেম, লোগো এবং ডাইনামিক ট্যাগলাইন */}
+        {/* ফুটার সেকশন */}
         <div
           style={{
             display: 'flex',
@@ -147,7 +144,6 @@ export default async function Image({ params }) {
             zIndex: 10,
           }}
         >
-          {/* লোগো ও সাইট নেম */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -171,7 +167,6 @@ export default async function Image({ params }) {
             </div>
           </div>
 
-          {/* ডাইনামিক ট্যাগলাইন/ক্যাটাগরি */}
           <div
             style={{
               display: 'flex',
@@ -183,7 +178,7 @@ export default async function Image({ params }) {
             }}
           >
             <span style={{ fontSize: '18px', color: '#e2e8f0' }}>
-              {dynamicTagline}
+              {dynamicCategory}
             </span>
           </div>
         </div>
@@ -191,13 +186,15 @@ export default async function Image({ params }) {
     ),
     {
       ...size,
-      fonts: [
-        {
-          name: 'Tarunima',
-          data: fontData,
-          style: 'normal',
-        },
-      ],
+      fonts: fontData
+        ? [
+            {
+              name: 'Tarunima',
+              data: fontData,
+              style: 'normal',
+            },
+          ]
+        : [],
     }
   );
 }
