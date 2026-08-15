@@ -8,24 +8,25 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
 
-    // ইউআরএল থেকে ডাইনামিক ডেটা নেওয়া (Query Parameters)
+    // ১. ইউআরএল থেকে ডাইনামিক ডেটা নেওয়া (Query Parameters)
     const title = searchParams.get('title') || 'এডুলিচার – অনলাইন জ্ঞানকোষ ও লাইব্রেরি';
     const subtitle = searchParams.get('subtitle') || 'অনলাইন বই ও সাহিত্য সংকলন';
     const tagline = searchParams.get('tagline') || 'সহজ ভাষায় সকল বই ও অনুচ্ছেদ পড়ুন';
 
-    // ১. Tarunima ফন্ট লোড করা
-    let fontData: Buffer | null = null;
+    // ২. Tarunima ফন্ট লোড করা এবং ArrayBuffer-এ রূপান্তর (নিরাপদ উপায়)
+    let fontData: ArrayBuffer | null = null;
     try {
-      fontData = await readFile(join(process.cwd(), 'public/fonts/tarunima.ttf'));
+      const buffer = await readFile(join(process.cwd(), 'public/fonts/tarunima.ttf'));
+      fontData = buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
     } catch (err) {
       console.error('Font load error:', err);
     }
 
-    // ২. সাইটের গ্লোবাল কনফিগারেশন
+    // ৩. সাইটের গ্লোবাল কনফিগারেশন
     const siteConfig = {
       siteName: 'এডুলিচার',
-      logoUrl: 'https://eduliture.org/logo.png', // আপনার সঠিক লোগো URL
-      bgImageUrl: 'https://eduliture.org/og-bg-pattern.png', // ব্যাকগ্রাউন্ড প্যাটার্ন
+      logoUrl: 'https://eduliture.org/logo.png',
+      bgImageUrl: 'https://eduliture.org/og-bg-pattern.png',
     };
 
     return new ImageResponse(
@@ -94,11 +95,6 @@ export async function GET(request: Request) {
                 color: '#ffffff',
                 margin: 0,
                 lineHeight: 1.3,
-                textShadow: '0 4px 12px rgba(0,0,0,0.6)',
-                display: '-webkit-box',
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
                 maxWidth: '1000px',
               }}
             >
@@ -106,7 +102,7 @@ export async function GET(request: Request) {
             </h1>
           </div>
 
-          {/* নিচের ফুটার সেকশন: লোগো, সাইট নেম এবং ট্যাগলাইন */}
+          {/* নিচের ফুটার সেকশন */}
           <div
             style={{
               display: 'flex',
@@ -142,7 +138,7 @@ export async function GET(request: Request) {
               </div>
             </div>
 
-            {/* ডান পাশে: ক্যাটাগরি / ট্যাগলাইন */}
+            {/* ডান পাশে: ট্যাগলাইন / ক্যাটাগরি */}
             <div
               style={{
                 display: 'flex',

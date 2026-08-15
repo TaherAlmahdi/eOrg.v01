@@ -36,14 +36,14 @@ interface BioFrontmatter {
   meta_title?: string;
   meta_description?: string;
   og_image?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 // ১. সাবডোমেন বের করার হেল্পার
 async function getOnlySubdomain(): Promise<string | null> {
   const headersList = await headers();
   const host = headersList.get('host') || '';
-  
+
   const hostWithoutPort = host.split(':')[0];
   const parts = hostWithoutPort.split('.');
 
@@ -53,8 +53,8 @@ async function getOnlySubdomain(): Promise<string | null> {
       return firstPart;
     }
   }
-  
-  return null; 
+
+  return null;
 }
 
 // ২. লোকাল ফাইল থেকে বায়োগ্রাফি ডাটা লোড করা
@@ -64,15 +64,19 @@ function getBioData(subdomain: string | null) {
   const targetDir = path.join(process.cwd(), 'content', 'pages', 'bio');
   const filePath = path.join(targetDir, `${subdomain.toLowerCase()}.md`);
 
-  if (!fs.existsSync(filePath)) return null;
+  try {
+    if (!fs.existsSync(filePath)) return null;
 
-  const fileContents = fs.readFileSync(filePath, 'utf-8');
-  const { data, content } = matter(fileContents);
+    const fileContents = fs.readFileSync(filePath, 'utf-8');
+    const { data, content } = matter(fileContents);
 
-  return {
-    frontmatter: data as BioFrontmatter,
-    content,
-  };
+    return {
+      frontmatter: data as BioFrontmatter,
+      content,
+    };
+  } catch {
+    return null;
+  }
 }
 
 // ৩. 🏷️ Dynamic Metadata Export
@@ -93,53 +97,57 @@ export async function generateMetadata(): Promise<Metadata> {
   const { frontmatter } = bioData;
   const currentPageTitle = frontmatter.title || frontmatter.name || 'জীবনী';
 
-  // 🔹 siteTitle সরিয়ে siteName ব্যবহার করা হলো
   const dynamicMetaTitle = buildTabTitle({
     metaTitle: frontmatter.meta_title,
-    currentPageTitle: currentPageTitle,
+    currentPageTitle,
     siteName: siteData?.title,
   });
 
-  const description = frontmatter.meta_description || `${currentPageTitle}-এর জীবনী ও সংক্ষিপ্ত পরিচিতি।`;
+  const description =
+    frontmatter.meta_description || `${currentPageTitle}-এর জীবনী ও সংক্ষিপ্ত পরিচিতি।`;
   const shareImage = frontmatter.og_image || frontmatter.image || siteData.ogImage;
 
   return {
     title: dynamicMetaTitle,
-    description: description,
+    description,
     openGraph: {
       title: dynamicMetaTitle,
-      description: description,
+      description,
       images: shareImage ? [{ url: shareImage }] : [],
     },
     twitter: {
       card: 'summary_large_image',
       title: dynamicMetaTitle,
-      description: description,
+      description,
       images: shareImage ? [shareImage] : [],
     },
   };
 }
 
 // ৪. কন্টেন্ট রেন্ডারার কম্পোনেন্ট (UI Layout Component)
-function BiographyContent({ 
-  frontmatter, 
-  content 
-}: { 
-  frontmatter: BioFrontmatter; 
-  content: string 
+function BiographyContent({
+  frontmatter,
+  content,
+}: {
+  frontmatter: BioFrontmatter;
+  content: string;
 }) {
-  const birthInfo = frontmatter.birth_date 
-    ? `${frontmatter.birth_date}${frontmatter.birth_place ? ` (${frontmatter.birth_place})` : ''}` 
+  const birthInfo = frontmatter.birth_date
+    ? `${frontmatter.birth_date}${frontmatter.birth_place ? ` (${frontmatter.birth_place})` : ''}`
     : undefined;
 
-  const deathInfo = frontmatter.death_date 
-    ? `${frontmatter.death_date}${frontmatter.death_place ? ` (${frontmatter.death_place})` : ''}` 
+  const deathInfo = frontmatter.death_date
+    ? `${frontmatter.death_date}${frontmatter.death_place ? ` (${frontmatter.death_place})` : ''}`
     : undefined;
 
   const websiteValue = frontmatter.website ? (
-    <a 
-      href={frontmatter.website.startsWith('http') ? frontmatter.website : `https://${frontmatter.website}`} 
-      target="_blank" 
+    <a
+      href={
+        frontmatter.website.startsWith('http')
+          ? frontmatter.website
+          : `https://${frontmatter.website}`
+      }
+      target="_blank"
       rel="noopener noreferrer"
       className="text-teal-600 dark:text-teal-400 hover:underline wrap-break-words"
     >
@@ -166,9 +174,7 @@ function BiographyContent({
     { label: 'ওয়েবসাইট', value: websiteValue },
   ];
 
-  const infoFields = rawFields.filter(
-    (item) => item.value !== undefined && item.value !== null && item.value !== ''
-  );
+  const infoFields = rawFields.filter((item) => Boolean(item.value));
 
   return (
     <main className="max-w-full mx-auto px-2 py-4">
@@ -182,7 +188,7 @@ function BiographyContent({
         </h1>
 
         <div className="prose prose-lg dark:prose-invert max-w-none font-tarunima leading-relaxed text-gray-800 dark:text-gray-200">
-          <ReactMarkdown 
+          <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             rehypePlugins={[rehypeRaw]}
           >
@@ -209,9 +215,9 @@ export default async function BiographyPage() {
   }
 
   return (
-    <BiographyContent 
-      frontmatter={bioData.frontmatter} 
-      content={bioData.content} 
+    <BiographyContent
+      frontmatter={bioData.frontmatter}
+      content={bioData.content}
     />
   );
 }

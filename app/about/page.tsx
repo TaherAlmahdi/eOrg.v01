@@ -42,11 +42,10 @@ async function getOnlySubdomain(): Promise<string> {
 
 function getAboutData(subdomain: string): AboutData {
   const dirPath = path.join(process.cwd(), 'content', 'pages', 'about');
-  let filePath = path.join(dirPath, `${subdomain.toLowerCase()}.md`);
+  const primaryPath = path.join(dirPath, `${subdomain.toLowerCase()}.md`);
+  const fallbackPath = path.join(dirPath, 'www.md');
 
-  if (!fs.existsSync(filePath)) {
-    filePath = path.join(dirPath, 'www.md');
-  }
+  const filePath = fs.existsSync(primaryPath) ? primaryPath : fallbackPath;
 
   try {
     if (!fs.existsSync(filePath)) {
@@ -63,7 +62,7 @@ function getAboutData(subdomain: string): AboutData {
       frontmatter: data as AboutFrontmatter,
       content,
     };
-  } catch (error) {
+  } catch {
     return {
       frontmatter: { title: 'আমাদের সম্পর্কে' },
       content: 'তথ্য লোড করতে সমস্যা হয়েছে।',
@@ -133,7 +132,6 @@ export async function generateMetadata(): Promise<Metadata> {
 
   const currentPageTitle = frontmatter.title || 'আমাদের সম্পর্কে';
 
-  // siteTitle সরিয়ে siteName ব্যবহার করা হলো
   const dynamicMetaTitle = buildTabTitle({
     metaTitle: frontmatter.meta_title,
     currentPageTitle,
