@@ -47,11 +47,20 @@ interface GenreListProps {
 const GenreList: FC<GenreListProps> = async ({ sortBy, limit }) => {
   const allBooks = await getAllBooks();
 
-  const authorSet = new Set<string>();
+  const contributorSet = new Set<string>();
   const genreMap = new Map<string, { label: string; slug: string; rawGenre: string; count: number }>();
 
   allBooks.forEach((book: any) => {
-    if (book.author) authorSet.add(book.author);
+    // 🔹 লেখক, অনুবাদক ও সম্পাদকদের ইউনিকভাবে যুক্ত করা হচ্ছে
+    if (typeof book.author === 'string' && book.author.trim()) {
+      contributorSet.add(book.author.trim());
+    }
+    if (typeof book.translator === 'string' && book.translator.trim()) {
+      contributorSet.add(book.translator.trim());
+    }
+    if (typeof book.editor === 'string' && book.editor.trim()) {
+      contributorSet.add(book.editor.trim());
+    }
 
     const bookGenres = collectAllGenresFromBook(book);
     const finalGenres = bookGenres.length > 0 ? bookGenres : ['অন্যান্য'];
@@ -95,7 +104,7 @@ const GenreList: FC<GenreListProps> = async ({ sortBy, limit }) => {
               <div>
                 <p className="text-sm font-semibold text-gray-500">আমাদের পরিবারে</p>
                 <h2 className="text-lg md:text-xl font-bold text-gray-800">
-                  সম্মানিত লেখক <span className="text-[#008080] font-black text-2xl md:text-3xl mx-1">{toBengaliNumber(authorSet.size)}</span> জন
+                  সম্মানিত লেখক <span className="text-[#008080] font-black text-2xl md:text-3xl mx-1">{toBengaliNumber(contributorSet.size)}</span> জন
                 </h2>
               </div>
             </div>
@@ -116,7 +125,7 @@ const GenreList: FC<GenreListProps> = async ({ sortBy, limit }) => {
           </div>
         </div>
 
-        {/* 🔹 প্রপস থেকে getIcon বাদ দেওয়া হয়েছে */}
+        {/* 🔹 প্রপস থেকে getIcon বাদ দেওয়া হয়েছে */}
         <GenreListView
           genres={genres}
           isHomePage={!!limit}

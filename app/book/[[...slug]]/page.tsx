@@ -151,7 +151,7 @@ export async function generateMetadata({ params, searchParams }: UnifiedPageProp
   const resolvedSearchParams = await searchParams;
   const rawSegments = resolvedParams.slug || [];
 
-  if (rawSegments.length === 0) return { title: 'বই পাওয়া যায়নি' };
+  if (rawSegments.length === 0) return { title: 'বই পাওয়া যায়নি | এডুলিচার' };
 
   const { bookSlug, volumeOrChapterSlug, chapterSlug, pageNumFromPath } = resolveRouteSegments(rawSegments);
 
@@ -166,7 +166,7 @@ export async function generateMetadata({ params, searchParams }: UnifiedPageProp
     chapterSlug
   );
 
-  if (!book) return { title: 'বই পাওয়া যায়নি' };
+  if (!book) return { title: 'বই পাওয়া যায়নি | এডুলিচার' };
 
   const splitPages = parseBookSubPages(book.content || '');
   const activePageIndex = resolveActivePageIndex(splitPages, pageNumFromPath, resolvedSearchParams.page);
@@ -184,47 +184,61 @@ export async function generateMetadata({ params, searchParams }: UnifiedPageProp
 
   const titleParts: string[] = [];
 
-  if (resolvedChapterTitle) {
-    titleParts.push(resolvedChapterTitle);
-  }
-
-  if (displayVolumeTitle && displayVolumeTitle !== resolvedChapterTitle) {
-    titleParts.push(displayVolumeTitle);
-  }
-
+  // ১. প্রথমে নেক্সটপেজ সৃষ্ট টাইটেল অথবা পাতা নম্বর যুক্ত হবে
   if (currentSubPage?.title) {
-    titleParts.unshift(currentSubPage.title);
+    titleParts.push(currentSubPage.title);
   } else if (currentPageNum > 1) {
     titleParts.push(`পাতা ${toBengaliNumber(currentPageNum)}`);
   }
 
+  // ২. এরপর চ্যাপ্টার টাইটেল
+  if (resolvedChapterTitle) {
+    titleParts.push(resolvedChapterTitle);
+  }
+
+  // ৩. এরপর খণ্ড / ভলিউম টাইটেল (যদি চ্যাপ্টার টাইটেল থেকে ভিন্ন হয়)
+  if (displayVolumeTitle && displayVolumeTitle !== resolvedChapterTitle) {
+    titleParts.push(displayVolumeTitle);
+  }
+
   const pageDisplayTitle = titleParts.join(' ❀ ');
+
+  const siteName = siteData?.title || 'এডুলিচার';
 
   const dynamicMetaTitle = buildTabTitle({
     metaTitle: book.meta_title,
     currentPageTitle: pageDisplayTitle || undefined,
     bookTitle: book.title,
-    siteName: siteData?.title || 'এডুলিচার',
+    siteName: siteName,
   });
 
-  const description = book.meta_description || `${book.title} - একটি অমূল্য সৃষ্টি।`;
+  const description = book.meta_description || `${book.title}${book.author ? ` - ${book.author}` : ''} | এডুলিচার সাহিত্য সংকলন।`;
   const currentPath = rawSegments.join('/');
+
+  const domainUrl = siteData.subdomain 
+    ? `https://${siteData.subdomain}.eduliture.org` 
+    : 'https://eduliture.org';
+    
+  const canonicalUrl = `${domainUrl}/book/${currentPath}`;
 
   // Dynamic OG Image Fallback Endpoint
   const fallbackOgUrl = `/api/og?title=${encodeURIComponent(book.title)}&subtitle=${encodeURIComponent(
-    displayVolumeTitle || resolvedChapterTitle || siteData.title || 'এডুলিচার'
-  )}&tagline=${encodeURIComponent('অনলাইন বই ও সাহিত্য সংকলন')}`;
+    displayVolumeTitle || resolvedChapterTitle || siteName
+  )}&tagline=${encodeURIComponent('এডুলিচার অনলাইন বই ও সাহিত্য সংকলন')}`;
 
   const shareImage = book.og_image || book.cover_image || siteData.ogImage || fallbackOgUrl;
 
   return {
     title: dynamicMetaTitle,
     description,
+    alternates: {
+      canonical: canonicalUrl,
+    },
     openGraph: {
       title: dynamicMetaTitle,
       description,
-      url: `https://${siteData.subdomain ? `${siteData.subdomain}.` : ''}eduliture.org/book/${currentPath}`,
-      siteName: siteData.title,
+      url: canonicalUrl,
+      siteName: siteName,
       images: shareImage ? [{ url: shareImage, width: 1200, height: 630, alt: book.title }] : [],
       locale: 'bn_BD',
       type: 'book',
@@ -458,11 +472,16 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
   const rawNotice = book.rawFrontmatter?.notice;
   const pageNotice: string | null = typeof rawNotice === 'string' && rawNotice.trim().length > 0 ? rawNotice.trim() : null;
 
-  const currentFullUrl = `https://${siteData.subdomain ? `${siteData.subdomain}.` : ''}eduliture.org/book/${rawSegments.join('/')}`;
+  const domainUrl = siteData.subdomain 
+    ? `https://${siteData.subdomain}.eduliture.org` 
+    : 'https://eduliture.org';
+
+  const currentFullUrl = `${domainUrl}/book/${rawSegments.join('/')}`;
+  const siteTitle = siteData.title || 'এডুলিচার';
   
   const fallbackOgUrl = `/api/og?title=${encodeURIComponent(book.title)}&subtitle=${encodeURIComponent(
-    displayVolumeTitle || displayChapterTitle || siteData.title || 'এডুলিচার'
-  )}&tagline=${encodeURIComponent('অনলাইন বই ও সাহিত্য সংকলন')}`;
+    displayVolumeTitle || displayChapterTitle || siteTitle
+  )}&tagline=${encodeURIComponent('এডুলিচার অনলাইন বই ও সাহিত্য সংকলন')}`;
 
   const jsonLdData = {
     '@context': 'https://schema.org',
@@ -472,14 +491,26 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
       '@type': 'Person',
       name: book.author || 'অজানা লেখক',
     },
+    ...(book.translator && {
+      translator: {
+        '@type': 'Person',
+        name: book.translator,
+      },
+    }),
+    ...(book.editor && {
+      editor: {
+        '@type': 'Person',
+        name: book.editor,
+      },
+    }),
     url: currentFullUrl,
     image: book.og_image || book.cover_image || siteData.ogImage || fallbackOgUrl,
-    description: book.meta_description || `${book.title} - একটি অমূল্য সৃষ্টি।`,
+    description: book.meta_description || `${book.title}${book.author ? ` - ${book.author}` : ''} | এডুলিচার সাহিত্য সংকলন।`,
     inLanguage: 'bn',
     publisher: {
       '@type': 'Organization',
-      name: siteData.title || 'এডুলিচার',
-      url: `https://${siteData.subdomain ? `${siteData.subdomain}.` : ''}eduliture.org`,
+      name: siteTitle,
+      url: domainUrl,
     },
     mainEntityOfPage: {
       '@type': 'WebPage',
@@ -563,7 +594,23 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
               <p className="mb-1 text-lg tracking-wide text-red-900 uppercase md:text-xl opacity-90">{activeSubtitle}</p>
             )}
 
-            <p className="text-lg font-medium text-red-900 font-tarunima">{book.author}</p>
+            {/* লেখক, অনুবাদক ও সম্পাদক তথ্য */}
+            <div className="space-y-0.5 text-red-900 font-tarunima">
+              {book.author && (
+                <p className="text-lg font-medium">{book.author}</p>
+              )}
+              {book.translator && (
+                <p className="text-base opacity-90">
+                  অনুবাদ: <span className="font-medium">{book.translator}</span>
+                </p>
+              )}
+              {book.editor && (
+                <p className="text-base opacity-90">
+                  সম্পাদনা: <span className="font-medium">{book.editor}</span>
+                </p>
+              )}
+            </div>
+
             <div className="w-48 h-0.5 bg-red-900/40 mx-auto mt-3"></div>
           </header>
 

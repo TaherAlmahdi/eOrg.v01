@@ -221,8 +221,10 @@
     color: #52527a;
     font-size: clamp(1.15rem, 1.2vw + 0.2rem, 1.25rem);
     line-height: normal;
-    text-align: justify;
     font-weight: 600;
+    margin-top: 15px !important;
+    margin-bottom: 0px !important;
+    padding: 0px !important;
   }
 
   /* ----------------------------------
@@ -1316,7 +1318,7 @@ span.right {
   width: 100%;
   margin: 15px 0;
   padding: 0 5%;
-  height: 50px;
+  min-height: 50px;
   
   /* Flexbox দিয়ে উভয় পাশে সাজানো এবং ভার্টিক্যালি সেন্টার করা */
   display: flex;

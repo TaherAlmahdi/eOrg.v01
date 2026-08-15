@@ -29,19 +29,41 @@ export default function BookDetails({ book }: BookDetailsProps) {
       {/* ২. পুস্তক বিবরণীর বিস্তারিত তথ্যের মূল কার্ড (নিচে থাকবে) */}
       <div className="p-4 bg-white border border-gray-100 rounded shadow-sm">
         <div className="space-y-2 text-sm text-gray-800">
-          {/* বইয়ের নাম */}
-          <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
-            <span className="font-bold">বই</span>
-            <span className="text-gray-400">:</span>
-            <span>{book.title}</span>
-          </div>
+          {/* বইয়ের নাম */}
+          {book.title && (
+            <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
+              <span className="font-bold">বই</span>
+              <span className="text-gray-400">:</span>
+              <span>{book.title}</span>
+            </div>
+          )}
 
           {/* লেখক */}
-          <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
-            <span className="font-bold">লেখক</span>
-            <span className="text-gray-400">:</span>
-            <span>{book.author}</span>
-          </div>
+          {book.author && (
+            <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
+              <span className="font-bold">লেখক</span>
+              <span className="text-gray-400">:</span>
+              <span>{book.author}</span>
+            </div>
+          )}
+
+          {/* অনুবাদক */}
+          {book.translator && (
+            <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
+              <span className="font-bold">অনুবাদক</span>
+              <span className="text-gray-400">:</span>
+              <span>{book.translator}</span>
+            </div>
+          )}
+
+          {/* সম্পাদক */}
+          {book.editor && (
+            <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
+              <span className="font-bold">সম্পাদক</span>
+              <span className="text-gray-400">:</span>
+              <span>{book.editor}</span>
+            </div>
+          )}
 
           {/* প্রথম প্রকাশ */}
           {book.pub_medium && (
@@ -69,8 +91,6 @@ export default function BookDetails({ book }: BookDetailsProps) {
               <span>{book.publisher}</span>
             </div>
           )}
-
-
 
           {/* অনুস্মৃতি */}
           {book.source_book && (

@@ -8,12 +8,14 @@ import { ChevronDown, ChevronRight, FileText, Folder, List, X } from 'lucide-rea
 interface SubPageItem {
   pageNumber: number;
   title?: string;
+  subtitle?: string;
 }
 
 interface ChapterItem {
   id?: string;
   slug: string;
   title: string;
+  subtitle?: string;
   subPages?: SubPageItem[];
 }
 
@@ -22,6 +24,7 @@ interface VolumeItem {
   id: string;
   slug?: string;
   title: string;
+  subtitle?: string;
   chapters?: ChapterItem[];
   subPages?: SubPageItem[];
 }
@@ -29,6 +32,7 @@ interface VolumeItem {
 interface MetaItem {
   slug: string;
   title: string;
+  subtitle?: string;
   subPages?: SubPageItem[];
 }
 
@@ -67,7 +71,8 @@ const SubPageList = memo(function SubPageList({
       {subPages.map((subPage) => {
         const isSubActive = subPage.pageNumber === currentPageNum;
         const pagePath = subPage.pageNumber === 1 ? basePath : `${basePath}/${subPage.pageNumber}`;
-        const displayLabel = subPage.title || `পাতা ${subPage.pageNumber}`;
+        const baseLabel = subPage.title || `পাতা ${subPage.pageNumber}`;
+        const displayLabel = subPage.subtitle ? `${baseLabel} : ${subPage.subtitle}` : baseLabel;
 
         return (
           <Link
@@ -143,6 +148,7 @@ export default function TableOfContents({
             const metaBasePath = `/book/${slug}/${meta.slug}`;
             const hasSubPages = Boolean(meta.subPages && meta.subPages.length > 1);
             const sectionKey = `meta-${meta.slug}`;
+            const metaDisplayTitle = meta.subtitle ? `${meta.title} : ${meta.subtitle}` : meta.title;
 
             return (
               <div key={meta.slug} className="space-y-0.5">
@@ -157,7 +163,7 @@ export default function TableOfContents({
                     }`}
                   >
                     <FileText size={14} opacity={0.6} />
-                    <span>{meta.title}</span>
+                    <span>{metaDisplayTitle}</span>
                   </Link>
 
                   {hasSubPages && (
@@ -195,6 +201,7 @@ export default function TableOfContents({
             const chapBasePath = `/book/${slug}/${chapSlug}`;
             const chapHasSubPages = Boolean(file.subPages && file.subPages.length > 1);
             const chapKey = `direct-${chapSlug}`;
+            const fileDisplayTitle = file.subtitle ? `${file.title} : ${file.subtitle}` : file.title;
 
             return (
               <div key={chapSlug} className="space-y-0.5">
@@ -209,7 +216,7 @@ export default function TableOfContents({
                     }`}
                   >
                     <FileText size={14} opacity={0.7} />
-                    <span>{file.title}</span>
+                    <span>{fileDisplayTitle}</span>
                   </Link>
 
                   {chapHasSubPages && (
@@ -245,6 +252,7 @@ export default function TableOfContents({
             const volBasePath = `/book/${slug}/${vol.id}`;
             const isVolumeActive = vol.id === currentChapter || vol.slug === currentChapter;
             const volHasSubPages = Boolean(vol.subPages && vol.subPages.length > 1);
+            const volDisplayTitle = vol.subtitle ? `${vol.title} : ${vol.subtitle}` : vol.title;
 
             return (
               <div key={vol.id} className="pb-1 border-b border-gray-100 last:border-0">
@@ -260,7 +268,7 @@ export default function TableOfContents({
                         isVolumeActive ? 'font-bold' : ''
                       }`}
                     >
-                      {vol.title}
+                      {volDisplayTitle}
                     </span>
                   </Link>
 
@@ -295,6 +303,7 @@ export default function TableOfContents({
                       const chapBasePath = `/book/${slug}/${vol.id}/${chapSlug}`;
                       const chapHasSubPages = Boolean(chap.subPages && chap.subPages.length > 1);
                       const chapKey = `chap-${chapSlug}`;
+                      const chapDisplayTitle = chap.subtitle ? `${chap.title} : ${chap.subtitle}` : chap.title;
 
                       return (
                         <div key={chapSlug} className="space-y-0.5">
@@ -309,7 +318,7 @@ export default function TableOfContents({
                               }`}
                             >
                               <FileText size={14} opacity={0.5} />
-                              <span>{chap.title}</span>
+                              <span>{chapDisplayTitle}</span>
                             </Link>
 
                             {chapHasSubPages && (
