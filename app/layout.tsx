@@ -1,8 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import { headers } from 'next/headers';
-import { Analytics } from "@vercel/analytics/next"
-import { SpeedInsights } from "@vercel/speed-insights/next"
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import Header from './components/Header';
 import Footer from './components/Footer';
 import { getSubdomainData } from '@/app/lib/get-site-data';
@@ -67,23 +67,29 @@ export async function generateMetadata(): Promise<Metadata> {
   const siteData = getSubdomainData(host);
   const siteUrl = host ? `https://${host}` : (process.env.NEXT_PUBLIC_SITE_URL || 'https://eduliture.org');
 
-  // ৪. ডায়নামিক টাইটেল ও ইমেজের ভেরিয়েবল সেট করা
+  // ৪. ডায়নামিক টাইটেল, ডেসক্রিপশন ও OG ইমেজের ইউআরএল সেট করা
   const defaultTitle = siteData?.title || 'এডুলিচার';
   const mainDomainTitle = 'এডুলিচার';
-  const dynamicTitle = subdomain ? `${defaultTitle}` : mainDomainTitle;
-  const ogImageUrl = siteData?.ogImage || '/og/site/default.webp';
-  const siteDescription = `${defaultTitle} ❀ শিক্ষা, সাহিত্য ও সংস্কৃতি বিষয়ক বিশুদ্ধজ্ঞান প্ল্যাটফর্ম`;
+  const dynamicTitle = subdomain ? `${defaultTitle}` : `${mainDomainTitle} ❀ বিশুদ্ধজ্ঞানের প্রত্যয়`;
+  
+  // Dynamic OG Image Fallback Processing
+  const ogTitleParam = encodeURIComponent(defaultTitle);
+  const ogTaglineParam = encodeURIComponent('শিক্ষা, সাহিত্য ও সংস্কৃতি বিষয়ক বিশুদ্ধজ্ঞান প্ল্যাটফর্ম');
+  const dynamicGeneratedOg = `${siteUrl}/api/og?title=${ogTitleParam}&tagline=${ogTaglineParam}`;
+  
+  const ogImageUrl = siteData?.ogImage || dynamicGeneratedOg;
+  const siteDescription = siteData?.description || `${defaultTitle} ❀ শিক্ষা, সাহিত্য ও সংস্কৃতি বিষয়ক বিশুদ্ধজ্ঞান প্ল্যাটফর্ম`;
 
   // ৫. SEO, Metadata & Open Graph সম্পূর্ণ কনফিগারেশন
   return {
     title: {
-      template: '%s',
+      template: '%s ❀ এডুলিচার',
       default: dynamicTitle,
     },
     description: siteDescription,
     metadataBase: new URL(siteUrl),
     alternates: {
-      canonical: siteUrl, // 🔹 Canonical URL যুক্ত করা হয়েছে
+      canonical: siteUrl, // 🔹 Canonical URL
     },
     robots: {
       index: true,
