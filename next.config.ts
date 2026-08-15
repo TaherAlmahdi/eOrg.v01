@@ -7,24 +7,23 @@ const withPWA = withPWAInit({
   register: true,
 });
 
-const nextConfig = {
-  turbo: {}, // Turbopack ফ্ল্যাগ এরর বাইপাস করার জন্য
+const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'eduliture.com',
-        port: '',
-        pathname: '/**', 
+        protocol: "https",
+        hostname: "eduliture.com",
+        port: "",
+        pathname: "/**",
       },
       {
-        protocol: 'https',
-        hostname: 'raw.githubusercontent.com',
-        port: '',
-        pathname: '/**',
+        protocol: "https",
+        hostname: "raw.githubusercontent.com",
+        port: "",
+        pathname: "/**",
       },
     ],
   },
-} as NextConfig;
+};
 
 export default withPWA(nextConfig);
