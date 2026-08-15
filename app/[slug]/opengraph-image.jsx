@@ -1,9 +1,10 @@
 import { ImageResponse } from 'next/og';
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 
-// Node.js রানটাইম ব্যবহার করা হয়েছে (Next.js 16+ এর জন্য)
+// Node.js রানটাইম ব্যবহার করা হয়েছে
 export const runtime = 'nodejs';
 
-// ছবির সাইজ ও ফরম্যাট
 export const alt = 'Site Preview';
 export const size = {
   width: 1200,
@@ -11,24 +12,50 @@ export const size = {
 };
 export const contentType = 'image/png';
 
-export default async function Image() {
-  // কাস্টম Tarunima ফন্ট লোড করা
-  // (আপনার public/fonts/tarunima.woff2 ফোল্ডারে ফাইলটি থাকতে হবে)
-  const fontData = await fetch(
-    new URL('https://eduliture.com/fonts/Tarunima.woff2', import.meta.url)
-  ).then((res) => res.arrayBuffer());
+// params ব্যবহারের মাধ্যমে প্রতিটি পেজের ইউআরএল ডাইনামিক করা হয়েছে
+export default async function Image({ params }) {
+  // ১. ডাইনামিক স্ラグ (slug) বের করা
+  const resolvedParams = await params;
+  const slug = resolvedParams?.slug;
 
-  // ১. ডাইনামিক ডেটা
+  // ২. কাস্টম Tarunima ফন্ট লোড করা
+  const fontData = await readFile(
+    join(process.cwd(), 'public/fonts/Tarunima.ttf')
+  );
+
+  // ৩. ডাইনামিক ডাটা ফেচিং (আপনার API/Database অনুযায়ী ডাটা সেট হবে)
+  let pageTitle = 'আমাদের ওয়েবসাইটে আপনাকে স্বাগতম';
+  let dynamicTagline = 'সহজ ভাষায় সকল বই ও অনুচ্ছেদ পড়ুন';
+
+  if (slug) {
+    try {
+      // আপনার অরিজিনাল API এন্ডপয়েন্ট বা ডাটাবেজ কল দিন
+      const res = await fetch(`https://eduliture.com/api/posts/${slug}`, {
+        next: { revalidate: 3600 } // ক্যাশিং
+      });
+
+      if (res.ok) {
+        const post = await res.json();
+        // পোস্টের টাইটেল ও ক্যাটাগরি বা ট্যাগলাইন সেট করা
+        pageTitle = post.title || pageTitle;
+        dynamicTagline = post.category || post.tagline || dynamicTagline;
+      } else {
+        // API না থাকলে স্ラグ (Slug) থেকে সুন্দর করে টাইটেল তৈরি করা
+        pageTitle = decodeURIComponent(slug).replace(/-/g, ' ');
+      }
+    } catch {
+      // এরর হলে স্ラグ থেকে টাইটেল ব্যাকআপ হিসেবে রাখা
+      pageTitle = decodeURIComponent(slug).replace(/-/g, ' ');
+    }
+  }
+
+  // ৪. সাইটের গ্লোবাল কনফিগারেশন
   const siteConfig = {
-    siteName: 'আমার প্ল্যাটফর্ম',
+    siteName: 'এডুলিচার',
     siteHeader: 'অনলাইন জ্ঞানকোষ ও লাইব্রেরি',
-    tagline: 'সহজ ভাষায় সকল বই ও অনুচ্ছেদ পড়ুন',
-    logoUrl: 'https://eduliture.com/logo.png', // আপনার পাবলিক লোগো URL
-    bgImageUrl: 'https://eduliture.com/og-bg-pattern.png', // ব্যাকগ্রাউন্ড ইমেজ URL
+    logoUrl: 'https://eduliture.com/logo.png',
+    bgImageUrl: 'https://eduliture.com/og-bg-pattern.png',
   };
-
-  // প্রতিটি পেজের জন্য ডিফল্ট পেজ টাইটেল
-  const pageTitle = 'আমাদের ওয়েবসাইটে আপনাকে স্বাগতম';
 
   return new ImageResponse(
     (
@@ -44,10 +71,10 @@ export default async function Image() {
           position: 'relative',
           backgroundColor: '#0f172a',
           color: '#ffffff',
-          fontFamily: 'Tarunima', // কাস্টম ফন্ট নির্দিষ্ট করা হলো
+          fontFamily: 'Tarunima',
         }}
       >
-        {/* ১. ব্যাকগ্রাউন্ড ইমেজ ও ডার্ক ওভারলে */}
+        {/* ব্যাকগ্রাউন্ড ইমেজ */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={siteConfig.bgImageUrl}
@@ -63,7 +90,7 @@ export default async function Image() {
           }}
         />
 
-        {/* ব্যাকগ্রাউন্ড ওভারলে গ্র্যাডিয়েন্ট */}
+        {/* ব্যাকগ্রাউন্ড ডার্ক ওভারলে */}
         <div
           style={{
             position: 'absolute',
@@ -76,7 +103,7 @@ export default async function Image() {
           }}
         />
 
-        {/* ২. উপরের সেকশন: পেজের টাইটেল */}
+        {/* ডাইনামিক পেজ টাইটেল */}
         <div
           style={{
             display: 'flex',
@@ -108,7 +135,7 @@ export default async function Image() {
           </h1>
         </div>
 
-        {/* ৩. নিচের সেকশন: ডাইনামিক লোগো, সাইট হেডার এবং সাইট ট্যাগ */}
+        {/* ফুটার: সাইট নেম, লোগো এবং ডাইনামিক ট্যাগলাইন */}
         <div
           style={{
             display: 'flex',
@@ -120,14 +147,8 @@ export default async function Image() {
             zIndex: 10,
           }}
         >
-          {/* বাম পাশে: লোগো ও সাইট হেডার */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '20px',
-            }}
-          >
+          {/* লোগো ও সাইট নেম */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={siteConfig.logoUrl}
@@ -140,33 +161,17 @@ export default async function Image() {
               }}
             />
 
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-              }}
-            >
-              <span
-                style={{
-                  fontSize: '26px',
-                  color: '#ffffff',
-                  letterSpacing: '0.5px',
-                }}
-              >
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <span style={{ fontSize: '26px', color: '#ffffff', letterSpacing: '0.5px' }}>
                 {siteConfig.siteName}
               </span>
-              <span
-                style={{
-                  fontSize: '18px',
-                  color: '#38bdf8',
-                }}
-              >
+              <span style={{ fontSize: '18px', color: '#38bdf8' }}>
                 {siteConfig.siteHeader}
               </span>
             </div>
           </div>
 
-          {/* ডান পাশে: সাইট ট্যাগ / ট্যাগলাইন */}
+          {/* ডাইনামিক ট্যাগলাইন/ক্যাটাগরি */}
           <div
             style={{
               display: 'flex',
@@ -177,13 +182,8 @@ export default async function Image() {
               border: '1px solid rgba(255, 255, 255, 0.15)',
             }}
           >
-            <span
-              style={{
-                fontSize: '18px',
-                color: '#e2e8f0',
-              }}
-            >
-              {siteConfig.tagline}
+            <span style={{ fontSize: '18px', color: '#e2e8f0' }}>
+              {dynamicTagline}
             </span>
           </div>
         </div>
