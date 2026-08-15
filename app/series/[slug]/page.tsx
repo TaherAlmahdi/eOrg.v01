@@ -1,215 +1,105 @@
-// app/lib/content/core/registry.ts
+import { headers } from 'next/headers';
+import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import { getAllBooks } from '@/app/lib/books';
+import { getSubdomainData } from '@/app/lib/get-site-data';
+import { getSlug, getSeriesTitle } from '@/app/lib/content/core/registry';
+import { sortSeriesBooks } from '@/app/utils/sortUtils';
 
-export const CONTENT_REGISTRY = {
-  labels: {
-    author: "লেখক",
-    genre: "ঘরানা",
-    tags: "শ্রেণী",
-    volume: "গ্রন্থখণ্ড",
-    chapter: "অধ্যায় বা পরিচ্ছেদ",
-    series: "সিরিজ",
-  } as Record<string, string>,
-
-  authors: {
-    "abu-ishaque": "আবু ইসহাক",
-    "bankim-chandra-chatterjee": "বঙ্কিমচন্দ্র চট্টোপাধ্যায়",
-    "bibhutibhushan-bandyopadhyay": "বিভূতিভূষণ বন্দ্যোপাধ্যায়",
-    "bibhutibhushan-mukhopadhyay": "বিভূতিভূষণ মুখোপাধ্যায়",
-    "humayun-ahmed": "হুমায়ূন আহমেদ",
-    "jibananda-dash": "জীবনানন্দ দাশ",
-    "kazi-nazrul-islam": "কাজী নজরুল ইসলাম",
-    "muhammad-lutfar-rahman": "মুহম্মদ লুৎফর রহমান",
-    "muhammad-nazibur-rahman": "মুহম্মদ নাজিবুর রহমান",
-    "muhammad-zafar-iqbal": "মুহম্মদ জাফর ইকবাল",
-    "al-mahmud": "আল মাহমুদ",
-    "rabindranath-tagore": "রবীন্দ্রনাথ ঠাকুর",
-    "sarat-chandra-chattopadhyay": "শরৎচন্দ্র চট্টোপাধ্যায়",
-    "satyajit-ray": "সত্যজিৎ রায়",
-    "shamsur-rahman": "শামসুর রহমান",
-    "sufia-kamal": "সুফিয়া কামাল",
-    "syed-mujtaba-ali": "সৈয়দ মুজতবা আলী",
-    "syed-shamsul-haque": "সৈয়দ শামসুল হক",
-    "syed-waliullah": "সৈয়দ ওয়ালীউল্লাহ",
-    "abanindranath-tagore": "অবনীন্দ্রনাথ ঠাকুর",
-    "zahir-raihan": "জহির রায়হান",
-    "ishwar-chandra-vidyasagar": "ঈশ্বরচন্দ্র বিদ্যাসাগর",
-    "anowar-pasha": "আনোয়ার পাশা",
-    "uttam-kumar-chatterjee": "উত্তমকুমার চট্টোপাধ্যায়",
-    "kasem-bin-abu-bakar": "কাসেম বিন আবু বাকার",
-    "charu-chandra-chakraborty": "জরাসন্ধ (চারুচন্দ্র চক্রবর্তী)",
-    "jahiruddin-babar": "জহির উদ্দীন বাবর",
-    "muhammad-jalaluddin-biswas": "মুহম্মদ জালালউদ্দীন বিশ্বাস",
-    "abhik-chatterjee": "অভীক চট্টোপাধ্যায়",
-    "neelima-ibrahim" : "নীলিমা ইব্রাহীম",
-
-  } as Record<string, string>,
-
-  // English Slug -> Bengali Value
-  genres: {
-    "adventure-fiction": "সাহসিক কাহিনী",
-    "autobiography": "আত্মজীবনী",
-    "biography": "জীবনী",
-    "children-fiction": "শিশু কাহিনী",
-    "childrens-literature": "শিশুসাহিত্য",
-    "classic": "ধ্রুপদী সাহিত্য",
-    "detective-fiction": "গুপ্তচর কাহিনী",
-    "drama": "নাটক",
-    "drama-fiction": "নাট্য কাহিনী",
-    "essay": "প্রবন্ধ",
-    "essays": "প্রবন্ধাবলী",
-    "fables": "নীতিকথা",
-    "folklore": "লোকগাথা",
-    "hinduism": "হিন্দুধর্ম",
-    "historical-criticism": "ঐতিহাসিক সমালোচনা",
-    "historical-essay": "ঐতিহাসিক প্রবন্ধ",
-    "historical-fiction": "ঐতিহাসিক কাহিনী",
-    "historical-novel": "ঐতিহাসিক উপন্যাস",
-    "historical-translation": "ঐতিহাসিক অনুবাদ",
-    "history": "ইতিহাস",
-    "horror-fiction": "ভয়ঙ্কর কাহিনী",
-    "humor": "রম্য সাহিত্য",
-    "islam": "ইসলাম",
-    "language-learning": "ভাষা শিক্ষা",
-    "letters": "পত্রাবলী",
-    "literary-criticism": "সাহিত্য সমালোচনা",
-    "literary-criticism-translation": "সাহিত্য সমালোচনা অনুবাদ",
-    "literary-essay": "সাহিত্য প্রবন্ধ",
-    "literary-fiction": "সাহিত্যিক কাহিনী",
-    "literary-translation": "সাহিত্য অনুবাদ",
-    "love-story": "প্রেম কাহিনী",
-    "memoir": "স্মৃতিকথা",
-    "miscellaneous": "বিবিধ",
-    "mythology": "পুরাণ",
-    "novel": "উপন্যাস",
-    "novella": "উপন্যাসিকা", 
-    "philosophical-criticism": "দর্শন সমালোচনা",
-    "philosophical-essay": "দর্শন প্রবন্ধ",
-    "philosophical-translation": "দর্শন অনুবাদ",
-    "philosophy": "দর্শন",
-    "poem": "কবিতা",
-    "poetry": "কাব্য",
-    "prison-story": "কারা কাহিনী",
-    "poetry-collection": "কবিতা সঙ্কলন",
-    "psychological-novel": "মনস্তাত্ত্বিক উপন্যাস",
-    "religious": "ধর্মীয় সাহিত্য",
-    "religious-criticism": "ধর্মীয় সমালোচনা",
-    "religious-essay": "ধর্মীয় প্রবন্ধ",
-    "religious-translation": "ধর্মীয় অনুবাদ",
-    "romance-fiction": "রোমান্টিক কাহিনী",
-    "romantic-novel": "রোমান্টিক উপন্যাস",
-    "satire": "ব্যঙ্গাত্মক কাহিনী",
-    "science": "বিজ্ঞান",
-    "science-criticism": "বিজ্ঞান সমালোচনা",
-    "science-essay": "বিজ্ঞান প্রবন্ধ",
-    "science-fiction": "বিজ্ঞান কল্পকাহিনী",
-    "science-translation": "বিজ্ঞান অনুবাদ",
-    "short-stories": "ছোটগল্প সংকলন",
-    "social-novel": "সামাজিক উপন্যাস",
-    "stories": "গল্পগ্রন্থ",
-    "story": "ছোটগল্প",
-    "supernatural-fiction": "অলৌকিক গল্প",
-    "theology": "ধর্মতত্ত্ব",
-    "translation": "অনুবাদ",
-    "travel-essay": "ভ্রমণ প্রবন্ধ",
-    "travelogue": "ভ্রমণকাহিনী",
-    "uncollected-works": "অগ্রন্থিত রচনা",
-    "unpublished-works": "অপ্রকাশিত রচনা",
-    "epistolary-novel": "পত্রোপন্যাস",
-    "liberation-war-novel": "মুক্তিযুদ্ধের উপন্যাস"
-
-        
-  } as Record<string, string>,
-
-  series: {
-    "feluda": "ফেলুদা সিরিজ",
-    "byomkesh": "ব্যোমকেশ সমগ্র",
-    "kakababu": "কাকাবাবু সিরিজ",
-    "humayun-ahmed-rachanabali": "হুমায়ূন আহমেদ রচনাবলী",
-    "himu": "হিমু সমগ্র",
-
-
-
-  } as Record<string, string>,
-
-
-    tags: {
-    "ধ্রুপদী": "classical",
-    "ঐতিহাসিক": "historical",
-    "রোমান্টিক": "romantic",
-  } as Record<string, string>,
-};
-
-/**
- * রুল ১: MD ফাইলের যেকোনো বাংলা টেক্সট থেকে ইংরেজি স্লাগ তৈরি করার সর্বজনীন ফাংশন।
- * উদাহরণ: getSlug("genres", "উপন্যাস") -> "novel"
- */
-export function getSlug(type: "authors" | "genres" | "tags" | "series", banglaText: string): string {
-  if (!banglaText) return "others";
-  const cleaned = banglaText.trim();
-
-  // Genres-এর জন্য Value (বাংলা) ধরে Key (ইংরেজি স্লাগ) খোঁজা হবে
-  if (type === "genres") {
-    const entry = Object.entries(CONTENT_REGISTRY.genres).find(
-      ([_, value]) => value === cleaned
-    );
-    return entry ? entry[0] : encodeURIComponent(cleaned);
-  }
-
-  // Authors এবং Tags-এর জন্য Key (বাংলা) ধরে Value (ইংরেজি) খোঁজা হবে
-  if (CONTENT_REGISTRY[type] && CONTENT_REGISTRY[type][cleaned]) {
-    return CONTENT_REGISTRY[type][cleaned];
-  }
-
-  return encodeURIComponent(cleaned);
+interface SeriesPageProps {
+  params: Promise<{ slug: string }>;
 }
 
-/**
- * রুল ২: ইউআরএল-এর ইংরেজি স্লাগ থেকে মূল বাংলা ঘরানা উদ্ধার করার ফাংশন।
- * উদাহরণ: getGenreTitle("novel") -> "উপন্যাস"
- */
-export function getGenreTitle(slug: string): string {
-  if (!slug) return "";
-  const decoded = decodeURIComponent(slug).toLowerCase();
-  
-  return CONTENT_REGISTRY.genres[decoded] || decodeURIComponent(slug);
-}
+// 🔹 ১. মেটাডেটা জেনারেটর (Next.js অনুমোদিত এক্সপোর্ট)
+export async function generateMetadata({ params }: SeriesPageProps): Promise<Metadata> {
+  const resolvedParams = await params;
+  const decodedSlug = decodeURIComponent(resolvedParams.slug).toLowerCase();
 
-/**
- * রুল ৩: ইউআরএল-এর ইংরেজি স্লাগ থেকে লেখকের বাংলা নাম উদ্ধার করার ফাংশন।
- * উদাহরণ: getAuthorTitle("rabindranath-tagore") -> "রবীন্দ্রনাথ ঠাকুর"
- */
-export function getAuthorTitle(slug: string): string {
-  if (!slug) return "";
-  const decoded = decodeURIComponent(slug).toLowerCase();
+  const targetBengaliSeries = getSeriesTitle(decodedSlug);
 
-  return CONTENT_REGISTRY.authors[decoded] || decodeURIComponent(slug);
-}
+  const headersList = await headers();
+  const host = headersList.get('host');
+  const siteData = getSubdomainData(host);
+  const siteName = siteData?.title || 'এডুলিচার';
 
-/**
- * রুল ৪: লেখকের বাংলা নাম থেকে ইংরেজি স্লাগ উদ্ধার করার ফাংশন।
- * উদাহরণ: getAuthorSlugFromTitle("রবীন্দ্রনাথ ঠাকুর") -> "rabindranath-tagore"
- */
-export function getAuthorSlugFromTitle(authorName: string): string | undefined {
-  if (!authorName) return undefined;
-  const trimmed = authorName.trim();
+  const pageTitle = `${targetBengaliSeries} ❀ গ্রন্থাগার ❀ ${siteName}`;
 
-  // CONTENT_REGISTRY.authors-এর Value (বাংলা নাম) সার্চ করে matching Key (English Slug) রিটার্ন করবে
-  const entry = Object.entries(CONTENT_REGISTRY.authors).find(
-    ([_, value]) => value.trim() === trimmed
-  );
-
-  return entry ? entry[0] : undefined;
-}
-
-/**
- * লেবেল অনুবাদের ফাংশন
- */
-export function getLabelTranslation(key: string): string {
-  const labels: Record<string, string> = {
-    ...CONTENT_REGISTRY.labels,
-    publisher: "প্রকাশক",
-    published: "প্রকাশকাল",
+  return {
+    title: pageTitle,
+    openGraph: {
+      title: pageTitle,
+    },
+    twitter: {
+      title: pageTitle,
+    },
   };
+}
 
-  return labels[key] || key;
+// 🔹 ২. মূল পেজ কম্পোনেন্ট (অবশ্যই export default হতে হবে)
+export default async function SeriesDetailPage({ params }: SeriesPageProps) {
+  const resolvedParams = await params;
+  const decodedSlug = decodeURIComponent(resolvedParams.slug);
+
+  const allBooks = await getAllBooks();
+
+  // সিরিজের বই ফিল্টার করা
+  const rawSeriesBooks = allBooks.filter((book: any) => {
+    if (typeof book.series === 'string') {
+      return getSlug('series', book.series) === decodedSlug;
+    }
+    if (Array.isArray(book.series)) {
+      return book.series.some((s: string) => getSlug('series', s) === decodedSlug);
+    }
+    return false;
+  });
+
+  if (rawSeriesBooks.length === 0) {
+    notFound();
+  }
+
+  const seriesBooks = sortSeriesBooks(rawSeriesBooks);
+  const seriesTitle = getSeriesTitle(decodedSlug);
+
+  return (
+    <div className="max-w-7xl mx-auto p-4 md:p-6 font-tarunima">
+      <h1 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800 border-b pb-3">
+        সিরিজ: <span className="text-indigo-600">{seriesTitle}</span>
+      </h1>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {seriesBooks.map((book: any, index: number) => (
+          <div
+            key={book.slug || index}
+            className="p-4 bg-white rounded border border-gray-200 shadow-sm flex flex-col justify-between"
+          >
+            <div>
+              <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded border border-indigo-100 inline-block mb-2">
+                পর্ব {book.seriesOrder || book.part || index + 1}
+              </span>
+              <h3 className="font-bold text-lg text-indigo-950">{book.title}</h3>
+              {book.author && <p className="text-sm text-gray-600 mt-1">{book.author}</p>}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// 🔹 ৩. স্ট্যাটিক স্লাগ জেনারেটর (Next.js অনুমোদিত এক্সপোর্ট)
+export async function generateStaticParams() {
+  const allBooks = await getAllBooks();
+  const seriesSet = new Set<string>();
+
+  allBooks.forEach((book: any) => {
+    if (typeof book.series === 'string') {
+      seriesSet.add(getSlug('series', book.series));
+    } else if (Array.isArray(book.series)) {
+      book.series.forEach((s: string) => seriesSet.add(getSlug('series', s)));
+    }
+  });
+
+  return Array.from(seriesSet).map((slug) => ({
+    slug,
+  }));
 }
