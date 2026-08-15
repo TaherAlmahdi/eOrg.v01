@@ -117,10 +117,10 @@ export const GenreListView: FC<GenreListViewProps> = ({
   return (
     <div className="w-full">
       {!isHomePage && (
-        <div className="mb-6 p-4 bg-white/90 backdrop-blur-md rounded border border-teal-100 shadow-sm space-y-4">
+        <div className="p-0 mb-6 space-y-4 border border-teal-100 rounded shadow-sm bg-white/90 backdrop-blur-md">
           {/* লাইভ সার্চ বার */}
           <div className="relative max-w-md mx-auto">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-teal-600 w-5 h-5" />
+            <Search className="absolute w-5 h-5 text-teal-600 -translate-y-1/2 left-3 top-1/2" />
             <input
               type="text"
               placeholder="ঘরানার নাম দিয়ে খুঁজুন..."
@@ -132,7 +132,7 @@ export const GenreListView: FC<GenreListViewProps> = ({
 
           {/* 🔹 ডাইনামিক আদ্যক্ষর কুইক ফিল্টার বার */}
           {availableLetters.length > 1 && (
-            <div className="flex flex-wrap items-center justify-center gap-1.5 pt-2 border-t border-gray-100 font-tarunima">
+            <div className="flex flex-wrap items-center justify-center gap-1 pt-2 border-t border-gray-100 font-tarunima">
               {availableLetters.map((letter) => (
                 <button
                   key={letter}
@@ -153,11 +153,11 @@ export const GenreListView: FC<GenreListViewProps> = ({
 
       {/* জনরা কার্ড গ্রিড */}
       {filteredGenres.length === 0 ? (
-        <div className="text-center p-8 bg-white/80 rounded text-gray-600 font-tarunima">
+        <div className="p-8 text-center text-gray-600 rounded bg-white/80 font-tarunima">
           কোনো জনরা পাওয়া যায়নি।
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 p-2">
+        <div className="grid grid-cols-1 gap-2 pt-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
           {filteredGenres.map(({ slug, label, rawGenre, count }) => {
             const IconComponent = getGenreIcon(slug, rawGenre);
 
@@ -165,13 +165,13 @@ export const GenreListView: FC<GenreListViewProps> = ({
               <Link
                 key={slug}
                 href={`/genre/${slug}`}
-                className="flex items-center justify-between gap-2.5 px-3.5 py-3 rounded bg-white/90 text-[#008080] border border-teal-100 shadow-sm transition-all duration-300 backdrop-blur-sm hover:bg-teal-50 hover:shadow-lg hover:border-teal-300 hover:scale-[1.02] shrink-0 grow basis-full sm:basis-[calc(50%-0.35rem)] lg:basis-[calc(33.333%-0.45rem)] xl:basis-[calc(25%-0.5rem)] 2xl:basis-[calc(20%-0.5rem)] max-w-full group cursor-pointer"
+                className="flex items-center justify-between gap-2 px-2 py-2 rounded bg-white/90 text-[#008080] border border-teal-100 shadow-sm transition-all duration-300 backdrop-blur-sm hover:bg-teal-50 hover:shadow-lg hover:border-teal-300 hover:scale-[1.02] shrink-0 grow basis-full sm:basis-[calc(50%-0.35rem)] lg:basis-[calc(33.333%-0.45rem)] xl:basis-[calc(25%-0.5rem)] 2xl:basis-[calc(20%-0.5rem)] max-w-full group cursor-pointer"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
                   <div className="p-2.5 rounded bg-orange-50 text-[#cc7a00] group-hover:bg-[#cc7a00] group-hover:text-[#ffffff] transition-colors duration-300 shrink-0">
                     <IconComponent className="w-5 h-5 md:w-6 md:h-6 shrink-0" />
                   </div>
-                  <h3 className="text-[#008080] group-hover:text-[#cc7a00] text-base md:text-lg font-semibold leading-snug font-tarunima truncate transition-colors">
+                  <h3 className="text-[#008080] group-hover:text-[#cc7a00] text-base font-semibold leading-snug font-tarunima truncate transition-colors">
                     {label}
                   </h3>
                 </div>
@@ -188,7 +188,7 @@ export const GenreListView: FC<GenreListViewProps> = ({
 
       {/* হোমপেজের জন্য "সকল জনরা দেখুন" বাটন */}
       {isHomePage && totalGenresCount > genres.length && (
-        <div className="text-center mt-6 mb-4">
+        <div className="mt-6 mb-4 text-center">
           <Link
             href="/genres"
             className="inline-flex items-center gap-2 px-6 py-2.5 rounded bg-[#008080] text-white font-tarunima font-normal text-sm hover:bg-teal-700 transition-colors shadow-sm"

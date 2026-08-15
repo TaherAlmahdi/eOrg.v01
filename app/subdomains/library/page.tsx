@@ -10,6 +10,7 @@ import { getLibraryBooks } from '../../lib/books';
 import { getSlug, getAuthorSlugFromTitle } from '../../lib/content/core/registry';
 import { getSubdomainData, buildTabTitle } from '@/app/lib/get-site-data';
 import { headerConfig } from '../../lib/headerConfig';
+import SeriesList from '@/app/components/SeriesList';
 
 // 🏷️ Dynamic Metadata Export
 export async function generateMetadata(): Promise<Metadata> {
@@ -147,7 +148,7 @@ export default async function LibraryHomePage() {
 
   return (
     <div 
-      className="relative w-full min-h-screen bg-cover bg-center bg-no-repeat bg-fixed py-4 px-2 sm:px-4"
+      className="relative w-full min-h-screen px-2 py-4 bg-fixed bg-center bg-no-repeat bg-cover sm:px-4"
       style={{ backgroundImage: "url('/bg01.png')" }}
     >
       {/* 🚀 JSON-LD Structured Data Schema */}
@@ -158,21 +159,21 @@ export default async function LibraryHomePage() {
         }}
       />
 
-      <div className="relative w-full h-auto overflow-x-clip mt-2 font-tarunima">
+      <div className="relative w-full h-auto mt-2 overflow-x-clip font-tarunima">
         
         {/* ১. নতুন বই সেকশন */}
         <section aria-labelledby="latest-books-heading">
-          <div className="flex justify-between items-end mb-8 border-b border-slate-200 pb-3">
+          <div className="flex items-end justify-between pb-2 mb-2 border-b border-slate-200">
             <h2 
               id="latest-books-heading" 
-              className="text-xl font-black text-slate-800 flex items-center gap-2 border-b-2 border-emerald-600 pb-3 -mb-3.5"
+              className="flex items-center gap-2 pb-2 -mb-3 text-xl font-black border-b-2 text-slate-800 border-emerald-600"
             >
               <Calendar className="w-5 h-5 text-emerald-600" />
               নতুন বই
             </h2>
             <Link 
               href="/books" 
-              className="text-sm font-medium font-tarunima text-emerald-600 hover:text-emerald-700 flex items-center gap-0.5 transition-colors group mb-1"
+              className="text-base font-medium font-tarunima text-emerald-600 hover:text-emerald-700 flex items-center gap-0.5 transition-colors group mb-1"
             >
               সকল বই 
               <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
@@ -180,9 +181,9 @@ export default async function LibraryHomePage() {
           </div>
           
           {sortedLatestBooks.length === 0 ? (
-            <p className="text-sm text-slate-500 py-6">কোনো নতুন বই পাওয়া যায়নি।</p>
+            <p className="py-6 text-sm text-slate-500">কোনো নতুন বই পাওয়া যায়নি।</p>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-8 gap-3 p-2">
+            <div className="grid grid-cols-2 gap-3 p-0 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-8">
               {sortedLatestBooks.map((book, index) => {
                 const item = book as unknown as Record<string, unknown>;
                 const rawBookSlug = item.slug || book.id;
@@ -201,7 +202,7 @@ export default async function LibraryHomePage() {
                     key={bookSlug} 
                     className={`flex flex-col bg-white rounded border border-slate-200 shadow-sm transition-all hover:shadow-md group ${responsiveVisibilityClass}`}
                   >
-                    <Link href={`/book/${encodeURIComponent(bookSlug)}`} className="relative aspect-2/3 w-full bg-slate-100 block overflow-hidden rounded-t">
+                    <Link href={`/book/${encodeURIComponent(bookSlug)}`} className="relative block w-full overflow-hidden rounded-t aspect-2/3 bg-slate-100">
                       <Image
                         src={book.cover || '/images/default-book-cover.png'}
                         alt={book.title || 'বইয়ের প্রচ্ছদ'}
@@ -211,19 +212,19 @@ export default async function LibraryHomePage() {
                       />
                     </Link>
                     
-                    <div className="p-3 flex flex-col grow justify-between">
+                    <div className="flex flex-col justify-between p-3 grow">
                       <div>
-                        <h3 className="text-base font-bold text-slate-900 line-clamp-2 leading-snug hover:text-emerald-600 transition-colors">
+                        <h3 className="text-base font-bold leading-snug transition-colors text-slate-900 line-clamp-2 hover:text-emerald-600">
                           <Link href={`/book/${encodeURIComponent(bookSlug)}`}>
                             {book.title || 'শিরোনামহীন'}
                           </Link>
                         </h3>
                         
-                        <p className="text-xs text-slate-600 mt-1 font-tarunima">
+                        <p className="mt-1 text-xs text-slate-600 font-tarunima">
                           {book.author ? (
                             <Link 
                               href={`/author/${encodeURIComponent(authorSlug)}`}
-                              className="hover:text-emerald-600 hover:underline transition-colors"
+                              className="transition-colors hover:text-emerald-600 hover:underline"
                             >
                               {book.author}
                             </Link>
@@ -242,24 +243,37 @@ export default async function LibraryHomePage() {
 
         {/* ২. ঘরানা নির্ঘণ্ট সেকশন */}
         <section data-aos="fade-up" className="relative">
-          <div className="flex justify-center mb-0 mt-5">
-            <div className="inline-flex items-center justify-center gap-3 px-8 py-5 rounded bg-teal-50/90 text-[#008080] mb-8 border border-teal-100 shadow-xs text-center backdrop-blur-md">
+          <div className="flex justify-center mt-5 mb-5">
+            <div className="inline-flex items-center justify-center gap-3 px-4 py-2 rounded bg-teal-50/90 text-[#008080] mb-0 border border-teal-100 shadow-xs text-center backdrop-blur-md">
               <Layers size={24} className="shrink-0 animate-pulse" />
-              <h1 className="text-xl md:text-2xl font-tarunima font-black text-gray-900 leading-none tracking-tight">
-                <span className="text-[#008080]">একনজরে</span> এডুলিচার <span className="text-[#cc7a00]">পাঠশালা</span>
+              <h1 className="text-xl font-black leading-none tracking-tight text-gray-900 md:text-2xl font-tarunima">
+                <span className="text-[#008080]">এডুলিচার</span> ঘরানা <span className="text-[#cc7a00]">নির্ঘণ্ট</span>
               </h1>
             </div>
           </div>
           <GenreList limit={20} />
         </section>
 
+        {/* ৩. সিরিজ নির্ঘণ্ট সেকশন */}
+        <section data-aos="fade-up" className="relative">
+          <div className="flex justify-center mt-5 mb-0">
+            <div className="inline-flex items-center justify-center gap-3 px-4 py-2 rounded bg-teal-50/90 text-[#008080] mb-0 border border-teal-100 shadow-xs text-center backdrop-blur-md">
+              <Layers size={24} className="shrink-0 animate-pulse" />
+              <h1 className="text-xl font-black leading-none tracking-tight text-gray-900 md:text-2xl font-tarunima">
+                <span className="text-[#008080]">এডুলিচার</span> সিরিজ <span className="text-[#cc7a00]">নির্ঘণ্ট</span>
+              </h1>
+            </div>
+          </div>
+          <SeriesList limit={20} />
+        </section>        
+
         {/* ৩. লেখক নির্ঘণ্ট সেকশন */}
         <section data-aos="fade-down" className="relative">
-          <div className="flex justify-center mb-5 mt-5">
+          <div className="flex justify-center mt-5 mb-5">
             <div className="inline-flex items-center justify-center gap-3 px-8 py-5 rounded bg-teal-50/90 text-[#008080] border border-teal-100 shadow-xs text-center backdrop-blur-md">
               <Users size={24} className="shrink-0 animate-pulse" />
-              <h1 className="text-xl md:text-2xl font-tarunima font-black text-gray-900 leading-none tracking-tight">
-                <span className="text-[#008080]">সম্মানিত</span> লেখক <span className="text-[#cc7a00]">তালিকা</span>
+              <h1 className="text-xl font-black leading-none tracking-tight text-gray-900 md:text-2xl font-tarunima">
+                <span className="text-[#008080]">এডুলিচার</span> লেখক <span className="text-[#cc7a00]">নির্ঘণ্ট</span>
               </h1>
             </div>
           </div>

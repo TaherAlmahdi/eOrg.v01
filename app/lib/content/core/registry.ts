@@ -10,6 +10,7 @@ export const CONTENT_REGISTRY = {
     series: "সিরিজ",
   } as Record<string, string>,
 
+  // English Slug -> Bengali Value
   authors: {
     "abu-ishaque": "আবু ইসহাক",
     "bankim-chandra-chatterjee": "বঙ্কিমচন্দ্র চট্টোপাধ্যায়",
@@ -40,7 +41,7 @@ export const CONTENT_REGISTRY = {
     "jahiruddin-babar": "জহির উদ্দীন বাবর",
     "muhammad-jalaluddin-biswas": "মুহম্মদ জালালউদ্দীন বিশ্বাস",
     "abhik-chatterjee": "অভীক চট্টোপাধ্যায়",
-    "neelima-ibrahim" : "নীলিমা ইব্রাহীম",
+    "neelima-ibrahim": "নীলিমা ইব্রাহীম",
   } as Record<string, string>,
 
   // English Slug -> Bengali Value
@@ -80,7 +81,7 @@ export const CONTENT_REGISTRY = {
     "miscellaneous": "বিবিধ",
     "mythology": "পুরাণ",
     "novel": "উপন্যাস",
-    "novella": "উপন্যাসিকা", 
+    "novella": "উপন্যাসিকা",
     "philosophical-criticism": "দর্শন সমালোচনা",
     "philosophical-essay": "দর্শন প্রবন্ধ",
     "philosophical-translation": "দর্শন অনুবাদ",
@@ -114,7 +115,7 @@ export const CONTENT_REGISTRY = {
     "uncollected-works": "অগ্রন্থিত রচনা",
     "unpublished-works": "অপ্রকাশিত রচনা",
     "epistolary-novel": "পত্রোপন্যাস",
-    "liberation-war-novel": "মুক্তিযুদ্ধের উপন্যাস"
+    "liberation-war-novel": "মুক্তিযুদ্ধের উপন্যাস",
   } as Record<string, string>,
 
   // English Slug -> Bengali Value
@@ -126,84 +127,89 @@ export const CONTENT_REGISTRY = {
     "himu": "হিমু সমগ্র",
   } as Record<string, string>,
 
+  // English Slug -> Bengali Value
   tags: {
-    "ধ্রুপদী": "classical",
-    "ঐতিহাসিক": "historical",
-    "রোমান্টিক": "romantic",
+    "classical": "ধ্রুপদী",
+    "historical": "ঐতিহাসিক",
+    "romantic": "রোমান্টিক",
   } as Record<string, string>,
 };
 
 /**
- * রুল ১: MD ফাইলের যেকোনো বাংলা টেক্সট থেকে ইংরেজি স্লাগ তৈরি করার সর্বজনীন ফাংশন।
- * উদাহরণ: getSlug("series", "ফেলুদা সিরিজ") -> "feluda"
+ * যেকোনো স্ট্রিংকে স্লাগে রূপান্তর করার হেল্পার (বাংলা অক্ষরের জন্য সেফ)
  */
-export function getSlug(type: "authors" | "genres" | "tags" | "series", banglaText: string): string {
-  if (!banglaText) return "others";
-  const cleaned = banglaText.trim();
-
-  // Genres এবং Series-এর জন্য Value (বাংলা) ধরে Key (ইংরেজি স্লাগ) খোঁজা হবে
-  if (type === "genres" || type === "series") {
-    const registry = CONTENT_REGISTRY[type];
-    const entry = Object.entries(registry).find(
-      ([_, value]) => value === cleaned
-    );
-    return entry ? entry[0] : encodeURIComponent(cleaned);
-  }
-
-  // Authors এবং Tags-এর জন্য Key (বাংলা) ধরে Value (ইংরেজি) খোঁজা হবে
-  if (CONTENT_REGISTRY[type] && CONTENT_REGISTRY[type][cleaned]) {
-    return CONTENT_REGISTRY[type][cleaned];
-  }
-
-  return encodeURIComponent(cleaned);
+export function slugify(text: string): string {
+  if (!text) return '';
+  return String(text)
+    .trim()
+    .replace(/\s+/g, '-') // স্পেসের জায়গায় হাইফেন
+    .replace(/[^\w\u0980-\u09FF\-]/g, '') // বাংলা ও আলফানিউমেরিক বাদে বাকি স্পেশাল ক্যারেক্টার বাদ
+    .toLowerCase();
 }
 
 /**
- * রুল ২: ইউআরএল-এর ইংরেজি স্লাগ থেকে মূল বাংলা ঘরানা উদ্ধার করার ফাংশন।
- * উদাহরণ: getGenreTitle("novel") -> "উপন্যাস"
+ * রুল ১: যেকোনো বাংলা টেক্সট থেকে ইংরেজি স্লাগ তৈরি করার সর্বজনীন ও নিরাপদ ফাংশন।
+ * রেজিস্ট্রি ফাইলে স্লাগ না থাকলে সরাসরি মূল বাংলা নামকে ক্লিন ফরম্যাটে রিটার্ন করবে।
+ */
+export function getSlug(
+  type: "authors" | "genres" | "tags" | "series",
+  banglaText: string
+): string {
+  if (!banglaText) return "others";
+  const cleaned = banglaText.trim();
+
+  const registry = CONTENT_REGISTRY[type];
+  if (!registry) return slugify(cleaned);
+
+  // ১. হুবহু মিল (Exact Match) খোঁজা
+  const exactEntry = Object.entries(registry).find(
+    ([_, value]) => value.trim() === cleaned
+  );
+  if (exactEntry) return exactEntry[0];
+
+  // ২. আংশিক মিল (Partial Match) খোঁজা
+  const partialEntry = Object.entries(registry).find(
+    ([_, value]) => value.includes(cleaned) || cleaned.includes(value)
+  );
+  if (partialEntry) return partialEntry[0];
+
+  // ৩. কোনো মিল না পেলে সরাসরি র' বাংলা টেক্সট বা slugify ফর্ম রিটার্ন করা (encodeURIComponent বাদ দেওয়া হয়েছে)
+  return slugify(cleaned) || cleaned;
+}
+
+/**
+ * রুল ২: ইউআরএল-এর ইংরেজি বা বাংলা স্লাগ থেকে মূল বাংলা ঘরানা উদ্ধার করার ফাংশন।
  */
 export function getGenreTitle(slug: string): string {
   if (!slug) return "";
-  const decoded = decodeURIComponent(slug).toLowerCase();
-  
+  const decoded = decodeURIComponent(slug).toLowerCase().trim();
   return CONTENT_REGISTRY.genres[decoded] || decodeURIComponent(slug);
 }
 
 /**
- * রুল ৩: ইউআরএল-এর ইংরেজি স্লাগ থেকে সিরিজের বাংলা শিরোনাম উদ্ধার করার ফাংশন।
- * উদাহরণ: getSeriesTitle("feluda") -> "ফেলুদা সিরিজ"
+ * রুল ৩: ইউআরএল-এর ইংরেজি বা বাংলা স্লাগ থেকে সিরিজের বাংলা শিরোনাম উদ্ধার করার ফাংশন।
  */
 export function getSeriesTitle(slug: string): string {
   if (!slug) return "";
-  const decoded = decodeURIComponent(slug).toLowerCase();
-
+  const decoded = decodeURIComponent(slug).toLowerCase().trim();
   return CONTENT_REGISTRY.series[decoded] || decodeURIComponent(slug);
 }
 
 /**
- * রুল ৪: ইউআরএল-এর ইংরেজি স্লাগ থেকে লেখকের বাংলা নাম উদ্ধার করার ফাংশন।
- * উদাহরণ: getAuthorTitle("rabindranath-tagore") -> "রবীন্দ্রনাথ ঠাকুর"
+ * রুল ৪: ইউআরএল-এর ইংরেজি বা বাংলা স্লাগ থেকে লেখকের বাংলা নাম উদ্ধার করার ফাংশন।
  */
 export function getAuthorTitle(slug: string): string {
   if (!slug) return "";
-  const decoded = decodeURIComponent(slug).toLowerCase();
-
+  const decoded = decodeURIComponent(slug).toLowerCase().trim();
   return CONTENT_REGISTRY.authors[decoded] || decodeURIComponent(slug);
 }
 
 /**
  * রুল ৫: লেখকের বাংলা নাম থেকে ইংরেজি স্লাগ উদ্ধার করার ফাংশন।
- * উদাহরণ: getAuthorSlugFromTitle("রবীন্দ্রনাথ ঠাকুর") -> "rabindranath-tagore"
  */
 export function getAuthorSlugFromTitle(authorName: string): string | undefined {
   if (!authorName) return undefined;
-  const trimmed = authorName.trim();
-
-  const entry = Object.entries(CONTENT_REGISTRY.authors).find(
-    ([_, value]) => value.trim() === trimmed
-  );
-
-  return entry ? entry[0] : undefined;
+  return getSlug("authors", authorName);
 }
 
 /**

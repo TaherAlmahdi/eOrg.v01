@@ -1,41 +1,51 @@
 import type { FC } from "react";
 import { getAllBooks } from "@/app/lib/books"; 
 import { CONTENT_REGISTRY, getSlug } from "@/app/lib/content/core/registry";
-import { SeriesListView } from "./SeriesListView"; // পরবর্তী ধাপে তৈরি করবেন
-import { BookOpen, Layers } from 'lucide-react';
+import { SeriesListView, type SeriesItem } from "./SeriesListView";
+import { Users, Library } from "lucide-react";
 
 const toBengaliNumber = (num: number | string): string =>
   num.toString().replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[parseInt(d, 10)]);
 
-// 🔹 সিরিজ ফিল্ড পার্স করার হেল্পার
+// ১. কোনো আইটেম থেকে সিরিজের নামগুলো নিরাপদভাবে বের করার হেলপার
 const parseSeriesField = (item: any): string[] => {
-  const result: string[] = [];
-  if (!item) return result;
-  if (typeof item.series === 'string' && item.series.trim()) {
-    result.push(item.series.trim());
-  } else if (Array.isArray(item.series)) {
-    item.series.forEach((s: any) => typeof s === 'string' && s.trim() && result.push(s.trim()));
-  }
-  return result;
+  if (!item) return [];
+  const fields = [item.Series, item.Seriess, item.series];
+  return fields
+    .flat()
+    .filter((val): val is string => typeof val === "string" && val.trim() !== "")
+    .map((val) => val.trim());
 };
 
-// 🔹 বই এবং সাব-আইটেম থেকে সমস্ত সিরিজ সংগ্রহ
+// ২. বই ও বইয়ের চাইল্ড আইটেমসমূহ থেকে সব সিরিজ সংগ্রহ করার হেলপার
 const collectAllSeriesFromBook = (book: any): string[] => {
   const seriesSet = new Set<string>();
-  parseSeriesField(book).forEach((s) => seriesSet.add(s));
 
-  const nestedArrays = [book.directChapters, book.chapters, book.stories, book.items, book.articles, book.contents];
-  nestedArrays.forEach((arr) => {
-    if (Array.isArray(arr)) arr.forEach((subItem: any) => parseSeriesField(subItem).forEach((s) => seriesSet.add(s)));
-  });
+  const processItem = (item: any) => {
+    parseSeriesField(item).forEach((s) => seriesSet.add(s));
+  };
+
+  processItem(book);
+
+  const processSubArray = (arr?: any[]) => {
+    if (Array.isArray(arr)) arr.forEach(processItem);
+  };
+
+  const nestedArrays = [
+    book.directChapters,
+    book.chapters,
+    book.stories,
+    book.items,
+    book.articles,
+    book.contents,
+  ];
+  nestedArrays.forEach(processSubArray);
 
   if (Array.isArray(book.volumes)) {
     book.volumes.forEach((vol: any) => {
-      parseSeriesField(vol).forEach((s) => seriesSet.add(s));
+      processItem(vol);
       const volSubArrays = [vol.chapters, vol.stories, vol.items, vol.directChapters];
-      volSubArrays.forEach((arr) => {
-        if (Array.isArray(arr)) arr.forEach((subItem: any) => parseSeriesField(subItem).forEach((s) => seriesSet.add(s)));
-      });
+      volSubArrays.forEach(processSubArray);
     });
   }
 
@@ -49,23 +59,40 @@ interface SeriesListProps {
 
 const SeriesList: FC<SeriesListProps> = async ({ sortBy, limit }) => {
   const allBooks = await getAllBooks();
-  const seriesMap = new Map<string, { label: string; slug: string; rawSeries: string; count: number }>();
+
+  const contributorSet = new Set<string>();
+  const seriesMap = new Map<string, SeriesItem>();
 
   allBooks.forEach((book: any) => {
-    const bookSeriesList = collectAllSeriesFromBook(book);
+    // 🔹 লেখক, অনুবাদক ও সম্পাদকদের সংগ্রহ করা
+    ["author", "translator", "editor"].forEach((role) => {
+      if (typeof book[role] === "string" && book[role].trim()) {
+        contributorSet.add(book[role].trim());
+      }
+    });
 
-    bookSeriesList.forEach((rawSeries) => {
+    const bookSeries = collectAllSeriesFromBook(book);
+    const finalSeries = bookSeries.length > 0 ? bookSeries : ["অন্যান্য"];
+
+    finalSeries.forEach((rawSeries) => {
       const cleanSeries = rawSeries.trim();
       if (!cleanSeries) return;
 
+      // 🔹 টাইপ-সেফ প্যারামিটার ব্যবহার করা হয়েছে ("series")
       const seriesSlug = getSlug("series", cleanSeries);
+      const registry = (CONTENT_REGISTRY as Record<string, Record<string, string>>).series || {};
 
       if (seriesMap.has(seriesSlug)) {
         const current = seriesMap.get(seriesSlug)!;
         seriesMap.set(seriesSlug, { ...current, count: current.count + 1 });
       } else {
-        const label = CONTENT_REGISTRY.series?.[seriesSlug] || cleanSeries;
-        seriesMap.set(seriesSlug, { label, slug: seriesSlug, rawSeries: cleanSeries, count: 1 });
+        const label = registry[seriesSlug] || cleanSeries;
+        seriesMap.set(seriesSlug, {
+          label,
+          slug: seriesSlug,
+          rawSeries: cleanSeries,
+          count: 1,
+        });
       }
     });
   });
@@ -79,44 +106,15 @@ const SeriesList: FC<SeriesListProps> = async ({ sortBy, limit }) => {
     return a.label.localeCompare(b.label, "bn", { sensitivity: "base" });
   });
 
-  const series = limit ? sortedSeries.slice(0, limit) : sortedSeries;
+  const seriesList = limit ? sortedSeries.slice(0, limit) : sortedSeries;
 
   return (
     <div className="relative w-full h-auto overflow-x-clip">
-      <div className="relative z-20 w-full max-w-none mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 mb-5 w-full p-2">
-          <div className="flex items-center justify-between p-6 bg-white/90 backdrop-blur-md rounded border border-white/60 shadow-sm hover:shadow-md transition-all duration-300">
-            <div className="flex items-center gap-4">
-              <div className="p-3.5 rounded bg-indigo-50 text-[#4f46e5] border border-indigo-100/50">
-                <Layers size={32} className="shrink-0" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-gray-500">সংগ্রহশালায়</p>
-                <h2 className="text-lg md:text-xl font-bold text-gray-800">
-                  মোট সিরিজ সংখ্যা <span className="text-[#4f46e5] font-black text-2xl md:text-3xl mx-1">{toBengaliNumber(seriesMap.size)}</span> টি
-                </h2>
-              </div>
-            </div>
-          </div>
+      <div className="relative z-20 w-full mx-auto max-w-none">
 
-          <div className="flex items-center justify-between p-6 bg-white/90 backdrop-blur-md rounded border border-white/60 shadow-sm hover:shadow-md transition-all duration-300">
-            <div className="flex items-center gap-4">
-              <div className="p-3.5 rounded bg-purple-50 text-[#9333ea] border border-purple-100/50">
-                <BookOpen size={32} className="shrink-0" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-gray-500">গ্রন্থভিত্তিক</p>
-                <h2 className="text-lg md:text-xl font-bold text-gray-800">
-                  সিরিজভুক্ত বই <span className="text-[#9333ea] font-black text-2xl md:text-3xl mx-1">{toBengaliNumber(allBooks.filter(b => collectAllSeriesFromBook(b).length > 0).length)}</span> টি
-                </h2>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* 🔹 ক্লায়েন্ট ভিউ কম্পোনেন্ট */}
+        {/* সিরিজ তালিকা ভিউ */}
         <SeriesListView
-          series={series}
+          seriesList={seriesList}
           isHomePage={!!limit}
           totalSeriesCount={seriesMap.size}
         />

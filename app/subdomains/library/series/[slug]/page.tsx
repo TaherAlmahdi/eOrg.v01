@@ -1,0 +1,1 @@
+export { default, generateMetadata } from '@/app/series/[slug]/page';

@@ -1,105 +1,112 @@
 import { headers } from 'next/headers';
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
-import { getAllBooks } from '@/app/lib/books';
-import { getSubdomainData } from '@/app/lib/get-site-data';
-import { getSlug, getSeriesTitle } from '@/app/lib/content/core/registry';
-import { sortSeriesBooks } from '@/app/utils/sortUtils';
+import { getSubdomainData, buildTabTitle } from '@/app/lib/get-site-data';
+import { getSeriesTitle } from '@/app/lib/content/core/registry';
+import { getLibraryBooks } from '@/app/lib/books';
+import { SeriesView, type BookSeries } from '@/app/components/SeriesView';
 
-interface SeriesPageProps {
-  params: Promise<{ slug: string }>;
+interface PageProps {
+  params: Promise<{ slug: string; author?: string }>;
 }
 
-// 🔹 ১. মেটাডেটা জেনারেটর (Next.js অনুমোদিত এক্সপোর্ট)
-export async function generateMetadata({ params }: SeriesPageProps): Promise<Metadata> {
-  const resolvedParams = await params;
-  const decodedSlug = decodeURIComponent(resolvedParams.slug).toLowerCase();
+// 🔹 ইউটিলিটি: স্লাগ নরম্যালাইজার (বাংলা ও ইংরেজি সাপোর্ট সহ)
+const slugify = (text: string): string =>
+  text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^\w\u0980-\u09FF-]+/g, '')
+    .replace(/\-\-+/g, '-');
 
-  const targetBengaliSeries = getSeriesTitle(decodedSlug);
+// 🔹 ডায়নামিক মেটাডাটা জেনারেটর
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const decodedSlug = decodeURIComponent(slug);
+
+  const targetBengaliSeries = getSeriesTitle(decodedSlug) || decodedSlug;
 
   const headersList = await headers();
-  const host = headersList.get('host');
+  const host = headersList.get('host') || '';
   const siteData = getSubdomainData(host);
   const siteName = siteData?.title || 'এডুলিচার';
 
-  const pageTitle = `${targetBengaliSeries} ❀ গ্রন্থাগার ❀ ${siteName}`;
+  const pageTitle = buildTabTitle({
+    currentPageTitle: `${targetBengaliSeries} ❀ গ্রন্থাগার`,
+    siteName,
+  });
 
   return {
     title: pageTitle,
-    openGraph: {
-      title: pageTitle,
-    },
-    twitter: {
-      title: pageTitle,
-    },
+    openGraph: { title: pageTitle },
+    twitter: { title: pageTitle },
   };
 }
 
-// 🔹 ২. মূল পেজ কম্পোনেন্ট (অবশ্যই export default হতে হবে)
-export default async function SeriesDetailPage({ params }: SeriesPageProps) {
-  const resolvedParams = await params;
-  const decodedSlug = decodeURIComponent(resolvedParams.slug);
+// 🔹 সিরিজ পেজ মূল কম্পোনেন্ট
+export default async function SeriesPage({ params }: PageProps) {
+  const { slug, author } = await params;
+  const decodedSlug = decodeURIComponent(slug).trim();
 
-  const allBooks = await getAllBooks();
+  // ১. সাবডোমেন ও হোস্ট ডেটা স্ট্র্যাক্ট করা
+  const headersList = await headers();
+  const host = headersList.get('host') || '';
+  const siteData = getSubdomainData(host);
+  const subdomain = author || siteData?.subdomain || '';
 
-  // সিরিজের বই ফিল্টার করা
-  const rawSeriesBooks = allBooks.filter((book: any) => {
-    if (typeof book.series === 'string') {
-      return getSlug('series', book.series) === decodedSlug;
+  // ২. সিরিজের নাম ও নরম্যালাইজড স্লাগ নির্ধারণ
+  const targetBengaliSeries = getSeriesTitle(decodedSlug) || decodedSlug;
+  const normalizedTarget = slugify(targetBengaliSeries);
+  const normalizedSlug = slugify(decodedSlug);
+
+  // ৩. ডেটাবেস/রেজিস্ট্রি থেকে বই লোড করা
+  const { latestBooks = [] } = await getLibraryBooks();
+
+  // ৪. সাবডোমেন ও সিরিজ ভিত্তিক ফিল্টারিং
+  const filteredBooks = (latestBooks as BookSeries[]).filter((book) => {
+    // সাবডোমেন ফিল্টার (যদি নির্দিষ্ট কোনো লেখক সাবডোমেনে থাকে)
+    if (subdomain && !['library', 'localhost:3000', 'eduliture'].includes(subdomain)) {
+      const bookAuthor = book.authorSlug || book.author || '';
+      if (slugify(String(bookAuthor)) !== slugify(subdomain)) {
+        return false;
+      }
     }
-    if (Array.isArray(book.series)) {
-      return book.series.some((s: string) => getSlug('series', s) === decodedSlug);
-    }
-    return false;
+
+    // সিরিজের প্রপার্টি চেক (Series বা series)
+    const rawSeries = book.Series || book.series;
+    if (!rawSeries) return false;
+
+    const seriesList = Array.isArray(rawSeries) ? rawSeries : [rawSeries];
+
+    return seriesList.some((s) => {
+      const sStr = String(s).trim();
+      const sNorm = slugify(sStr);
+
+      return (
+        sStr.toLowerCase() === decodedSlug.toLowerCase() ||
+        sNorm === normalizedTarget ||
+        sNorm === normalizedSlug
+      );
+    });
   });
 
-  if (rawSeriesBooks.length === 0) {
-    notFound();
-  }
+  // ৫. প্রকাশনার প্রথম সাল অনুসারে শর্টিং
+  filteredBooks.sort((a, b) => {
+    const rawA = a.first_published || a.published;
+    const rawB = b.first_published || b.published;
 
-  const seriesBooks = sortSeriesBooks(rawSeriesBooks);
-  const seriesTitle = getSeriesTitle(decodedSlug);
+    const pubA = rawA ? parseInt(String(rawA), 10) || 0 : Infinity;
+    const pubB = rawB ? parseInt(String(rawB), 10) || 0 : Infinity;
+
+    if (pubA !== pubB) return pubA - pubB;
+    return (a.title || '').localeCompare(b.title || '', 'bn');
+  });
 
   return (
-    <div className="max-w-7xl mx-auto p-4 md:p-6 font-tarunima">
-      <h1 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800 border-b pb-3">
-        সিরিজ: <span className="text-indigo-600">{seriesTitle}</span>
-      </h1>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {seriesBooks.map((book: any, index: number) => (
-          <div
-            key={book.slug || index}
-            className="p-4 bg-white rounded border border-gray-200 shadow-sm flex flex-col justify-between"
-          >
-            <div>
-              <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded border border-indigo-100 inline-block mb-2">
-                পর্ব {book.seriesOrder || book.part || index + 1}
-              </span>
-              <h3 className="font-bold text-lg text-indigo-950">{book.title}</h3>
-              {book.author && <p className="text-sm text-gray-600 mt-1">{book.author}</p>}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+    <SeriesView
+      seriesTitle={String(targetBengaliSeries)}
+      books={filteredBooks}
+      subdomain={subdomain}
+    />
   );
-}
-
-// 🔹 ৩. স্ট্যাটিক স্লাগ জেনারেটর (Next.js অনুমোদিত এক্সপোর্ট)
-export async function generateStaticParams() {
-  const allBooks = await getAllBooks();
-  const seriesSet = new Set<string>();
-
-  allBooks.forEach((book: any) => {
-    if (typeof book.series === 'string') {
-      seriesSet.add(getSlug('series', book.series));
-    } else if (Array.isArray(book.series)) {
-      book.series.forEach((s: string) => seriesSet.add(getSlug('series', s)));
-    }
-  });
-
-  return Array.from(seriesSet).map((slug) => ({
-    slug,
-  }));
 }

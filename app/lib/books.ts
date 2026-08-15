@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import { existsSync, statSync, readdirSync, readFileSync } from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
+import { getSlug } from '@/app/lib/content/core/registry';
 
 // ==========================================
 // 1. Core Interfaces & Types
@@ -11,10 +12,13 @@ export interface ChapterItem {
   slug: string;
   title: string;
   genre?: string | string[]; 
-  genres?: string[];         
+  genres?: string[]; 
+  item?: string | string[];
+  items?: string[];
   content?: string;
   series?: string;
   seriesSlug?: string;
+  series_link?: string;
   series_order?: number | string;
 }
 
@@ -24,6 +28,7 @@ export interface VolumeItem {
   chapters?: ChapterItem[];
   series?: string;
   seriesSlug?: string;
+  series_link?: string;
   series_order?: number | string;
 }
 
@@ -35,6 +40,7 @@ export interface MetaFileItem {
 export interface SeriesItem {
   name: string;
   slug: string;
+  link?: string;
   order?: number | string;
   title?: string;
 }
@@ -56,8 +62,11 @@ export interface Book {
   genres: string[];
   genre?: string | string[];
   genre_links?: Array<{ name: string; link: string }>;
+  items?: string[];
+  item?: string | string[];
   series?: string;
   seriesSlug?: string;
+  series_link?: string;
   series_order?: number | string;
   series_title?: string;
   series_info?: SeriesItem;
@@ -99,6 +108,7 @@ export interface BookNode {
   filePath: string;
   series?: string;
   seriesSlug?: string;
+  series_link?: string;
   series_order?: number | string;
 }
 
@@ -164,58 +174,95 @@ export function extractGenresFromData(data: any): string[] {
 }
 
 /**
- * বইয়ের ফোল্ডার থেকে গভীরে থাকা সকল .md ফাইল স্ক্যান করে
- * ডাইনামিকালি সব Genre সংগ্রহ করার ইউনিভার্সাল হেল্পার
+ * ফ্রন্টম্যাটার থেকে Dynamic Genre Links তৈরি করার হেল্পার (registry সহ)
  */
-function collectGenresDeep(data: any, bookFolderPath?: string): string[] {
-  const genresSet = new Set<string>();
-
-  // ১. মূল index.md-এর জনরা যোগ
-  extractGenresFromData(data).forEach((g) => genresSet.add(g));
-
-  // ২. volumes/directChapters অবজেক্টের ভেতরের জনরা যোগ
-  const scanObj = (obj: any) => {
-    if (!obj || typeof obj !== 'object') return;
-    extractGenresFromData(obj).forEach((g) => genresSet.add(g));
-
-    for (const key in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, key) && typeof obj[key] === 'object') {
-        scanObj(obj[key]);
-      }
-    }
-  };
-
-  if (data.volumes) scanObj(data.volumes);
-  if (data.directChapters) scanObj(data.directChapters);
-
-  // ৩. ফিজিক্যাল ফোল্ডার স্ক্যান করে ভেতরের সব ফাইল থেকে জনরা রিড করা
-  if (bookFolderPath && existsSync(bookFolderPath)) {
-    try {
-      const scanDir = (dirPath: string) => {
-        const entries = readdirSync(dirPath, { withFileTypes: true });
-        for (const entry of entries) {
-          const fullPath = path.join(dirPath, entry.name);
-          if (entry.isDirectory()) {
-            scanDir(fullPath);
-          } else if (entry.isFile() && entry.name.endsWith('.md')) {
-            try {
-              const fileContent = readFileSync(fullPath, 'utf8');
-              const { data: fileData } = matter(fileContent);
-              extractGenresFromData(fileData).forEach((g) => genresSet.add(g));
-            } catch {
-              // ফাইল রিড ট্রাই-ক্যাচ
-            }
-          }
-        }
-      };
-      scanDir(bookFolderPath);
-    } catch {
-      // ডিরেক্টরি ট্রাভার্সাল ট্রাই-ক্যাচ
-    }
+export function generateGenreLinks(
+  explicitLinks: Array<{ name: string; link: string }> | undefined,
+  genresList: string[]
+): Array<{ name: string; link: string }> {
+  if (explicitLinks && explicitLinks.length > 0) {
+    return explicitLinks;
   }
 
-  const result = Array.from(genresSet);
-  return result.length > 0 ? result : ['অন্যান্য'];
+  return genresList.map((gName) => ({
+    name: gName,
+    link: `/genre/${getSlug('genres', gName)}`,
+  }));
+}
+
+/**
+ * ফ্রন্টম্যাটার থেকে Dynamic Series Link তৈরি করার হেল্পার (registry সহ)
+ */
+export function generateSeriesLink(
+  explicitLink: string | undefined,
+  seriesName: string,
+  customSlug?: string
+): string | undefined {
+  if (explicitLink) return explicitLink;
+  if (!seriesName) return undefined;
+
+  const targetSlug = customSlug || getSlug('series', seriesName) || slugify(seriesName);
+  return `/series/${targetSlug}`;
+}
+
+/**
+ * যেকোনো ফ্রন্টম্যাটার ডাটা থেকে item/items (কবিতা, গল্প, প্রবন্ধ ইত্যাদি) এক্সট্র্যাক্ট করার হেল্পার
+ */
+export function extractItemsFromData(data: any): string[] {
+  const itemsSet = new Set<string>();
+
+  if (!data) return [];
+
+  const rawItem = data.item || data.items;
+  if (typeof rawItem === 'string' && rawItem.trim()) {
+    itemsSet.add(rawItem.trim());
+  } else if (Array.isArray(rawItem)) {
+    rawItem.forEach((i) => {
+      if (typeof i === 'string' && i.trim()) itemsSet.add(i.trim());
+    });
+  }
+
+  return Array.from(itemsSet);
+}
+
+/**
+ * শুধুমাত্র চ্যাপ্টার বা পাতার ফাইলগুলো স্ক্যান করে Item/Items সংগ্রাহক হেল্পার।
+ * (index.md ফাইলগুলোকে এখানে সম্পূর্ণ বাদ রাখা হয়েছে)
+ */
+function collectChapterItemsDeep(bookFolderPath: string): string[] {
+  const itemsSet = new Set<string>();
+
+  if (!bookFolderPath || !existsSync(bookFolderPath)) {
+    return [];
+  }
+
+  try {
+    const scanDir = (dirPath: string) => {
+      const entries = readdirSync(dirPath, { withFileTypes: true });
+      for (const entry of entries) {
+        const fullPath = path.join(dirPath, entry.name);
+        if (entry.isDirectory()) {
+          scanDir(fullPath);
+        } else if (entry.isFile() && entry.name.endsWith('.md')) {
+          // index.md ফাইল সম্পূর্ণ স্কিপ
+          if (entry.name.toLowerCase() === 'index.md') continue;
+
+          try {
+            const fileContent = readFileSync(fullPath, 'utf8');
+            const { data: fileData } = matter(fileContent);
+            extractItemsFromData(fileData).forEach((i) => itemsSet.add(i));
+          } catch {
+            // ফাইল রিড এরর ক্যাচ
+          }
+        }
+      }
+    };
+    scanDir(bookFolderPath);
+  } catch {
+    // ডিরেক্টরি ট্রাভার্সাল এরর ক্যাচ
+  }
+
+  return Array.from(itemsSet);
 }
 
 // ==========================================
@@ -267,15 +314,25 @@ export async function getLibraryBooks(currentSubdomain?: string): Promise<{
             }
           }
 
-          // গভীর স্ক্যান সহ সকল জনরা সংগ্রহ করা
-          const extractedGenres = collectGenresDeep(data, bookFolderPath);
+          // ১. জঁরা শুধুমাত্র index.md থেকে সংগৃহীত
+          const bookGenres = extractGenresFromData(data);
+          if (bookGenres.length === 0) bookGenres.push('অন্যান্য');
+
+          // ২. আইটেমস সংগৃহীত হবে চ্যাপ্টার/পাতার ফাইলসমূহ থেকে (index.md ব্যতিরেকে)
+          const extractedItems = collectChapterItemsDeep(bookFolderPath);
 
           const bookSlug = data.slug ? String(data.slug).trim() : bookFolderName;
 
-          // সিরিজ সংক্রান্ত ডাটা সঠিকভাবে প্রস্তুত করা
+          // ৩. সিরিজ শুধুমাত্র index.md থেকে সংগৃহীত
           const seriesName = data.series ? String(data.series).trim() : '';
-          const seriesSlugVal = data.seriesSlug ? String(data.seriesSlug).trim() : slugify(seriesName);
+          const seriesSlugVal = data.seriesSlug
+            ? String(data.seriesSlug).trim()
+            : getSlug('series', seriesName) || slugify(seriesName);
           const seriesOrderVal = data.series_order || data.series_index || '';
+          const seriesLinkVal = generateSeriesLink(data.series_link, seriesName, seriesSlugVal);
+
+          // জঁরা লিঙ্কস জেনারেট
+          const genreLinksVal = generateGenreLinks(data.genre_links, bookGenres);
 
           allBooks.push({
             id: bookSlug,
@@ -291,23 +348,29 @@ export async function getLibraryBooks(currentSubdomain?: string): Promise<{
             editor: data.editor || '',
             editorSlug: data.editorSlug || '',
             subdomains: bookSubdomains,
-            genres: extractedGenres,
-            genre: data.genre || extractedGenres,
-            genre_links: data.genre_links || [],
+            genres: bookGenres,
+            genre: data.genre || bookGenres,
+            genre_links: genreLinksVal,
+            items: extractedItems,
+            item: extractedItems,
             series: seriesName,
             seriesSlug: seriesSlugVal,
+            series_link: seriesLinkVal,
             series_order: seriesOrderVal,
             series_title: data.series_title || '',
-            series_info: seriesName ? {
-              name: seriesName,
-              slug: seriesSlugVal,
-              order: seriesOrderVal,
-              title: data.series_title || ''
-            } : undefined,
+            series_info: seriesName
+              ? {
+                  name: seriesName,
+                  slug: seriesSlugVal,
+                  link: seriesLinkVal,
+                  order: seriesOrderVal,
+                  title: data.series_title || '',
+                }
+              : undefined,
             volumes: data.volumes || [],
             directChapters: data.directChapters || [],
             metaFiles: data.metaFiles || [],
-            publishDate: data.published ? String(data.published) : (data.date ? String(data.date) : ''),
+            publishDate: data.published ? String(data.published) : data.date ? String(data.date) : '',
             published: data.published ? String(data.published) : '',
             first_published: data.first_published || '',
             publisher: data.publisher ? String(data.publisher) : '',
@@ -337,13 +400,11 @@ export async function getLibraryBooks(currentSubdomain?: string): Promise<{
     const booksBySeries: Record<string, Book[]> = {};
 
     for (const book of sortedBooks) {
-      // জনরা ভিত্তিক গ্রুপিং
       for (const gName of book.genres) {
         if (!booksByGenre[gName]) booksByGenre[gName] = [];
         booksByGenre[gName].push(book);
       }
 
-      // সিরিজ ভিত্তিক গ্রুপিং
       if (book.series) {
         const sName = book.series;
         if (!booksBySeries[sName]) booksBySeries[sName] = [];
@@ -351,7 +412,6 @@ export async function getLibraryBooks(currentSubdomain?: string): Promise<{
       }
     }
 
-    // সিরিজের বইগুলোকে ক্রম (series_order) অনুযায়ী সর্ট করা
     for (const sName in booksBySeries) {
       booksBySeries[sName].sort((a, b) => {
         const orderA = a.series_order ? Number(a.series_order) : 0;
@@ -362,7 +422,7 @@ export async function getLibraryBooks(currentSubdomain?: string): Promise<{
 
     return { latestBooks: sortedBooks, booksByGenre, booksBySeries };
   } catch (error) {
-    console.error("Library scanning error:", error);
+    console.error('Library scanning error:', error);
     return { latestBooks: [], booksByGenre: {}, booksBySeries: {} };
   }
 }
@@ -411,7 +471,7 @@ export async function getBookDirectoryBySlug(bookSlug: string): Promise<string |
 }
 
 /**
- * ৩. বইয়ের হায়ারার্কি স্ক্যান করার আপডেটেড ফাংশন (একক ও বহুখণ্ডের বইয়ের জন্য)
+ * ৩. বইয়ের হায়ারার্কি স্ক্যান করার আপডেটেড ফাংশন
  */
 export async function getBookHierarchy(slug: string): Promise<{
   nodes: BookNode[];
@@ -440,13 +500,13 @@ export async function getBookHierarchy(slug: string): Promise<{
   }
 
   const entries = readdirSync(bookDir, { withFileTypes: true });
-  const hasSubVolumes = entries.some(e => e.isDirectory());
+  const hasSubVolumes = entries.some((e) => e.isDirectory());
 
   if (!hasSubVolumes) {
     // একক খণ্ডের বইয়ের জন্য
     const chapterFiles = entries
-      .filter(e => e.isFile() && e.name.endsWith('.md') && e.name !== 'index.md')
-      .map(e => e.name)
+      .filter((e) => e.isFile() && e.name.endsWith('.md') && e.name !== 'index.md')
+      .map((e) => e.name)
       .sort(naturalSort);
 
     for (const chapFile of chapterFiles) {
@@ -454,19 +514,13 @@ export async function getBookHierarchy(slug: string): Promise<{
       const { data } = matter(readFileSync(chapFilePath, 'utf8'));
       const chapSlug = chapFile.replace(/\.md$/, '');
       const title = data.title || chapSlug;
-      const genres = extractGenresFromData(data);
+      const items = extractItemsFromData(data);
 
-      const sName = data.series ? String(data.series).trim() : undefined;
-      const sSlug = data.seriesSlug ? String(data.seriesSlug).trim() : (sName ? slugify(sName) : undefined);
-
-      directChapters.push({ 
-        slug: chapSlug, 
-        title, 
-        genre: data.genre, 
-        genres,
-        series: sName,
-        seriesSlug: sSlug,
-        series_order: data.series_order
+      directChapters.push({
+        slug: chapSlug,
+        title,
+        item: data.item,
+        items,
       });
 
       nodes.push({
@@ -476,16 +530,13 @@ export async function getBookHierarchy(slug: string): Promise<{
         volId: '',
         chapterSlug: chapSlug,
         filePath: chapFilePath,
-        series: sName,
-        seriesSlug: sSlug,
-        series_order: data.series_order
       });
     }
   } else {
     // বহুখণ্ডের বইয়ের জন্য
     const volumeFolders = entries
-      .filter(e => e.isDirectory())
-      .map(e => e.name)
+      .filter((e) => e.isDirectory())
+      .map((e) => e.name)
       .sort(naturalSort);
 
     for (const volFolder of volumeFolders) {
@@ -502,15 +553,10 @@ export async function getBookHierarchy(slug: string): Promise<{
       }
 
       let volTitle = volFolder.toUpperCase();
-      let volData: any = {};
 
       if (volIndexPath) {
         const { data } = matter(readFileSync(volIndexPath, 'utf8'));
-        volData = data;
         volTitle = data.title || data.volume_title || volTitle;
-
-        const sName = data.series ? String(data.series).trim() : undefined;
-        const sSlug = data.seriesSlug ? String(data.seriesSlug).trim() : (sName ? slugify(sName) : undefined);
 
         nodes.push({
           type: 'volume',
@@ -518,9 +564,6 @@ export async function getBookHierarchy(slug: string): Promise<{
           title: volTitle,
           volId: volFolder,
           filePath: volIndexPath,
-          series: sName,
-          seriesSlug: sSlug,
-          series_order: data.series_order
         });
       }
 
@@ -529,7 +572,7 @@ export async function getBookHierarchy(slug: string): Promise<{
       const targetDir = hasChaptersFolder ? chaptersDir : volPath;
 
       const chapFiles = readdirSync(targetDir)
-        .filter(f => f.endsWith('.md') && f !== 'index.md' && f !== `${volFolder}.md`)
+        .filter((f) => f.endsWith('.md') && f !== 'index.md' && f !== `${volFolder}.md`)
         .sort(naturalSort);
 
       const volChapters: ChapterItem[] = [];
@@ -539,19 +582,13 @@ export async function getBookHierarchy(slug: string): Promise<{
         const { data } = matter(readFileSync(chapFilePath, 'utf8'));
         const chapSlug = chapFile.replace(/\.md$/, '');
         const title = data.title || `পরিচ্ছেদ ${chapSlug}`;
-        const genres = extractGenresFromData(data);
+        const items = extractItemsFromData(data);
 
-        const sName = data.series ? String(data.series).trim() : undefined;
-        const sSlug = data.seriesSlug ? String(data.seriesSlug).trim() : (sName ? slugify(sName) : undefined);
-
-        volChapters.push({ 
-          slug: chapSlug, 
-          title, 
-          genre: data.genre, 
-          genres,
-          series: sName,
-          seriesSlug: sSlug,
-          series_order: data.series_order
+        volChapters.push({
+          slug: chapSlug,
+          title,
+          item: data.item,
+          items,
         });
 
         nodes.push({
@@ -561,22 +598,13 @@ export async function getBookHierarchy(slug: string): Promise<{
           volId: volFolder,
           chapterSlug: chapSlug,
           filePath: chapFilePath,
-          series: sName,
-          seriesSlug: sSlug,
-          series_order: data.series_order
         });
       }
-
-      const volSName = volData.series ? String(volData.series).trim() : undefined;
-      const volSSlug = volData.seriesSlug ? String(volData.seriesSlug).trim() : (volSName ? slugify(volSName) : undefined);
 
       volumes.push({
         id: volFolder,
         title: volTitle,
         chapters: volChapters,
-        series: volSName,
-        seriesSlug: volSSlug,
-        series_order: volData.series_order
       });
     }
   }
@@ -628,7 +656,9 @@ export async function getBookBySlug(
 
           const { nodes, volumes, directChapters } = await getBookHierarchy(fileSlug);
 
-          const extractedGenres = collectGenresDeep(mainData, bookFolderPath);
+          // জঁরা ও সিরিজ কেবল বইয়ের মূল index.md থেকেই গৃহিত
+          const extractedGenres = extractGenresFromData(mainData);
+          if (extractedGenres.length === 0) extractedGenres.push('অন্যান্য');
 
           let targetFilePath = indexMdPath;
           let currentVolTitle = '';
@@ -638,21 +668,25 @@ export async function getBookBySlug(
           if (volumeOrChapterSlug) {
             if (chapterSlug) {
               const matchedNodeIndex = nodes.findIndex(
-                n => n.type === 'chapter' &&
-                     n.volId.toLowerCase() === volumeOrChapterSlug.toLowerCase() &&
-                     n.chapterSlug?.toLowerCase() === chapterSlug.toLowerCase()
+                (n) =>
+                  n.type === 'chapter' &&
+                  n.volId.toLowerCase() === volumeOrChapterSlug.toLowerCase() &&
+                  n.chapterSlug?.toLowerCase() === chapterSlug.toLowerCase()
               );
               if (matchedNodeIndex !== -1) {
                 targetNodeIndex = matchedNodeIndex;
                 targetFilePath = nodes[matchedNodeIndex].filePath;
                 currentChapTitle = nodes[matchedNodeIndex].title;
-                const parentVol = nodes.find(n => n.type === 'volume' && n.volId === nodes[matchedNodeIndex].volId);
+                const parentVol = nodes.find(
+                  (n) => n.type === 'volume' && n.volId === nodes[matchedNodeIndex].volId
+                );
                 if (parentVol) currentVolTitle = parentVol.title;
               }
             } else {
               const matchedNodeIndex = nodes.findIndex(
-                n => (n.type === 'volume' && n.volId.toLowerCase() === volumeOrChapterSlug.toLowerCase()) ||
-                     (n.type === 'chapter' && n.chapterSlug?.toLowerCase() === volumeOrChapterSlug.toLowerCase())
+                (n) =>
+                  (n.type === 'volume' && n.volId.toLowerCase() === volumeOrChapterSlug.toLowerCase()) ||
+                  (n.type === 'chapter' && n.chapterSlug?.toLowerCase() === volumeOrChapterSlug.toLowerCase())
               );
 
               if (matchedNodeIndex !== -1) {
@@ -674,11 +708,19 @@ export async function getBookBySlug(
           const fileContents = await fs.readFile(targetFilePath, 'utf8');
           const { data: pageData, content } = matter(fileContents);
 
+          // আইটেম নির্ধারণ: চ্যাপ্টার/পাতার ফাইল থেকে; না থাকলে পুরো বই থেকে স্ক্যান করা
+          let pageItems = extractItemsFromData(pageData);
+          if (pageItems.length === 0 && targetFilePath !== indexMdPath) {
+            pageItems = extractItemsFromData(pageData);
+          } else if (targetFilePath === indexMdPath) {
+            pageItems = collectChapterItemsDeep(bookFolderPath);
+          }
+
           // নেভিগেশন লিঙ্ক নির্ধারণ লজিক
-          let prevLink = "/books";
-          let prevLabel = "গ্রন্থাগার";
-          let nextLink = "/books";
-          let nextLabel = "গ্রন্থাগার";
+          let prevLink = '/books';
+          let prevLabel = 'গ্রন্থাগার';
+          let nextLink = '/books';
+          let nextLabel = 'গ্রন্থাগার';
 
           if (targetNodeIndex === -1) {
             if (nodes.length > 0) {
@@ -698,28 +740,40 @@ export async function getBookBySlug(
               nextLink = nodes[targetNodeIndex + 1].href;
               nextLabel = nodes[targetNodeIndex + 1].title;
             } else {
-              nextLink = "/books";
-              nextLabel = "গ্রন্থাগার";
+              nextLink = '/books';
+              nextLabel = 'গ্রন্থাগার';
             }
           }
 
-          const resolvedSubtitle = pageData.subtitle 
-            ? String(pageData.subtitle) 
-            : (targetNodeIndex === -1 && mainData.subtitle ? String(mainData.subtitle) : '');
+          const resolvedSubtitle = pageData.subtitle
+            ? String(pageData.subtitle)
+            : targetNodeIndex === -1 && mainData.subtitle
+            ? String(mainData.subtitle)
+            : '';
 
-          const resolvedNotice = pageData.notice 
-            ? String(pageData.notice) 
-            : (targetNodeIndex === -1 && mainData.notice ? String(mainData.notice) : '');
+          const resolvedNotice = pageData.notice
+            ? String(pageData.notice)
+            : targetNodeIndex === -1 && mainData.notice
+            ? String(mainData.notice)
+            : '';
 
-          // সিরিজ রেজোলিউশন
-          const resolvedSeries = pageData.series || mainData.series || '';
-          const resolvedSeriesName = resolvedSeries ? String(resolvedSeries).trim() : '';
-          const resolvedSeriesSlug = pageData.seriesSlug || mainData.seriesSlug 
-            ? String(pageData.seriesSlug || mainData.seriesSlug).trim() 
-            : slugify(resolvedSeriesName);
+          // সিরিজ রেজোলিউশন (একমাত্র mainData থেকে)
+          const resolvedSeriesName = mainData.series ? String(mainData.series).trim() : '';
+          const resolvedSeriesSlug = mainData.seriesSlug
+            ? String(mainData.seriesSlug).trim()
+            : getSlug('series', resolvedSeriesName) || slugify(resolvedSeriesName);
 
-          const resolvedSeriesOrder = pageData.series_order || pageData.series_index || mainData.series_order || mainData.series_index || '';
-          const resolvedSeriesTitle = pageData.series_title || mainData.series_title || '';
+          const resolvedSeriesLink = generateSeriesLink(
+            mainData.series_link,
+            resolvedSeriesName,
+            resolvedSeriesSlug
+          );
+
+          const resolvedSeriesOrder = mainData.series_order || mainData.series_index || '';
+          const resolvedSeriesTitle = mainData.series_title || '';
+
+          // জঁরা লিঙ্ক রেজোলিউশন (একমাত্র mainData থেকে)
+          const resolvedGenreLinks = generateGenreLinks(mainData.genre_links, extractedGenres);
 
           return {
             id: fileSlug,
@@ -728,30 +782,40 @@ export async function getBookBySlug(
             subtitle: resolvedSubtitle,
             meta_title: pageData.meta_title || mainData.meta_title || '',
             meta_description: pageData.meta_description || mainData.meta_description || '',
-            author: pageData.author || mainData.author || 'অজ্ঞাত লেখক',
-            authorSlug: pageData.authorSlug || mainData.authorSlug || authorFolderName,
-            translator: pageData.translator || mainData.translator || '',
-            translatorSlug: pageData.translatorSlug || mainData.translatorSlug || '',
-            editor: pageData.editor || mainData.editor || '',
-            editorSlug: pageData.editorSlug || mainData.editorSlug || '',
+            author: mainData.author || 'অজ্ঞাত লেখক',
+            authorSlug: mainData.authorSlug || authorFolderName,
+            translator: mainData.translator || '',
+            translatorSlug: mainData.translatorSlug || '',
+            editor: mainData.editor || '',
+            editorSlug: mainData.editorSlug || '',
             subdomains: bookSubdomains,
             genres: extractedGenres,
             genre: mainData.genre || extractedGenres,
-            genre_links: mainData.genre_links || [],
+            genre_links: resolvedGenreLinks,
+            items: pageItems,
+            item: pageData.item || pageItems,
             series: resolvedSeriesName,
             seriesSlug: resolvedSeriesSlug,
+            series_link: resolvedSeriesLink,
             series_order: resolvedSeriesOrder,
             series_title: resolvedSeriesTitle,
-            series_info: resolvedSeriesName ? {
-              name: resolvedSeriesName,
-              slug: resolvedSeriesSlug,
-              order: resolvedSeriesOrder,
-              title: resolvedSeriesTitle,
-            } : undefined,
-            volumes: volumes.length > 0 ? volumes : (mainData.volumes || []),
-            directChapters: directChapters.length > 0 ? directChapters : (mainData.directChapters || []),
+            series_info: resolvedSeriesName
+              ? {
+                  name: resolvedSeriesName,
+                  slug: resolvedSeriesSlug,
+                  link: resolvedSeriesLink,
+                  order: resolvedSeriesOrder,
+                  title: resolvedSeriesTitle,
+                }
+              : undefined,
+            volumes: volumes.length > 0 ? volumes : mainData.volumes || [],
+            directChapters: directChapters.length > 0 ? directChapters : mainData.directChapters || [],
             metaFiles: mainData.metaFiles || [],
-            publishDate: mainData.published ? String(mainData.published) : (mainData.date ? String(mainData.date) : ''),
+            publishDate: mainData.published
+              ? String(mainData.published)
+              : mainData.date
+              ? String(mainData.date)
+              : '',
             published: mainData.published ? String(mainData.published) : '',
             first_published: mainData.first_published || '',
             publisher: mainData.publisher ? String(mainData.publisher) : '',

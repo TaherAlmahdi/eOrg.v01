@@ -65,13 +65,13 @@ export const AuthorListView: FC<AuthorListViewProps> = ({
     <div className="w-full">
       {/* 🔹 লেখক পেজের জন্য সার্চ বার ও আদ্যক্ষর ফিল্টার বার */}
       {!isHomePage && (
-        <div className="mb-6 p-4 bg-white/90 backdrop-blur-md rounded border border-teal-100 shadow-sm space-y-4">
+        <div className="p-0 mb-2 space-y-4 border border-teal-100 rounded shadow-sm bg-white/90 backdrop-blur-md">
 
 
 
           {/* সার্চ ইনপুট */}
           <div className="relative max-w-md mx-auto">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-teal-600 w-5 h-5" />
+            <Search className="absolute w-5 h-5 text-teal-600 -translate-y-1/2 left-3 top-1/2" />
             <input
               type="text"
               placeholder="লেখকের নাম দিয়ে খুঁজুন..."
@@ -104,11 +104,11 @@ export const AuthorListView: FC<AuthorListViewProps> = ({
 
       {/* 🔹 লেখক তালিকা গ্রিড */}
       {filteredAuthors.length === 0 ? (
-        <div className="text-center p-8 bg-white/80 rounded text-gray-600 font-tarunima">
+        <div className="p-8 text-center text-gray-600 rounded bg-white/80 font-tarunima">
           কোনো লেখকের তথ্য পাওয়া যায়নি।
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 p-2">
+        <div className="grid grid-cols-1 gap-2 p-0 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
           {filteredAuthors.map(({ slug, name, count }) => (
             <Link
               key={slug}
@@ -124,8 +124,8 @@ export const AuthorListView: FC<AuthorListViewProps> = ({
                 </h3>
               </div>
 
-              <div className="text-right shrink-0 flex items-center gap-1.5 bg-teal-50 text-[#008080] border border-teal-100 px-2 py-1 rounded text-xs font-semibold">
-                <BookOpen size={13} className="shrink-0" />
+              <div className="text-right shrink-0 flex items-center gap-1.5 bg-teal-50 text-[#008080] border border-teal-100 px-2 py-1 rounded text-xs md:text-sm font-semibold">
+                <BookOpen size={14} className="shrink-0" />
                 <span>{toBengaliNumber(count)} টি</span>
               </div>
             </Link>
@@ -135,7 +135,7 @@ export const AuthorListView: FC<AuthorListViewProps> = ({
 
       {/* 🔹 হোমপেজের জন্য "সকল লেখক দেখুন" বাটন */}
       {isHomePage && totalAuthorsCount > authors.length && (
-        <div className="text-center mt-6 mb-4 font-tarunima">
+        <div className="mt-6 mb-4 text-center font-tarunima">
           <Link
             href="/authors"
             className="inline-flex items-center gap-2 px-6 py-2.5 rounded bg-[#008080] text-white font-semibold text-sm hover:bg-teal-700 transition-colors shadow-sm"

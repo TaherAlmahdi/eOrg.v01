@@ -1,58 +1,228 @@
 "use client";
 
 import type { FC } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
-import { Layers } from "lucide-react";
+import { 
+  BookOpen, Search, BookMarked, Bookmark, Feather, Scroll, Layers, 
+  FileText, Languages, Laugh, BookText, Compass, History, GraduationCap, 
+  Music, Flame, MoonStar, Cross, Sun, Flower2 
+} from "lucide-react";
 
-interface SeriesItem {
-  label: string;
-  slug: string;
-  count: number;
-}
+// ১. Lucide icons mapping
+const SERIES_ICONS: Record<string, FC<{ className?: string }>> = {
+  novel: ({ className }) => <BookMarked className={className} />,
+  novella: ({ className }) => <Bookmark className={className} />,
+  poetry: ({ className }) => <Feather className={className} />,
+  essay: ({ className }) => <Scroll className={className} />,
+  story: ({ className }) => <BookOpen className={className} />,
+  drama: ({ className }) => <Layers className={className} />,
+  research: ({ className }) => <Search className={className} />,
+  article: ({ className }) => <FileText className={className} />,
+  translation: ({ className }) => <Languages className={className} />,
+  humor: ({ className }) => <Laugh className={className} />,
+  classic: ({ className }) => <BookText className={className} />,
+  folklore: ({ className }) => <Compass className={className} />,
+  history: ({ className }) => <History className={className} />,
+  philosophy: ({ className }) => <GraduationCap className={className} />,
+  song: ({ className }) => <Music className={className} />,
+  speech: ({ className }) => <FileText className={className} />,
+  religious: ({ className }) => <Flame className={className} />,
+  islam: ({ className }) => <MoonStar className={className} />,
+  hinduism: ({ className }) => <Sun className={className} />,
+  buddhism: ({ className }) => <Flower2 className={className} />,
+  christianity: ({ className }) => <Cross className={className} />,
+};
 
-interface SeriesListViewProps {
-  series: SeriesItem[];
-  isHomePage?: boolean;
-  totalSeriesCount: number;
-}
+// ২. স্মার্ট আইকন ডিটেক্টর
+const getSeriesIcon = (slug: string, rawText: string): FC<{ className?: string }> => {
+  const cleanSlug = slug.toLowerCase().trim();
+  const cleanText = rawText.toLowerCase().trim();
+
+  if (SERIES_ICONS[cleanSlug]) return SERIES_ICONS[cleanSlug];
+  if (SERIES_ICONS[cleanText]) return SERIES_ICONS[cleanText];
+
+  if (cleanSlug.includes("islam") || cleanText.includes("ইসলাম")) return SERIES_ICONS.islam;
+  if (cleanSlug.includes("hindu") || cleanText.includes("হিন্দু")) return SERIES_ICONS.hinduism;
+  if (cleanSlug.includes("buddh") || cleanText.includes("বৌদ্ধ")) return SERIES_ICONS.buddhism;
+  if (cleanSlug.includes("christ") || cleanText.includes("খ্রিষ্ট")) return SERIES_ICONS.christianity;
+  if (cleanSlug.includes("religi") || cleanText.includes("ধর্ম")) return SERIES_ICONS.religious;
+
+  if (cleanSlug.includes("novel") || cleanText.includes("উপন্যাস")) return SERIES_ICONS.novel;
+  if (cleanSlug.includes("poem") || cleanText.includes("কবিতা")) return SERIES_ICONS.poetry;
+  if (cleanSlug.includes("essay") || cleanText.includes("প্রবন্ধ")) return SERIES_ICONS.essay;
+  if (cleanSlug.includes("story") || cleanText.includes("গল্প")) return SERIES_ICONS.story;
+
+  return ({ className }) => <BookText className={className} />;
+};
 
 const toBengaliNumber = (num: number | string): string =>
   num.toString().replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[parseInt(d, 10)]);
 
+export interface SeriesItem {
+  slug: string;
+  label: string;
+  rawSeries: string;
+  count: number;
+}
+
+interface SeriesListViewProps {
+  seriesList?: SeriesItem[];
+  isHomePage?: boolean;
+  totalSeriesCount: number;
+}
+
 export const SeriesListView: FC<SeriesListViewProps> = ({
-  series,
-  isHomePage,
+  seriesList = [],
+  isHomePage = false,
   totalSeriesCount,
 }) => {
-  return (
-    <div className="w-full p-2">
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-        {series.map((item) => (
-          <Link
-            key={item.slug}
-            href={`/series/${item.slug}`}
-            className="flex items-center justify-between p-3.5 bg-white/80 hover:bg-white rounded border border-gray-100 hover:border-indigo-300 shadow-xs hover:shadow-md transition-all group"
-          >
-            <div className="flex items-center gap-2.5 truncate">
-              <Layers className="size-4 text-indigo-600 shrink-0 group-hover:scale-110 transition-transform" />
-              <span className="text-sm font-semibold text-gray-700 group-hover:text-indigo-900 truncate">
-                {item.label}
-              </span>
-            </div>
-            <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">
-              {toBengaliNumber(item.count)}
-            </span>
-          </Link>
-        ))}
-      </div>
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedLetter, setSelectedLetter] = useState("সব");
 
-      {isHomePage && totalSeriesCount > series.length && (
-        <div className="mt-6 text-center">
+  // 🔹 ১. ফিল্টারিং, র‍্যান্ডমাইজিং (হোমপেজ) এবং বাংলা বর্ণানুক্রম সাজানো (সিরিজ পেজ)
+  const validSeriesList = useMemo(() => {
+    // বৈধ সিরিজ ফিল্টার (ফাঁকা ও 'অন্যান্য' বাদ)
+    const filtered = seriesList.filter((item) => {
+      if (!item.label || !item.slug) return false;
+      const cleanLabel = item.label.trim().toLowerCase();
+      const cleanSlug = item.slug.trim().toLowerCase();
+      
+      return !(
+        cleanLabel === "" || 
+        cleanLabel === "অন্যান্য" || 
+        cleanLabel === "others" ||
+        cleanSlug === "others" ||
+        cleanSlug === "other"
+      );
+    });
+
+    if (isHomePage) {
+      // হোমপেজ: র‍্যান্ডমাইজড শাফলিং এবং ২০টি নির্বাচন
+      const shuffled = [...filtered].sort(() => 0.5 - Math.random());
+      return shuffled.slice(0, 20);
+    } else {
+      // সিরিজ পেজ: বাংলা বর্ণানুক্রমে সাজানো (A-Z / অ-ক্ষ)
+      return [...filtered].sort((a, b) =>
+        a.label.trim().localeCompare(b.label.trim(), "bn", { sensitivity: "base" })
+      );
+    }
+  }, [seriesList, isHomePage]);
+
+  // 🔹 ২. প্রথম বর্ণ ডাইনামিক্যালি বের করা
+  const availableLetters = useMemo(() => {
+    if (isHomePage) return [];
+
+    const lettersSet = new Set<string>();
+
+    validSeriesList.forEach((item) => {
+      const firstChar = item.label.trim().charAt(0);
+      if (firstChar) {
+        lettersSet.add(firstChar);
+      }
+    });
+
+    const sortedLetters = Array.from(lettersSet).sort((a, b) =>
+      a.localeCompare(b, "bn", { sensitivity: "base" })
+    );
+
+    return ["সব", ...sortedLetters];
+  }, [validSeriesList, isHomePage]);
+
+  // 🔹 ৩. সার্চ ও আদ্যক্ষর ভিত্তিক ফিল্টারিং
+  const filteredSeries = useMemo(() => {
+    if (isHomePage) return validSeriesList;
+
+    return validSeriesList.filter((item) => {
+      const matchesSearch = item.label.toLowerCase().includes(searchQuery.toLowerCase());
+      const firstChar = item.label.trim().charAt(0);
+      const matchesLetter = selectedLetter === "সব" || firstChar === selectedLetter;
+
+      return matchesSearch && matchesLetter;
+    });
+  }, [validSeriesList, searchQuery, selectedLetter, isHomePage]);
+
+  return (
+    <div className="w-full">
+      {!isHomePage && (
+        <div className="p-4 mb-6 space-y-4 border border-teal-100 rounded shadow-sm bg-white/90 backdrop-blur-md">
+          {/* লাইভ সার্চ বার */}
+          <div className="relative max-w-md mx-auto">
+            <Search className="absolute w-5 h-5 text-teal-600 -translate-y-1/2 left-3 top-1/2" />
+            <input
+              type="text"
+              placeholder="সিরিজের নাম দিয়ে খুঁজুন..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-teal-200 rounded focus:outline-none focus:ring-2 focus:ring-[#008080] font-tarunima text-sm bg-teal-50/30 text-gray-800"
+            />
+          </div>
+
+          {/* ডাইনামিক আদ্যক্ষর কুইক ফিল্টার বার */}
+          {availableLetters.length > 1 && (
+            <div className="flex flex-wrap items-center justify-center gap-1.5 pt-2 border-t border-gray-100 font-tarunima">
+              {availableLetters.map((letter) => (
+                <button
+                  key={letter}
+                  type="button"
+                  onClick={() => setSelectedLetter(letter)}
+                  className={`px-2.5 py-1 text-xs md:text-sm font-semibold rounded transition-colors ${
+                    selectedLetter === letter
+                      ? "bg-[#008080] text-white shadow-xs"
+                      : "bg-gray-100 hover:bg-teal-50 text-gray-700 hover:text-[#008080]"
+                  }`}
+                >
+                  {letter}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* সিরিজ লিস্ট (ফ্লেক্স গ্রিড ও অটো উইডথ) */}
+      {filteredSeries.length === 0 ? (
+        <div className="p-8 text-center text-gray-600 border rounded bg-white/80 border-teal-50 font-tarunima">
+          কোনো সিরিজ পাওয়া যায়নি।
+        </div>
+      ) : (
+        <div className="flex flex-wrap gap-2 p-2">
+          {filteredSeries.map(({ slug, label, rawSeries, count }) => {
+            const IconComponent = getSeriesIcon(slug, rawSeries);
+
+            return (
+              <Link
+                key={slug}
+                href={`/series/${slug}`}
+                className="flex-1 min-w-55 sm:min-w-65 flex items-center justify-between gap-2 px-2 py-2 rounded bg-white/90 text-[#008080] border border-teal-100 shadow-sm transition-all duration-300 backdrop-blur-sm hover:bg-teal-50 hover:shadow-md hover:border-teal-300 hover:scale-[1.01] group cursor-pointer"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="p-2.5 rounded bg-orange-50 text-[#cc7a00] group-hover:bg-[#cc7a00] group-hover:text-white transition-colors duration-300 shrink-0">
+                    <IconComponent className="w-5 h-5 md:w-6 md:h-6 shrink-0" />
+                  </div>
+                  <h3 className="text-[#008080] group-hover:text-[#cc7a00] text-base font-semibold leading-snug font-tarunima truncate transition-colors">
+                    {label}
+                  </h3>
+                </div>
+
+                <div className="text-right shrink-0 flex items-center gap-1.5 bg-teal-50 text-[#008080] border border-teal-100 px-2.5 py-1 rounded text-xs md:text-sm font-semibold">
+                  <BookOpen size={14} className="shrink-0" />
+                  <span>{toBengaliNumber(count)} টি</span>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      )}
+
+      {/* হোমপেজের জন্য "সকল সিরিজ দেখুন" বাটন */}
+      {isHomePage && totalSeriesCount > 20 && (
+        <div className="mt-6 mb-4 text-center">
           <Link
             href="/series"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-900 text-white font-medium text-sm rounded hover:bg-indigo-800 transition-colors shadow-sm"
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded bg-[#008080] text-white font-tarunima font-normal text-sm hover:bg-teal-700 transition-colors shadow-sm"
           >
-            সকল সিরিজ দেখুন ({toBengaliNumber(totalSeriesCount)})
+            সকল সিরিজ দেখুন ({toBengaliNumber(totalSeriesCount)} টি) →
           </Link>
         </div>
       )}

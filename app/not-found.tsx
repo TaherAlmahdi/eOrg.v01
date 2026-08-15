@@ -17,7 +17,7 @@ interface StoryItem {
 
 // MDX ফোল্ডার থেকে ডাটা ফেচ করার ফাংশন
 async function getSubdomainsData(): Promise<StoryItem[]> {
-  const targetDir = path.join(process.cwd(), 'content', 'pages', 'sucsess');
+  const targetDir = path.join(process.cwd(), 'content', 'pages', 'success');
 
   if (!fs.existsSync(targetDir)) return [];
 
@@ -68,16 +68,16 @@ export default async function NotFound() {
 
   return (
     <div
-      className="relative min-h-screen w-full flex flex-col items-center justify-between p-4 md:p-6 bg-cover bg-center bg-no-repeat bg-fixed text-white overflow-x-clip"
+      className="relative flex flex-col items-center justify-between w-full min-h-screen p-4 text-white bg-fixed bg-center bg-no-repeat bg-cover md:p-6 overflow-x-clip"
       style={{ backgroundImage: "url('/bg03.png')" }}
     >
       {/* ব্যাকগ্রাউন্ড ওভারলে */}
       <div className="absolute inset-0 bg-[#ffcc66]/20 z-10 pointer-events-none backdrop-blur-[1px]" />
 
       {/* 🟢 ১. কারেন্ট ডোমেনের হেডার সেকশন */}
-<header className="relative z-20 w-full max-w-full flex flex-col items-center text-center pt-4">
+<header className="relative z-20 flex flex-col items-center w-full max-w-full pt-4 text-center">
   {/* 🟢 404 GIF Image Container */}
-  <div className="relative w-full max-w-[280px] sm:max-w-[480px] md:max-w-[480px] aspect-[509/337] mx-auto mb-2 overflow-hidden">
+  <div className="relative w-full mx-auto mb-2 overflow-hidden max-w-70 sm:max-w-120 md:max-w-120 aspect-509/337">
     <Image
       src="/404.gif" // আপনার জিফ ফাইলের সঠিক পাথ (public/images/404.gif বা public/404.gif অনুযায়ী দিন)
       alt="404 Page Not Found"
@@ -91,17 +91,17 @@ export default async function NotFound() {
 </header>
 
       {/* 🟢 ২. মূল ৪-০-৪ কন্টেন্ট */}
-      <main className="relative z-20 w-full max-w-full text-center py-6 px-2 my-auto">
+      <main className="relative z-20 w-full max-w-full px-2 py-6 my-auto text-center">
 
-        <h3 className="text-2xl md:text-3xl font-bold mt-2 text-gray-900 font-tarunima">
+        <h3 className="mt-2 text-2xl font-bold text-gray-900 md:text-3xl font-tarunima">
           আপনি যা চাচ্ছেন তা পাওয়া যায়নি!
         </h3>
-        <p className="text-gray-800 text-sm md:text-lg mt-2 mb-6 max-w-2xl mx-auto font-medium font-tarunima">
+        <p className="max-w-2xl mx-auto mt-2 mb-6 text-sm font-medium text-gray-800 md:text-lg font-tarunima">
           অনুগ্রহ করে এডুলিচার বিশুদ্ধজ্ঞান প্রকল্পগুলোতে খোঁজ করুন।
         </p>
 
         {/* 🟢 ৩. সাবডোমেন সাইটের তালিকা */}
-        <div className="flex flex-wrap gap-3 justify-start items-stretch relative px-2 z-20 w-full text-left">
+        <div className="relative z-20 flex flex-wrap items-stretch justify-start w-full gap-3 px-2 text-left">
           {stories.map((story, index) => (
             <a
               key={index}
@@ -109,7 +109,7 @@ export default async function NotFound() {
               className="flex items-center justify-center gap-1.25 px-3 py-2.5 rounded mb-1 bg-white/90 text-[#008080] border border-teal-100 shadow-sm text-center transition-all duration-300 backdrop-blur-sm hover:bg-teal-50 hover:shadow-lg hover:border-teal-300 hover:scale-[1.02] shrink-0 grow basis-full sm:basis-[calc(50%-0.75rem)] lg:basis-[calc(33.333%-0.75rem)] xl:basis-[calc(25%-0.75rem)] 2xl:basis-[calc(20%-0.75rem)] max-w-full group cursor-pointer overflow-hidden"
             >
               {/* বামে আইকন/লোগো */}
-              <div className="relative w-12 h-12 shrink-0 overflow-hidden">
+              <div className="relative w-12 h-12 overflow-hidden shrink-0">
                 <Image
                   src={story.icon}
                   alt={story.title}
@@ -120,12 +120,12 @@ export default async function NotFound() {
               </div>
 
               {/* ডানে টাইটেল ও ট্যাগলাইন */}
-              <div className="grow text-left flex flex-col justify-center min-w-0">
-                <h3 className="text-green text-lg md:text-xl font-semibold leading-snug font-tarunima truncate">
+              <div className="flex flex-col justify-center min-w-0 text-left grow">
+                <h3 className="text-lg font-semibold leading-snug truncate text-green md:text-xl font-tarunima">
                   {story.title}
                 </h3>
                 {story.excerpt && (
-                  <p className="text-gray-600 text-xs md:text-sm mt-1 font-normal font-tarunima line-clamp-2">
+                  <p className="mt-1 text-xs font-normal text-gray-600 md:text-sm font-tarunima line-clamp-2">
                     {story.excerpt}
                   </p>
                 )}
@@ -135,7 +135,7 @@ export default async function NotFound() {
         </div>
 
         {/* 🟢 ৪. হোম পেজে ফেরার দুটি ডাইনামিক অপশন */}
-        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className="flex flex-col items-center justify-center gap-4 mt-8 sm:flex-row">
           {/* যে সাবডোমেনে ভিজিটর বর্তমান আছে তার হোমে ফেরার লিংক */}
           <a
             href={currentConfig.siteUrl}
@@ -155,7 +155,7 @@ export default async function NotFound() {
       </main>
 
       {/* ফুটার */}
-      <footer className="relative z-20 text-xs text-gray-700 pb-2 font-tarunima">
+      <footer className="relative z-20 pb-2 text-xs text-gray-700 font-tarunima">
         &copy; {new Date().getFullYear()} {currentConfig.siteName}। সর্বস্বত্ব সংরক্ষিত।
       </footer>
     </div>
