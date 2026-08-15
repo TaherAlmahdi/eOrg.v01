@@ -1234,29 +1234,6 @@ span.right {
   margin-bottom: 30px;
 }
 
-.intro {
-  width: 100%;
-  margin: 15px 0;
-  padding-left: 5%;
-  padding-right: 5%;
-  height: 50px;
-  vertical-align: middle;
-}
-
-.intro_left {
-  margin-right: 25%;
-  width: 25%;
-  float: left;
-  font-size: inherit !important;
-}
-
-.intro_right {
-  margin-left: 25%;
-  width: 25%;
-  float: left;
-  font-size: inherit !important;
-}
-
 .pub {
   color: goldenrod;
 }
@@ -1333,4 +1310,27 @@ span.right {
   width: fit-content;
   text-align: center;
   display: block;
+}
+
+.intro {
+  width: 100%;
+  margin: 15px 0;
+  padding: 0 5%;
+  height: 50px;
+  
+  /* Flexbox দিয়ে উভয় পাশে সাজানো এবং ভার্টিক্যালি সেন্টার করা */
+  display: flex;
+  align-items: center; /* ভার্টিক্যালি সেন্টার করবে */
+  justify-content: space-between; /* দুই পাশ বরাবর কন্টেন্ট রাখবে */
+  box-sizing: border-box;
+}
+
+.intro_left {
+  text-align: left; /* বাম পাশের লেখা লেফ্ট এলাইন */
+  font-size: inherit !important;
+}
+
+.intro_right {
+  text-align: center; /* ডান পাশের লেখা সেন্টার এলাইন */
+  font-size: inherit !important;
 }
