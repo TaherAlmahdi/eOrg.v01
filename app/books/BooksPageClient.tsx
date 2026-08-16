@@ -160,7 +160,7 @@ export default function BooksPageClient({ initialBooks = [], siteTitle }: BooksP
             <p>আপনার অনুসন্ধান অনুযায়ী কোনো বই পাওয়া যায়নি।</p>
           </div>
         ) : (
-          <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-6 xl:grid-cols-8 gap-2 border-b border-red-100">
+          <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-6 xl:grid-cols-8 gap-2 pb-4 border-b border-red-100">
             {filteredBooks.map((book) => (
               <Link
                 key={book.slug}

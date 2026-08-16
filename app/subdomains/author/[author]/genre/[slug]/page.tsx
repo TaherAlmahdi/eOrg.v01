@@ -103,7 +103,7 @@ export default async function GenrePage({ params }: Props) {
       <div className="max-w-8xl mx-auto py-4 px-3">
         <header className="mb-6 border-b border-orange-200 pb-3">
           <h2 className="text-2xl text-center md:text-3xl font-bold font-sabrina text-gray-800">
-            ঘরানা: {targetBengaliGenre}
+            ঘরানা : {targetBengaliGenre}
           </h2>
           <p className="text-gray-500 text-center mt-2 italic">
             {filteredBooks.length > 0 

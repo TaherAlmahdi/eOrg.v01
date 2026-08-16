@@ -5,12 +5,13 @@ import { Metadata } from 'next';
 import { headers } from 'next/headers';
 import GenreList from '@/app/components/GenreList';
 import AuthorList from '@/app/components/AuthorList';
-import { Calendar, ChevronRight, Layers, Users } from 'lucide-react';
+import { BookCopy, Calendar, ChevronRight, Layers, Users } from 'lucide-react';
 import { getLibraryBooks } from '../../lib/books';
 import { getSlug, getAuthorSlugFromTitle } from '../../lib/content/core/registry';
 import { getSubdomainData, buildTabTitle } from '@/app/lib/get-site-data';
 import { headerConfig } from '../../lib/headerConfig';
 import SeriesList from '@/app/components/SeriesList';
+import { LibraryStats } from '@/app/components/LibraryStats';
 
 // 🏷️ Dynamic Metadata Export
 export async function generateMetadata(): Promise<Metadata> {
@@ -62,7 +63,46 @@ export default async function LibraryHomePage() {
   const subdomain = siteData.subdomain || 'library';
   const currentConfig = headerConfig[subdomain] || headerConfig.library || headerConfig.main;
 
-  const { latestBooks } = await getLibraryBooks();
+  // 🔹 getLibraryBooks থেকে রিটার্ন হওয়া অবজেক্ট আনপ্যাক করা
+  const { latestBooks = [], booksByGenre = {}, booksBySeries = {} } = await getLibraryBooks();
+
+  // 🔹 সব ক্যাটাগরি ও সিরিজ থেকে ইউনিক বইগুলোর তালিকা তৈরি (allBooks-এর বিকল্প হিসেবে)
+  const bookMap = new Map<string, Record<string, unknown>>();
+
+  latestBooks.forEach((book) => {
+    const item = book as unknown as Record<string, unknown>;
+    const id = String(item.id || item.slug || book.title);
+    bookMap.set(id, item);
+  });
+
+  Object.values(booksByGenre).flat().forEach((book) => {
+    const item = book as unknown as Record<string, unknown>;
+    const id = String(item.id || item.slug || book.title);
+    if (!bookMap.has(id)) bookMap.set(id, item);
+  });
+
+  Object.values(booksBySeries).flat().forEach((book) => {
+    const item = book as unknown as Record<string, unknown>;
+    const id = String(item.id || item.slug || book.title);
+    if (!bookMap.has(id)) bookMap.set(id, item);
+  });
+
+  const allBooksList = Array.from(bookMap.values());
+
+  // 🔹 লেখক ও সিরিজের ইউনিক কাউন্ট বের করা
+  const contributorSet = new Set(
+    allBooksList
+      .map((b) => String(b.author || '').trim())
+      .filter(Boolean)
+  );
+
+  const seriesSet = new Set(
+    Object.keys(booksBySeries).concat(
+      allBooksList
+        .map((b) => String(b.series || '').trim())
+        .filter(Boolean)
+    )
+  );
 
   const getAuthorSlug = (bookItem: Record<string, unknown>): string => {
     const authorName = String(bookItem.author || '').trim();
@@ -161,6 +201,20 @@ export default async function LibraryHomePage() {
 
       <div className="relative w-full h-auto mt-2 overflow-x-clip font-tarunima">
         
+        {/* ১. Library Stats */}
+        <section aria-labelledby="latest-books-heading">
+          <div className="relative w-full h-auto overflow-x-clip">
+            <div className="relative z-20 w-full mx-auto max-w-none">
+              {/* 🔹 আলাদা করা স্ট্যাটস কম্পোনেন্ট */}
+              <LibraryStats 
+                totalAuthors={contributorSet.size}
+                totalBooks={allBooksList.length}
+                totalSeries={seriesSet.size}
+              />
+            </div>
+          </div>
+        </section>
+
         {/* ১. নতুন বই সেকশন */}
         <section aria-labelledby="latest-books-heading">
           <div className="flex items-end justify-between pb-2 mb-2 border-b border-slate-200">
@@ -245,7 +299,7 @@ export default async function LibraryHomePage() {
         <section data-aos="fade-up" className="relative">
           <div className="flex justify-center mt-5 mb-5">
             <div className="inline-flex items-center justify-center gap-3 px-4 py-2 rounded bg-teal-50/90 text-[#008080] mb-0 border border-teal-100 shadow-xs text-center backdrop-blur-md">
-              <Layers size={24} className="shrink-0 animate-pulse" />
+              <BookCopy size={24} className="shrink-0 animate-pulse" />
               <h1 className="text-xl font-black leading-none tracking-tight text-gray-900 md:text-2xl font-tarunima">
                 <span className="text-[#008080]">এডুলিচার</span> ঘরানা <span className="text-[#cc7a00]">নির্ঘণ্ট</span>
               </h1>
@@ -255,8 +309,8 @@ export default async function LibraryHomePage() {
         </section>
 
         {/* ৩. সিরিজ নির্ঘণ্ট সেকশন */}
-        <section data-aos="fade-up" className="relative">
-          <div className="flex justify-center mt-5 mb-0">
+        <section data-aos="fade-down" className="relative">
+          <div className="flex justify-center mt-5 mb-5">
             <div className="inline-flex items-center justify-center gap-3 px-4 py-2 rounded bg-teal-50/90 text-[#008080] mb-0 border border-teal-100 shadow-xs text-center backdrop-blur-md">
               <Layers size={24} className="shrink-0 animate-pulse" />
               <h1 className="text-xl font-black leading-none tracking-tight text-gray-900 md:text-2xl font-tarunima">
@@ -267,10 +321,10 @@ export default async function LibraryHomePage() {
           <SeriesList limit={20} />
         </section>        
 
-        {/* ৩. লেখক নির্ঘণ্ট সেকশন */}
-        <section data-aos="fade-down" className="relative">
+        {/* ৪. লেখক নির্ঘণ্ট সেকশন */}
+        <section data-aos="fade-up" className="relative">
           <div className="flex justify-center mt-5 mb-5">
-            <div className="inline-flex items-center justify-center gap-3 px-8 py-5 rounded bg-teal-50/90 text-[#008080] border border-teal-100 shadow-xs text-center backdrop-blur-md">
+            <div className="inline-flex items-center justify-center gap-3 px-4 py-2 rounded bg-teal-50/90 text-[#008080] mb-0 border border-teal-100 shadow-xs text-center backdrop-blur-md">
               <Users size={24} className="shrink-0 animate-pulse" />
               <h1 className="text-xl font-black leading-none tracking-tight text-gray-900 md:text-2xl font-tarunima">
                 <span className="text-[#008080]">এডুলিচার</span> লেখক <span className="text-[#cc7a00]">নির্ঘণ্ট</span>

@@ -80,7 +80,7 @@ export const SeriesListView: FC<SeriesListViewProps> = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLetter, setSelectedLetter] = useState("সব");
 
-  // 🔹 ১. ফিল্টারিং, র‍্যান্ডমাইজিং (হোমপেজ) এবং বাংলা বর্ণানুক্রম সাজানো (সিরিজ পেজ)
+  // 🔹 ১. ফিল্টারিং ও লেটেস্ট সাজানো (হোমপেজ) এবং বাংলা বর্ণানুক্রম সাজানো (সিরিজ পেজ)
   const validSeriesList = useMemo(() => {
     // বৈধ সিরিজ ফিল্টার (ফাঁকা ও 'অন্যান্য' বাদ)
     const filtered = seriesList.filter((item) => {
@@ -98,9 +98,8 @@ export const SeriesListView: FC<SeriesListViewProps> = ({
     });
 
     if (isHomePage) {
-      // হোমপেজ: র‍্যান্ডমাইজড শাফলিং এবং ২০টি নির্বাচন
-      const shuffled = [...filtered].sort(() => 0.5 - Math.random());
-      return shuffled.slice(0, 20);
+      // ✅ সংশোধন: র‍্যান্ডমাইজ বাদ দিয়ে সর্বশেষ যুক্ত হওয়া প্রথম ২০টি নেওয়া হলো
+      return filtered.slice(0, 20);
     } else {
       // সিরিজ পেজ: বাংলা বর্ণানুক্রমে সাজানো (A-Z / অ-ক্ষ)
       return [...filtered].sort((a, b) =>
@@ -143,9 +142,9 @@ export const SeriesListView: FC<SeriesListViewProps> = ({
   }, [validSeriesList, searchQuery, selectedLetter, isHomePage]);
 
   return (
-    <div className="w-full">
+    <div className="w-full px-2">
       {!isHomePage && (
-        <div className="p-4 mb-6 space-y-4 border border-teal-100 rounded shadow-sm bg-white/90 backdrop-blur-md">
+        <div className="p-4 mb-3 space-y-4 border border-teal-100 rounded shadow-sm bg-white/90 backdrop-blur-md">
           {/* লাইভ সার্চ বার */}
           <div className="relative max-w-md mx-auto">
             <Search className="absolute w-5 h-5 text-teal-600 -translate-y-1/2 left-3 top-1/2" />
@@ -160,7 +159,7 @@ export const SeriesListView: FC<SeriesListViewProps> = ({
 
           {/* ডাইনামিক আদ্যক্ষর কুইক ফিল্টার বার */}
           {availableLetters.length > 1 && (
-            <div className="flex flex-wrap items-center justify-center gap-1.5 pt-2 border-t border-gray-100 font-tarunima">
+            <div className="flex flex-wrap items-center justify-center gap-1 pt-2 border-t border-gray-100 font-tarunima">
               {availableLetters.map((letter) => (
                 <button
                   key={letter}
@@ -182,25 +181,26 @@ export const SeriesListView: FC<SeriesListViewProps> = ({
 
       {/* সিরিজ লিস্ট (ফ্লেক্স গ্রিড ও অটো উইডথ) */}
       {filteredSeries.length === 0 ? (
-        <div className="p-8 text-center text-gray-600 border rounded bg-white/80 border-teal-50 font-tarunima">
+        <div className="p-8 text-center text-gray-600 rounded bg-white/80 font-tarunima">
           কোনো সিরিজ পাওয়া যায়নি।
         </div>
       ) : (
-        <div className="flex flex-wrap gap-2 p-2">
-          {filteredSeries.map(({ slug, label, rawSeries, count }) => {
+        <div className="flex flex-wrap gap-2 p-0">
+          {filteredSeries.map(({ slug, label, rawSeries, count }, index) => {
             const IconComponent = getSeriesIcon(slug, rawSeries);
 
             return (
               <Link
-                key={slug}
+                key={`${slug}-${index}`}
                 href={`/series/${slug}`}
-                className="flex-1 min-w-55 sm:min-w-65 flex items-center justify-between gap-2 px-2 py-2 rounded bg-white/90 text-[#008080] border border-teal-100 shadow-sm transition-all duration-300 backdrop-blur-sm hover:bg-teal-50 hover:shadow-md hover:border-teal-300 hover:scale-[1.01] group cursor-pointer"
+                className="flex-1 min-w-55 sm:min-w-65 flex items-center justify-between gap-2 px-2.5 py-2.5 rounded bg-white/90 text-[#008080] border border-teal-100 shadow-sm transition-all duration-300 backdrop-blur-sm hover:bg-teal-50 hover:shadow-md hover:border-teal-300 hover:scale-[1.01] group cursor-pointer"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
                   <div className="p-2.5 rounded bg-orange-50 text-[#cc7a00] group-hover:bg-[#cc7a00] group-hover:text-white transition-colors duration-300 shrink-0">
                     <IconComponent className="w-5 h-5 md:w-6 md:h-6 shrink-0" />
                   </div>
-                  <h3 className="text-[#008080] group-hover:text-[#cc7a00] text-base font-semibold leading-snug font-tarunima truncate transition-colors">
+                  {/* ✅ লাইন হাইট বাড়িয়ে এবং py-1 যুক্ত করে অক্ষরের মাত্রা ও কার কাটা থেকে রক্ষা করা হয়েছে */}
+                  <h3 className="text-[#008080] group-hover:text-[#cc7a00] text-base font-semibold leading-relaxed py-1 font-tarunima truncate transition-colors">
                     {label}
                   </h3>
                 </div>

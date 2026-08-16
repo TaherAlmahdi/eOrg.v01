@@ -3,10 +3,17 @@ import type { Metadata } from 'next';
 import { getSubdomainData, buildTabTitle } from '@/app/lib/get-site-data';
 import { getSeriesTitle } from '@/app/lib/content/core/registry';
 import { getLibraryBooks } from '@/app/lib/books';
-import { SeriesView, type BookSeries } from '@/app/components/SeriesView';
+
+// ⚠️ SeriesView Default Export নাকি Named Export নিশ্চিত করে সঠিক ইম্পোর্টটি বেছে নিন:
+// যদি SeriesView ফাইলে "export default function SeriesView" থাকে:
+import SeriesView, { type BookSeries } from '@/app/components/SeriesView';
+
+// যদি SeriesView ফাইলে "export function SeriesView" থাকে, তবে ওপরের লাইনটি কমেন্ট করে নিচেরটি আনকমেন্ট করুন:
+// import { SeriesView, type BookSeries } from '@/app/components/SeriesView';
 
 interface PageProps {
-  params: Promise<{ slug: string; author?: string }>;
+  params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ author?: string }>;
 }
 
 // 🔹 ইউটিলিটি: স্লাগ নরম্যালাইজার (বাংলা ও ইংরেজি সাপোর্ট সহ)
@@ -44,8 +51,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 // 🔹 সিরিজ পেজ মূল কম্পোনেন্ট
-export default async function SeriesPage({ params }: PageProps) {
-  const { slug, author } = await params;
+export default async function SeriesPage({ params, searchParams }: PageProps) {
+  const { slug } = await params;
+  const resolvedSearchParams = searchParams ? await searchParams : {};
+  const author = resolvedSearchParams.author;
+  
   const decodedSlug = decodeURIComponent(slug).trim();
 
   // ১. সাবডোমেন ও হোস্ট ডেটা স্ট্র্যাক্ট করা

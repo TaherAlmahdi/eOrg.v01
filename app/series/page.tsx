@@ -61,7 +61,7 @@ export default async function SeriesPage() {
       </header>
 
       {/* সিরিজ লিস্ট সেকশন */}
-      <div className="px-2 py-2 mx-auto max-w-8xl">
+      <div className="max-w-8xl mx-auto py-2 px-2">
         <SeriesList sortBy="alphabetical" />
       </div>
     </main>

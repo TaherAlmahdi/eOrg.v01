@@ -103,7 +103,7 @@ export default async function GenrePage({ params }: Props) {
       <div className="max-w-8xl mx-auto py-4 px-3">
         <header className="mb-6 border-b border-orange-200 pb-3">
           <h2 className="text-2xl text-center md:text-3xl font-bold font-sabrina text-gray-800">
-            ঘরানা: {targetBengaliGenre}
+            ঘরানা : {targetBengaliGenre}
           </h2>
           <p className="text-gray-500 text-center mt-2 italic">
             {filteredBooks.length > 0 
@@ -113,7 +113,7 @@ export default async function GenrePage({ params }: Props) {
         </header>
 
         {filteredBooks.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-6 gap-4">
+          <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-6 xl:grid-cols-8 gap-2 pb-4 border-b border-red-100">
             {filteredBooks.map((book) => (
               <Link 
                 key={book.id || book.slug} 
@@ -135,7 +135,7 @@ export default async function GenrePage({ params }: Props) {
                   <h3 className="text-base font-bold text-gray-900 group-hover:text-emerald-700 transition-colors line-clamp-2 leading-snug">
                     {book.title}
                   </h3>
-                  <p className="text-xs text-gray-500 mt-1 font-tarunima">
+                  <p className="text-xs md:text-sm text-gray-500 mt-1 font-tarunima">
                     {book.author || 'অজানা লেখক'}
                   </p>
                 </div>

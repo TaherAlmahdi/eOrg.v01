@@ -2,10 +2,6 @@ import type { FC } from "react";
 import { getAllBooks } from "@/app/lib/books"; 
 import { CONTENT_REGISTRY, getSlug } from "@/app/lib/content/core/registry";
 import { GenreListView } from "./GenreListView";
-import { Users, Library, Layers } from 'lucide-react';
-
-const toBengaliNumber = (num: number | string): string =>
-  num.toString().replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[parseInt(d, 10)]);
 
 const parseGenreField = (item: any): string[] => {
   const result: string[] = [];
@@ -48,6 +44,7 @@ const GenreList: FC<GenreListProps> = async ({ sortBy, limit }) => {
   const allBooks = await getAllBooks();
 
   const contributorSet = new Set<string>();
+  const seriesSet = new Set<string>();
   const genreMap = new Map<string, { label: string; slug: string; rawGenre: string; count: number }>();
 
   allBooks.forEach((book: any) => {
@@ -60,6 +57,17 @@ const GenreList: FC<GenreListProps> = async ({ sortBy, limit }) => {
     }
     if (typeof book.editor === 'string' && book.editor.trim()) {
       contributorSet.add(book.editor.trim());
+    }
+
+    // 🔹 সিরিজের ইউনিক কাউন্ট সংগ্রহ
+    const rawSeries = book.Series || book.series;
+    if (rawSeries) {
+      const seriesList = Array.isArray(rawSeries) ? rawSeries : [rawSeries];
+      seriesList.forEach((s) => {
+        if (typeof s === 'string' && s.trim()) {
+          seriesSet.add(s.trim());
+        }
+      });
     }
 
     const bookGenres = collectAllGenresFromBook(book);
@@ -95,37 +103,8 @@ const GenreList: FC<GenreListProps> = async ({ sortBy, limit }) => {
   return (
     <div className="relative w-full h-auto overflow-x-clip">
       <div className="relative z-20 w-full mx-auto max-w-none">
-        <div className="grid w-full grid-cols-1 gap-2 p-0 mb-0 md:grid-cols-2">
-          <div className="flex items-center justify-between p-2 transition-all duration-300 border rounded shadow-sm bg-white/90 backdrop-blur-md border-white/60 hover:shadow-md">
-            <div className="flex items-center gap-4">
-              <div className="p-2 rounded bg-teal-50 text-[#008080] border border-teal-100/50">
-                <Users size={32} className="shrink-0" />
-              </div>
-              <div>
-                <p className="text-base font-semibold text-gray-500">আমাদের পরিবারে</p>
-                <h2 className="text-lg font-bold text-gray-800 md:text-xl">
-                  সম্মানিত লেখক <span className="text-[#008080] font-black text-2xl md:text-3xl mx-1">{toBengaliNumber(contributorSet.size)}</span> জন
-                </h2>
-              </div>
-            </div>
-          </div>
 
-          <div className="flex items-center justify-between p-2 transition-all duration-300 border rounded shadow-sm bg-white/90 backdrop-blur-md border-white/60 hover:shadow-md">
-            <div className="flex items-center gap-4">
-              <div className="p-2 rounded bg-amber-50 text-[#cc7a00] border border-amber-100/50">
-                <Library size={32} className="shrink-0" />
-              </div>
-              <div>
-                <p className="text-base font-semibold text-gray-500">এডুলিচার পাঠশালায়</p>
-                <h2 className="text-lg font-bold text-gray-800 md:text-xl">
-                  প্রকাশিত গ্রন্থ সংখ্যা <span className="text-[#cc7a00] font-black text-2xl md:text-3xl mx-1">{toBengaliNumber(allBooks.length)}</span> টি
-                </h2>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        {/* 🔹 প্রপস থেকে getIcon বাদ দেওয়া হয়েছে */}
         <GenreListView
           genres={genres}
           isHomePage={!!limit}

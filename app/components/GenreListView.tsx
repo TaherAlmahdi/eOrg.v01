@@ -115,9 +115,9 @@ export const GenreListView: FC<GenreListViewProps> = ({
   }, [genres, searchQuery, selectedLetter, isHomePage]);
 
   return (
-    <div className="w-full">
+    <div className="w-full px-2"> 
       {!isHomePage && (
-        <div className="p-0 mb-6 space-y-4 border border-teal-100 rounded shadow-sm bg-white/90 backdrop-blur-md">
+        <div className="p-4 mb-3 space-y-4 border border-teal-100 rounded shadow-sm bg-white/90 backdrop-blur-md">
           {/* লাইভ সার্চ বার */}
           <div className="relative max-w-md mx-auto">
             <Search className="absolute w-5 h-5 text-teal-600 -translate-y-1/2 left-3 top-1/2" />
@@ -151,13 +151,13 @@ export const GenreListView: FC<GenreListViewProps> = ({
         </div>
       )}
 
-      {/* জনরা কার্ড গ্রিড */}
+      {/* ঘরানা কার্ড গ্রিড */}
       {filteredGenres.length === 0 ? (
         <div className="p-8 text-center text-gray-600 rounded bg-white/80 font-tarunima">
-          কোনো জনরা পাওয়া যায়নি।
+          কোনো ঘরানা পাওয়া যায়নি।
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-2 pt-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+        <div className="flex flex-wrap gap-2 p-0">
           {filteredGenres.map(({ slug, label, rawGenre, count }) => {
             const IconComponent = getGenreIcon(slug, rawGenre);
 
