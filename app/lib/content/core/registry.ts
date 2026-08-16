@@ -116,6 +116,7 @@ export const CONTENT_REGISTRY = {
     "unpublished-works": "অপ্রকাশিত রচনা",
     "epistolary-novel": "পত্রোপন্যাস",
     "liberation-war-novel": "মুক্তিযুদ্ধের উপন্যাস",
+    "parapsychology": "পরামনোবিজ্ঞান",
   } as Record<string, string>,
 
   // English Slug -> Bengali Value
