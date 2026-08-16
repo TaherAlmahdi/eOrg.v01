@@ -1,11 +1,12 @@
 ---
-title: "দেবী"
+title: "ভয়"
 author: "হুমায়ূন আহমেদ"
 type: "book_index"
-slug: "devi"
+slug: "bhoy"
 subdomain: "library"
 
-first_published: 1985
+first_published: 1991
+pabulished_date: 1991-05
 published: "2026-08-16"
 
 genre:
@@ -23,7 +24,7 @@ series:
 series_links:
   - { name: "হুমায়ূন রচনাবলী", link: "/series/humayun-rachanabali" }
   - { name: "মিসির আলি অমনিবাস", link: "/series/misir-ali-omnibus" }
-series_order: 1
+series_order: 6
 cover_image: "/cover/devi-humayun-ahmed.webp"
 
 meta_description: "হুমায়ূন আহমেদের বিখ্যাত উপন্যাস ‘দেবী’। মিসির আলি চরিত্রের প্রথম আত্মপ্রকাশ ঘটে এই উপন্যাসের মাধ্যমে।"

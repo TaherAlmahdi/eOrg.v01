@@ -126,15 +126,34 @@ const naturalSort = (a: string, b: string) =>
   a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
 
 /**
- * যেকোনো স্ট্রিংকে স্লাগে রূপান্তর করার হেল্পার
+ * বাংলা ডিজিটকে ইংরেজি ডিজিটে রূপান্তর করার হেল্পার
+ */
+function parseNumericOrder(value: unknown): number {
+  if (value === undefined || value === null || value === '') return 0;
+  
+  const banglaDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+  let strVal = String(value).trim();
+  
+  // বাংলা সংখ্যাকে ইংরেজিতে রূপান্তর
+  for (let i = 0; i < 10; i++) {
+    strVal = strVal.replace(new RegExp(banglaDigits[i], 'g'), String(i));
+  }
+  
+  const parsed = parseFloat(strVal);
+  return isNaN(parsed) ? 0 : parsed;
+}
+
+/**
+ * যেকোনো স্ট্রিংকে স্লাগে রূপান্তর করার হেল্পার (বাংলা অক্ষরের পূর্ণ সাপোর্টসহ)
  */
 function slugify(text: string): string {
   if (!text) return '';
   return String(text)
     .trim()
     .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/[^\w\u0980-\u09FF\-]/g, ''); // বাংলা বর্ণমালা ও হাইফেন সাপোর্ট
+    .replace(/\s+/g, '-') // স্পেস হাইফেন হবে
+    .replace(/[^\w\u0980-\u09FF\-]/g, '') // বাংলা, ইংরেজি অক্ষরের বাইরের ক্যারেক্টার বাদ
+    .replace(/-+/g, '-'); // একাধিক হাইফেন একটা করবে
 }
 
 /**
@@ -186,18 +205,20 @@ export function extractSeriesFromData(data: any): SeriesItem[] {
     for (const item of rawSeriesList) {
       if (typeof item === 'object' && item.name) {
         const sName = String(item.name).trim();
-        const sSlug = item.slug ? String(item.slug).trim() : getSlug('series', sName) || slugify(sName);
+        const registrySlug = getSlug('series', sName);
+        const sSlug = item.slug ? String(item.slug).trim() : registrySlug || slugify(sName) || encodeURIComponent(sName);
         const sLink = generateSeriesLink(item.link, sName, sSlug);
         seriesList.push({
           name: sName,
           slug: sSlug,
           link: sLink,
-          order: item.order || item.series_order || '',
+          order: item.order ?? item.series_order ?? item.series_index ?? '',
           title: item.title || '',
         });
       } else if (typeof item === 'string' && item.trim()) {
         const sName = item.trim();
-        const sSlug = getSlug('series', sName) || slugify(sName);
+        const registrySlug = getSlug('series', sName);
+        const sSlug = registrySlug || slugify(sName) || encodeURIComponent(sName);
         seriesList.push({
           name: sName,
           slug: sSlug,
@@ -212,19 +233,21 @@ export function extractSeriesFromData(data: any): SeriesItem[] {
     const rawSeries = data.series;
     if (typeof rawSeries === 'string' && rawSeries.trim()) {
       const sName = rawSeries.trim();
-      const sSlug = data.seriesSlug ? String(data.seriesSlug).trim() : getSlug('series', sName) || slugify(sName);
+      const registrySlug = getSlug('series', sName);
+      const sSlug = data.seriesSlug ? String(data.seriesSlug).trim() : registrySlug || slugify(sName) || encodeURIComponent(sName);
       seriesList.push({
         name: sName,
         slug: sSlug,
         link: generateSeriesLink(data.series_link, sName, sSlug),
-        order: data.series_order || data.series_index || '',
+        order: data.series_order ?? data.series_index ?? data.series_number ?? '',
         title: data.series_title || '',
       });
     } else if (Array.isArray(rawSeries)) {
       rawSeries.forEach((s) => {
         if (typeof s === 'string' && s.trim()) {
           const sName = s.trim();
-          const sSlug = getSlug('series', sName) || slugify(sName);
+          const registrySlug = getSlug('series', sName);
+          const sSlug = registrySlug || slugify(sName) || encodeURIComponent(sName);
           seriesList.push({
             name: sName,
             slug: sSlug,
@@ -239,7 +262,7 @@ export function extractSeriesFromData(data: any): SeriesItem[] {
 }
 
 /**
- * ফ্রন্টম্যাটার থেকে Dynamic Genre Links তৈরি করার হেল্পার (registry সহ)
+ * ফ্রন্টম্যাটার থেকে Dynamic Genre Links তৈরি করার হেল্পার (registry সহ fallback বাংলা স্লাগ)
  */
 export function generateGenreLinks(
   explicitLinks: Array<{ name: string; link: string }> | undefined,
@@ -249,14 +272,18 @@ export function generateGenreLinks(
     return explicitLinks;
   }
 
-  return genresList.map((gName) => ({
-    name: gName,
-    link: `/genre/${getSlug('genres', gName)}`,
-  }));
+  return genresList.map((gName) => {
+    const registrySlug = getSlug('genres', gName);
+    const targetSlug = registrySlug || slugify(gName) || encodeURIComponent(gName);
+    return {
+      name: gName,
+      link: `/genre/${targetSlug}`,
+    };
+  });
 }
 
 /**
- * ফ্রন্টম্যাটার থেকে Dynamic Series Link তৈরি করার হেল্পার (registry সহ)
+ * ফ্রন্টম্যাটার থেকে Dynamic Series Link তৈরি করার হেল্পার (registry সহ fallback বাংলা স্লাগ)
  */
 export function generateSeriesLink(
   explicitLink: string | undefined,
@@ -266,7 +293,8 @@ export function generateSeriesLink(
   if (explicitLink) return explicitLink;
   if (!seriesName) return undefined;
 
-  const targetSlug = customSlug || getSlug('series', seriesName) || slugify(seriesName);
+  const registrySlug = getSlug('series', seriesName);
+  const targetSlug = customSlug || registrySlug || slugify(seriesName) || encodeURIComponent(seriesName);
   return `/series/${targetSlug}`;
 }
 
@@ -383,13 +411,15 @@ export async function getLibraryBooks(currentSubdomain?: string): Promise<{
           // ২. আইটেমস সংগৃহীত হবে চ্যাপ্টার/পাতার ফাইলসমূহ থেকে (index.md ব্যতিরেকে)
           const extractedItems = collectChapterItemsDeep(bookFolderPath);
 
-          const bookSlug = data.slug ? String(data.slug).trim() : bookFolderName;
+          // স্লাগ সল্যুশন: registry থেকে প্রাপ্ত স্লাগ -> ফ্রন্টম্যাটারের slug -> বাংলা slugify -> ফোল্ডার নাম
+          const registryBookSlug = getSlug('books', data.title);
+          const bookSlug = registryBookSlug || (data.slug ? String(data.slug).trim() : slugify(data.title) || bookFolderName);
 
           // ৩. একাধিক সিরিজের সাপোর্ট এক্সট্র্যাক্ট করা
           const extractedSeriesList = extractSeriesFromData(data);
           const seriesNames = extractedSeriesList.map((s) => s.name);
 
-          // ব্যাকওয়ার্ড কমপ্যাটিবিলিটির জন্য প্রথম সিরিজ ডাটা
+          // ব্যাকওয়ার্ড কমপ্যাটিবিলিটির জন্য প্রথম সিরিজ ডাটা
           const primarySeries = extractedSeriesList[0];
 
           // জঁরা লিঙ্কস জেনারেট
@@ -418,7 +448,7 @@ export async function getLibraryBooks(currentSubdomain?: string): Promise<{
             seriesList: extractedSeriesList,
             seriesSlug: primarySeries?.slug || '',
             series_link: primarySeries?.link || '',
-            series_order: primarySeries?.order || '',
+            series_order: primarySeries?.order ?? data.series_order ?? '',
             series_title: primarySeries?.title || data.series_title || '',
             series_info: extractedSeriesList.length > 1 ? extractedSeriesList : primarySeries,
             volumes: data.volumes || [],
@@ -459,7 +489,7 @@ export async function getLibraryBooks(currentSubdomain?: string): Promise<{
         booksByGenre[gName].push(book);
       }
 
-      // ৪. একাধিক সিরিজের জন্য লুপ চালিয়ে সকল সিরিজে বইটি অন্তর্ভুক্ত করা
+      // ৪. একাধিক সিরিজের জন্য লুপ চালিয়ে সকল সিরিজে বইটি অন্তর্ভুক্ত করা
       if (book.seriesList && book.seriesList.length > 0) {
         for (const sItem of book.seriesList) {
           const sName = sItem.name;
@@ -473,14 +503,17 @@ export async function getLibraryBooks(currentSubdomain?: string): Promise<{
       }
     }
 
+    // সিরিজ অর্ডার সর্টিং সমাধান
     for (const sName in booksBySeries) {
       booksBySeries[sName].sort((a, b) => {
         const getOrder = (bObj: Book) => {
-          if (bObj.seriesList) {
+          if (bObj.seriesList && bObj.seriesList.length > 0) {
             const found = bObj.seriesList.find((s) => s.name === sName);
-            return found?.order ? Number(found.order) : 0;
+            if (found && found.order !== undefined && found.order !== '') {
+              return parseNumericOrder(found.order);
+            }
           }
-          return bObj.series_order ? Number(bObj.series_order) : 0;
+          return parseNumericOrder(bObj.series_order);
         };
         return getOrder(a) - getOrder(b);
       });
@@ -519,12 +552,22 @@ export async function getBookDirectoryBySlug(bookSlug: string): Promise<string |
         if (existsSync(indexMdPath)) {
           const fileContents = await fs.readFile(indexMdPath, 'utf8');
           const { data } = matter(fileContents);
-          const fileSlug = data.slug ? String(data.slug).trim() : bookItem.name;
+          
+          const registrySlug = getSlug('books', data.title);
+          const fileSlug = registrySlug || (data.slug ? String(data.slug).trim() : slugify(data.title) || bookItem.name);
 
-          if (fileSlug.toLowerCase() === bookSlug.toLowerCase()) {
+          // ডিকোড করা স্লাগের মাধ্যমে ম্যাচ মেকিং
+          if (
+            fileSlug.toLowerCase() === bookSlug.toLowerCase() ||
+            encodeURIComponent(fileSlug).toLowerCase() === bookSlug.toLowerCase() ||
+            fileSlug.toLowerCase() === decodeURIComponent(bookSlug).toLowerCase()
+          ) {
             return bookFolderPath;
           }
-        } else if (bookItem.name.toLowerCase() === bookSlug.toLowerCase()) {
+        } else if (
+          bookItem.name.toLowerCase() === bookSlug.toLowerCase() ||
+          bookItem.name.toLowerCase() === decodeURIComponent(bookSlug).toLowerCase()
+        ) {
           return bookFolderPath;
         }
       }
@@ -713,9 +756,17 @@ export async function getBookBySlug(
           const mainIndexContents = await fs.readFile(indexMdPath, 'utf8');
           const { data: mainData } = matter(mainIndexContents);
 
-          const fileSlug = mainData.slug ? String(mainData.slug).trim() : bookFolderName;
+          const registrySlug = getSlug('books', mainData.title);
+          const fileSlug = registrySlug || (mainData.slug ? String(mainData.slug).trim() : slugify(mainData.title) || bookFolderName);
 
-          if (fileSlug.toLowerCase() !== bookSlug.toLowerCase()) {
+          // ডিকোড করা ইউআরএল ও বাংলা স্লাগ উভয় ক্ষেত্রে মিলানোর লজিক
+          const isMatchedSlug = 
+            fileSlug.toLowerCase() === bookSlug.toLowerCase() ||
+            encodeURIComponent(fileSlug).toLowerCase() === bookSlug.toLowerCase() ||
+            fileSlug.toLowerCase() === decodeURIComponent(bookSlug).toLowerCase() ||
+            bookFolderName.toLowerCase() === bookSlug.toLowerCase();
+
+          if (!isMatchedSlug) {
             continue;
           }
 
@@ -855,7 +906,7 @@ export async function getBookBySlug(
             seriesList: extractedSeriesList,
             seriesSlug: primarySeries?.slug || '',
             series_link: primarySeries?.link || '',
-            series_order: primarySeries?.order || '',
+            series_order: primarySeries?.order ?? mainData.series_order ?? '',
             series_title: primarySeries?.title || mainData.series_title || '',
             series_info: extractedSeriesList.length > 1 ? extractedSeriesList : primarySeries,
             volumes: volumes.length > 0 ? volumes : mainData.volumes || [],
