@@ -62,10 +62,10 @@ export const AuthorListView: FC<AuthorListViewProps> = ({
   }, [authors, searchQuery, selectedLetter, isHomePage]);
 
   return (
-    <div className="w-full">
+    <div className="w-full px-0">
       {/* 🔹 লেখক পেজের জন্য সার্চ বার ও আদ্যক্ষর ফিল্টার বার */}
       {!isHomePage && (
-        <div className="p-0 mb-2 space-y-4 border border-teal-100 rounded shadow-sm bg-white/90 backdrop-blur-md">
+        <div className="p-4 mb-2 space-y-4 border border-teal-100 rounded shadow-sm bg-white/90 backdrop-blur-md">
 
 
 
@@ -133,17 +133,6 @@ export const AuthorListView: FC<AuthorListViewProps> = ({
         </div>
       )}
 
-      {/* 🔹 হোমপেজের জন্য "সকল লেখক দেখুন" বাটন */}
-      {isHomePage && totalAuthorsCount > authors.length && (
-        <div className="mt-6 mb-4 text-center font-tarunima">
-          <Link
-            href="/authors"
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded bg-[#008080] text-white font-semibold text-sm hover:bg-teal-700 transition-colors shadow-sm"
-          >
-            সকল লেখক দেখুন ({toBengaliNumber(totalAuthorsCount)} জন) →
-          </Link>
-        </div>
-      )}
     </div>
   );
 };

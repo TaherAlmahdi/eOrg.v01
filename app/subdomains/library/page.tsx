@@ -215,23 +215,27 @@ export default async function LibraryHomePage() {
           </div>
         </section>
 
-        {/* ১. নতুন বই সেকশন */}
-        <section aria-labelledby="latest-books-heading">
-          <div className="flex items-end justify-between pb-2 mb-2 border-b border-slate-200">
-            <h2 
-              id="latest-books-heading" 
-              className="flex items-center gap-2 pb-2 -mb-3 text-xl font-black border-b-2 text-slate-800 border-emerald-600"
-            >
-              <Calendar className="w-5 h-5 text-emerald-600" />
-              নতুন বই
-            </h2>
+        {/* ২. নতুন বই সেকশন */}
+        <section aria-labelledby="latest-books-heading">                  
+          <div className="flex w-full items-center justify-between mt-4 px-3 sm:px-4 py-2 mb-4 rounded bg-teal-50/90 text-[#008080] border border-teal-100 shadow-xs backdrop-blur-md">
+            
+            {/* বামে: আইকন ও টাইটেল */}
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              <Calendar size={22} className="shrink-0 animate-pulse text-emerald-600 sm:w-6 sm:h-6" />
+              <h2 className="text-base sm:text-lg md:text-xl font-black text-slate-800 font-tarunima truncate">
+                <span className="text-[#008080]">নতুন</span> <span className="text-[#cc7a00]">বই</span>
+              </h2>
+            </div>
+
+            {/* ডানে: লিঙ্ক */}
             <Link 
               href="/books" 
-              className="text-base font-medium font-tarunima text-emerald-600 hover:text-emerald-700 flex items-center gap-0.5 transition-colors group mb-1"
+              className="text-xs sm:text-sm md:text-base font-medium font-tarunima text-emerald-600 hover:text-emerald-700 flex items-center gap-0.5 transition-colors group shrink-0"
             >
-              সকল বই 
-              <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+              সব বই 
+              <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
+
           </div>
           
           {sortedLatestBooks.length === 0 ? (
@@ -295,41 +299,76 @@ export default async function LibraryHomePage() {
           )}
         </section>
 
-        {/* ২. ঘরানা নির্ঘণ্ট সেকশন */}
+        {/* ৩. ঘরানা নির্ঘণ্ট সেকশন */}
         <section data-aos="fade-up" className="relative">
-          <div className="flex justify-center mt-5 mb-5">
-            <div className="inline-flex items-center justify-center gap-3 px-4 py-2 rounded bg-teal-50/90 text-[#008080] mb-0 border border-teal-100 shadow-xs text-center backdrop-blur-md">
-              <BookCopy size={24} className="shrink-0 animate-pulse" />
-              <h1 className="text-xl font-black leading-none tracking-tight text-gray-900 md:text-2xl font-tarunima">
-                <span className="text-[#008080]">এডুলিচার</span> ঘরানা <span className="text-[#cc7a00]">নির্ঘণ্ট</span>
-              </h1>
+          <div className="flex w-full items-center justify-between mt-4 px-4 py-2 mb-4 rounded bg-teal-50/90 text-[#008080] border border-teal-100 shadow-xs backdrop-blur-md">
+            <div className="flex items-center gap-3">
+              <BookCopy size={22} className="shrink-0 animate-pulse text-[#008080]" />
+                <h2 className="flex items-center gap-2 text-lg md:text-xl font-black text-slate-800 font-tarunima">
+                <span className="text-[#008080]">ঘরানা</span> <span className="text-[#cc7a00]">নির্ঘণ্ট</span>
+              </h2>
             </div>
+
+            {/* ডানে: লিঙ্ক */}
+            <Link 
+              href="/genres" 
+              className="text-base font-medium font-tarunima text-emerald-600 hover:text-emerald-700 flex items-center gap-0.5 transition-colors group shrink-0"
+            >
+              সব ঘরানা 
+              <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+            </Link>
+
           </div>
+
           <GenreList limit={20} />
         </section>
 
-        {/* ৩. সিরিজ নির্ঘণ্ট সেকশন */}
+        {/* ৪. সিরিজ নির্ঘণ্ট সেকশন */}
         <section data-aos="fade-down" className="relative">
-          <div className="flex justify-center mt-5 mb-5">
-            <div className="inline-flex items-center justify-center gap-3 px-4 py-2 rounded bg-teal-50/90 text-[#008080] mb-0 border border-teal-100 shadow-xs text-center backdrop-blur-md">
-              <Layers size={24} className="shrink-0 animate-pulse" />
-              <h1 className="text-xl font-black leading-none tracking-tight text-gray-900 md:text-2xl font-tarunima">
-                <span className="text-[#008080]">এডুলিচার</span> সিরিজ <span className="text-[#cc7a00]">নির্ঘণ্ট</span>
-              </h1>
+          <div className="flex w-full items-center justify-between mt-4 px-3 sm:px-4 py-2 mb-4 rounded bg-teal-50/90 text-[#008080] border border-teal-100 shadow-xs backdrop-blur-md">
+            
+            {/* বামে: আইকন ও টাইটেল */}
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              <Layers size={22} className="shrink-0 animate-pulse sm:w-6 sm:h-6" />
+              <h2 className="text-base sm:text-lg md:text-xl font-black text-slate-800 font-tarunima truncate">
+                <span className="text-[#008080]">সিরিজ</span> <span className="text-[#cc7a00]">নির্ঘণ্ট</span>
+              </h2>
             </div>
+
+            {/* ডানে: লিঙ্ক */}
+            <Link 
+              href="/series" 
+              className="text-xs sm:text-sm md:text-base font-medium font-tarunima text-emerald-600 hover:text-emerald-700 flex items-center gap-0.5 transition-colors group shrink-0"
+            >
+              সব সিরিজ 
+              <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform group-hover:translate-x-0.5" />
+            </Link>
+
           </div>
           <SeriesList limit={20} />
         </section>        
 
-        {/* ৪. লেখক নির্ঘণ্ট সেকশন */}
+        {/* ৫. লেখক নির্ঘণ্ট সেকশন */}
         <section data-aos="fade-up" className="relative">
-          <div className="flex justify-center mt-5 mb-5">
-            <div className="inline-flex items-center justify-center gap-3 px-4 py-2 rounded bg-teal-50/90 text-[#008080] mb-0 border border-teal-100 shadow-xs text-center backdrop-blur-md">
-              <Users size={24} className="shrink-0 animate-pulse" />
-              <h1 className="text-xl font-black leading-none tracking-tight text-gray-900 md:text-2xl font-tarunima">
-                <span className="text-[#008080]">এডুলিচার</span> লেখক <span className="text-[#cc7a00]">নির্ঘণ্ট</span>
-              </h1>
+          <div className="flex w-full items-center justify-between mt-4 px-3 sm:px-4 py-2 mb-4 rounded bg-teal-50/90 text-[#008080] border border-teal-100 shadow-xs backdrop-blur-md"> 
+            
+            {/* বামে: আইকন ও টাইটেল */}
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              <Users size={22} className="shrink-0 animate-pulse sm:w-6 sm:h-6" />
+              <h2 className="text-base sm:text-lg md:text-xl font-black text-slate-800 font-tarunima truncate">
+                <span className="text-[#008080]">লেখক</span> <span className="text-[#cc7a00]">নির্ঘণ্ট</span>
+              </h2>
             </div>
+
+            {/* ডানে: লিঙ্ক */}
+            <Link 
+              href="/authors" 
+              className="text-xs sm:text-sm md:text-base font-medium font-tarunima text-emerald-600 hover:text-emerald-700 flex items-center gap-0.5 transition-colors group shrink-0"
+            >
+              সব লেখক 
+              <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform group-hover:translate-x-0.5" />
+            </Link>
+
           </div>
           <AuthorList limit={20} />
         </section>

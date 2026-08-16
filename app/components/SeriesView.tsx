@@ -128,7 +128,7 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
           <div className="flex justify-center mt-3 mb-2">
             <div className="inline-flex flex-col items-center justify-center gap-2 px-4 py-3 rounded bg-teal-50/90 text-[#008080] mb-0 border border-teal-100 shadow-xs text-center backdrop-blur-md">
               <div className="flex items-center gap-2">
-                <Layers size={24} className="shrink-0 animate-pulse" />
+                <Layers size={22} className="shrink-0 animate-pulse" />
                 <h1 className="text-xl font-black leading-none tracking-tight text-gray-900 md:text-2xl font-tarunima">
                   <span className="text-[#008080]">{seriesTitle}</span>
                 </h1>

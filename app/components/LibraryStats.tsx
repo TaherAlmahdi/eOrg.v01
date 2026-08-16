@@ -16,7 +16,7 @@ export const LibraryStats: FC<LibraryStatsProps> = ({
   totalSeries,
 }) => {
   return (
-    <div className="grid w-full grid-cols-1 gap-2 p-2 mb-3 sm:grid-cols-2 md:grid-cols-3">
+    <div className="grid w-full grid-cols-1 gap-2 p-0 mb-3 sm:grid-cols-2 md:grid-cols-3">
       {/* লেখক সংখ্যা */}
       <div className="flex items-center justify-between p-2 transition-all duration-300 border rounded shadow-sm bg-white/90 backdrop-blur-md border-white/60 hover:shadow-md">
         <div className="flex items-center gap-4">
@@ -64,7 +64,7 @@ export const LibraryStats: FC<LibraryStatsProps> = ({
           <div>
             <p className="text-base font-semibold text-gray-500">বিশেষ আয়োজনে</p>
             <h2 className="text-lg font-bold text-gray-800 md:text-xl">
-              মোট গ্রন্থ সিরিজ{" "}
+              মোট সিরিজ{" "}
               <span className="text-[#4f46e5] font-black text-2xl md:text-3xl mx-1">
                 {toBengaliNumber(totalSeries)}
               </span>{" "}

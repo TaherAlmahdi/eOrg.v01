@@ -115,7 +115,7 @@ export const GenreListView: FC<GenreListViewProps> = ({
   }, [genres, searchQuery, selectedLetter, isHomePage]);
 
   return (
-    <div className="w-full px-2"> 
+    <div className="w-full px-0"> 
       {!isHomePage && (
         <div className="p-4 mb-3 space-y-4 border border-teal-100 rounded shadow-sm bg-white/90 backdrop-blur-md">
           {/* লাইভ সার্চ বার */}
@@ -186,17 +186,6 @@ export const GenreListView: FC<GenreListViewProps> = ({
         </div>
       )}
 
-      {/* হোমপেজের জন্য "সকল জনরা দেখুন" বাটন */}
-      {isHomePage && totalGenresCount > genres.length && (
-        <div className="mt-6 mb-4 text-center">
-          <Link
-            href="/genres"
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded bg-[#008080] text-white font-tarunima font-normal text-sm hover:bg-teal-700 transition-colors shadow-sm"
-          >
-            সকল ঘরানা দেখুন ({toBengaliNumber(totalGenresCount)} টি) →
-          </Link>
-        </div>
-      )}
     </div>
   );
 };
