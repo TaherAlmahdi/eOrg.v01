@@ -8,6 +8,7 @@ export const CONTENT_REGISTRY = {
     volume: "গ্রন্থখণ্ড",
     chapter: "অধ্যায় বা পরিচ্ছেদ",
     series: "সিরিজ",
+    books: "বই",
   } as Record<string, string>,
 
   // English Slug -> Bengali Value
@@ -129,9 +130,6 @@ export const CONTENT_REGISTRY = {
     "misir-ali-omnibus": "মিসির আলি অমনিবাস",
     "zahir-raihan-rachanabali": "জহির রায়হান রচনাবলী",
     "sukanta-samagra": "সুকান্ত সমগ্র",
-    
-
-
   } as Record<string, string>,
 
   // English Slug -> Bengali Value
@@ -140,7 +138,12 @@ export const CONTENT_REGISTRY = {
     "historical": "ঐতিহাসিক",
     "romantic": "রোমান্টিক",
   } as Record<string, string>,
+
+  // English Slug -> Bengali Value (প্রয়োজনে কাস্টম বইয়ের স্লাগ ও বাংলা নাম এখানে যোগ করা যাবে)
+  books: {} as Record<string, string>,
 };
+
+export type RegistryCategory = "authors" | "genres" | "tags" | "series" | "books";
 
 /**
  * যেকোনো স্ট্রিংকে স্লাগে রূপান্তর করার হেল্পার (বাংলা অক্ষরের জন্য সেফ)
@@ -156,10 +159,10 @@ export function slugify(text: string): string {
 
 /**
  * রুল ১: যেকোনো বাংলা টেক্সট থেকে ইংরেজি স্লাগ তৈরি করার সর্বজনীন ও নিরাপদ ফাংশন।
- * রেজিস্ট্রি ফাইলে স্লাগ না থাকলে সরাসরি মূল বাংলা নামকে ক্লিন ফরম্যাটে রিটার্ন করবে।
+ * কেবল শতভাগ নিশ্চিত মিল (Exact Match) থাকলেই রেজিস্ট্রি স্লাগ ফেরত দেবে, নতুবা নিরাপদভাবে slugify করবে।
  */
 export function getSlug(
-  type: "authors" | "genres" | "tags" | "series",
+  type: RegistryCategory,
   banglaText: string
 ): string {
   if (!banglaText) return "others";
@@ -168,19 +171,13 @@ export function getSlug(
   const registry = CONTENT_REGISTRY[type];
   if (!registry) return slugify(cleaned);
 
-  // ১. হুবহু মিল (Exact Match) খোঁজা
+  // ১. কেবল হুবহু মিল (Exact Match) খোঁজা হচ্ছে
   const exactEntry = Object.entries(registry).find(
-    ([_, value]) => value.trim() === cleaned
+    ([_, value]) => value.trim().toLowerCase() === cleaned.toLowerCase()
   );
   if (exactEntry) return exactEntry[0];
 
-  // ২. আংশিক মিল (Partial Match) খোঁজা
-  const partialEntry = Object.entries(registry).find(
-    ([_, value]) => value.includes(cleaned) || cleaned.includes(value)
-  );
-  if (partialEntry) return partialEntry[0];
-
-  // ৩. কোনো মিল না পেলে সরাসরি র' বাংলা টেক্সট বা slugify ফর্ম রিটার্ন করা (encodeURIComponent বাদ দেওয়া হয়েছে)
+  // ২. কোনো মিল না পেলে সরাসরি slugify ফরম্যাট রিটার্ন করবে (ভুল আংশিক মিল নেওয়ার ঝুঁকি বন্ধ করা হলো)
   return slugify(cleaned) || cleaned;
 }
 
@@ -212,7 +209,16 @@ export function getAuthorTitle(slug: string): string {
 }
 
 /**
- * রুল ৫: লেখকের বাংলা নাম থেকে ইংরেজি স্লাগ উদ্ধার করার ফাংশন।
+ * রুল ৫: ইউআরএল-এর ইংরেজি বা বাংলা স্লাগ থেকে বইয়ের বাংলা নাম উদ্ধার করার ফাংশন।
+ */
+export function getBookTitle(slug: string): string {
+  if (!slug) return "";
+  const decoded = decodeURIComponent(slug).toLowerCase().trim();
+  return CONTENT_REGISTRY.books[decoded] || decodeURIComponent(slug);
+}
+
+/**
+ * রুল ৬: লেখকের বাংলা নাম থেকে ইংরেজি স্লাগ উদ্ধার করার ফাংশন।
  */
 export function getAuthorSlugFromTitle(authorName: string): string | undefined {
   if (!authorName) return undefined;

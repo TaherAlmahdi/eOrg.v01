@@ -5,11 +5,7 @@ import { getSeriesTitle } from '@/app/lib/content/core/registry';
 import { getLibraryBooks } from '@/app/lib/books';
 
 // ⚠️ SeriesView Default Export নাকি Named Export নিশ্চিত করে সঠিক ইম্পোর্টটি বেছে নিন:
-// যদি SeriesView ফাইলে "export default function SeriesView" থাকে:
 import SeriesView, { type BookSeries } from '@/app/components/SeriesView';
-
-// যদি SeriesView ফাইলে "export function SeriesView" থাকে, তবে ওপরের লাইনটি কমেন্ট করে নিচেরটি আনকমেন্ট করুন:
-// import { SeriesView, type BookSeries } from '@/app/components/SeriesView';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -58,7 +54,7 @@ export default async function SeriesPage({ params, searchParams }: PageProps) {
   
   const decodedSlug = decodeURIComponent(slug).trim();
 
-  // ১. সাবডোমেন ও হোস্ট ডেটা স্ট্র্যাক্ট করা
+  // ১. সাবডোমেন ও হোস্ট ডেটা এক্সট্র্যাক্ট করা
   const headersList = await headers();
   const host = headersList.get('host') || '';
   const siteData = getSubdomainData(host);
@@ -100,15 +96,31 @@ export default async function SeriesPage({ params, searchParams }: PageProps) {
     });
   });
 
-  // ৫. প্রকাশনার প্রথম সাল অনুসারে শর্টিং
+  // ৫. সিরিজ অর্ডার (series_order) অনুসারে সর্টিং
   filteredBooks.sort((a, b) => {
-    const rawA = a.first_published || a.published;
-    const rawB = b.first_published || b.published;
+    // ১. প্রাইমারি: series_order চেক (অন্যান্য প্রপার্টি নেম সাপোর্ট সহ)
+    const rawOrderA = (a as any).series_order ?? (a as any).seriesOrder ?? (a as any).sort_order ?? (a as any).sortOrder;
+    const rawOrderB = (b as any).series_order ?? (b as any).seriesOrder ?? (b as any).sort_order ?? (b as any).sortOrder;
 
-    const pubA = rawA ? parseInt(String(rawA), 10) || 0 : Infinity;
-    const pubB = rawB ? parseInt(String(rawB), 10) || 0 : Infinity;
+    const orderA = rawOrderA !== undefined && rawOrderA !== null && rawOrderA !== ''
+      ? parseInt(String(rawOrderA), 10) || Infinity
+      : Infinity;
+    const orderB = rawOrderB !== undefined && rawOrderB !== null && rawOrderB !== ''
+      ? parseInt(String(rawOrderB), 10) || Infinity
+      : Infinity;
+
+    if (orderA !== orderB) return orderA - orderB;
+
+    // ২. সেকেন্ডারি: প্রকাশনার প্রথম সাল
+    const rawPubA = a.first_published || a.published;
+    const rawPubB = b.first_published || b.published;
+
+    const pubA = rawPubA ? parseInt(String(rawPubA), 10) || 0 : Infinity;
+    const pubB = rawPubB ? parseInt(String(rawPubB), 10) || 0 : Infinity;
 
     if (pubA !== pubB) return pubA - pubB;
+
+    // ৩. টারশিয়ারি: টাইটেল (বাংলা বর্ণমালা)
     return (a.title || '').localeCompare(b.title || '', 'bn');
   });
 
