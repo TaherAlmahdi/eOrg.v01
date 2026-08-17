@@ -16,9 +16,9 @@ import {
 // ==========================================
 
 /**
- * বইয়ের স্লাগ নির্ধারণের প্রধান লজিক:
+ * বইয়ের স্লাগ নির্ধারণের প্রধান লজিক:
  * ১. index.md এর Frontmatter-এ 'slug' থাকলে সেটি ব্যবহৃত হবে।
- * ২. 'slug' না থাকলে সরাসরি বইয়ের ফোল্ডারের নাম (folderName) ব্যবহৃত হবে।
+ * ২. 'slug' না থাকলে সরাসরি বইয়ের ফোল্ডারের নাম (folderName) ব্যবহৃত হবে।
  */
 function getEffectiveSlug(data: Record<string, any>, folderName: string): string {
   if (data && data.slug !== undefined && data.slug !== null) {
@@ -173,12 +173,12 @@ export async function getLibraryBooks(currentSubdomain?: string): Promise<{
             const found = book.seriesList.find((s) => s.name === sName);
             if (found && found.order !== undefined && found.order !== '') {
               const parsed = parseNumericOrder(found.order);
-              if (!isNaN(parsed)) return parsed;
+              if (parsed !== null) return parsed;
             }
           }
           if (book.series_order !== undefined && book.series_order !== '') {
             const parsed = parseNumericOrder(book.series_order);
-            if (!isNaN(parsed)) return parsed;
+            if (parsed !== null) return parsed;
           }
           return null;
         };
@@ -245,7 +245,6 @@ export async function getBookDirectoryBySlug(bookSlug: string): Promise<string |
           const fileContents = await fs.readFile(indexMdPath, 'utf8');
           const { data } = matter(fileContents);
 
-          // 🎯 স্লাগ লজিক: ডিরেক্টরি ম্যাচ করার ক্ষেত্রেও একই লজিক কাজ করবে
           const fileSlug = getEffectiveSlug(data, bookItem.name);
 
           if (

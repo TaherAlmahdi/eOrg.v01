@@ -241,7 +241,7 @@ export default async function LibraryHomePage() {
           {sortedLatestBooks.length === 0 ? (
             <p className="py-6 text-sm text-slate-500">কোনো নতুন বই পাওয়া যায়নি।</p>
           ) : (
-            <div className="grid grid-cols-2 gap-3 p-0 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-8">
+            <div className="grid grid-cols-2 gap-1.5 p-0 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-8 bg-gray-200/50">
               {sortedLatestBooks.map((book, index) => {
                 const item = book as unknown as Record<string, unknown>;
                 const rawBookSlug = item.slug || book.id;
@@ -271,14 +271,14 @@ export default async function LibraryHomePage() {
                     </Link>
                     
                     <div className="flex flex-col justify-between p-3 grow">
-                      <div>
-                        <h3 className="text-base font-bold leading-snug transition-colors text-slate-900 line-clamp-2 hover:text-emerald-600">
+                      <div className="text-center">
+                        <h3 className="text-base font-semibold leading-snug text-gray-900 transition-colors group-hover:text-emerald-700 line-clamp-2">
                           <Link href={`/book/${encodeURIComponent(bookSlug)}`}>
                             {book.title || 'শিরোনামহীন'}
                           </Link>
                         </h3>
                         
-                        <p className="mt-1 text-xs text-slate-600 font-tarunima">
+                        <p className="mt-1 text-xs md:text-sm text-gray-500 font-tarunima">
                           {book.author ? (
                             <Link 
                               href={`/author/${encodeURIComponent(authorSlug)}`}

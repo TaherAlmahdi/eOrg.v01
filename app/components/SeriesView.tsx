@@ -3,7 +3,7 @@
 import { useState, useMemo, FC } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Home, BookOpen, Search, X, BookCopy, Layers } from "lucide-react";
+import { Home, BookOpen, Search, X, Layers } from "lucide-react";
 
 // 🔹 মূল বইয়ের টাইপ
 export interface SeriesBook {
@@ -51,13 +51,13 @@ const getUniversalFirstLetter = (str: string): string => {
     firstGrapheme = cleaned.charAt(0);
   }
 
-  // ২. কার-চিহ্ন, ডায়াক্রিটিক্যাল মার্কস ও স্বরচিহ্ন রিমুভ করা
+  // ২. কার-চিহ্ন, ডায়াক্রিটিক্যাল মার্কস ও স্বরচিহ্ন রিমুভ করা
   // \u0300-\u036f (Latin diacritics), \u09be-\u09cd (Bengali vowels), \u064b-\u065f (Arabic Harakat/Tashkeel)
   const baseLetter = firstGrapheme
     .normalize("NFD")
     .replace(/[\u0300-\u036f\u09be-\u09cd\u064b-\u065f]/g, "");
 
-  // ইংরেজি হলে uppercase করা যাতে 'a' এবং 'A' আলাদা বাটন না হয়
+  // ইংরেজি হলে uppercase করা যাতে 'a' এবং 'A' আলাদা বাটন না হয়
   return baseLetter.toUpperCase();
 };
 
@@ -65,7 +65,7 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLetter, setSelectedLetter] = useState<string | null>(null);
 
-  // 🔹 ১. যেকোনো ভাষার বইয়ের তালিকা থেকে স্বয়ংক্রিয়ভাবে আদ্যক্ষরের তালিকা তৈরি
+  // 🔹 ১. যেকোনো ভাষার বইয়ের তালিকা থেকে স্বয়ংক্রিয়ভাবে আদ্যক্ষরের তালিকা তৈরি
   const availableLetters = useMemo(() => {
     const lettersSet = new Set<string>();
 
@@ -78,11 +78,11 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
       }
     });
 
-    // স্বয়ংক্রিয় বর্ণানুক্রমিক সাজানো (Alphabetical & Script-based Sorting)
+    // স্বয়ংক্রিয় বর্ণানুক্রমিক সাজানো (Alphabetical & Script-based Sorting)
     return Array.from(lettersSet).sort((a, b) => a.localeCompare(b));
   }, [books]);
 
-  // 🔹 ২. সার্চ ও নির্বাচিত আদ্যক্ষর অনুযায়ী ফিল্টারিং
+  // 🔹 ২. সার্চ ও নির্বাচিত আদ্যক্ষর অনুযায়ী ফিল্টারিং
   const filteredBooks = useMemo(() => {
     return books.filter((book) => {
       const matchesSearch =
@@ -124,7 +124,6 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
       {/* মূল কন্টেন্ট */}
       <div className="px-3 py-6 mx-auto max-w-full">
         <header className="pb-3 mb-6 border-b border-orange-200">
-        
           <div className="flex justify-center mt-3 mb-2">
             <div className="inline-flex flex-col items-center justify-center gap-2 px-4 py-3 rounded bg-teal-50/90 text-[#008080] mb-0 border border-teal-100 shadow-xs text-center backdrop-blur-md">
               <div className="flex items-center gap-2">
@@ -135,13 +134,11 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
               </div>
               <p className="italic text-center text-gray-500">
                 {books.length > 0
-                ? `এই সিরিজে মোট ${toBengaliNumber(books.length)}টি বই রয়েছে`
-                : "এই সিরিজে বর্তমানে কোনো বই নেই"}
+                  ? `এই সিরিজে মোট ${toBengaliNumber(books.length)}টি বই রয়েছে`
+                  : "এই সিরিজে বর্তমানে কোনো বই নেই"}
               </p>
             </div>
           </div>
-
-
 
           {/* 🔍 সার্চ বার ও ডায়নামিক বহুভাষিক আদ্যক্ষর ফিল্টার */}
           {books.length > 0 && (
@@ -150,7 +147,7 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
               <div className="relative max-w-md mx-auto">
                 <input
                   type="text"
-                  placeholder="বই বা লেখকের নাম দিয়ে খুঁজুন..."
+                  placeholder="বই বা লেখকের নাম দিয়ে খুঁজুন..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-10 py-2 text-base bg-white border border-orange-200 rounded focus:outline-none focus:ring-2 focus:ring-[#7575a3] transition-all text-gray-800 placeholder-gray-400 shadow-sm"
@@ -166,7 +163,7 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
                 )}
               </div>
 
-              {/* ডায়নামিক ফিল্টার বাটন (স্বয়ংক্রিয়ভাবে যেকোনো ভাষার আদ্যক্ষর জেনারেট করবে) */}
+              {/* ডায়নামিক ফিল্টার বাটন */}
               {availableLetters.length > 0 && (
                 <div className="flex flex-wrap justify-center gap-1 sm:gap-1.5 pt-2">
                   <button
@@ -211,9 +208,9 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
                 <Link
                   key={book.id || book.slug}
                   href={`/book/${bookSlug}`}
-                  className="flex flex-col h-full group"
+                  className="flex flex-col h-full group bg-white p-0 rounded border border-gray-200/80 shadow-xs transition-all duration-300 hover:-translate-y-1.5 hover:shadow-md hover:border-orange-200"
                 >
-                  <div className="relative aspect-2/3 overflow-hidden rounded shadow-sm bg-white transition-transform duration-300 group-hover:-translate-y-1.5 group-hover:shadow-md">
+                  <div className="relative aspect-2/3 overflow-hidden rounded-t border-b border-gray-200/50 bg-gray-50">
                     <Image
                       src={book.cover || "/default-cover.jpg"}
                       alt={book.title || "বইয়ের প্রচ্ছদ"}
@@ -224,7 +221,7 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
                     <div className="absolute inset-0 transition-opacity opacity-0 bg-black/5 group-hover:opacity-100" />
                   </div>
 
-                  <div className="mt-2 text-center">
+                  <div className="mt-0 text-center flex flex-col justify-between bg-gray-200/50 p-2 grow">
                     <h3 className="text-base font-semibold leading-snug text-gray-900 transition-colors group-hover:text-emerald-700 line-clamp-2">
                       {book.title}
                     </h3>
@@ -242,7 +239,7 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
             <p className="text-lg italic text-gray-400">
               {books.length === 0
                 ? "দুঃখিত, এই বিভাগে কোনো বই খুঁজে পাওয়া যায়নি।"
-                : "আপনার অনুসন্ধানের সাথে মিল রেখে কোনো বই পাওয়া যায়নি।"}
+                : "আপনার অনুসন্ধানের সাথে মিল রেখে কোনো বই পাওয়া যায়নি।"}
             </p>
             {(searchQuery || selectedLetter) && (
               <button
