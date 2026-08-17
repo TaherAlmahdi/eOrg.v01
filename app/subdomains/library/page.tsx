@@ -217,7 +217,7 @@ export default async function LibraryHomePage() {
 
         {/* ২. নতুন বই সেকশন */}
         <section aria-labelledby="latest-books-heading">                  
-          <div className="flex w-full items-center justify-between mt-4 px-3 sm:px-4 py-2 mb-4 rounded bg-[#527a7a] text-[#008080] border border-teal-100 shadow-xs backdrop-blur-md">
+          <div className="flex w-full items-center justify-between mt-4 px-3 sm:px-4 py-2 mb-4 rounded bg-teal-50/90 text-[#008080] border border-teal-100 shadow-xs backdrop-blur-md">
             
             {/* বামে: আইকন ও টাইটেল */}
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
@@ -301,7 +301,7 @@ export default async function LibraryHomePage() {
 
         {/* ৩. ঘরানা নির্ঘণ্ট সেকশন */}
         <section data-aos="fade-up" className="relative">
-          <div className="flex w-full items-center justify-between mt-4 px-4 py-2 mb-4 rounded bg-[#527a7a] text-[#008080] border border-teal-100 shadow-xs backdrop-blur-md">
+          <div className="flex w-full items-center justify-between mt-4 px-4 py-2 mb-4 rounded bg-teal-50/90 text-[#008080] border border-teal-100 shadow-xs backdrop-blur-md">
             <div className="flex items-center gap-3">
               <BookCopy size={22} className="shrink-0 animate-pulse text-[#008080]" />
                 <h2 className="flex items-center gap-2 text-lg md:text-xl font-black text-slate-800 font-tarunima">
@@ -325,7 +325,7 @@ export default async function LibraryHomePage() {
 
         {/* ৪. সিরিজ নির্ঘণ্ট সেকশন */}
         <section data-aos="fade-down" className="relative">
-          <div className="flex w-full items-center justify-between mt-4 px-3 sm:px-4 py-2 mb-4 rounded bg-[#527a7a] text-[#008080] border border-teal-100 shadow-xs backdrop-blur-md">
+          <div className="flex w-full items-center justify-between mt-4 px-3 sm:px-4 py-2 mb-4 rounded bg-teal-50/90 text-[#008080] border border-teal-100 shadow-xs backdrop-blur-md">
             
             {/* বামে: আইকন ও টাইটেল */}
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
@@ -350,7 +350,7 @@ export default async function LibraryHomePage() {
 
         {/* ৫. লেখক নির্ঘণ্ট সেকশন */}
         <section data-aos="fade-up" className="relative">
-          <div className="flex w-full items-center justify-between mt-4 px-3 sm:px-4 py-2 mb-4 rounded bg-teal-50/100 text-[#008080] border border-teal-100 shadow-xs backdrop-blur-md"> 
+          <div className="flex w-full items-center justify-between mt-4 px-3 sm:px-4 py-2 mb-4 rounded bg-teal-50/90 text-[#008080] border border-teal-100 shadow-xs backdrop-blur-md"> 
             
             {/* বামে: আইকন ও টাইটেল */}
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">

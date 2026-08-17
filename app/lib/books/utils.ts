@@ -9,21 +9,12 @@ export const naturalSort = (a: string, b: string) =>
   a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
 
 /**
- * বাংলা ডিজিটকে ইংরেজি ডিজিটে রূপান্তর করার হেল্পার
+ * ইংরেজি সংখ্যা পার্স করার হেল্পার
  */
-export function parseNumericOrder(value: unknown): number {
-  if (value === undefined || value === null || value === '') return 0;
-  
-  const banglaDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
-  let strVal = String(value).trim();
-  
-  // বাংলা সংখ্যাকে ইংরেজিতে রূপান্তর
-  for (let i = 0; i < 10; i++) {
-    strVal = strVal.replace(new RegExp(banglaDigits[i], 'g'), String(i));
-  }
-  
-  const parsed = parseFloat(strVal);
-  return isNaN(parsed) ? 0 : parsed;
+export function parseNumericOrder(value: unknown): number | null {
+  if (value === undefined || value === null || value === '') return null;
+  const parsed = parseFloat(String(value).trim());
+  return isNaN(parsed) ? null : parsed;
 }
 
 /**
@@ -34,9 +25,9 @@ export function slugify(text: string): string {
   return String(text)
     .trim()
     .toLowerCase()
-    .replace(/\s+/g, '-') // স্পেস হাইফেন হবে
-    .replace(/[^\w\u0980-\u09FF\-]/g, '') // বাংলা, ইংরেজি অক্ষরের বাইরের ক্যারেক্টার বাদ
-    .replace(/-+/g, '-'); // একাধিক হাইফেন একটা করবে
+    .replace(/\s+/g, '-')
+    .replace(/[^\w\u0980-\u09FF\-]/g, '')
+    .replace(/-+/g, '-');
 }
 
 /**
@@ -54,4 +45,46 @@ export function parseSubdomains(subdomainRaw: unknown, defaultAuthorFolder: stri
   }
 
   return [defaultAuthorFolder, 'library'];
+}
+
+/**
+ * সিরিজের বইগুলোকে series_order -> first_published -> title (বাংলা বর্ণানুক্রম) অনুযায়ী সর্ট করার প্রধান লজিক
+ */
+export function sortSeriesBooks<T extends Record<string, any>>(books: T[]): T[] {
+  if (!books || books.length <= 1) return books;
+
+  // ১. চেক: সিরিজের "সবগুলো" বইয়ে বৈধ series_order আছে কি না
+  const hasAllSeriesOrder = books.every((book) => {
+    const rawOrder = book.series_order ?? book.seriesOrder ?? book.sort_order ?? book.sortOrder;
+    return parseNumericOrder(rawOrder) !== null;
+  });
+
+  if (hasAllSeriesOrder) {
+    return [...books].sort((a, b) => {
+      const rawA = a.series_order ?? a.seriesOrder ?? a.sort_order ?? a.sortOrder;
+      const rawB = b.series_order ?? b.seriesOrder ?? b.sort_order ?? b.sortOrder;
+      return (parseNumericOrder(rawA) ?? 0) - (parseNumericOrder(rawB) ?? 0);
+    });
+  }
+
+  // ২. চেক: সবগুলো বইয়ে series_order না থাকলে, "সবগুলো" বইয়ে first_published সাল আছে কি না
+  const hasAllFirstPublished = books.every((book) => {
+    const rawPub = book.first_published ?? book.published ?? book.pub_year;
+    return parseNumericOrder(rawPub) !== null;
+  });
+
+  if (hasAllFirstPublished) {
+    return [...books].sort((a, b) => {
+      const rawA = a.first_published ?? a.published ?? a.pub_year;
+      const rawB = b.first_published ?? b.published ?? b.pub_year;
+      return (parseNumericOrder(rawA) ?? 0) - (parseNumericOrder(rawB) ?? 0);
+    });
+  }
+
+  // ৩. কোনো তথ্য অনুপস্থিত থাকলে স্বয়ংসক্রিয়ভাবে বাংলা বর্ণানুক্রমিক সর্টে ফলব্যাক করবে
+  return [...books].sort((a, b) => {
+    const titleA = String(a.title || '').trim();
+    const titleB = String(b.title || '').trim();
+    return titleA.localeCompare(titleB, 'bn');
+  });
 }

@@ -69,7 +69,7 @@ export interface SeriesItem {
 interface SeriesListViewProps {
   seriesList?: SeriesItem[];
   isHomePage?: boolean;
-  totalSeriesCount: number;
+  totalSeriesCount?: number;
 }
 
 export const SeriesListView: FC<SeriesListViewProps> = ({
@@ -80,9 +80,8 @@ export const SeriesListView: FC<SeriesListViewProps> = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLetter, setSelectedLetter] = useState("সব");
 
-  // 🔹 ১. ফিল্টারিং ও লেটেস্ট সাজানো (হোমপেজ) এবং বাংলা বর্ণানুক্রম সাজানো (সিরিজ পেজ)
+  // 🔹 ১. ফিল্টারিং ও সাজানো
   const validSeriesList = useMemo(() => {
-    // বৈধ সিরিজ ফিল্টার (ফাঁকা ও 'অন্যান্য' বাদ)
     const filtered = seriesList.filter((item) => {
       if (!item.label || !item.slug) return false;
       const cleanLabel = item.label.trim().toLowerCase();
@@ -98,17 +97,16 @@ export const SeriesListView: FC<SeriesListViewProps> = ({
     });
 
     if (isHomePage) {
-      // ✅ সংশোধন: র‍্যান্ডমাইজ বাদ দিয়ে সর্বশেষ যুক্ত হওয়া প্রথম ২০টি নেওয়া হলো
       return filtered.slice(0, 20);
     } else {
-      // সিরিজ পেজ: বাংলা বর্ণানুক্রমে সাজানো (A-Z / অ-ক্ষ)
+      // সিরিজ কার্ডের নামগুলোকে বাংলা বর্ণানুক্রমে সাজানো
       return [...filtered].sort((a, b) =>
         a.label.trim().localeCompare(b.label.trim(), "bn", { sensitivity: "base" })
       );
     }
   }, [seriesList, isHomePage]);
 
-  // 🔹 ২. প্রথম বর্ণ ডাইনামিক্যালি বের করা
+  // 🔹 ২. প্রথমাংশ ডাইনামিক্যালি বের করা
   const availableLetters = useMemo(() => {
     if (isHomePage) return [];
 
@@ -128,7 +126,7 @@ export const SeriesListView: FC<SeriesListViewProps> = ({
     return ["সব", ...sortedLetters];
   }, [validSeriesList, isHomePage]);
 
-  // 🔹 ৩. সার্চ ও আদ্যক্ষর ভিত্তিক ফিল্টারিং
+  // 🔹 ৩. সার্চ ও আদ্যক্ষর ফিল্টারিং
   const filteredSeries = useMemo(() => {
     if (isHomePage) return validSeriesList;
 
@@ -157,7 +155,7 @@ export const SeriesListView: FC<SeriesListViewProps> = ({
             />
           </div>
 
-          {/* ডাইনামিক আদ্যক্ষর কুইক ফিল্টার বার */}
+          {/* আদ্যক্ষর ফিল্টার বার */}
           {availableLetters.length > 1 && (
             <div className="flex flex-wrap items-center justify-center gap-1 pt-2 border-t border-gray-100 font-tarunima">
               {availableLetters.map((letter) => (
@@ -179,7 +177,7 @@ export const SeriesListView: FC<SeriesListViewProps> = ({
         </div>
       )}
 
-      {/* সিরিজ লিস্ট (ফ্লেক্স গ্রিড ও অটো উইডথ) */}
+      {/* সিরিজ তালিকা */}
       {filteredSeries.length === 0 ? (
         <div className="p-8 text-center text-gray-600 rounded bg-white/80 font-tarunima">
           কোনো সিরিজ পাওয়া যায়নি।
@@ -199,7 +197,6 @@ export const SeriesListView: FC<SeriesListViewProps> = ({
                   <div className="p-2.5 rounded bg-orange-50 text-[#cc7a00] group-hover:bg-[#cc7a00] group-hover:text-white transition-colors duration-300 shrink-0">
                     <IconComponent className="w-5 h-5 md:w-6 md:h-6 shrink-0" />
                   </div>
-                  {/* ✅ লাইন হাইট বাড়িয়ে এবং py-1 যুক্ত করে অক্ষরের মাত্রা ও কার কাটা থেকে রক্ষা করা হয়েছে */}
                   <h3 className="text-[#008080] group-hover:text-[#cc7a00] text-base font-semibold leading-relaxed py-1 font-tarunima truncate transition-colors">
                     {label}
                   </h3>
@@ -214,7 +211,6 @@ export const SeriesListView: FC<SeriesListViewProps> = ({
           })}
         </div>
       )}
-
     </div>
   );
 };
