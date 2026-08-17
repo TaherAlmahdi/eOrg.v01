@@ -159,7 +159,7 @@ export function slugify(text: string): string {
 
 /**
  * রুল ১: যেকোনো বাংলা টেক্সট থেকে ইংরেজি স্লাগ তৈরি করার সর্বজনীন ও নিরাপদ ফাংশন।
- * রেজিস্ট্রি ফাইলে স্লাগ না থাকলে সরাসরি মূল বাংলা নামকে ক্লিন ফরম্যাটে রিটার্ন করবে।
+ * কেবল শতভাগ নিশ্চিত মিল (Exact Match) থাকলেই রেজিস্ট্রি স্লাগ ফেরত দেবে, নতুবা নিরাপদভাবে slugify করবে।
  */
 export function getSlug(
   type: RegistryCategory,
@@ -171,19 +171,13 @@ export function getSlug(
   const registry = CONTENT_REGISTRY[type];
   if (!registry) return slugify(cleaned);
 
-  // ১. হুবহু মিল (Exact Match) খোঁজা
+  // ১. কেবল হুবহু মিল (Exact Match) খোঁজা হচ্ছে
   const exactEntry = Object.entries(registry).find(
-    ([_, value]) => value.trim() === cleaned
+    ([_, value]) => value.trim().toLowerCase() === cleaned.toLowerCase()
   );
   if (exactEntry) return exactEntry[0];
 
-  // ২. আংশিক মিল (Partial Match) খোঁজা
-  const partialEntry = Object.entries(registry).find(
-    ([_, value]) => value.includes(cleaned) || cleaned.includes(value)
-  );
-  if (partialEntry) return partialEntry[0];
-
-  // ৩. কোনো মিল না পেলে সরাসরি র' বাংলা টেক্সট বা slugify ফর্ম রিটার্ন করা
+  // ২. কোনো মিল না পেলে সরাসরি slugify ফরম্যাট রিটার্ন করবে (ভুল আংশিক মিল নেওয়ার ঝুঁকি বন্ধ করা হলো)
   return slugify(cleaned) || cleaned;
 }
 

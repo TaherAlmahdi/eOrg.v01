@@ -15,6 +15,8 @@ export interface ChapterItem {
   genres?: string[];
   item?: string | string[];
   items?: string[];
+  itemsSlug?: string;
+  items_link?: string;
   content?: string;
   series?: string | string[];
   seriesSlug?: string;
