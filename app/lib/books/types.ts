@@ -24,7 +24,7 @@ export interface MetaFileItem {
 }
 
 /**
- * একাধিক ইন্টারফেসে ব্যবহৃত কমন সিরিজ প্রপার্টিগুলোকে একক মডিউলে আনা হয়েছে
+ * একাধিক ইন্টারফেসে ব্যবহৃত কমন সিরিজ প্রপার্টি
  */
 export interface SeriesBaseProperties {
   series?: MultiValue<string>;
@@ -34,20 +34,21 @@ export interface SeriesBaseProperties {
 }
 
 /**
- * জেনার এবং আইটেম সংক্রান্ত কমন প্রপার্টি
+ * জেনার এবং আইটেম সংক্রান্ত প্রপার্টি
+ * - genres এবং items কে Required (string[]) করা হয়েছে যেন 'possibly undefined' এরর না আসে।
  */
 export interface TaxonomyProperties {
   genre?: MultiValue<string>;
-  genres?: string[];
+  genres: string[]; // 👈 '?' সরিয়ে আবশ্যিক করা হলো
   item?: MultiValue<string>;
-  items?: string[];
+  items: string[];  // 👈 '?' সরিয়ে আবশ্যিক করা হলো
 }
 
 // ==========================================
 // 2. Structural Content Types
 // ==========================================
 
-export interface ChapterItem extends SeriesBaseProperties, TaxonomyProperties {
+export interface ChapterItem extends SeriesBaseProperties, Partial<TaxonomyProperties> {
   slug: string;
   title: string;
   content?: string;
