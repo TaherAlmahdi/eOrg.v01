@@ -19,7 +19,7 @@ genre_links:
   - name: "হিন্দুধর্ম"
     link: "/genre/hinduism"
   - name: "ধর্মতত্ত্ব"
-  - link: "/genre/theology"
+    link: "/genre/theology"
 
 cover_image: "/cover/srimad-bhagavad-gita.webp"
 

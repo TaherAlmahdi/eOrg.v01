@@ -129,15 +129,20 @@
     line-height: 1.55;
     color: var(--text-main);
     position: relative;
-    display: flex;
+    display: block;
     align-items: flex-start;
     gap: 0px;
-    padding: 5px 3px;
-    background-color: #f0f9ff; /* হালকা নীল ব্যাকগ্রাউন্ড */
+    padding: 5px 10px;
+    background-color: #f0f5f5; /* হালকা নীল ব্যাকগ্রাউন্ড */
     border-left: 4px solid #0284c7 !important; /* বামের নীল বর্ডার */
     color: #0f172a;
     text-align: justify;
   }
+ 
+.quote p {
+  text-indent: 30px;
+  margin-bottom: 0.4rem !important;
+}
 
   .first,
   .dcap,
