@@ -23,6 +23,14 @@ export interface MetaFileItem {
   title: string;
 }
 
+export interface SubPageItem {
+  title: string;
+  slug?: string;         // 👈 '?' যোগ করে optional করা হলো
+  link?: string;
+  pageNumber?: number;   // 👈 যুক্ত করা হলো
+  subtitle?: string;     // 👈 extractors.ts-এর জন্য যুক্ত করা হলো
+}
+
 /**
  * একাধিক ইন্টারফেসে ব্যবহৃত কমন সিরিজ প্রপার্টি
  */
@@ -35,13 +43,12 @@ export interface SeriesBaseProperties {
 
 /**
  * জেনার এবং আইটেম সংক্রান্ত প্রপার্টি
- * - genres এবং items কে Required (string[]) করা হয়েছে যেন 'possibly undefined' এরর না আসে।
  */
 export interface TaxonomyProperties {
   genre?: MultiValue<string>;
-  genres: string[]; // 👈 '?' সরিয়ে আবশ্যিক করা হলো
+  genres: string[];
   item?: MultiValue<string>;
-  items: string[];  // 👈 '?' সরিয়ে আবশ্যিক করা হলো
+  items: string[];
 }
 
 // ==========================================
@@ -108,6 +115,7 @@ export interface Book extends SeriesBaseProperties, TaxonomyProperties {
   volumes?: VolumeItem[];
   directChapters?: ChapterItem[];
   metaFiles?: MetaFileItem[];
+  subPages?: SubPageItem[];
 
   // Publication Details
   publishDate?: string;
