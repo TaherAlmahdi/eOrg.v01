@@ -139,9 +139,30 @@
     text-align: justify;
   }
  
-.quote p {
+.quote p, .quote p.normal {
+  text-indent: 0px;
+  margin-bottom: 0.4rem !important;
+  font-size: inherit !important;
+  color: inherit !important;
+}
+
+.quote p, .quote p.normal {
   text-indent: 30px;
   margin-bottom: 0.4rem !important;
+}
+
+.quote p.right {
+  text-align: right !important;
+  margin-bottom: 0.4rem !important;
+  font-size: inherit !important;
+  color: inherit !important;
+}
+
+.quote p.pc {
+  text-align: center !important;
+  margin-bottom: 0.4rem !important;
+  font-size: inherit !important;
+  color: inherit !important;
 }
 
   .first,

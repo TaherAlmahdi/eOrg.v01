@@ -6,6 +6,7 @@ export interface SubPageItem {
   pageNumber: number;
   title?: string;
   subtitle?: string;
+  slug?: string;
 }
 
 export interface ChapterItem {
@@ -16,8 +17,8 @@ export interface ChapterItem {
   subPages?: SubPageItem[];
   genre?: string | string[];
   genres?: string[];
-  item?: string | string[];
-  items?: string[];
+  item?: string | string[] | ChapterItem[] | SubPageItem[];
+  items?: string[] | ChapterItem[] | SubPageItem[];
   itemsSlug?: string;
   items_link?: string;
   content?: string;
@@ -71,8 +72,8 @@ export interface Book {
   genres: string[];
   genre?: string | string[];
   genre_links?: Array<{ name: string; link: string }>;
-  items?: string[];
-  item?: string | string[];
+  items?: string[] | ChapterItem[] | SubPageItem[];
+  item?: string | string[] | ChapterItem[] | SubPageItem[];
   series?: string | string[];
   seriesList?: SeriesItem[];
   seriesSlug?: string;

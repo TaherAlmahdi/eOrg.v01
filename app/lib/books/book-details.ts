@@ -3,7 +3,7 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import matter from 'gray-matter';
 import { getSlug } from '@/app/lib/content/core/registry';
-import { BookDetail } from './types';
+import { BookDetail, SubPageItem } from './types'; // SubPageItem বা প্রয়োজনীয় টাইপ ইম্পোর্ট নিশ্চিত করুন
 import { booksDirectory, parseSubdomains, slugify } from './utils';
 import {
   collectChapterItemsDeep,
@@ -118,12 +118,14 @@ export async function getBookBySlug(
           const fileContents = await fs.readFile(targetFilePath, 'utf8');
           const { data: pageData, content } = matter(fileContents);
 
-          // আইটেম নির্ধারণ: চ্যাপ্টার/পাতার ফাইল থেকে; না থাকলে পুরো বই থেকে স্ক্যান করা
-          let pageItems = extractItemsFromData(pageData);
-          if (pageItems.length === 0 && targetFilePath !== indexMdPath) {
-            pageItems = extractItemsFromData(pageData);
-          } else if (targetFilePath === indexMdPath) {
+          // [সংশোধন ১]: pageItems-এর টাইপ সেফটি এবং ক্লিন আপ
+          // extractItemsFromData এবং collectChapterItemsDeep উভয় রিটার্ন মিলিয়ে টাইপ সেট করা
+          let pageItems: any[] = [];
+          
+          if (targetFilePath === indexMdPath) {
             pageItems = collectChapterItemsDeep(bookFolderPath);
+          } else {
+            pageItems = extractItemsFromData(pageData);
           }
 
           // নেভিগেশন লিঙ্ক নির্ধারণ লজিক
@@ -200,7 +202,8 @@ export async function getBookBySlug(
             series_link: primarySeries?.link || '',
             series_order: primarySeries?.order ?? mainData.series_order ?? '',
             series_title: primarySeries?.title || mainData.series_title || '',
-            series_info: extractedSeriesList.length > 1 ? extractedSeriesList : primarySeries,
+            // [সংশোধন ২]: series_info টাইপ সেফ করা হলো
+            series_info: extractedSeriesList.length > 0 ? extractedSeriesList : primarySeries || null,
             volumes: volumes.length > 0 ? volumes : mainData.volumes || [],
             directChapters: directChapters.length > 0 ? directChapters : mainData.directChapters || [],
             metaFiles: mainData.metaFiles || [],
