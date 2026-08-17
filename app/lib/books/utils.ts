@@ -1,38 +1,54 @@
 import path from 'path';
+import { existsSync, readdirSync, readFileSync } from 'fs';
+import matter from 'gray-matter';
+import { getSlug } from '@/app/lib/content/core/registry';
+import { SeriesItem, Book } from './types';
 
 export const booksDirectory = path.resolve(process.cwd(), 'content', 'books');
 
 /**
- * আলফানিউমেরিক বা প্রাকৃতিক ক্রমানুসারে ফাইল/ফোল্ডার সর্টিং
+ * বাংলা ইউনিকোড এনকোডিং নরম্যালাইজার (য়, ড়, ঢ়, ব় এনকোডিং ফিক্স সহ)
  */
-export const naturalSort = (a: string, b: string) =>
-  a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
-
-/**
- * ইংরেজি সংখ্যা পার্স করার হেল্পার
- */
-export function parseNumericOrder(value: unknown): number | null {
-  if (value === undefined || value === null || value === '') return null;
-  const parsed = parseFloat(String(value).trim());
-  return isNaN(parsed) ? null : parsed;
-}
-
-/**
- * যেকোনো স্ট্রিংকে স্লাগে রূপান্তর করার হেল্পার (বাংলা অক্ষরের পূর্ণ সাপোর্টসহ)
- */
-export function slugify(text: string): string {
+export function normalizeBanglaText(text: string): string {
   if (!text) return '';
   return String(text)
+    .normalize('NFC')
+    .replace(/\u09AF\u09BC/g, '\u09DF') // য + ় = য়
+    .replace(/\u09A1\u09BC/g, '\u09DC') // ড + ় = ড়
+    .replace(/\u09A2\u09BC/g, '\u09DD') // ঢ + ় = ঢ়
+    .replace(/\u09AC\u09BC/g, '\u09E0'); // ব + ় = ব়
+}
+
+export const naturalSort = (a: string, b: string) => {
+  const normA = normalizeBanglaText(a);
+  const normB = normalizeBanglaText(b);
+  return normA.localeCompare(normB, undefined, { numeric: true, sensitivity: 'base' });
+};
+
+// বাংলা সংখ্যাকে ইংরেজি সংখ্যায় রূপান্তর করার হেলপার
+function normalizeDigits(val: unknown): string {
+  if (val === null || val === undefined || val === '') return '';
+  return String(val)
+    .trim()
+    .replace(/[০-৯]/g, (d) => '০১২৩৪৫৬৭৮৯'.indexOf(d).toString());
+}
+
+function parseNumberValue(val: unknown): number {
+  const str = normalizeDigits(val);
+  if (!str) return Infinity;
+  const num = parseFloat(str);
+  return isNaN(num) ? Infinity : num;
+}
+
+export function slugify(text: string): string {
+  if (!text) return '';
+  return normalizeBanglaText(text)
     .trim()
     .toLowerCase()
     .replace(/\s+/g, '-')
-    .replace(/[^\w\u0980-\u09FF\-]/g, '')
-    .replace(/-+/g, '-');
+    .replace(/[^\w\u0980-\u09FF\-]/g, '');
 }
 
-/**
- * স্ট্রিম/স্ট্রিং থেকে সাবডোমেন অ্যারে বের করার হেল্পার
- */
 export function parseSubdomains(subdomainRaw: unknown, defaultAuthorFolder: string): string[] {
   if (!subdomainRaw) return [defaultAuthorFolder, 'library'];
 
@@ -47,44 +63,259 @@ export function parseSubdomains(subdomainRaw: unknown, defaultAuthorFolder: stri
   return [defaultAuthorFolder, 'library'];
 }
 
+export function extractGenresFromData(data: Record<string, unknown> | null | undefined): string[] {
+  if (!data) return [];
+  const genresSet = new Set<string>();
+  const rawGenre = data.genre || data.genres;
+
+  if (typeof rawGenre === 'string' && rawGenre.trim()) {
+    genresSet.add(normalizeBanglaText(rawGenre.trim()));
+  } else if (Array.isArray(rawGenre)) {
+    rawGenre.forEach((g) => {
+      if (typeof g === 'string' && g.trim()) genresSet.add(normalizeBanglaText(g.trim()));
+    });
+  }
+
+  return Array.from(genresSet);
+}
+
+export function generateSeriesLink(
+  explicitLink: string | undefined,
+  seriesName: string,
+  customSlug?: string
+): string | undefined {
+  if (explicitLink) return explicitLink;
+  if (!seriesName) return undefined;
+
+  const normalizedName = normalizeBanglaText(seriesName);
+  const targetSlug = customSlug || getSlug('series', normalizedName) || slugify(normalizedName);
+  return `/series/${targetSlug}`;
+}
+
+export function extractSeriesFromData(data: Record<string, unknown> | null | undefined): SeriesItem[] {
+  if (!data) return [];
+  const seriesList: SeriesItem[] = [];
+
+  // series_list, series_info অথবা series (যদি অবজেক্ট অ্যারে হিসেবে থাকে)
+  const rawSeriesList =
+    data.series_list ||
+    data.series_info ||
+    (Array.isArray(data.series) && typeof data.series[0] === 'object' ? data.series : null);
+
+  if (Array.isArray(rawSeriesList)) {
+    for (const item of rawSeriesList) {
+      if (typeof item === 'object' && item !== null && 'name' in item) {
+        const itemObj = item as Record<string, unknown>;
+        const sName = normalizeBanglaText(String(itemObj.name).trim());
+        const sSlug = itemObj.slug
+          ? String(itemObj.slug).trim()
+          : getSlug('series', sName) || slugify(sName);
+        const sLink = generateSeriesLink(
+          typeof itemObj.link === 'string' ? itemObj.link : undefined,
+          sName,
+          sSlug
+        );
+        seriesList.push({
+          name: sName,
+          slug: sSlug,
+          link: sLink,
+          order: String(itemObj.order || itemObj.series_order || ''),
+          title: normalizeBanglaText(String(itemObj.title || '')),
+        });
+      }
+    }
+    if (seriesList.length > 0) return seriesList;
+  }
+
+  // স্ট্রিং বা স্ট্রিং অ্যারে হ্যান্ডলিং
+  if (data.series) {
+    const rawSeries = data.series;
+    if (typeof rawSeries === 'string' && rawSeries.trim()) {
+      const sName = normalizeBanglaText(rawSeries.trim());
+      const sSlug = data.seriesSlug
+        ? String(data.seriesSlug).trim()
+        : getSlug('series', sName) || slugify(sName);
+      seriesList.push({
+        name: sName,
+        slug: sSlug,
+        link: generateSeriesLink(
+          typeof data.series_link === 'string' ? data.series_link : undefined,
+          sName,
+          sSlug
+        ),
+        order: String(data.series_order || data.series_index || ''),
+        title: normalizeBanglaText(String(data.series_title || '')),
+      });
+    } else if (Array.isArray(rawSeries)) {
+      rawSeries.forEach((s) => {
+        if (typeof s === 'string' && s.trim()) {
+          const sName = normalizeBanglaText(s.trim());
+          const sSlug = getSlug('series', sName) || slugify(sName);
+          seriesList.push({
+            name: sName,
+            slug: sSlug,
+            link: generateSeriesLink(undefined, sName, sSlug),
+          });
+        }
+      });
+    }
+  }
+
+  return seriesList;
+}
+
+export function generateGenreLinks(
+  explicitLinks: Array<{ name: string; link: string }> | undefined,
+  genresList: string[]
+): Array<{ name: string; link: string }> {
+  if (explicitLinks && explicitLinks.length > 0) {
+    return explicitLinks.map((g) => ({
+      name: normalizeBanglaText(g.name),
+      link: g.link,
+    }));
+  }
+
+  return genresList.map((gName) => {
+    const normName = normalizeBanglaText(gName);
+    return {
+      name: normName,
+      link: `/genre/${getSlug('genres', normName) || slugify(normName)}`,
+    };
+  });
+}
+
+export function extractItemsFromData(data: Record<string, unknown> | null | undefined): string[] {
+  if (!data) return [];
+  const itemsSet = new Set<string>();
+  const rawItem = data.item || data.items;
+
+  if (typeof rawItem === 'string' && rawItem.trim()) {
+    itemsSet.add(normalizeBanglaText(rawItem.trim()));
+  } else if (Array.isArray(rawItem)) {
+    rawItem.forEach((i) => {
+      if (typeof i === 'string' && i.trim()) itemsSet.add(normalizeBanglaText(i.trim()));
+    });
+  }
+
+  return Array.from(itemsSet);
+}
+
+export function collectChapterItemsDeep(bookFolderPath: string): string[] {
+  const itemsSet = new Set<string>();
+
+  if (!bookFolderPath || !existsSync(bookFolderPath)) {
+    return [];
+  }
+
+  try {
+    const scanDir = (dirPath: string) => {
+      const entries = readdirSync(dirPath, { withFileTypes: true });
+      for (const entry of entries) {
+        const fullPath = path.join(dirPath, entry.name);
+        if (entry.isDirectory()) {
+          scanDir(fullPath);
+        } else if (entry.isFile() && entry.name.endsWith('.md')) {
+          if (entry.name.toLowerCase() === 'index.md') continue;
+
+          try {
+            const fileContent = readFileSync(fullPath, 'utf8');
+            const { data: fileData } = matter(fileContent);
+            extractItemsFromData(fileData).forEach((i) => itemsSet.add(i));
+          } catch {
+            // Read error ignore
+          }
+        }
+      }
+    };
+    scanDir(bookFolderPath);
+  } catch {
+    // Directory traversal error ignore
+  }
+
+  return Array.from(itemsSet);
+}
+
 /**
- * সিরিজের বইগুলোকে series_order -> first_published -> title (বাংলা বর্ণানুক্রম) অনুযায়ী সর্ট করার প্রধান লজিক
+ * টার্গেট সিরিজের সাপেক্ষে একটি বইয়ের অর্ডার খোঁজার হেলপার
  */
-export function sortSeriesBooks<T extends Record<string, any>>(books: T[]): T[] {
-  if (!books || books.length <= 1) return books;
+function getTargetSeriesOrder(book: Record<string, any>, targetSeries?: string): string | null {
+  if (targetSeries) {
+    const targetSlug = slugify(targetSeries);
+    const rawSeriesList = book.series_list || book.series_info || book.series;
 
-  // ১. চেক: সিরিজের "সবগুলো" বইয়ে বৈধ series_order আছে কি না
-  const hasAllSeriesOrder = books.every((book) => {
-    const rawOrder = book.series_order ?? book.seriesOrder ?? book.sort_order ?? book.sortOrder;
-    return parseNumericOrder(rawOrder) !== null;
-  });
+    if (Array.isArray(rawSeriesList)) {
+      for (const item of rawSeriesList) {
+        if (typeof item === 'object' && item !== null) {
+          const sName = normalizeBanglaText(String(item.name || '').trim());
+          const sSlug = item.slug ? String(item.slug).trim() : slugify(sName);
 
-  if (hasAllSeriesOrder) {
-    return [...books].sort((a, b) => {
-      const rawA = a.series_order ?? a.seriesOrder ?? a.sort_order ?? a.sortOrder;
-      const rawB = b.series_order ?? b.seriesOrder ?? b.sort_order ?? b.sortOrder;
-      return (parseNumericOrder(rawA) ?? 0) - (parseNumericOrder(rawB) ?? 0);
-    });
+          if (sSlug === targetSlug || slugify(sName) === targetSlug) {
+            const orderVal = item.order ?? item.series_order ?? item.series_index;
+            if (orderVal !== null && orderVal !== undefined && String(orderVal).trim() !== '') {
+              return String(orderVal).trim();
+            }
+          }
+        }
+      }
+    }
   }
 
-  // ২. চেক: সবগুলো বইয়ে series_order না থাকলে, "সবগুলো" বইয়ে first_published সাল আছে কি না
-  const hasAllFirstPublished = books.every((book) => {
-    const rawPub = book.first_published ?? book.published ?? book.pub_year;
-    return parseNumericOrder(rawPub) !== null;
-  });
-
-  if (hasAllFirstPublished) {
-    return [...books].sort((a, b) => {
-      const rawA = a.first_published ?? a.published ?? a.pub_year;
-      const rawB = b.first_published ?? b.published ?? b.pub_year;
-      return (parseNumericOrder(rawA) ?? 0) - (parseNumericOrder(rawB) ?? 0);
-    });
+  const topOrder = book.series_order ?? book.order;
+  if (topOrder !== null && topOrder !== undefined && String(topOrder).trim() !== '') {
+    return String(topOrder).trim();
   }
 
-  // ৩. কোনো তথ্য অনুপস্থিত থাকলে স্বয়ংসক্রিয়ভাবে বাংলা বর্ণানুক্রমিক সর্টে ফলব্যাক করবে
+  return null;
+}
+
+/**
+ * সিরিজের বইগুলোর জন্য রিফ্যাক্টর্ড সর্টিং হেলপার
+ */
+export function sortSeriesBooks<T extends Partial<Book> & Record<string, any>>(
+  books: T[],
+  targetSeries?: string
+): T[] {
+  if (!Array.isArray(books) || books.length <= 1) return books ? [...books] : [];
+
   return [...books].sort((a, b) => {
-    const titleA = String(a.title || '').trim();
-    const titleB = String(b.title || '').trim();
-    return titleA.localeCompare(titleB, 'bn');
+    const orderAStr = getTargetSeriesOrder(a, targetSeries);
+    const orderBStr = getTargetSeriesOrder(b, targetSeries);
+
+    const hasOrderA = orderAStr !== null;
+    const hasOrderB = orderBStr !== null;
+
+    // ১. টার্গেট সিরিজের নির্দিষ্ট Order থাকলে সেটি প্রাধান্য পাবে
+    if (hasOrderA && hasOrderB) {
+      const numA = parseNumberValue(orderAStr);
+      const numB = parseNumberValue(orderBStr);
+      if (numA !== numB) return numA - numB;
+    } else if (hasOrderA) {
+      return -1;
+    } else if (hasOrderB) {
+      return 1;
+    }
+
+    // ২. Order না থাকলে first_published তারিখ অনুযায়ী সর্ট হবে
+    const firstPubA = a.first_published ?? a.firstPublished ?? a.year;
+    const firstPubB = b.first_published ?? b.firstPublished ?? b.year;
+
+    const hasPubA = firstPubA !== null && firstPubA !== undefined && String(firstPubA).trim() !== '';
+    const hasPubB = firstPubB !== null && firstPubB !== undefined && String(firstPubB).trim() !== '';
+
+    if (hasPubA && hasPubB) {
+      const dateA = normalizeDigits(firstPubA);
+      const dateB = normalizeDigits(firstPubB);
+      const dateCompare = naturalSort(dateA, dateB);
+      if (dateCompare !== 0) return dateCompare;
+    } else if (hasPubA) {
+      return -1;
+    } else if (hasPubB) {
+      return 1;
+    }
+
+    // ৩. শেষ ফালব্যাক হিসেবে শিরোনামের প্রাকৃতিক বর্ণানুক্রমিক সর্ট
+    const titleA = String(a.title || a.name || '');
+    const titleB = String(b.title || b.name || '');
+    return naturalSort(titleA, titleB);
   });
 }

@@ -13,7 +13,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const decodedSlug = decodeURIComponent(slug);
+  const decodedSlug = decodeURIComponent(slug).trim();
 
   const targetBengaliSeries = getSeriesTitle(decodedSlug) || decodedSlug;
 
@@ -38,7 +38,7 @@ export default async function SeriesPage({ params, searchParams }: PageProps) {
   const { slug } = await params;
   const resolvedSearchParams = searchParams ? await searchParams : {};
   const author = resolvedSearchParams.author;
-  
+
   const decodedSlug = decodeURIComponent(slug).trim();
 
   const headersList = await headers();
@@ -53,6 +53,7 @@ export default async function SeriesPage({ params, searchParams }: PageProps) {
   const { latestBooks = [] } = await getLibraryBooks();
 
   const filteredBooks = (latestBooks as BookSeries[]).filter((book) => {
+    // ১. সাবডোমেইন / লেখক ফিল্টার
     if (subdomain && !['library', 'localhost:3000', 'eduliture'].includes(subdomain)) {
       const bookAuthor = book.authorSlug || book.author || '';
       if (slugify(String(bookAuthor)) !== slugify(subdomain)) {
@@ -60,24 +61,40 @@ export default async function SeriesPage({ params, searchParams }: PageProps) {
       }
     }
 
-    const rawSeries = book.Series || book.series;
+    // ২. সিরিজ ফিল্টারিং (স্ট্রিং ও অবজেক্ট উভয় স্ট্রাকচার সাপোর্ট সহ)
+    const rawSeries = book.Series || book.series || book.series_list || book.series_info;
     if (!rawSeries) return false;
 
     const seriesList = Array.isArray(rawSeries) ? rawSeries : [rawSeries];
 
     return seriesList.some((s) => {
-      const sStr = String(s).trim();
-      const sNorm = slugify(sStr);
+      let sName = '';
+      let sSlug = '';
+
+      if (typeof s === 'string') {
+        sName = s.trim();
+        sSlug = slugify(sName);
+      } else if (typeof s === 'object' && s !== null) {
+        sName = String((s as Record<string, any>).name || '').trim();
+        sSlug = (s as Record<string, any>).slug
+          ? String((s as Record<string, any>).slug).trim()
+          : slugify(sName);
+      }
+
+      const sNormName = slugify(sName);
 
       return (
-        sStr.toLowerCase() === decodedSlug.toLowerCase() ||
-        sNorm === normalizedTarget ||
-        sNorm === normalizedSlug
+        sName.toLowerCase() === decodedSlug.toLowerCase() ||
+        sSlug === normalizedTarget ||
+        sSlug === normalizedSlug ||
+        sNormName === normalizedTarget ||
+        sNormName === normalizedSlug
       );
     });
   });
 
-  const sortedBooks = sortSeriesBooks(filteredBooks);
+  // ৩. টার্গেট সিরিজ উল্লেখ করে সর্টিং হেলপার কল
+  const sortedBooks = sortSeriesBooks(filteredBooks, targetBengaliSeries);
 
   return (
     <SeriesView

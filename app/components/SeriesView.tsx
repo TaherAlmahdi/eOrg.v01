@@ -5,18 +5,23 @@ import Link from "next/link";
 import Image from "next/image";
 import { Home, BookOpen, Search, X, Layers } from "lucide-react";
 
-// 🔹 মূল বইয়ের টাইপ
+// 🔹 মূল বইয়ের টাইপ (টাইপ-এরর সমাধানের জন্য আপডেট করা হয়েছে)
 export interface SeriesBook {
   id?: string;
   slug: string;
   title: string;
   author?: string;
   cover?: string;
-  Series?: string | string[];
-  series?: string | string[];
+  Series?: string | string[] | any;
+  series?: string | string[] | any;
+  series_list?: any;
+  series_info?: any;
+  series_order?: string | number;
+  series_index?: string | number;
   first_published?: number | string;
   published?: number | string;
   authorSlug?: string;
+  [key: string]: any; // ব্যাকএন্ডের অন্যান্য ডাইনামিক ফিল্ডের জন্য
 }
 
 export type BookSeries = SeriesBook;
@@ -52,7 +57,6 @@ const getUniversalFirstLetter = (str: string): string => {
   }
 
   // ২. কার-চিহ্ন, ডায়াক্রিটিক্যাল মার্কস ও স্বরচিহ্ন রিমুভ করা
-  // \u0300-\u036f (Latin diacritics), \u09be-\u09cd (Bengali vowels), \u064b-\u065f (Arabic Harakat/Tashkeel)
   const baseLetter = firstGrapheme
     .normalize("NFD")
     .replace(/[\u0300-\u036f\u09be-\u09cd\u064b-\u065f]/g, "");
@@ -78,7 +82,6 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
       }
     });
 
-    // স্বয়ংক্রিয় বর্ণানুক্রমিক সাজানো (Alphabetical & Script-based Sorting)
     return Array.from(lettersSet).sort((a, b) => a.localeCompare(b));
   }, [books]);
 
@@ -168,11 +171,10 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
                 <div className="flex flex-wrap justify-center gap-1 sm:gap-1.5 pt-2">
                   <button
                     onClick={() => setSelectedLetter(null)}
-                    className={`px-2.5 py-1 text-base rounded transition-colors ${
-                      selectedLetter === null
-                        ? "bg-[#7575a3] text-white font-semibold"
-                        : "bg-white text-gray-600 border border-gray-200 hover:bg-orange-50"
-                    }`}
+                    className={`px-2.5 py-1 text-base rounded transition-colors ${selectedLetter === null
+                      ? "bg-[#7575a3] text-white font-semibold"
+                      : "bg-white text-gray-600 border border-gray-200 hover:bg-orange-50"
+                      }`}
                   >
                     সব
                   </button>
@@ -184,11 +186,10 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
                       <button
                         key={letter}
                         onClick={() => setSelectedLetter(isSelected ? null : letter)}
-                        className={`px-2 py-1 text-base rounded font-semibold transition-colors ${
-                          isSelected
-                            ? "bg-[#7575a3] text-white font-semibold"
-                            : "bg-white text-gray-700 border border-gray-200 hover:bg-orange-50 hover:border-orange-300"
-                        }`}
+                        className={`px-2 py-1 text-base rounded font-semibold transition-colors ${isSelected
+                          ? "bg-[#7575a3] text-white font-semibold"
+                          : "bg-white text-gray-700 border border-gray-200 hover:bg-orange-50 hover:border-orange-300"
+                          }`}
                       >
                         {letter}
                       </button>
@@ -210,7 +211,7 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
                   href={`/book/${bookSlug}`}
                   className="flex flex-col h-full group bg-white p-0 rounded border border-gray-200/80 shadow-xs transition-all duration-300 hover:-translate-y-1.5 hover:shadow-md hover:border-orange-200"
                 >
-                  <div className="relative aspect-2/3 overflow-hidden rounded-t border-b border-gray-200/50 bg-gray-50">
+                  <div className="relative aspect-[2/3] overflow-hidden rounded-t border-b border-gray-200/50 bg-gray-50">
                     <Image
                       src={book.cover || "/default-cover.jpg"}
                       alt={book.title || "বইয়ের প্রচ্ছদ"}

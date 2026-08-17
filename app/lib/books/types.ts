@@ -1,45 +1,21 @@
 // ==========================================
-// Core Interfaces & Types
+// 1. Common / Shared Base Types
 // ==========================================
 
-export interface SubPageItem {
-  pageNumber: number;
-  title?: string;
-  subtitle?: string;
-  slug?: string;
-}
+export type FlexibleString = string | number;
+export type MultiValue<T> = T | T[];
 
-export interface ChapterItem {
-  id?: string;
+export interface SeriesItem {
+  name: string;
   slug: string;
-  title: string;
-  subtitle?: string;
-  subPages?: SubPageItem[];
-  genre?: string | string[];
-  genres?: string[];
-  item?: string | string[] | ChapterItem[] | SubPageItem[];
-  items?: string[] | ChapterItem[] | SubPageItem[];
-  itemsSlug?: string;
-  items_link?: string;
-  content?: string;
-  series?: string | string[];
-  seriesSlug?: string;
-  series_link?: string;
-  series_order?: number | string;
+  link?: string;
+  order?: FlexibleString;
+  title?: string;
 }
 
-export interface VolumeItem {
-  type?: 'volume' | 'chapter';
-  id: string;
-  slug?: string;
-  title: string;
-  subtitle?: string;
-  chapters?: ChapterItem[];
-  subPages?: SubPageItem[];
-  series?: string | string[];
-  seriesSlug?: string;
-  series_link?: string;
-  series_order?: number | string;
+export interface LinkItem {
+  name: string;
+  link: string;
 }
 
 export interface MetaFileItem {
@@ -47,53 +23,104 @@ export interface MetaFileItem {
   title: string;
 }
 
-export interface SeriesItem {
-  name: string;
-  slug: string;
-  link?: string;
-  order?: number | string;
-  title?: string;
+/**
+ * একাধিক ইন্টারফেসে ব্যবহৃত কমন সিরিজ প্রপার্টিগুলোকে একক মডিউলে আনা হয়েছে
+ */
+export interface SeriesBaseProperties {
+  series?: MultiValue<string>;
+  seriesSlug?: string;
+  series_link?: string;
+  series_order?: FlexibleString;
 }
 
-export interface Book {
+/**
+ * জেনার এবং আইটেম সংক্রান্ত কমন প্রপার্টি
+ */
+export interface TaxonomyProperties {
+  genre?: MultiValue<string>;
+  genres?: string[];
+  item?: MultiValue<string>;
+  items?: string[];
+}
+
+// ==========================================
+// 2. Structural Content Types
+// ==========================================
+
+export interface ChapterItem extends SeriesBaseProperties, TaxonomyProperties {
+  slug: string;
+  title: string;
+  content?: string;
+  itemsSlug?: string;
+  items_link?: string;
+}
+
+export interface VolumeItem extends SeriesBaseProperties {
+  id: string;
+  title: string;
+  chapters?: ChapterItem[];
+}
+
+export interface BookNode extends SeriesBaseProperties {
+  type: 'volume' | 'chapter';
+  href: string;
+  title: string;
+  volId: string;
+  filePath: string;
+  chapterSlug?: string;
+}
+
+// ==========================================
+// 3. Main Book Interfaces
+// ==========================================
+
+export interface Book extends SeriesBaseProperties, TaxonomyProperties {
   id: string;
   slug: string;
   title: string;
   subtitle?: string;
+
+  // SEO & Metadata
   meta_title?: string;
   meta_description?: string;
+  og_image?: string;
+
+  // People & Entities
   author: string;
   authorSlug: string;
   translator?: string;
   translatorSlug?: string;
   editor?: string;
   editorSlug?: string;
+  publisher?: string;
+
+  // Categorization & Links
   subdomains: string[];
-  genres: string[];
-  genre?: string | string[];
-  genre_links?: Array<{ name: string; link: string }>;
-  items?: string[] | ChapterItem[] | SubPageItem[];
-  item?: string | string[] | ChapterItem[] | SubPageItem[];
-  series?: string | string[];
+  genre_links?: LinkItem[];
+
+  // Series Specific Extended Properties
   seriesList?: SeriesItem[];
-  seriesSlug?: string;
-  series_link?: string;
-  series_order?: number | string;
   series_title?: string;
-  series_info?: SeriesItem | SeriesItem[];
+  series_info?: MultiValue<SeriesItem>;
+
+  // Structure & Content
   volumes?: VolumeItem[];
   directChapters?: ChapterItem[];
   metaFiles?: MetaFileItem[];
+
+  // Publication Details
   publishDate?: string;
-  published?: string;
-  first_published?: string | number;
-  publisher?: string;
+  published?: FlexibleString;
+  first_published?: FlexibleString;
+  source_book?: FlexibleString;
+  pub_medium?: string;
+
+  // Media & Assets
   cover?: string;
   cover_image?: string;
-  source_book?: string | number;
-  pub_medium?: string;
+
+  // Navigation & Extra Info
   notice?: string;
-  og_image?: string;
   footnotes?: string[];
   chapter_title?: string;
   volume_title?: string;
@@ -108,17 +135,4 @@ export interface Book {
 export interface BookDetail extends Book {
   content: string;
   rawFrontmatter: Record<string, unknown>;
-}
-
-export interface BookNode {
-  type: 'volume' | 'chapter';
-  href: string;
-  title: string;
-  volId: string;
-  chapterSlug?: string;
-  filePath: string;
-  series?: string | string[];
-  seriesSlug?: string;
-  series_link?: string;
-  series_order?: number | string;
 }

@@ -125,10 +125,10 @@ export const CONTENT_REGISTRY = {
     "feluda": "ফেলুদা সিরিজ",
     "byomkesh": "ব্যোমকেশ সমগ্র",
     "kakababu": "কাকাবাবু সিরিজ",
-    "humayun-rachanabali": "হুমায়ূন রচনাবলী",
+    "humayun-ahmed-rachanabali": "হুমায়ূন আহমেদ রচনাবলী",
     "himu-samagra": "হিমু সমগ্র",
     "misir-ali-omnibus": "মিসির আলি অমনিবাস",
-    "zahir-raihan-rachanabali": "জহির রায়হান রচনাবলী",
+    "zahir-raihan-rachanabali": "জহির রায়হান রচনাবলী",
     "sukanta-samagra": "সুকান্ত সমগ্র",
   } as Record<string, string>,
 
@@ -146,14 +146,33 @@ export const CONTENT_REGISTRY = {
 export type RegistryCategory = "authors" | "genres" | "tags" | "series" | "books";
 
 /**
- * যেকোনো স্ট্রিংকে স্লাগে রূপান্তর করার হেল্পার (বাংলা অক্ষরের জন্য সেফ)
+ * বাংলা স্ট্রিংকে সংগত ও নরম্যালাইজড ডিকম্পোজিশনে রূপান্তর করার হেল্পার।
+ * এটি 'ড+নুক্তা' ফরম্যাটকে সরাসরি একক বর্ণে (যেমন: ড়, ঢ়, য়) রূপান্তর করে।
+ */
+export function normalizeBanglaText(text: string): string {
+  if (!text) return "";
+  return String(text)
+    .normalize("NFC") // ইউনিকোড কম্পোজিশন ঠিক করা (ড + ় => ড়)
+    .replace(/\u09A1\u09BC/g, "ড়") // ড + নুক্তা = ড়
+    .replace(/\u09A2\u09BC/g, "ঢ়") // ঢ + নুক্তা = ঢ়
+    .replace(/\u09AF\u09BC/g, "য়") // য + নুক্তা = য়
+    .replace(/\u09B0/g, "র");      // অসমীয়া/বাংলা র-এর সঠিক ম্যাপিং
+}
+
+/**
+ * যেকোনো স্ট্রিংকে স্লাগে রূপান্তর করার হেল্পার (বাংলা ড়, ঢ়, য়, ্য, ্র সহ অন্যান্য চিহ্নের জন্য নিরাপদ)
  */
 export function slugify(text: string): string {
-  if (!text) return '';
-  return String(text)
+  if (!text) return "";
+
+  const normalized = normalizeBanglaText(text);
+
+  return normalized
     .trim()
-    .replace(/\s+/g, '-') // স্পেসের জায়গায় হাইফেন
-    .replace(/[^\w\u0980-\u09FF\-]/g, '') // বাংলা ও আলফানিউমেরিক বাদে বাকি স্পেশাল ক্যারেক্টার বাদ
+    .replace(/\s+/g, "-") // স্পেসের জায়গায় হাইফেন
+    // \u0980-\u09FF পুরো বাংলা ব্লককে কাভার করে (যার মধ্যে ড় \u09DC, ঢ় \u09DD, য় \u09DF সহ সকল নুক্তা ও যুক্তবর্ণ রয়েছে)
+    .replace(/[^\w\u0980-\u09FF\-]/g, "")
+    .replace(/-+/g, "-") // একাধিক হাইফেন পাশাপাশি থাকলে একটিতে রূপান্তর
     .toLowerCase();
 }
 
@@ -166,18 +185,18 @@ export function getSlug(
   banglaText: string
 ): string {
   if (!banglaText) return "others";
-  const cleaned = banglaText.trim();
+  const cleaned = normalizeBanglaText(banglaText).trim();
 
   const registry = CONTENT_REGISTRY[type];
   if (!registry) return slugify(cleaned);
 
-  // ১. কেবল হুবহু মিল (Exact Match) খোঁজা হচ্ছে
+  // ১. কেবল হুবহু মিল (Exact Match) খোঁজা হচ্ছে (নরম্যালাইজড টেক্সটের সাথে)
   const exactEntry = Object.entries(registry).find(
-    ([_, value]) => value.trim().toLowerCase() === cleaned.toLowerCase()
+    ([_, value]) => normalizeBanglaText(value).trim().toLowerCase() === cleaned.toLowerCase()
   );
   if (exactEntry) return exactEntry[0];
 
-  // ২. কোনো মিল না পেলে সরাসরি slugify ফরম্যাট রিটার্ন করবে (ভুল আংশিক মিল নেওয়ার ঝুঁকি বন্ধ করা হলো)
+  // ২. কোনো মিল না পেলে সরাসরি slugify ফরম্যাট রিটার্ন করবে
   return slugify(cleaned) || cleaned;
 }
 
@@ -186,7 +205,7 @@ export function getSlug(
  */
 export function getGenreTitle(slug: string): string {
   if (!slug) return "";
-  const decoded = decodeURIComponent(slug).toLowerCase().trim();
+  const decoded = normalizeBanglaText(decodeURIComponent(slug)).toLowerCase().trim();
   return CONTENT_REGISTRY.genres[decoded] || decodeURIComponent(slug);
 }
 
@@ -195,7 +214,7 @@ export function getGenreTitle(slug: string): string {
  */
 export function getSeriesTitle(slug: string): string {
   if (!slug) return "";
-  const decoded = decodeURIComponent(slug).toLowerCase().trim();
+  const decoded = normalizeBanglaText(decodeURIComponent(slug)).toLowerCase().trim();
   return CONTENT_REGISTRY.series[decoded] || decodeURIComponent(slug);
 }
 
@@ -204,7 +223,7 @@ export function getSeriesTitle(slug: string): string {
  */
 export function getAuthorTitle(slug: string): string {
   if (!slug) return "";
-  const decoded = decodeURIComponent(slug).toLowerCase().trim();
+  const decoded = normalizeBanglaText(decodeURIComponent(slug)).toLowerCase().trim();
   return CONTENT_REGISTRY.authors[decoded] || decodeURIComponent(slug);
 }
 
@@ -213,7 +232,7 @@ export function getAuthorTitle(slug: string): string {
  */
 export function getBookTitle(slug: string): string {
   if (!slug) return "";
-  const decoded = decodeURIComponent(slug).toLowerCase().trim();
+  const decoded = normalizeBanglaText(decodeURIComponent(slug)).toLowerCase().trim();
   return CONTENT_REGISTRY.books[decoded] || decodeURIComponent(slug);
 }
 
