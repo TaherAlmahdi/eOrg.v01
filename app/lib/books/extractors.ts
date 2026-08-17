@@ -2,14 +2,14 @@ import { existsSync, readdirSync, readFileSync } from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import { getSlug } from '@/app/lib/content/core/registry';
-import { SeriesItem } from './types';
+import { SeriesItem, SubPageItem } from './types';
 import { slugify } from './utils';
 
 /**
  * যেকোনো ফ্রন্টম্যাটার ডাটা থেকে genre/genres এক্সট্র্যাক্ট করার হেল্পার
  */
 export function extractGenresFromData(data: any): string[] {
-  if (!data) return [];
+  if (!data || typeof data !== 'object') return [];
   const genresSet = new Set<string>();
   const rawGenre = data.genre || data.genres;
 
@@ -28,14 +28,14 @@ export function extractGenresFromData(data: any): string[] {
  * যেকোনো ফ্রন্টম্যাটার ডাটা থেকে একাধিক SeriesItem বের করার হেল্পার
  */
 export function extractSeriesFromData(data: any): SeriesItem[] {
-  if (!data) return [];
+  if (!data || typeof data !== 'object') return [];
   const seriesList: SeriesItem[] = [];
 
   // ১. যদি স্ট্রাকচার্ড series_list বা series_info থাকে (অ্যারে অবজেক্ট হিসেবে)
   const rawSeriesList = data.series_list || data.series_info;
   if (Array.isArray(rawSeriesList)) {
     for (const item of rawSeriesList) {
-      if (typeof item === 'object' && item.name) {
+      if (typeof item === 'object' && item !== null && item.name) {
         const sName = String(item.name).trim();
         const registrySlug = getSlug('series', sName);
         const sSlug = item.slug ? String(item.slug).trim() : registrySlug || slugify(sName) || encodeURIComponent(sName);
@@ -94,7 +94,7 @@ export function extractSeriesFromData(data: any): SeriesItem[] {
 }
 
 /**
- * ফ্রন্টম্যাটার থেকে Dynamic Genre Links তৈরি করার হেল্পার (registry সহ fallback বাংলা স্লাগ)
+ * ফ্রন্টম্যাটার থেকে Dynamic Genre Links তৈরি করার হেল্পার
  */
 export function generateGenreLinks(
   explicitLinks: Array<{ name: string; link: string }> | undefined,
@@ -115,7 +115,7 @@ export function generateGenreLinks(
 }
 
 /**
- * ফ্রন্টম্যাটার থেকে Dynamic Series Link তৈরি করার হেল্পার (registry সহ fallback বাংলা স্লাগ)
+ * ফ্রন্টম্যাটার থেকে Dynamic Series Link তৈরি করার হেল্পার
  */
 export function generateSeriesLink(
   explicitLink: string | undefined,
@@ -131,22 +131,37 @@ export function generateSeriesLink(
 }
 
 /**
- * যেকোনো ফ্রন্টম্যাটার ডাটা থেকে item/items (কবিতা, গল্প, প্রবন্ধ ইত্যাদি) এক্সট্র্যাক্ট করার হেল্পার
+ * ফ্রন্টম্যাটার ডাটা থেকে item/items/pages/subPages এক্সট্র্যাক্ট করে 
+ * TOC কম্পোনেন্টের উপযোগী SubPageItem অবজেক্টে রূপান্তর করার হেল্পার
  */
-export function extractItemsFromData(data: any): string[] {
-  if (!data) return [];
-  const itemsSet = new Set<string>();
-  const rawItem = data.item || data.items;
+export function extractItemsFromData(data: any): SubPageItem[] {
+  if (!data || typeof data !== 'object') return [];
+  const rawItems = data.subPages || data.items || data.item || data.pages;
+  const itemsList: SubPageItem[] = [];
 
-  if (typeof rawItem === 'string' && rawItem.trim()) {
-    itemsSet.add(rawItem.trim());
-  } else if (Array.isArray(rawItem)) {
-    rawItem.forEach((i) => {
-      if (typeof i === 'string' && i.trim()) itemsSet.add(i.trim());
+  if (Array.isArray(rawItems)) {
+    rawItems.forEach((item, index) => {
+      if (typeof item === 'string' && item.trim()) {
+        itemsList.push({
+          pageNumber: index + 1,
+          title: item.trim(),
+        });
+      } else if (typeof item === 'object' && item !== null) {
+        itemsList.push({
+          pageNumber: Number(item.pageNumber || item.page || index + 1),
+          title: String(item.title || item.name || '').trim(),
+          subtitle: item.subtitle ? String(item.subtitle).trim() : undefined,
+        });
+      }
+    });
+  } else if (typeof rawItems === 'string' && rawItems.trim()) {
+    itemsList.push({
+      pageNumber: 1,
+      title: rawItems.trim(),
     });
   }
 
-  return Array.from(itemsSet);
+  return itemsList;
 }
 
 /**
@@ -172,16 +187,19 @@ export function collectChapterItemsDeep(bookFolderPath: string): string[] {
           try {
             const fileContent = readFileSync(fullPath, 'utf8');
             const { data: fileData } = matter(fileContent);
-            extractItemsFromData(fileData).forEach((i) => itemsSet.add(i));
+            const extracted = extractItemsFromData(fileData);
+            extracted.forEach((i) => {
+              if (i.title) itemsSet.add(i.title);
+            });
           } catch {
-            // ফাইল রিড এরর ক্যাচ
+            // ফাইল রিড ট্রাই-ক্যাচ ইগনোর
           }
         }
       }
     };
     scanDir(bookFolderPath);
   } catch {
-    // ডিরেক্টরি ট্রাভার্সাল এরর ক্যাচ
+    // ফাইল ট্রাভার্সাল এরর ইগনোর
   }
 
   return Array.from(itemsSet);

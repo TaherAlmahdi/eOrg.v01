@@ -81,7 +81,7 @@ export async function getLibraryBooks(currentSubdomain?: string): Promise<{
 
           const extractedItems = collectChapterItemsDeep(bookFolderPath);
 
-          // 🎯 স্লাগ লজিক: ফ্রন্টম্যাটারের 'slug' আগে চেক করা হচ্ছে, না থাকলে ফোল্ডারের নাম
+          // স্লাগ নির্ধারণ
           const bookSlug = getEffectiveSlug(data, bookFolderName);
 
           const extractedSeriesList = extractSeriesFromData(data);
@@ -166,6 +166,7 @@ export async function getLibraryBooks(currentSubdomain?: string): Promise<{
       }
     }
 
+    // সিریز সোর্টিং লজিক
     for (const sName in booksBySeries) {
       booksBySeries[sName].sort((a, b) => {
         const getOrderVal = (book: Book): number | null => {
@@ -193,7 +194,7 @@ export async function getLibraryBooks(currentSubdomain?: string): Promise<{
         if (orderA !== null && orderB !== null) {
           return orderA - orderB;
         }
-        
+
         if (orderA !== null) return -1;
         if (orderB !== null) return 1;
 
@@ -229,6 +230,8 @@ export async function getBookDirectoryBySlug(bookSlug: string): Promise<string |
   try {
     const authorItems = await fs.readdir(booksDirectory, { withFileTypes: true });
 
+    const targetSlug = decodeURIComponent(bookSlug).toLowerCase();
+
     for (const authorItem of authorItems) {
       if (!authorItem.isDirectory()) continue;
 
@@ -245,18 +248,17 @@ export async function getBookDirectoryBySlug(bookSlug: string): Promise<string |
           const fileContents = await fs.readFile(indexMdPath, 'utf8');
           const { data } = matter(fileContents);
 
-          const fileSlug = getEffectiveSlug(data, bookItem.name);
+          const fileSlug = getEffectiveSlug(data, bookItem.name).toLowerCase();
 
           if (
-            fileSlug.toLowerCase() === bookSlug.toLowerCase() ||
-            encodeURIComponent(fileSlug).toLowerCase() === bookSlug.toLowerCase() ||
-            fileSlug.toLowerCase() === decodeURIComponent(bookSlug).toLowerCase()
+            fileSlug === targetSlug ||
+            encodeURIComponent(fileSlug).toLowerCase() === targetSlug
           ) {
             return bookFolderPath;
           }
         } else if (
-          bookItem.name.toLowerCase() === bookSlug.toLowerCase() ||
-          bookItem.name.toLowerCase() === decodeURIComponent(bookSlug).toLowerCase()
+          bookItem.name.toLowerCase() === targetSlug ||
+          encodeURIComponent(bookItem.name).toLowerCase() === targetSlug
         ) {
           return bookFolderPath;
         }

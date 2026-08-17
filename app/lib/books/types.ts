@@ -2,9 +2,18 @@
 // Core Interfaces & Types
 // ==========================================
 
+export interface SubPageItem {
+  pageNumber: number;
+  title?: string;
+  subtitle?: string;
+}
+
 export interface ChapterItem {
+  id?: string;
   slug: string;
   title: string;
+  subtitle?: string;
+  subPages?: SubPageItem[];
   genre?: string | string[];
   genres?: string[];
   item?: string | string[];
@@ -19,9 +28,13 @@ export interface ChapterItem {
 }
 
 export interface VolumeItem {
+  type?: 'volume' | 'chapter';
   id: string;
+  slug?: string;
   title: string;
+  subtitle?: string;
   chapters?: ChapterItem[];
+  subPages?: SubPageItem[];
   series?: string | string[];
   seriesSlug?: string;
   series_link?: string;
