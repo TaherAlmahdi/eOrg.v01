@@ -14,7 +14,7 @@ export default function BookCover({ coverImage, title }: BookCoverProps) {
   if (!coverImage) return null;
 
   return (
-    <div className="space-y-3 font-tarunima">
+    <div className="space-y-2 font-tarunima">
       {/* ১. প্রচ্ছদ ছবির ফুল-ওয়াইড আলাদা বর্ডার কার্ড (উপরে থাকবে) */}
       {showCover && (
         <div className="p-0 border border-gray-100 rounded shadow-sm overflow-hidden bg-white transition-all duration-300 ease-in-out">
@@ -27,11 +27,11 @@ export default function BookCover({ coverImage, title }: BookCoverProps) {
       )}
 
       {/* ২. হেডার ও টগল বাটনের আলাদা বক্স (নিচে থাকবে) */}
-      <div className="p-3 bg-white border border-gray-100 rounded shadow-sm flex items-center justify-between">
-        <span className="font-bold px-1 tracking-wide text-red-900 uppercase text-md">
+      <div className="p-0 bg-white border border-gray-100 rounded shadow-sm flex items-center justify-between">
+        <span className="font-bold p-2 tracking-wide text-red-900 uppercase text-md">
           পুস্তক বিবরণী
         </span>
-        
+
         <button
           type="button"
           onClick={() => setShowCover(!showCover)}

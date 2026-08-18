@@ -46,11 +46,11 @@ export default function BookDetails({ book, series: explicitSeries }: BookDetail
       <BookCover coverImage={book.cover_image} title={book.title} />
 
       {/* ২. পুস্তক বিবরণীর বিস্তারিত তথ্যের মূল কার্ড (নিচে থাকবে) */}
-      <div className="p-4 bg-white border border-gray-100 rounded shadow-sm">
+      <div className="p-2 bg-white border border-gray-100 rounded shadow-sm">
         <div className="space-y-2 text-sm text-gray-800">
           {/* বইয়ের নাম */}
           {book.title && (
-            <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
+            <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
               <span className="font-bold">বই</span>
               <span className="text-gray-400">:</span>
               <span>{book.title}</span>
@@ -59,7 +59,7 @@ export default function BookDetails({ book, series: explicitSeries }: BookDetail
 
           {/* লেখক */}
           {book.author && (
-            <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
+            <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
               <span className="font-bold">লেখক</span>
               <span className="text-gray-400">:</span>
               <span>{book.author}</span>
@@ -68,7 +68,7 @@ export default function BookDetails({ book, series: explicitSeries }: BookDetail
 
           {/* অনুবাদক */}
           {book.translator && (
-            <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
+            <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
               <span className="font-bold">অনুবাদক</span>
               <span className="text-gray-400">:</span>
               <span>{book.translator}</span>
@@ -77,7 +77,7 @@ export default function BookDetails({ book, series: explicitSeries }: BookDetail
 
           {/* সম্পাদক */}
           {book.editor && (
-            <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
+            <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
               <span className="font-bold">সম্পাদক</span>
               <span className="text-gray-400">:</span>
               <span>{book.editor}</span>
@@ -86,7 +86,7 @@ export default function BookDetails({ book, series: explicitSeries }: BookDetail
 
           {/* প্রথম প্রকাশ */}
           {book.pub_medium && (
-            <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
+            <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
               <span className="font-bold">প্রথম প্রকাশ</span>
               <span className="text-gray-400">:</span>
               <span>{book.pub_medium}</span>
@@ -95,7 +95,7 @@ export default function BookDetails({ book, series: explicitSeries }: BookDetail
 
           {/* গ্রন্থরূপ */}
           {book.first_published && (
-            <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
+            <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
               <span className="font-bold">গ্রন্থরূপ</span>
               <span className="text-gray-400">:</span>
               <span>{toBengaliNumber(book.first_published)}</span>
@@ -104,7 +104,7 @@ export default function BookDetails({ book, series: explicitSeries }: BookDetail
 
           {/* প্রকাশক */}
           {book.publisher && (
-            <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
+            <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
               <span className="font-bold">প্রকাশক</span>
               <span className="text-gray-400">:</span>
               <span>{book.publisher}</span>
@@ -113,7 +113,7 @@ export default function BookDetails({ book, series: explicitSeries }: BookDetail
 
           {/* অনুস্মৃতি */}
           {book.source_book && (
-            <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
+            <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
               <span className="font-bold">অনুস্মৃতি</span>
               <span className="text-gray-400">:</span>
               <span>{toBengaliNumber(book.source_book)}</span>
@@ -122,7 +122,7 @@ export default function BookDetails({ book, series: explicitSeries }: BookDetail
 
           {/* সিরিজ / গ্রন্থমালা */}
           {seriesData && (
-            <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
+            <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
               <span className="font-bold">সিরিজ</span>
               <span className="text-gray-400">:</span>
               <span className="flex flex-wrap gap-x-1 items-baseline">
@@ -164,7 +164,7 @@ export default function BookDetails({ book, series: explicitSeries }: BookDetail
 
           {/* ঘরানা */}
           {book.genre && (
-            <div className="grid grid-cols-[80px_15px_1fr] items-baseline">
+            <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
               <span className="font-bold">ঘরানা</span>
               <span className="text-gray-400">:</span>
               <span className="flex flex-wrap gap-x-1">
