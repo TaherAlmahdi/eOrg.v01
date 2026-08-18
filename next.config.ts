@@ -5,6 +5,9 @@ const withPWA = withPWAInit({
   dest: "public",
   disable: process.env.NODE_ENV === "development",
   register: true,
+  workboxOptions: {
+    maximumFileSizeToCacheInBytes: 50 * 1024 * 1024, // ৫০ MB পর্যন্ত ফাইল প্রিক্যাশ সাপোর্ট
+  },
 });
 
 const nextConfig: NextConfig = {
@@ -12,7 +15,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "eduliture.com",
+        hostname: "eduliture.org",
         port: "",
         pathname: "/**",
       },
