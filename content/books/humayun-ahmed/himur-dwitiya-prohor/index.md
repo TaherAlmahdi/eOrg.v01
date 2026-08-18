@@ -6,7 +6,7 @@ slug: "himur-dwitiya-prohor"
 subdomain: "library"
 
 first_published: 1997
-published: "2026-08-15"
+published: "2026-08-17"
 
 genre:
   - "উপন্যাস"
