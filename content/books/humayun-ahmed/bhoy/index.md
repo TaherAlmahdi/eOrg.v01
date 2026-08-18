@@ -10,7 +10,7 @@ published_date: "1991-05"
 published: "2026-08-16"
 
 genre:
-  - "উপন্যাস"
+  - "গল্পগ্রন্থ"
   - "পরামনোবিজ্ঞান"
 
 genre_links:
