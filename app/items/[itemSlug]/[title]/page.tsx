@@ -1,75 +1,48 @@
-// app/items/[itemSlug]/[title]/page.tsx
-import { notFound } from 'next/navigation';
-import Link from 'next/link';
-import { getItemByParams } from '@/app/lib/books';
+import { headers } from 'next/headers';
+import type { Metadata } from 'next';
+import { getSubdomainData } from '@/app/lib/get-site-data';
+import { ITEM_REGISTRY, getItemSlug } from '@/app/lib/content/core/registry/items';
+import ItemView from '@/app/components/ItemView';
 
 interface PageProps {
-  params: Promise<{
-    itemSlug: string;
-    title: string;
-  }>;
+  params: Promise<{ slug: string }>;
 }
 
-export default async function SingleItemContentPage({ params }: PageProps) {
-  const { itemSlug, title } = await params;
+// 🔹 ডায়নামিক ট্যাব টাইটেল (Metadata)
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  
+  // ১. স্লাগ ডিকোড ও রেজিস্ট্রি থেকে বাংলা নাম বের করা
+  const rawSlug = decodeURIComponent(slug).trim();
+  const targetSlug = getItemSlug(rawSlug);
+  const targetBengaliItem = ITEM_REGISTRY[targetSlug]?.name || rawSlug;
 
-  const data = await getItemByParams(itemSlug, title);
+  // ২. হোস্ট থেকে ডায়নামিক সাইটের নাম বের করা
+  const headersList = await headers();
+  const host = headersList.get('host');
+  const siteData = getSubdomainData(host);
+  const siteName = siteData?.title || 'এডুলিচার';
 
-  if (!data) {
-    notFound();
-  }
+  // ❀ সেপারেটর ব্যবহার করে ৩ স্তরের ফুল টাইটেল গঠন
+  const pageTitle = `${targetBengaliItem} ❀ গ্রন্থাগার ❀ ${siteName}`;
 
-  const { item, navigation } = data;
+  return {
+    title: pageTitle,
+    openGraph: {
+      title: pageTitle,
+    },
+    twitter: {
+      title: pageTitle,
+    },
+  };
+}
 
-  return (
-    <article className="max-w-3xl mx-auto px-4 py-8">
-      {/* মেটা ট্র্যাকিং */}
-      <div className="text-sm text-gray-500 mb-4 flex gap-2 items-center">
-        <Link href={`/items/${item.itemTypeSlug}`} className="capitalize font-medium hover:underline text-blue-600">
-          {item.itemType}
-        </Link>
-        <span>•</span>
-        <span>{item.author}</span>
-        <span>•</span>
-        <Link href={`/book/${item.bookSlug}`} className="hover:underline">
-          {item.bookTitle}
-        </Link>
-      </div>
+export default async function ItemPage({ params }: PageProps) {
+  const { slug } = await params;
 
-      {/* টাইটেল */}
-      <h1 className="text-4xl font-bold mb-6 text-gray-900">{item.title}</h1>
+  const headersList = await headers();
+  const host = headersList.get('host');
+  const siteData = getSubdomainData(host);
 
-      {/* কনটেন্ট */}
-      <div className="prose prose-lg max-w-none mb-12 text-gray-800 leading-relaxed">
-        {item.content}
-      </div>
-
-      {/* নেক্সট ও প্রিভিয়াস আইটেম নেভিগেশন */}
-      <div className="border-t pt-6 mt-8 flex justify-between items-center gap-4">
-        {navigation.prev ? (
-          <Link
-            href={navigation.prev.href}
-            className="flex flex-col text-left group p-3 rounded-lg border hover:bg-gray-50 transition"
-          >
-            <span className="text-xs text-gray-400 font-medium">← পূর্ববর্তী আইটেম</span>
-            <span className="text-sm font-semibold text-blue-600 group-hover:underline">
-              {navigation.prev.title}
-            </span>
-          </Link>
-        ) : <div />}
-
-        {navigation.next ? (
-          <Link
-            href={navigation.next.href}
-            className="flex flex-col text-right group p-3 rounded-lg border hover:bg-gray-50 transition"
-          >
-            <span className="text-xs text-gray-400 font-medium">পরবর্তী আইটেম →</span>
-            <span className="text-sm font-semibold text-blue-600 group-hover:underline">
-              {navigation.next.title}
-            </span>
-          </Link>
-        ) : <div />}
-      </div>
-    </article>
-  );
+  return <ItemView slug={slug} authorSlug={siteData?.subdomain} />;
 }

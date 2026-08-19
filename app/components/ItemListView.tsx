@@ -1,128 +1,153 @@
 // app/components/ItemListView.tsx
-import fs from "fs";
-import path from "path";
-import matter from "gray-matter";
-import Link from "next/link";
-import { Layers, BookOpen } from "lucide-react";
+"use client";
 
-export interface ItemTypeData {
+import { useState, useMemo } from "react";
+import Link from "next/link";
+
+export interface ItemData {
+  label: string;
   slug: string;
-  name: string;
   count: number;
 }
 
-export interface ItemListViewProps {
-  items?: ItemTypeData[];
+interface ItemListViewProps {
+  items: ItemData[];
   isHomePage?: boolean;
+  limit?: number;
+  initialPageSize?: number;
 }
 
-const toBengaliNumber = (num: number | string): string =>
-  num.toString().replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[parseInt(d, 10)]);
-
-// MD/MDX ফাইল স্ক্যান করে ফ্রন্টম্যাটারের item অবজেক্ট থেকে ডাটা নেয়ার লজিক
-export async function getRealItemsList(): Promise<ItemTypeData[]> {
-  const contentDir = path.join(process.cwd(), "content");
-
-  if (!fs.existsSync(contentDir)) {
-    return [];
-  }
-
-  // key: name, value: { count, slug }
-  const itemMap: Record<string, { count: number; slug: string }> = {};
-
-  function scanDirectory(dir: string) {
-    const files = fs.readdirSync(dir);
-
-    for (const file of files) {
-      const fullPath = path.join(dir, file);
-      const stat = fs.statSync(fullPath);
-
-      if (stat.isDirectory()) {
-        scanDirectory(fullPath);
-      } else if (file.endsWith(".md") || file.endsWith(".mdx")) {
-        const fileContent = fs.readFileSync(fullPath, "utf-8");
-        const { data } = matter(fileContent);
-
-        // শুধুমাত্র item ফিল্ড চেক করা হচ্ছে
-        const itemObj = data.item;
-
-        if (itemObj && typeof itemObj === "object" && itemObj.name) {
-          const name = String(itemObj.name).trim();
-          
-          // link থেকে স্লগ বের করা (যেমন: "/items/story" -> "story")
-          let slug = "";
-          if (itemObj.link && typeof itemObj.link === "string") {
-            slug = itemObj.link.split("/").filter(Boolean).pop() || "";
-          }
-
-          if (!slug) {
-            slug = name.toLowerCase().replace(/\s+/g, "-");
-          }
-
-          if (!itemMap[name]) {
-            itemMap[name] = { count: 1, slug };
-          } else {
-            itemMap[name].count += 1;
-          }
-        }
-      }
-    }
-  }
-
-  scanDirectory(contentDir);
-
-  const itemsList: ItemTypeData[] = Object.entries(itemMap).map(
-    ([name, { count, slug }]) => ({
-      slug,
-      name,
-      count,
-    })
-  );
-
-  return itemsList.sort((a, b) =>
-    a.name.localeCompare(b.name, "bn", { sensitivity: "base" })
-  );
-}
-
-export default async function ItemListView({
+export default function ItemListView({
   items,
   isHomePage = false,
+  limit,
+  initialPageSize = 100,
 }: ItemListViewProps) {
-  const displayItems = items ?? (await getRealItemsList());
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedLetter, setSelectedLetter] = useState("সব");
+  const [visibleCount, setVisibleCount] = useState<number>(
+    isHomePage && limit ? limit : initialPageSize
+  );
 
-  if (displayItems.length === 0) {
-    return (
-      <div className="p-8 text-center text-gray-600 rounded bg-white/80 font-tarunima border border-teal-100">
-        কোনো আইটেমের তথ্য পাওয়া যায়নি।
-      </div>
-    );
-  }
+  // 🟢 ১. পাওয়া যাওয়া আইটেমগুলোর প্রথম বর্ণ ডাইনামিকালি বের করা
+  const availableLetters = useMemo(() => {
+    const letters = new Set<string>();
+    items.forEach((item) => {
+      if (item.label) {
+        const firstChar = item.label.trim().charAt(0);
+        if (firstChar) letters.add(firstChar);
+      }
+    });
+
+    return Array.from(letters).sort((a, b) => a.localeCompare(b, "bn"));
+  }, [items]);
+
+  // 🟢 ২. সার্চ ও আদ্যক্ষর ফিল্টারিং
+  const filteredItems = useMemo(() => {
+    return items.filter((item) => {
+      const matchesSearch = item.label
+        .toLowerCase()
+        .includes(searchTerm.trim().toLowerCase());
+
+      const firstChar = item.label.trim().charAt(0);
+      const matchesLetter =
+        selectedLetter === "সব" || firstChar === selectedLetter;
+
+      return matchesSearch && matchesLetter;
+    });
+  }, [items, searchTerm, selectedLetter]);
+
+  // হোম পেজ হলে লিমিট অনুযায়ী, অন্যথায় লোড মোড় পেজিনেশন
+  const displayedItems = isHomePage && limit
+    ? filteredItems.slice(0, limit)
+    : filteredItems.slice(0, visibleCount);
+
+  const hasMore = !isHomePage && visibleCount < filteredItems.length;
+
+  const handleLoadMore = () => {
+    setVisibleCount((prev) => prev + initialPageSize);
+  };
 
   return (
-    <div className="w-full px-0">
-      <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-        {displayItems.map(({ slug, name, count }) => (
-          <Link
-            key={slug}
-            href={`/items/${slug}`}
-            className="flex items-center justify-between gap-3 px-3.5 py-2.5 rounded bg-white/90 text-[#008080] border border-teal-100 shadow-sm transition-all duration-300 backdrop-blur-sm hover:bg-teal-50 hover:shadow-md hover:border-teal-300 hover:-translate-y-0.5 group cursor-pointer w-full"
-          >
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className="p-2 rounded bg-orange-50 text-[#cc7a00] group-hover:bg-[#cc7a00] group-hover:text-white transition-colors duration-300 shrink-0">
-                <Layers className="w-5 h-5 shrink-0" />
-              </div>
-              <h3 className="text-[#008080] group-hover:text-[#cc7a00] text-base font-semibold leading-snug font-tarunima truncate transition-colors">
-                {name}
-              </h3>
-            </div>
+    <section className="w-full py-4 space-y-6">
+      {/* 🟢 সার্চ ও আদ্যক্ষর ফিল্টার বার (শুধুমাত্র আইটেম পেজে বা চাইলে সর্বত্র) */}
+      {!isHomePage && (
+        <div className="space-y-4 bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl border border-gray-200 dark:border-gray-800">
+          {/* সার্চ বক্স */}
+          <div className="max-w-md w-full">
+            <input
+              type="text"
+              placeholder="আইটেমের নাম খুঁজুন..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full px-4 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            />
+          </div>
 
-            <div className="text-right shrink-0 flex items-center gap-1.5 bg-teal-50 text-[#008080] border border-teal-100 px-2 py-1 rounded text-xs md:text-sm font-semibold">
-              <BookOpen size={14} className="shrink-0" />
-              <span>{toBengaliNumber(count)} টি</span>
-            </div>
-          </Link>
-        ))}
-      </div>
-    </div>
+          {/* আদ্যক্ষর ফিল্টার বাটনসমূহ */}
+          <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-gray-200 dark:border-gray-800">
+            <button
+              onClick={() => setSelectedLetter("সব")}
+              className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+                selectedLetter === "সব"
+                  ? "bg-emerald-600 text-white"
+                  : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+              }`}
+            >
+              সব
+            </button>
+            {availableLetters.map((letter) => (
+              <button
+                key={letter}
+                onClick={() => setSelectedLetter(letter)}
+                className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+                  selectedLetter === letter
+                    ? "bg-emerald-600 text-white"
+                    : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                }`}
+              >
+                {letter}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 🟢 আইটেম গ্রিড তালিকা */}
+      {displayedItems.length > 0 ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+          {displayedItems.map((item) => (
+            <Link
+              key={item.slug}
+              href={`/items/${item.slug}`}
+              className="flex items-center justify-between p-3 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-emerald-500 dark:hover:border-emerald-500 hover:shadow-sm transition-all group"
+            >
+              <span className="font-medium text-gray-800 dark:text-gray-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors line-clamp-1">
+                {item.label}
+              </span>
+              <span className="ml-1.5 px-2 py-0.5 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-950/50 group-hover:text-emerald-600 dark:group-hover:text-emerald-400">
+                ({item.count})
+              </span>
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-10 text-gray-500 dark:text-gray-400 text-sm">
+          কোনো আইটেম পাওয়া যায়নি।
+        </div>
+      )}
+
+      {/* 🟢 লোড মোর বাটন */}
+      {!isHomePage && hasMore && (
+        <div className="mt-8 flex justify-center">
+          <button
+            onClick={handleLoadMore}
+            className="px-6 py-2.5 text-sm font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-200 dark:border-emerald-800 rounded-full transition-all cursor-pointer"
+          >
+            আরও লোড করুন ({filteredItems.length - visibleCount}টি বাকি)
+          </button>
+        </div>
+      )}
+    </section>
   );
 }
