@@ -90,6 +90,7 @@ export default function proxy(request: NextRequest) {
     '/genres', 
     '/books', 
     '/book', 
+    '/items', // 🟢 /items এবং /items/... রাউট বাইপাসে যুক্ত করা হলো
   ];
 
   if (globalBypassRoutes.some(route => pathname.startsWith(route))) {

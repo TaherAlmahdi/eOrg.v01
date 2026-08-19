@@ -1,5 +1,5 @@
 // app/lib/content/core/registry.ts
-
+export * from "@/app/lib/registry/items";
 export const CONTENT_REGISTRY = {
   labels: {
     author: "লেখক",
