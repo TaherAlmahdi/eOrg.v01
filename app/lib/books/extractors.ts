@@ -5,6 +5,10 @@ import { getSlug } from '@/app/lib/content/core/registry';
 import { SeriesItem, SubPageItem } from './types';
 import { slugify } from './utils';
 
+// কন্টেন্ট ডিরেক্টরি পাথ
+const BOOKS_DIRECTORY = path.join(process.cwd(), 'content/books');
+const ALTERNATE_BOOKS_DIRECTORY = path.join(process.cwd(), 'app/content/books');
+
 /**
  * যেকোনো ফ্রন্টম্যাটার ডাটা থেকে genre/genres এক্সট্র্যাক্ট করার হেল্পার
  */
@@ -31,7 +35,6 @@ export function extractSeriesFromData(data: any): SeriesItem[] {
   if (!data || typeof data !== 'object') return [];
   const seriesList: SeriesItem[] = [];
 
-  // ১. যদি স্ট্রাকচার্ড series_list বা series_info থাকে (অ্যারে অবজেক্ট হিসেবে)
   const rawSeriesList = data.series_list || data.series_info;
   if (Array.isArray(rawSeriesList)) {
     for (const item of rawSeriesList) {
@@ -60,7 +63,6 @@ export function extractSeriesFromData(data: any): SeriesItem[] {
     }
   }
 
-  // ২. যদি সাধারণ series ফিল্ড থাকে (String বা Array of Strings)
   if (seriesList.length === 0 && data.series) {
     const rawSeries = data.series;
     if (typeof rawSeries === 'string' && rawSeries.trim()) {
@@ -136,36 +138,38 @@ export function generateSeriesLink(
  */
 export function extractItemsFromData(data: any): SubPageItem[] {
   if (!data || typeof data !== 'object') return [];
-  const rawItems = data.subPages || data.items || data.item || data.pages;
+  const rawItems = data.subPages || data.items || data.item || data.pages || data.itemTypes;
   const itemsList: SubPageItem[] = [];
 
-  if (Array.isArray(rawItems)) {
-    rawItems.forEach((item, index) => {
-      if (typeof item === 'string' && item.trim()) {
-        itemsList.push({
-          pageNumber: index + 1,
-          title: item.trim(),
-        });
-      } else if (typeof item === 'object' && item !== null) {
+  const addParsedItem = (item: any, index: number) => {
+    if (typeof item === 'string' && item.trim()) {
+      itemsList.push({
+        pageNumber: index + 1,
+        title: item.trim(),
+      });
+    } else if (typeof item === 'object' && item !== null) {
+      const itemTitle = item.title || item.name || item.type || item.item || '';
+      if (itemTitle) {
         itemsList.push({
           pageNumber: Number(item.pageNumber || item.page || index + 1),
-          title: String(item.title || item.name || '').trim(),
+          title: String(itemTitle).trim(),
           subtitle: item.subtitle ? String(item.subtitle).trim() : undefined,
         });
       }
-    });
-  } else if (typeof rawItems === 'string' && rawItems.trim()) {
-    itemsList.push({
-      pageNumber: 1,
-      title: rawItems.trim(),
-    });
+    }
+  };
+
+  if (Array.isArray(rawItems)) {
+    rawItems.forEach((item, index) => addParsedItem(item, index));
+  } else if (rawItems) {
+    addParsedItem(rawItems, 0);
   }
 
   return itemsList;
 }
 
 /**
- * শুধুমাত্র চ্যাপ্টার বা পাতার ফাইলগুলো স্ক্যান করে Item/Items সংগ্রাহক হেল্পার।
+ * একটি নির্দিষ্ট বুক ফোল্ডার ও তার সকল সাব-ফোল্ডারের .md ফাইল স্ক্যান করে Item সংগ্রহের হেল্পার
  */
 export function collectChapterItemsDeep(bookFolderPath: string): string[] {
   const itemsSet = new Set<string>();
@@ -182,8 +186,6 @@ export function collectChapterItemsDeep(bookFolderPath: string): string[] {
         if (entry.isDirectory()) {
           scanDir(fullPath);
         } else if (entry.isFile() && entry.name.endsWith('.md')) {
-          if (entry.name.toLowerCase() === 'index.md') continue;
-
           try {
             const fileContent = readFileSync(fullPath, 'utf8');
             const { data: fileData } = matter(fileContent);
@@ -199,8 +201,65 @@ export function collectChapterItemsDeep(bookFolderPath: string): string[] {
     };
     scanDir(bookFolderPath);
   } catch {
-    // ফাইল ট্রাভার্সাল এরর ইগনোর
+    // ইগনোর
   }
 
+  return Array.from(itemsSet);
+}
+
+/**
+ * 🟢 মূল গ্লোবাল ফাংশন: পুরো app/content/books ফোল্ডার, সাব-ফোল্ডার ও গ্র্যান্ড-সাবফোল্ডারের
+ * সমস্ত .md ফাইল রিকার্সিভলি স্ক্যান করে অনন্য (Unique) আইটেমের নাম এক্সট্র্যাক্ট করে।
+ */
+export function getAllExtractedItems(authorSlug?: string): string[] {
+  let targetDir = BOOKS_DIRECTORY;
+  if (!existsSync(targetDir) && existsSync(ALTERNATE_BOOKS_DIRECTORY)) {
+    targetDir = ALTERNATE_BOOKS_DIRECTORY;
+  }
+
+  if (!existsSync(targetDir)) return [];
+
+  const itemsSet = new Set<string>();
+
+  const scanRecursive = (dirPath: string) => {
+    const entries = readdirSync(dirPath, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const fullPath = path.join(dirPath, entry.name);
+
+      if (entry.isDirectory()) {
+        scanRecursive(fullPath);
+      } else if (entry.isFile() && entry.name.endsWith('.md')) {
+        try {
+          const fileContent = readFileSync(fullPath, 'utf8');
+          const { data: frontmatter } = matter(fileContent);
+
+          // নির্দিষ্ট লেখকের ফিল্টারিং (যদি ফিল্টার দেওয়া থাকে)
+          if (authorSlug && authorSlug !== 'library') {
+            const fileAuthor =
+              frontmatter.authorSlug ||
+              frontmatter.author_slug ||
+              frontmatter.author;
+            if (
+              fileAuthor &&
+              String(fileAuthor).toLowerCase() !== String(authorSlug).toLowerCase()
+            ) {
+              continue;
+            }
+          }
+
+          // আইটেম এক্সট্র্যাক্ট করা
+          const extracted = extractItemsFromData(frontmatter);
+          extracted.forEach((item) => {
+            if (item.title) itemsSet.add(item.title);
+          });
+        } catch {
+          // ইগনোর
+        }
+      }
+    }
+  };
+
+  scanRecursive(targetDir);
   return Array.from(itemsSet);
 }

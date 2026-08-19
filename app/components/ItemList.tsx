@@ -7,23 +7,25 @@ import matter from "gray-matter";
 import { getItemSlug, ITEM_REGISTRY } from "@/app/lib/content/core/registry";
 import ItemListView from "./ItemListView";
 
-// ১. index.md বা index.mdx ছাড়া সব কন্টেন্ট ফাইল রিকার্সিভলি খুঁজে বের করা
+// ডিরেক্টরি পাথ সেটিংস
+const PRIMARY_CONTENT_DIR = path.join(process.cwd(), "content");
+const ALTERNATE_CONTENT_DIR = path.join(process.cwd(), "app/content");
+
+/**
+ * রিকার্সিভলি সব .md এবং .mdx ফাইল খুঁজে বের করার হেল্পার
+ */
 const getAllContentFiles = (dirPath: string, arrayOfFiles: string[] = []): string[] => {
   if (!fs.existsSync(dirPath)) return arrayOfFiles;
 
-  const files = fs.readdirSync(dirPath);
+  const entries = fs.readdirSync(dirPath, { withFileTypes: true });
 
-  files.forEach((file) => {
-    const fullPath = path.join(dirPath, file);
-    if (fs.statSync(fullPath).isDirectory()) {
+  entries.forEach((entry) => {
+    const fullPath = path.join(dirPath, entry.name);
+    if (entry.isDirectory()) {
       arrayOfFiles = getAllContentFiles(fullPath, arrayOfFiles);
-    } else {
-      const fileName = file.toLowerCase();
-      // 🟢 index.md বা index.mdx ফাইল বাদ দিয়ে বাকি সব .md/.mdx ফাইল নেওয়া
-      if (
-        (fileName.endsWith(".md") || fileName.endsWith(".mdx")) &&
-        !fileName.startsWith("index.")
-      ) {
+    } else if (entry.isFile()) {
+      const fileName = entry.name.toLowerCase();
+      if (fileName.endsWith(".md") || fileName.endsWith(".mdx")) {
         arrayOfFiles.push(fullPath);
       }
     }
@@ -32,12 +34,53 @@ const getAllContentFiles = (dirPath: string, arrayOfFiles: string[] = []): strin
   return arrayOfFiles;
 };
 
-// ২. প্রতিটি স্বতন্ত্র কন্টেন্ট ফাইলের Frontmatter থেকে আইটেম এক্সট্র্যাক্ট করা
-const getProcessedItems = cache(async (authorSlug?: string) => {
-  // আপনার কন্টেন্ট বা বইয়ের ফাইল যেখানে থাকে (যেমন: 'content' বা 'data')
-  const contentDirectory = path.join(process.cwd(), "content");
-  const allFilePaths = getAllContentFiles(contentDirectory);
+/**
+ * ফ্রন্টম্যাটার ডাটা থেকে স্ট্রিং বা অবজেক্ট থেকে আইটেমের নাম বের করার হেল্পার
+ */
+const extractRawItemsFromFrontmatter = (frontmatter: Record<string, any>): string[] => {
+  const rawItems: string[] = [];
 
+  const parseItemValue = (value: any) => {
+    if (typeof value === "string" && value.trim()) {
+      rawItems.push(value.trim());
+    } else if (typeof value === "object" && value !== null) {
+      const title = value.title || value.name || value.item || value.type;
+      if (typeof title === "string" && title.trim()) {
+        rawItems.push(title.trim());
+      }
+    }
+  };
+
+  // সম্ভাব্য সকল ফিল্ড চেক করা
+  const candidateFields = [
+    frontmatter.item,
+    frontmatter.items,
+    frontmatter.itemTypes,
+    frontmatter.subPages,
+    frontmatter.pages,
+  ];
+
+  candidateFields.forEach((field) => {
+    if (Array.isArray(field)) {
+      field.forEach(parseItemValue);
+    } else if (field) {
+      parseItemValue(field);
+    }
+  });
+
+  return rawItems;
+};
+
+/**
+ * সকল ফাইল প্রসেস করে আইটেম এক্সট্র্যাক্ট ও প্রসেস করা
+ */
+const getProcessedItems = cache(async (authorSlug?: string) => {
+  let contentDirectory = PRIMARY_CONTENT_DIR;
+  if (!fs.existsSync(contentDirectory) && fs.existsSync(ALTERNATE_CONTENT_DIR)) {
+    contentDirectory = ALTERNATE_CONTENT_DIR;
+  }
+
+  const allFilePaths = getAllContentFiles(contentDirectory);
   const itemMap = new Map<string, { label: string; slug: string; count: number }>();
 
   allFilePaths.forEach((filePath) => {
@@ -51,31 +94,21 @@ const getProcessedItems = cache(async (authorSlug?: string) => {
           frontmatter.authorSlug ||
           frontmatter.author_slug ||
           frontmatter.author;
+
         if (
           !fileAuthor ||
           String(fileAuthor).toLowerCase() !== String(authorSlug).toLowerCase()
         ) {
-          return; // অন্য লেখকের ফাইল হলে স্কিপ করা
+          return; // অন্য লেখকের ফাইল হলে স্কিপ
         }
       }
 
-      // 🟢 কেবল আইটেমের ফিল্ডগুলো পার্স করা (জঁরা বা ক্যাটাগরি বাদ)
-      const rawItems: string[] = [];
+      const rawItems = extractRawItemsFromFrontmatter(frontmatter);
 
-      if (typeof frontmatter.item === "string") rawItems.push(frontmatter.item);
-      if (typeof frontmatter.items === "string") rawItems.push(frontmatter.items);
-      if (Array.isArray(frontmatter.items)) rawItems.push(...frontmatter.items);
-      if (Array.isArray(frontmatter.itemTypes)) rawItems.push(...frontmatter.itemTypes);
-
-      // সংগৃহীত আইটেম ফিল্টার ও কাউন্ট
-      rawItems.forEach((rawItem) => {
-        if (!rawItem || typeof rawItem !== "string") return;
-        const cleanItem = rawItem.trim();
-        if (!cleanItem) return;
-
+      rawItems.forEach((cleanItem) => {
         const slug = getItemSlug(cleanItem);
 
-        // রেজিস্ট্রি চেক বা ফলব্যাক
+        // রেজিস্ট্রি থেকে মেটাডাটা নেওয়া (যদি থাকে)
         const meta = ITEM_REGISTRY[slug] || ITEM_REGISTRY[cleanItem.toLowerCase()];
         const finalSlug = meta?.slug || slug || cleanItem.toLowerCase();
         const finalLabel = meta?.name || cleanItem;
@@ -91,8 +124,8 @@ const getProcessedItems = cache(async (authorSlug?: string) => {
           });
         }
       });
-    } catch (e) {
-      // ফাইল রিড করতে সমস্যা হলে স্কিপ করা
+    } catch {
+      // ফাইল রিড ট্রাই-ক্যাচ ইগনোর
     }
   });
 
