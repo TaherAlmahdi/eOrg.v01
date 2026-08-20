@@ -139,6 +139,7 @@ export interface Book extends SeriesBaseProperties, TaxonomyProperties {
   prevLabel?: string;
   nextLink?: string;
   nextLabel?: string;
+  [key: string]: any;
 }
 
 export interface BookDetail extends Book {
