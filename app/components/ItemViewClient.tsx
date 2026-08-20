@@ -24,14 +24,33 @@ const extractFieldText = (field: any, fallback: string = "—"): string => {
   return fallback;
 };
 
-export default function ItemViewClient({ initialItems, displayTitle }: any) {
+// টাইপস্ক্রিপ্ট এরর এড়াতে ইন্ডেক্স সিগনেচারসহ ইন্টারফেস ডিফাইন করা হলো
+interface ItemType {
+  title?: any;
+  bookTitle?: any;
+  book?: any;
+  author?: any;
+  href?: string;
+  bookHref?: string;
+  bookSlug?: string;
+  authorHref?: string;
+  authorSlug?: string;
+  [key: string]: any;
+}
+
+interface ItemViewClientProps {
+  initialItems: ItemType[];
+  displayTitle: string;
+}
+
+export default function ItemViewClient({ initialItems, displayTitle }: ItemViewClientProps) {
   const [search, setSearch] = useState("");
   const [selectedLetter, setSelectedLetter] = useState<string | null>(null);
 
   // ১. ইউনিক আদ্যক্ষর (Alphabet) তালিকা তৈরি যা দিয়ে বর্ণানুক্রমিক ফিল্টার হবে
   const availableLetters = useMemo(() => {
     const lettersSet = new Set<string>();
-    initialItems.forEach((item: any) => {
+    initialItems.forEach((item) => {
       const title = extractFieldText(item.title);
       if (title && title !== "—" && title !== "শিরোনামহীন") {
         const firstChar = title.trim().charAt(0);
@@ -46,7 +65,7 @@ export default function ItemViewClient({ initialItems, displayTitle }: any) {
 
   // ২. সার্চ ও বর্ণানুক্রমিক ফিল্টারিং লজিক
   const filtered = useMemo(() => {
-    return initialItems.filter((item: any) => {
+    return initialItems.filter((item) => {
       const titleText = extractFieldText(item.title);
       const bookText = extractFieldText(item.bookTitle || item.book);
       const authorText = extractFieldText(item.author);
@@ -143,7 +162,7 @@ export default function ItemViewClient({ initialItems, displayTitle }: any) {
       ) : (
         /* রেসপন্সিভ গ্রিড: মোবাইলে ১ কলাম, ল্যাপটপে ২ কলাম, বড় স্ক্রিনে (২০ ইঞ্চি+) ৩ কলাম */
         <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-2">
-          {filtered.map((item: any, idx: number) => {
+          {filtered.map((item, idx) => {
             const titleText = extractFieldText(item.title, "শিরোনামহীন");
             const titleHref = item.href || "#";
 
