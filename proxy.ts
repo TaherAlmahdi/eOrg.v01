@@ -66,7 +66,7 @@ export default function proxy(request: NextRequest) {
 
   if (!ALLOWED_SUBDOMAINS.has(subdomain)) {
     const protocol = request.headers.get('x-forwarded-proto') || 'https';
-    return NextResponse.redirect(`${protocol}://www.eduliter.org/`, 307);
+    return NextResponse.redirect(`${protocol}://www.eduliture.org/`, 307);
   }
 
   const requestHeaders = new Headers(request.headers);
@@ -98,7 +98,7 @@ export default function proxy(request: NextRequest) {
       url.pathname = `/subdomains/library${pathname === '/' ? '' : pathname}`;
     }
   } else {
-    // লেখক সাবডোমেন (যেমন: vidyasagar.eduliter.org/items)
+    // লেখক সাবডোমেন (যেমন: vidyasagar.eduliture.org/items)
     if (pathname.startsWith('/authors')) {
       url.pathname = '/404';
     } else if (!pathname.startsWith('/subdomains/author')) {

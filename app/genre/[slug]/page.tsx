@@ -1,47 +1,79 @@
+// app/genre/[slug]/page.tsx
+
+import React from 'react';
 import { headers } from 'next/headers';
 import type { Metadata } from 'next';
-import { getSubdomainData } from '@/app/lib/get-site-data';
+import { getLibraryBooks } from '@/app/lib/books';
+import { getSubdomainData, buildTabTitle } from '@/app/lib/get-site-data';
 import { getGenreTitle } from '@/app/lib/content/core/registry';
-import GenreView from '@/app/components/GenreView';
+import BooksPageClient, { Book } from '@/app/books/BooksPageClient';
 
-interface PageProps {
+type Props = {
   params: Promise<{ slug: string }>;
-}
+};
 
-// 🔹 ডায়নামিক ট্যাব টাইটেল
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const decodedSlug = decodeURIComponent(slug).toLowerCase();
-
-  // ১. রেজিস্ট্রি থেকে বাংলা জনরার নাম বের করা (যেমন: novel -> উপন্যাস)
   const targetBengaliGenre = getGenreTitle(decodedSlug) || slug;
 
-  // ২. হোস্ট থেকে ডায়নামিক সাইটের নাম বের করা
   const headersList = await headers();
   const host = headersList.get('host');
   const siteData = getSubdomainData(host);
   const siteName = siteData?.title || 'এডুলিচার';
 
-  // ❀ সেপারেটর ব্যবহার করে ৩ স্তরের ফুল টাইটেল গঠন
-  const pageTitle = `${targetBengaliGenre} ❀ গ্রন্থাগার ❀ ${siteName}`;
+  const pageTitle = buildTabTitle({
+    currentPageTitle: targetBengaliGenre,
+    siteName,
+  });
 
   return {
     title: pageTitle,
-    openGraph: {
-      title: pageTitle,
-    },
-    twitter: {
-      title: pageTitle,
-    },
+    openGraph: { title: pageTitle },
+    twitter: { title: pageTitle },
   };
 }
 
-export default async function GenrePage({ params }: PageProps) {
+export default async function GenrePage({ params }: Props) {
   const { slug } = await params;
+  const decodedSlug = slug.toLowerCase();
 
-  const headersList = await headers();
-  const host = headersList.get('host');
+  const headerList = await headers();
+  const subdomain = headerList.get('x-subdomain') || '';
+  const host = headerList.get('host');
   const siteData = getSubdomainData(host);
+  const siteTitle = siteData?.title || 'এডুলিচার';
+  
+  const targetBengaliGenre = getGenreTitle(decodedSlug) || slug;
+  const targetStr = String(targetBengaliGenre).trim().toLowerCase();
 
-  return <GenreView slug={slug} authorSlug={siteData.subdomain} />;
+  const { latestBooks } = await getLibraryBooks();
+
+  // ফিল্টারিং লজিক (১. লেখক সাবডোমেন এবং ২. ঘরানা)
+  const filteredBooks = latestBooks.filter((book) => {
+    if (subdomain && subdomain !== 'library' && subdomain !== 'localhost:3000' && subdomain !== 'eduliture') {
+      const bookAuthorSlug = (book as unknown as Record<string, unknown>).authorSlug || book.author;
+      const isMatchingAuthor = String(bookAuthorSlug).trim().toLowerCase() === subdomain.trim().toLowerCase();
+      if (!isMatchingAuthor) return false;
+    }
+
+    const rawGenres = book.genres || (book as unknown as Record<string, unknown>).genre;
+    if (!rawGenres) return false;
+
+    if (Array.isArray(rawGenres)) {
+      return rawGenres.some((g: unknown) => String(g).trim().toLowerCase() === targetStr);
+    }
+    if (typeof rawGenres === 'string') {
+      return String(rawGenres).trim().toLowerCase() === targetStr;
+    }
+    return false;
+  });
+
+  return (
+    <BooksPageClient 
+      initialBooks={filteredBooks as unknown as Book[]} 
+      siteTitle={siteTitle}
+      genreTitle={targetBengaliGenre}
+    />
+  );
 }

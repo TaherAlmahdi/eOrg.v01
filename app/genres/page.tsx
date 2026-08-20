@@ -15,8 +15,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
   if (host.includes('library.eduliture.org') || host.includes('library.')) {
     siteName = 'এডুলিচার পাঠশালা';
-  } else if (host.includes('banglakosh.eduliture.org') || host.includes('banglakosh.')) {
-    siteName = 'বাংলাকোষ';
+  } else if (host.includes('nazrul.eduliture.org') || host.includes('nazrul.')) {
+    siteName = 'নজরুল রচনাবলী';
   }
 
   const dynamicMetaTitle = buildTabTitle({

@@ -124,7 +124,7 @@ export default function ItemListView({
             <Search className="absolute w-5 h-5 text-teal-600 -translate-y-1/2 left-3 top-1/2" />
             <input
               type="text"
-              placeholder="আইটেমের নাম দিয়ে খুঁজুন..."
+              placeholder="প্রকরণ খুঁজুন..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-teal-200 rounded focus:outline-none focus:ring-2 focus:ring-[#008080] font-tarunima text-sm bg-teal-50/30 text-gray-800"
