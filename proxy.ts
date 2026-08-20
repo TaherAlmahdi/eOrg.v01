@@ -3,8 +3,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-
-
 const ALLOWED_SUBDOMAINS = new Set([
   'library',
   'vidyasagar',
@@ -55,10 +53,10 @@ export default function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // ৩. মূল ডোমেনে (মেইন ডোমেন) যদি /items কল করা হয় এবং আপনি সেখানে দেখাইতে না চান
+  // ৩. মূল ডোমেনে (মেইন ডোমেন) যদি /items কল করা হয় এবং আপনি সেখানে দেখাইতে না চান
   if (!subdomain) {
-    if (pathname.startsWith('/items')) {
-      url.pathname = '/404'; // মেইন ডোমেনে /items কল করলে 404 দেখাবে
+    if (pathname.startsWith('/items') || pathname.startsWith('/item')) {
+      url.pathname = '/404'; // মেইন ডোমেনে কল করলে 404 দেখাবে
       return NextResponse.rewrite(url);
     }
     return NextResponse.next();
@@ -73,22 +71,43 @@ export default function proxy(request: NextRequest) {
   requestHeaders.set('x-subdomain', subdomain);
   url.searchParams.set('subdomain', subdomain);
 
-  // 🔴 গ্লোবাল বাইপাস থেকে /items বাদ দেওয়া হয়েছে
+  // 🔴 লাইব্রেরি সাবডোমেনের জন্য /items এবং /item কে সুনির্দিষ্টভাবে হ্যান্ডেল করা
+  if (subdomain === 'library') {
+    if (pathname.startsWith('/items') || pathname.startsWith('/item')) {
+      if (!pathname.startsWith('/subdomains/library')) {
+        url.pathname = `/subdomains/library${pathname}`;
+        return NextResponse.rewrite(url, {
+          request: { headers: requestHeaders },
+        });
+      }
+    }
+  }
+
+  // গ্লোবাল বাইপাস রুটসমূহ
   const globalBypassRoutes = [
     '/about', 
     '/biography', 
-    '/genres', 
+    '-genres', 
     '/books', 
-    '/book'
+    '/book',
+    '/items',
+    '/item'
   ];
 
   if (globalBypassRoutes.some(route => pathname.startsWith(route))) {
+    if (subdomain === 'library' && !pathname.startsWith('/subdomains/library')) {
+      url.pathname = `/subdomains/library${pathname}`;
+      return NextResponse.rewrite(url, {
+        request: { headers: requestHeaders },
+      });
+    }
+
     return NextResponse.next({
       request: { headers: requestHeaders },
     });
   }
 
-  // 🟢 ৪. সাবডোমেন অনুযায়ী /items রিরাইট লজিক
+  // 🟢 ৪. সাবডোমেন অনুযায়ী /items বা অন্যান্য রিরাইট লজিক
   if (subdomain === 'library') {
     if (pathname.startsWith('/authors')) {
       return NextResponse.next({ request: { headers: requestHeaders } });

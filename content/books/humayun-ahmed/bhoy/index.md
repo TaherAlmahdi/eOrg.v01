@@ -14,7 +14,7 @@ genre:
   - "পরামনোবিজ্ঞান"
 
 genre_links:
-  - { name: "উপন্যাস", link: "/genre/novel" }
+  - { name: "গল্পগ্রন্থ", link: "/genre/stories" }
   - { name: "পরামনোবিজ্ঞান", link: "/genre/parapsychology" }
 
 series_list:
