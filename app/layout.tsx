@@ -1,18 +1,22 @@
 import fs from 'fs';
 import path from 'path';
 import { headers } from 'next/headers';
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
+import Script from 'next/script';
+import type { Metadata } from 'next';
+import localFont from 'next/font/local';
+import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
+
 import Header from './components/Header';
 import Footer from './components/Footer';
-import { getSubdomainData } from '@/app/lib/get-site-data';
-import type { Metadata } from "next";
-import localFont from 'next/font/local';
-import Script from 'next/script';
 import AOSProvider from './components/AOSProvider';
-import "./globals.css";
+import { getSubdomainData } from '@/app/lib/get-site-data';
 
-// ফন্ট কনফিগারেশন
+import './globals.css';
+
+// ==========================================
+// 🖋️ Local Fonts Configuration
+// ==========================================
 const mallika = localFont({
   src: '../public/fonts/Mallika.woff2',
   variable: '--font-mallika',
@@ -34,12 +38,11 @@ const tarunima = localFont({
   preload: true,
 });
 
-export async function generateMetadata(): Promise<Metadata> {
-  const headersList = await headers();
-  const host = headersList.get('host') || '';
-
-  // ১. ডোমেন থেকে সাবডোমেন আলাদা করা
-  const hostname = host.split(':')[0]; // পোর্ট সরাতে (e.g. localhost:3000 -> localhost)
+// ==========================================
+// 🛠️ Helper Functions
+// ==========================================
+function parseDomainContext(host: string) {
+  const hostname = host.split(':')[0];
   const parts = hostname.split('.');
 
   const isSubdomain =
@@ -47,32 +50,43 @@ export async function generateMetadata(): Promise<Metadata> {
     (hostname.includes('localhost') && parts.length > 1 && parts[0] !== 'localhost');
 
   const subdomain = isSubdomain ? parts[0] : null;
+  const domainKey = subdomain || 'main';
 
-  // ২. সাবডোমেন অনুযায়ী আইকনের পাথ নির্ধারণ
-  let iconPath = '/favicon.ico'; // মূল ডোমেনের জন্য ডিফল্ট app/favicon.ico
+  return { hostname, subdomain, domainKey };
+}
 
-  if (subdomain) {
-    const targetIconName = `${subdomain}.ico`;
-    const localFilePath = path.join(process.cwd(), 'public', 'favicon', targetIconName);
+function getSubdomainFavicon(subdomain: string | null): string {
+  if (!subdomain) return '/favicon.ico';
 
-    if (fs.existsSync(localFilePath)) {
-      iconPath = `/favicon/${targetIconName}`;
-    } else {
-      const defaultSubPath = path.join(process.cwd(), 'public', 'favicon', 'default.ico');
-      iconPath = fs.existsSync(defaultSubPath) ? '/favicon/default.ico' : '/favicon.ico';
-    }
+  const targetIconName = `${subdomain}.ico`;
+  const localFilePath = path.join(process.cwd(), 'public', 'favicon', targetIconName);
+
+  if (fs.existsSync(localFilePath)) {
+    return `/favicon/${targetIconName}`;
   }
 
-  // ৩. সাবডোমেন অনুযায়ী ডাটাবেজ/কনফিগ থেকে সাইটের ডাটা আনা
-  const siteData = getSubdomainData(host);
-  const siteUrl = host ? `https://${host}` : (process.env.NEXT_PUBLIC_SITE_URL || 'https://eduliture.org');
+  const defaultSubPath = path.join(process.cwd(), 'public', 'favicon', 'default.ico');
+  return fs.existsSync(defaultSubPath) ? '/favicon/default.ico' : '/favicon.ico';
+}
 
-  // ৪. ডায়নামিক টাইটেল, ডেসক্রিপশন ও OG ইমেজের ইউআরএল সেট করা
+// ==========================================
+// 🏷️ Metadata Generation
+// ==========================================
+export async function generateMetadata(): Promise<Metadata> {
+  const headersList = await headers();
+  const host = headersList.get('host') || '';
+
+  const { subdomain } = parseDomainContext(host);
+  const iconPath = getSubdomainFavicon(subdomain);
+
+  const siteData = getSubdomainData(host);
+  const siteUrl = host ? `https://${host}` : process.env.NEXT_PUBLIC_SITE_URL || 'https://eduliture.org';
+
   const defaultTitle = siteData?.title || 'এডুলিচার';
   const mainDomainTitle = 'এডুলিচার';
-  const dynamicTitle = subdomain ? `${defaultTitle}` : `${mainDomainTitle} ❀ বিশুদ্ধজ্ঞানের প্রত্যয়`;
+  const dynamicTitle = subdomain ? defaultTitle : `${mainDomainTitle} ❀ বিশুদ্ধজ্ঞানের প্রত্যয়`;
 
-  // Dynamic OG Image Fallback Processing
+  // Dynamic OG Image Fallback
   const ogTitleParam = encodeURIComponent(defaultTitle);
   const ogTaglineParam = encodeURIComponent('শিক্ষা, সাহিত্য ও সংস্কৃতি বিষয়ক বিশুদ্ধজ্ঞান প্ল্যাটফর্ম');
   const dynamicGeneratedOg = `${siteUrl}/api/og?title=${ogTitleParam}&tagline=${ogTaglineParam}`;
@@ -80,7 +94,6 @@ export async function generateMetadata(): Promise<Metadata> {
   const ogImageUrl = siteData?.ogImage || dynamicGeneratedOg;
   const siteDescription = siteData?.description || `${defaultTitle} ❀ শিক্ষা, সাহিত্য ও সংস্কৃতি বিষয়ক বিশুদ্ধজ্ঞান প্ল্যাটফর্ম`;
 
-  // ৫. SEO, Metadata & Open Graph সম্পূর্ণ কনফিগারেশন
   return {
     title: {
       template: '%s ❀ এডুলিচার',
@@ -89,7 +102,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: siteDescription,
     metadataBase: new URL(siteUrl),
     alternates: {
-      canonical: siteUrl, // 🔹 Canonical URL
+      canonical: siteUrl,
     },
     robots: {
       index: true,
@@ -132,6 +145,9 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+// ==========================================
+// 🏛️ Root Layout
+// ==========================================
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -139,17 +155,7 @@ export default async function RootLayout({
 }>) {
   const headersList = await headers();
   const host = headersList.get('host') || '';
-  const hostname = host.split(':')[0];
-  const parts = hostname.split('.');
-
-  // ডাইনামিকভাবে সাবডোমেন বা ডোমেন কি এক্সট্র্যাক্ট করা
-  let currentDomainKey = 'main';
-
-  if (parts.length > 2 && parts[0] !== 'www') {
-    currentDomainKey = parts[0];
-  } else if (parts.length === 2 && hostname.includes('localhost') && parts[0] !== 'localhost') {
-    currentDomainKey = parts[0];
-  }
+  const { domainKey } = parseDomainContext(host);
 
   return (
     <html
@@ -158,16 +164,27 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        {/* গুগল অ্যাডসেন্স */}
+        {/* AdSense Standard Script */}
         <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5551708286100565"
           crossOrigin="anonymous"
         />
+      </head>
+      <body className="min-h-full flex flex-col bg-[#fdfdf7] text-gray-900 font-tarunima">
+        <AOSProvider />
 
-        {/* Google tag (gtag.js) */}
+        <Header domainKey={domainKey} />
+
+        <main className="grow">{children}</main>
+
+        <Footer />
+
+        <Analytics />
+        <SpeedInsights />
+
+        {/* Google Analytics Script via Next.js Script Strategy */}
         <Script
-          async
           src="https://www.googletagmanager.com/gtag/js?id=G-MYTW1KXYEG"
           strategy="afterInteractive"
         />
@@ -176,24 +193,9 @@ export default async function RootLayout({
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-
             gtag('config', 'G-MYTW1KXYEG');
           `}
         </Script>
-      </head>
-      <body className="min-h-full flex flex-col bg-[#fdfdf7] text-gray-900 font-tarunima">
-        <AOSProvider />
-
-        {/* ডাইনামিক ডোমেন কি প্রপ্স হিসেবে পাস করা হলো */}
-        <Header domainKey={currentDomainKey} />
-
-        <main className="grow">
-          {children}
-        </main>
-
-        <Footer />
-        <Analytics />
-        <SpeedInsights />
       </body>
     </html>
   );

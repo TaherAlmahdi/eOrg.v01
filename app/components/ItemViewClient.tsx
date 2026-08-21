@@ -1,7 +1,8 @@
 'use client';
+
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
-import { Search, Home, ChevronLeft } from "lucide-react";
+import { Search, Home } from "lucide-react";
 
 // বাংলা ও ইউনিকোড নরমালাইজেশন (স্মার্ট সার্চের জন্য)
 const normalizeBengali = (text: string = ''): string => {
@@ -15,6 +16,20 @@ const normalizeBengali = (text: string = ''): string => {
     .toLowerCase()
     .replace(/\s+/g, '')
     .trim();
+};
+
+/**
+ * স্ট্রিপিং ও ইউআরএল বান্ধব স্লাগ তৈরির ফাংশন
+ * স্লাগ না থাকলে সরাসরি টাইটেলকে স্লাগে রূপান্তর করবে
+ */
+const slugify = (text: string = ''): string => {
+  if (!text) return '';
+  return text
+    .toString()
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '-') // স্পেসের পরিবর্তে ড্যাশ (-)
+    .replace(/[^\w\u0980-\u09FF\-]/g, ''); // বাংলা ও ইংরেজি অক্ষর এবং ড্যাশ ছাড়া বাকি চিহ্ন রিমুভ
 };
 
 const extractFieldText = (field: any, fallback: string = "—"): string => {
@@ -91,7 +106,7 @@ export default function ItemViewClient({ initialItems, displayTitle }: any) {
     });
   }, [initialItems, search, selectedLetter]);
 
-  useMemo(() => {
+  useEffect(() => {
     setVisibleCount(itemsPerPage);
   }, [search, selectedLetter, itemsPerPage]);
 
@@ -146,8 +161,8 @@ export default function ItemViewClient({ initialItems, displayTitle }: any) {
           <button
             onClick={() => setSelectedLetter(null)}
             className={`px-2 py-1 text-xs font-semibold rounded transition-colors cursor-pointer ${selectedLetter === null
-              ? 'bg-[#008080] text-white shadow-xs'
-              : 'bg-white text-gray-700 hover:bg-teal-100 border border-teal-200'
+                ? 'bg-[#008080] text-white shadow-xs'
+                : 'bg-white text-gray-700 hover:bg-teal-100 border border-teal-200'
               }`}
           >
             সব
@@ -158,8 +173,8 @@ export default function ItemViewClient({ initialItems, displayTitle }: any) {
               key={idx}
               onClick={() => setSelectedLetter(selectedLetter === letter ? null : letter)}
               className={`px-2 py-1 text-xs font-semibold rounded transition-colors cursor-pointer ${selectedLetter === letter
-                ? 'bg-[#008080] text-white shadow-xs'
-                : 'bg-white text-gray-700 hover:bg-teal-100 border border-teal-200'
+                  ? 'bg-[#008080] text-white shadow-xs'
+                  : 'bg-white text-gray-700 hover:bg-teal-100 border border-teal-200'
                 }`}
             >
               {letter}
@@ -177,16 +192,14 @@ export default function ItemViewClient({ initialItems, displayTitle }: any) {
           {/* রেসপন্সিভ গ্রিড */}
           <div className="grid grid-cols-1 md:grid-cols-3 2xl:grid-cols-4 gap-1">
             {currentItems.map((item: any, idx: number) => {
-              const titleText = extractFieldText(item.title, "শিরোনামহীন");
+              const itemTitle = extractFieldText(item.title, "শিরোনামহীন");
+              const bookTitle = extractFieldText(item.bookTitle || item.book, "—");
+              const authorName = extractFieldText(item.author, "—");
 
-              // সিঙ্গেল আইটেমের জন্য ইউআরএল ফরম্যাট নির্ধারণ (যেমন: /item/story/chokh)
-              const titleHref = item.slug ? `/item/${item.slug}` : (item.href || "#");
-
-              const bookText = extractFieldText(item.bookTitle || item.book, "—");
-              const bookHref = item.bookHref || (item.bookSlug ? `/book/${item.bookSlug}` : "#");
-
-              const authorText = extractFieldText(item.author, "—");
-              const authorHref = item.authorHref || (item.authorSlug ? `/author/${item.authorSlug}` : "#");
+              // যদি slug দেওয়া না থাকে, তবে সরাসরি title কে slugify করে ব্যবহার করা হবে
+              const itemSlug = item.slug ? item.slug : slugify(itemTitle);
+              const bookSlug = item.bookSlug ? item.bookSlug : slugify(bookTitle);
+              const authorSlug = item.authorSlug ? item.authorSlug : slugify(authorName);
 
               return (
                 <div key={idx} className="bg-white border border-teal-100 rounded p-2 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-center">
@@ -194,53 +207,49 @@ export default function ItemViewClient({ initialItems, displayTitle }: any) {
                   {/* ১. ডেস্কটপ ভিউ */}
                   <div className="hidden md:flex items-center flex-wrap gap-x-2 text-base">
                     <Link
-                      href={titleHref}
+                      href={`/item/${itemSlug}`}
                       className="font-bold text-[#008080] hover:text-[#cc7a00] no-underline transition-colors"
                     >
-                      {titleText}
+                      {itemTitle}
                     </Link>
                     <span className="text-gray-300">|</span>
-                    {bookHref !== "#" ? (
-                      <Link href={bookHref} className="text-teal-700 hover:text-[#cc7a00] no-underline transition-colors">
-                        {bookText}
-                      </Link>
-                    ) : (
-                      <span className="text-gray-600">{bookText}</span>
-                    )}
+                    <Link
+                      href={`/book/${bookSlug}`}
+                      className="text-teal-700 hover:text-[#cc7a00] no-underline transition-colors"
+                    >
+                      {bookTitle}
+                    </Link>
                     <span className="text-gray-300">|</span>
-                    {authorHref !== "#" ? (
-                      <Link href={authorHref} className="text-gray-600 hover:text-[#cc7a00] no-underline transition-colors">
-                        {authorText}
-                      </Link>
-                    ) : (
-                      <span className="text-gray-600">{authorText}</span>
-                    )}
+                    <Link
+                      href={`/author/${authorSlug}`}
+                      className="text-gray-600 hover:text-[#cc7a00] no-underline transition-colors"
+                    >
+                      {authorName}
+                    </Link>
                   </div>
 
                   {/* ২. মোবাইল ভিউ */}
                   <div className="flex md:hidden flex-col space-y-2">
                     <Link
-                      href={titleHref}
+                      href={`/item/${itemSlug}`}
                       className="text-base font-bold text-[#008080] hover:text-[#cc7a00] transition-colors"
                     >
-                      {titleText}
+                      {itemTitle}
                     </Link>
                     <div className="flex items-center flex-wrap gap-x-2 text-xs text-gray-600 pt-1 border-t border-gray-100">
-                      {bookHref !== "#" ? (
-                        <Link href={bookHref} className="text-teal-700 hover:text-[#cc7a00] no-underline transition-colors">
-                          {bookText}
-                        </Link>
-                      ) : (
-                        <span>{bookText}</span>
-                      )}
+                      <Link
+                        href={`/book/${bookSlug}`}
+                        className="text-teal-700 hover:text-[#cc7a00] no-underline transition-colors"
+                      >
+                        {bookTitle}
+                      </Link>
                       <span className="text-gray-300">|</span>
-                      {authorHref !== "#" ? (
-                        <Link href={authorHref} className="hover:text-[#cc7a00] no-underline transition-colors">
-                          {authorText}
-                        </Link>
-                      ) : (
-                        <span>{authorText}</span>
-                      )}
+                      <Link
+                        href={`/author/${authorSlug}`}
+                        className="hover:text-[#cc7a00] no-underline transition-colors"
+                      >
+                        {authorName}
+                      </Link>
                     </div>
                   </div>
 
