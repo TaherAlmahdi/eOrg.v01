@@ -230,7 +230,7 @@ function ItemTOC({
           return (
             <li key={itemSlug}>
               <Link
-                href={`/${itemSlug}`}
+                href={`/item/${itemSlug}`}
                 className={`block px-2 py-1 rounded transition-colors truncate ${isCurrent
                   ? 'bg-[#008080] text-white font-semibold'
                   : 'text-gray-700 hover:bg-orange-50 hover:text-red-900'
@@ -409,12 +409,12 @@ export default async function SingleItemPage({ params, searchParams }: PageProps
   if (currentPageNum > 1) {
     const prevPageNum = currentPageNum - 1;
     const prevPageObj = splitPages[prevPageNum - 1];
-    prevActionLink = prevPageNum === 1 ? `/${effectiveSlug}` : `/${effectiveSlug}/${prevPageNum}`;
+    prevActionLink = prevPageNum === 1 ? `/item/${effectiveSlug}` : `/item/${effectiveSlug}/${prevPageNum}`;
     prevActionLabel = getSubPageLabel(prevPageObj);
   } else if (currentGlobalIndex > 0) {
     // সাব-পেজ না থাকলে বর্ণানুক্রমিক পূর্ববর্তী আইটেম
     const prevItem = sortedItems[currentGlobalIndex - 1];
-    prevActionLink = `/${resolveItemSlug(prevItem, prevItem.title)}`;
+    prevActionLink = `/item/${resolveItemSlug(prevItem, prevItem.title)}`;
     prevActionLabel = prevItem.title;
   }
 
@@ -426,7 +426,7 @@ export default async function SingleItemPage({ params, searchParams }: PageProps
   } else if (currentGlobalIndex !== -1 && currentGlobalIndex < sortedItems.length - 1) {
     // সাব-পেজ না থাকলে বর্ণানুক্রমিক পরবর্তী আইটেম
     const nextItem = sortedItems[currentGlobalIndex + 1];
-    nextActionLink = `/${resolveItemSlug(nextItem, nextItem.title)}`;
+    nextActionLink = `/item/${resolveItemSlug(nextItem, nextItem.title)}`;
     nextActionLabel = nextItem.title;
   }
 
