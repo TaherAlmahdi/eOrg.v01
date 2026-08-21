@@ -71,12 +71,13 @@ interface ItemListViewProps {
   isHomePage?: boolean;
   limit?: number;
   totalItemsCount?: number;
+  slug?: string;
+  slugsArray?: string[];
 }
 
 export default function ItemListView({
-  items,
+  items = [],
   isHomePage = false,
-  totalItemsCount,
 }: ItemListViewProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLetter, setSelectedLetter] = useState("সব");
@@ -94,7 +95,6 @@ export default function ItemListView({
       }
     });
 
-    // বাংলা বর্ণানুক্রমিক সর্টিং (অ, আ, ই ... ক, খ ...)
     const sortedLetters = Array.from(lettersSet).sort((a, b) =>
       a.localeCompare(b, "bn", { sensitivity: "base" })
     );
@@ -139,10 +139,11 @@ export default function ItemListView({
                   type="button"
                   key={letter}
                   onClick={() => setSelectedLetter(letter)}
-                  className={`px-2.5 py-1 text-xs md:text-sm font-semibold rounded transition-colors ${selectedLetter === letter
-                    ? "bg-[#008080] text-white shadow-xs"
-                    : "bg-gray-100 hover:bg-teal-50 text-gray-700 hover:text-[#008080]"
-                    }`}
+                  className={`px-2.5 py-1 text-xs md:text-sm font-semibold rounded transition-colors ${
+                    selectedLetter === letter
+                      ? "bg-[#008080] text-white shadow-xs"
+                      : "bg-gray-100 hover:bg-teal-50 text-gray-700 hover:text-[#008080]"
+                  }`}
                 >
                   {letter}
                 </button>
@@ -152,7 +153,7 @@ export default function ItemListView({
         </div>
       )}
 
-      {/* আইটেম কার্ড গ্রিড (Flex-basis responsive grid) */}
+      {/* আইটেম কার্ড গ্রিড */}
       {filteredItems.length === 0 ? (
         <div className="p-8 text-center text-gray-600 rounded bg-white/80 font-tarunima">
           কোন প্রকরণ পাওয়া যায়নি।

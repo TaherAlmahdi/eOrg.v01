@@ -18,7 +18,14 @@ interface LibraryItem {
   items?: string | string[];
   itemType?: string | string[];
   itemTypeSlug?: string;
-  [key: string]: unknown; // এই লাইনটি ইনডেক্স সিগনেচার এরর দূর করবে
+  slugsArray?: string[];
+  [key: string]: unknown;
+}
+
+interface ItemViewProps {
+  slug: string;
+  authorSlug?: string;
+  slugsArray?: string[]; // ক্যাচ-অল স্লাগ অ্যারে রিসিভ করার জন্য
 }
 
 const extractFieldText = (field: any, fallback: string = "—"): string => {
@@ -48,13 +55,17 @@ const extractItemSlugsFromEntry = (entry: LibraryItem): string[] => {
   }).filter(Boolean);
 };
 
-export default async function ItemView({ slug, authorSlug }: { slug: string; authorSlug?: string }) {
+export default async function ItemView({ slug, authorSlug, slugsArray = [] }: ItemViewProps) {
+  // slugsArray থেকে লেয়ারগুলো আলাদা করে নেওয়া যেতে পারে (যদি প্রয়োজন হয়)
+  // যেমন: slugsArray[0] -> প্রকরণ (category), slugsArray[1] -> মূল আইটেম, slugsArray[2] -> পাতা নম্বর
+  const categoryType = slugsArray.length > 1 ? slugsArray[0] : null;
+
   // টাইপ কাস্টিং করে নিশ্চিত করা হলো যাতে টাইপ কমপ্যাটিবল থাকে
   const allLibraryItems = (await getAllLibraryItems()) as unknown as LibraryItem[];
 
   const rawSlug = decodeURIComponent(slug).trim();
   const targetSlug = getItemSlug(rawSlug);
-  const displayTitle = ITEM_REGISTRY[targetSlug]?.name || rawSlug;
+  const displayTitle = ITEM_REGISTRY[targetSlug]?.name || rawSlug || 'সকল আইটেম';
 
   const filteredItems = allLibraryItems.filter((entry) => {
     if (authorSlug) {
@@ -64,6 +75,14 @@ export default async function ItemView({ slug, authorSlug }: { slug: string; aut
       if (fileAuthorSlug !== authorSlug.toLowerCase()) return false;
     }
 
+    // যদি প্রকরণ বা ক্যাটাগরি থাকে, তবে সেটি ফিল্টারে যুক্ত করতে পারেন
+    if (categoryType && entry.category && entry.category !== categoryType) {
+      return false;
+    }
+
+    // যদি slug খালি থাকে (যেমন /items পেজ), তবে সব আইটেম রিটার্ন করবে
+    if (!targetSlug) return true;
+
     const itemSlugs = extractItemSlugsFromEntry(entry);
     return itemSlugs.includes(targetSlug);
   });
@@ -72,6 +91,7 @@ export default async function ItemView({ slug, authorSlug }: { slug: string; aut
     <ItemViewClient 
       initialItems={filteredItems} 
       displayTitle={displayTitle} 
+      slugsArray={slugsArray}
     />
   );
 }

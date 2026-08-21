@@ -5,28 +5,31 @@ import { ITEM_REGISTRY, getItemSlug } from '@/app/lib/content/core/registry/item
 import { buildTabTitle } from '@/app/lib/get-site-data';
 
 interface PageProps {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug?: string[] }>;
   searchParams: Promise<{ subdomain?: string }>;
 }
 
-// 🔹 ডাইনামিক মেটাডেটা ফাংশন
+// 🔹 ডাইনামিক মেটাডেটা ফাংশন (ক্যাচ-অল স্লাগ সমর্থনসহ)
 export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
   const resolvedParams = await params;
   const resolvedSearchParams = await searchParams;
 
-  const rawSlug = resolvedParams?.slug ? decodeURIComponent(resolvedParams.slug).trim() : '';
-  const targetSlug = getItemSlug(rawSlug);
-  const displayTitle = ITEM_REGISTRY[targetSlug]?.name || rawSlug || 'তালিকা';
+  const slugs = resolvedParams?.slug || [];
+  
+  // স্লাগ অ্যারে থেকে প্রাসঙ্গিক অংশ নির্ধারণ (যেমন: /items/story/chokh হলে শেষ অংশ বা প্রধান স্লাগ)
+  const rawSlug = slugs.length > 0 ? decodeURIComponent(slugs[slugs.length - 1]).trim() : '';
+  
+  const registeredSlug = getItemSlug(rawSlug);
+  const targetSlug = registeredSlug || rawSlug;
+  const displayTitle = ITEM_REGISTRY[targetSlug]?.name || rawSlug || 'সকল আইটেম';
 
   const headersList = await headers();
   const host = headersList.get('host') || '';
   const headerSubdomain = headersList.get('x-subdomain');
 
   const subdomain = resolvedSearchParams?.subdomain || headerSubdomain;
-  // যদি রাউট বা প্যারাম থেকে authorSlug পাওয়া না যায়, সাবডোমেন চেক করা হচ্ছে
   const authorSlug = (subdomain && subdomain !== 'library' ? subdomain : undefined);
 
-  // সাবডোমেন বা হোস্টনেম অনুযায়ী সাইটের নাম ঠিক করার লজিক
   let siteName = 'এডুলিচার';
 
   if (host.includes('library.eduliture.org') || host.includes('library.') || subdomain === 'library') {
@@ -48,13 +51,27 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
   };
 }
 
-export default async function ItemTypePage({ params }: PageProps) {
+export default async function ItemsCatchAllPage({ params }: PageProps) {
   const resolvedParams = await params;
-  const slug = resolvedParams?.slug ? decodeURIComponent(resolvedParams.slug).trim() : '';
+  const slugs = resolvedParams?.slug || [];
+
+  // ১. যদি শুধু /items হয় (কোনো স্লাগ নেই)
+  if (slugs.length === 0) {
+    return (
+      <div className="py-0">
+        <ItemView slug="" slugsArray={slugs} />
+      </div>
+    );
+  }
+
+  // ২. নির্দিষ্ট প্রকরণ, বই বা সাব-পেজের ক্ষেত্রে স্লাগ প্রসেসিং
+  const rawSlug = decodeURIComponent(slugs[slugs.length - 1]).trim();
+  const registeredSlug = getItemSlug(rawSlug);
+  const finalSlug = registeredSlug || rawSlug;
 
   return (
     <div className="py-0">
-      <ItemView slug={slug} />
+      <ItemView slug={finalSlug} slugsArray={slugs} />
     </div>
   );
 }

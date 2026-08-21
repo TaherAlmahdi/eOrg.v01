@@ -1,5 +1,9 @@
+import { EventEmitter } from 'events';
 import type { NextConfig } from "next";
 import withPWAInit from "@ducanh2912/next-pwa";
+
+// ইভেন্ট লিসেনার লিমিট বাড়িয়ে MaxListenersExceededWarning দূর করা হলো
+EventEmitter.defaultMaxListeners = 25;
 
 const withPWA = withPWAInit({
   dest: "public",
