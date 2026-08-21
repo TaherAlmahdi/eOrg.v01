@@ -3,10 +3,10 @@
 import type { FC } from "react";
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { 
-  BookOpen, Search, BookMarked, Bookmark, Feather, Scroll, Layers, 
-  FileText, Languages, Laugh, BookText, Compass, History, GraduationCap, 
-  Music, Flame, MoonStar, Cross, Sun, Flower2 
+import {
+  BookOpen, Search, BookMarked, Bookmark, Feather, Scroll, Layers,
+  FileText, Languages, Laugh, BookText, Compass, History, GraduationCap,
+  Music, Flame, MoonStar, Cross, Sun, Flower2
 } from "lucide-react";
 
 // ১. Lucide icons mapping
@@ -115,7 +115,7 @@ export const GenreListView: FC<GenreListViewProps> = ({
   }, [genres, searchQuery, selectedLetter, isHomePage]);
 
   return (
-    <div className="w-full px-0"> 
+    <div className="w-full px-0">
       {!isHomePage && (
         <div className="p-4 mb-3 space-y-4 border border-teal-100 rounded shadow-sm bg-white/90 backdrop-blur-md">
           {/* লাইভ সার্চ বার */}
@@ -132,16 +132,15 @@ export const GenreListView: FC<GenreListViewProps> = ({
 
           {/* 🔹 ডাইনামিক আদ্যক্ষর কুইক ফিল্টার বার */}
           {availableLetters.length > 1 && (
-            <div className="flex flex-wrap items-center justify-center gap-1 pt-2 border-t border-gray-100 font-tarunima">
+            <div className="mt-3 w-full flex flex-wrap items-center justify-center gap-0.5 py-1 px-2 bg-orange-50/50 rounded border border-orange-100 text-xs sm:text-sm md:text-base lg:text-lg font-tarunima shadow-xs">
               {availableLetters.map((letter) => (
                 <button
                   key={letter}
                   onClick={() => setSelectedLetter(letter)}
-                  className={`px-2.5 py-1 text-xs md:text-sm font-semibold rounded transition-colors ${
-                    selectedLetter === letter
-                      ? "bg-[#008080] text-white shadow-xs"
-                      : "bg-gray-100 hover:bg-teal-50 text-gray-700 hover:text-[#008080]"
-                  }`}
+                  className={`px-2.5 py-1 text-xs md:text-sm font-semibold rounded transition-colors ${selectedLetter === letter
+                    ? "bg-[#008080] text-white shadow-xs"
+                    : "bg-gray-100 hover:bg-teal-50 text-gray-700 hover:text-[#008080]"
+                    }`}
                 >
                   {letter}
                 </button>
@@ -154,7 +153,7 @@ export const GenreListView: FC<GenreListViewProps> = ({
       {/* ঘরানা কার্ড গ্রিড */}
       {filteredGenres.length === 0 ? (
         <div className="p-8 text-center text-gray-600 rounded bg-white/80 font-tarunima">
-          কোনো ঘরানা পাওয়া যায়নি।
+          কোন ঘরানা পাওয়া যায়নি।
         </div>
       ) : (
         <div className="flex flex-wrap gap-2 p-0">

@@ -48,12 +48,12 @@ export default function GenreViewClient({ initialBooks, targetBengaliGenre }: Ge
       {/* হেডার: বামে টাইটেল ও কাউন্ট, ডানে লাইভ সার্চবার */}
       <header className="mb-6 border-b border-orange-200 pb-4 flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="text-center md:text-left">
-          <h2 className="text-2xl md:text-3xl font-bold font-sabrina text-gray-800">
+          <h2 className="text-xl md:text-2xl font-bold font-sabrina text-gray-800">
             ঘরানা : {targetBengaliGenre}
           </h2>
           <p className="text-gray-500 mt-1 italic text-sm md:text-base">
-            {displayedBooks.length > 0 
-              ? `এই ঘরানায় মোট ${toBengaliNumber(displayedBooks.length)}টি বই রয়েছে` 
+            {displayedBooks.length > 0
+              ? `এই ঘরানায় মোট ${toBengaliNumber(displayedBooks.length)}টি বই রয়েছে`
               : "কোনো বই পাওয়া যায়নি"}
           </p>
         </div>
@@ -76,22 +76,22 @@ export default function GenreViewClient({ initialBooks, targetBengaliGenre }: Ge
       {displayedBooks.length > 0 ? (
         <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-6 xl:grid-cols-8 gap-2 pb-4 border-b border-red-100">
           {displayedBooks.map((book) => (
-            <Link 
-              key={book.id || book.slug} 
-              href={`/book/${book.id || book.slug}`} 
+            <Link
+              key={book.id || book.slug}
+              href={`/book/${book.id || book.slug}`}
               className="group flex flex-col h-full"
             >
               <div className="relative aspect-2/3 overflow-hidden rounded shadow-sm bg-white border border-gray-100 transition-transform duration-300 group-hover:-translate-y-1.5 group-hover:shadow-md">
-                <Image 
-                  src={book.cover || '/default-cover.jpg'} 
-                  alt={book.title || 'বইয়ের প্রচ্ছদ'} 
+                <Image
+                  src={book.cover || '/default-cover.jpg'}
+                  alt={book.title || 'বইয়ের প্রচ্ছদ'}
                   fill
                   sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 16vw"
                   className="object-cover"
                 />
                 <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
-              
+
               <div className="mt-2 text-center">
                 <h3 className="text-base font-bold text-gray-900 group-hover:text-emerald-700 transition-colors line-clamp-2 leading-snug">
                   {book.title}
@@ -107,12 +107,12 @@ export default function GenreViewClient({ initialBooks, targetBengaliGenre }: Ge
         <div className="text-center py-24 border-2 border-dashed border-orange-100 rounded-2xl">
           <BookOpen size={48} className="mx-auto text-orange-200 mb-4" />
           <p className="text-gray-400 text-lg italic">
-            {searchQuery 
-              ? `"${searchQuery}" এর সাথে মিলে এমন কোনো বই খুঁজে পাওয়া যায়নি।` 
+            {searchQuery
+              ? `"${searchQuery}" এর সাথে মিলে এমন কোনো বই খুঁজে পাওয়া যায়নি।`
               : "দুঃখিত, এই বিভাগে কোনো বই খুঁজে পাওয়া যায়নি।"}
           </p>
           {searchQuery ? (
-            <button 
+            <button
               onClick={() => setSearchQuery('')}
               className="mt-4 text-sm text-orange-600 hover:underline cursor-pointer"
             >

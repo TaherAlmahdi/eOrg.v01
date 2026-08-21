@@ -40,11 +40,11 @@ export default function ItemViewClient({ initialItems, displayTitle }: any) {
         setItemsPerPage(25);
         setVisibleCount(25);
       } else if (width >= 1536) {
+        setItemsPerPage(60);
+        setVisibleCount(60);
+      } else {
         setItemsPerPage(45);
         setVisibleCount(45);
-      } else {
-        setItemsPerPage(30);
-        setVisibleCount(30);
       }
     };
 
@@ -105,13 +105,13 @@ export default function ItemViewClient({ initialItems, displayTitle }: any) {
 
   return (
     <main className="w-full px-2 md:px-4 py-3 font-tarunima space-y-3">
-      
+
       {/* ব্রেডক্রাম সেকশন */}
       <nav className="w-full bg-[#7575a3] border-b border-gray-200 py-2 px-3 text-white overflow-x-auto no-scrollbar">
         <div className="max-w-full mx-auto text-sm font-tarunima flex items-center whitespace-nowrap">
-          <Link href="/" className="shrink-0"><Home size={16} /></Link> 
+          <Link href="/" className="shrink-0"><Home size={16} /></Link>
           <span className="mx-2 text-white/50 shrink-0">/</span>
-          <Link href="/items" className="hover:text-red-100 shrink-0">প্রকরণ</Link> 
+          <Link href="/items" className="hover:text-red-100 shrink-0">প্রকরণ</Link>
           <span className="mx-2 text-white/50 shrink-0">/</span>
           <span className="hover:text-red-100 shrink-0">{displayTitle}</span>
         </div>
@@ -120,7 +120,7 @@ export default function ItemViewClient({ initialItems, displayTitle }: any) {
       {/* হেডার সেকশন */}
       <header className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-gray-200 pb-2 gap-2">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-950">
+          <h1 className="text-xl md:text-2xl font-bold text-gray-950">
             প্রকরণ : <span className="text-[#008080]">{displayTitle}</span>
           </h1>
           <p className="text-sm text-gray-500 mt-1">
@@ -130,7 +130,7 @@ export default function ItemViewClient({ initialItems, displayTitle }: any) {
 
         {/* সার্চবার */}
         <div className="relative w-full md:w-80 shrink-0">
-          <input 
+          <input
             className="w-full px-4 py-2 pl-10 text-sm bg-white border border-teal-200 rounded focus:ring-1 focus:ring-[#008080] outline-none shadow-xs"
             placeholder="শিরোনাম, মূল গ্রন্থ বা লেখক দিয়ে খুঁজুন..."
             value={search}
@@ -142,14 +142,13 @@ export default function ItemViewClient({ initialItems, displayTitle }: any) {
 
       {/* ৩. বর্ণানুক্রমিক ফিল্টার বার */}
       {availableLetters.length > 0 && (
-        <div className="flex items-center gap-1 flex-wrap bg-teal-50/50 p-1 rounded border border-teal-100">        
+        <div className="flex items-center gap-1 flex-wrap bg-teal-50/50 p-1 rounded border border-teal-100">
           <button
             onClick={() => setSelectedLetter(null)}
-            className={`px-2 py-1 text-xs font-semibold rounded transition-colors cursor-pointer ${
-              selectedLetter === null 
-                ? 'bg-[#008080] text-white shadow-xs' 
-                : 'bg-white text-gray-700 hover:bg-teal-100 border border-teal-200'
-            }`}
+            className={`px-2 py-1 text-xs font-semibold rounded transition-colors cursor-pointer ${selectedLetter === null
+              ? 'bg-[#008080] text-white shadow-xs'
+              : 'bg-white text-gray-700 hover:bg-teal-100 border border-teal-200'
+              }`}
           >
             সব
           </button>
@@ -158,18 +157,17 @@ export default function ItemViewClient({ initialItems, displayTitle }: any) {
             <button
               key={idx}
               onClick={() => setSelectedLetter(selectedLetter === letter ? null : letter)}
-              className={`px-2 py-1 text-xs font-semibold rounded transition-colors cursor-pointer ${
-                selectedLetter === letter 
-                  ? 'bg-[#008080] text-white shadow-xs' 
-                  : 'bg-white text-gray-700 hover:bg-teal-100 border border-teal-200'
-              }`}
+              className={`px-2 py-1 text-xs font-semibold rounded transition-colors cursor-pointer ${selectedLetter === letter
+                ? 'bg-[#008080] text-white shadow-xs'
+                : 'bg-white text-gray-700 hover:bg-teal-100 border border-teal-200'
+                }`}
             >
               {letter}
             </button>
           ))}
         </div>
       )}
-      
+
       {filtered.length === 0 ? (
         <div className="p-12 text-center text-gray-500 bg-white rounded border border-dashed border-gray-300">
           আপনার অনুসন্ধান অনুযায়ী কোন {displayTitle} পাওয়া যায়নি।
@@ -177,10 +175,10 @@ export default function ItemViewClient({ initialItems, displayTitle }: any) {
       ) : (
         <>
           {/* রেসপন্সিভ গ্রিড */}
-          <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-2">
+          <div className="grid grid-cols-1 md:grid-cols-3 2xl:grid-cols-4 gap-1">
             {currentItems.map((item: any, idx: number) => {
               const titleText = extractFieldText(item.title, "শিরোনামহীন");
-              
+
               // সিঙ্গেল আইটেমের জন্য ইউআরএল ফরম্যাট নির্ধারণ (যেমন: /item/story/chokh)
               const titleHref = item.slug ? `/item/${item.slug}` : (item.href || "#");
 
@@ -192,7 +190,7 @@ export default function ItemViewClient({ initialItems, displayTitle }: any) {
 
               return (
                 <div key={idx} className="bg-white border border-teal-100 rounded p-2 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-center">
-                  
+
                   {/* ১. ডেস্কটপ ভিউ */}
                   <div className="hidden md:flex items-center flex-wrap gap-x-2 text-base">
                     <Link

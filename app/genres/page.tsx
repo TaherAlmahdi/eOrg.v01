@@ -35,9 +35,9 @@ export default async function GenresPage() {
       {/* নেভিগেশন বার */}
       <nav className="w-full bg-[#7575a3] border-b border-gray-200 py-2 px-3 text-white overflow-x-auto no-scrollbar">
         <div className="max-w-full mx-auto text-sm font-tarunima flex items-center whitespace-nowrap">
-          <Link href="/" className="shrink-0"><Home size={16} /></Link> 
+          <Link href="/" className="shrink-0"><Home size={16} /></Link>
           <span className="mx-2 text-white/50 shrink-0">/</span>
-          <Link href="/genres" className="hover:text-red-100 shrink-0">ঘরানা</Link> 
+          <Link href="/genres" className="hover:text-red-100 shrink-0">ঘরানা</Link>
         </div>
       </nav>
 

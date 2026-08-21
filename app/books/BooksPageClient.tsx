@@ -45,12 +45,12 @@ interface BooksPageClientProps {
   genreTitle?: string;
 }
 
-export default function BooksPageClient({ 
-  initialBooks = [], 
-  siteTitle, 
-  genreTitle 
+export default function BooksPageClient({
+  initialBooks = [],
+  siteTitle,
+  genreTitle
 }: BooksPageClientProps) {
-  
+
   // সার্ভার ও ক্লায়েন্ট উভয় ক্ষেত্রে প্রথম রেন্ডারে নিরাপদ ডিফল্ট মান ৩০ রাখা হলো (Hydration Mismatch এড়াতে)
   const [limit, setLimit] = useState(30);
 
@@ -110,10 +110,10 @@ export default function BooksPageClient({
         const bookGenres = Array.isArray(book.genres)
           ? book.genres
           : typeof book.genre === 'string'
-          ? [book.genre]
-          : Array.isArray(book.genre)
-          ? book.genre
-          : [];
+            ? [book.genre]
+            : Array.isArray(book.genre)
+              ? book.genre
+              : [];
         const matchesGenre = bookGenres.some((g) =>
           normalizeBengali(g).includes(normalizedGenre)
         );
@@ -191,18 +191,18 @@ export default function BooksPageClient({
       {/* বইয়ের গ্রিড ও ফিল্টার হেডার */}
       <div className="max-w-full mx-auto py-2 px-2">
         <div className="mb-2 border-b border-orange-200 pb-2">
-          
+
           {/* হেডার রো: বামে টাইটেল, ডানে সার্চবার */}
           <div className="flex flex-col md:flex-row items-center justify-between gap-3">
             {/* টাইটেল ও কাউন্ট */}
             <div className="text-center md:text-left">
-              <h2 className="text-2xl font-bold font-sabrina text-[#996633]">
+              <h2 className="text-xl md:text-2xl font-bold font-sabrina text-[#996633]">
                 {genreTitle ? `ঘরানা : ${genreTitle}` : `${siteTitle} গ্রন্থাগার`}
               </h2>
               <p className="text-gray-500 mt-1 italic font-tarunima text-sm">
                 {filteredBooks.length > 0
-                  ? `প্রকাশিত বইয়ের সংখ্যা ${toBengaliNumber(filteredBooks.length)}টি; আপনার পছন্দের বইটি বেছে নিন`
-                  : "এই মুহূর্তে কোনো বই পাওয়া যায়নি"}
+                  ? `প্রকাশিত বইয়ের সংখ্যা ${toBengaliNumber(filteredBooks.length)}টি।`
+                  : "এই মুহূর্তে কোন বই পাওয়া যায়নি"}
               </p>
             </div>
 
@@ -234,11 +234,10 @@ export default function BooksPageClient({
                 <button
                   key={letter}
                   onClick={() => setSelectedLetter(letter)}
-                  className={`px-2 py-0.5 rounded transition-all cursor-pointer ${
-                    selectedLetter === letter
-                      ? 'bg-[#996633] text-white font-bold shadow-xs'
-                      : 'bg-white text-gray-700 hover:bg-orange-100 border border-gray-100'
-                  }`}
+                  className={`px-2 py-0.5 rounded transition-all cursor-pointer ${selectedLetter === letter
+                    ? 'bg-[#996633] text-white font-bold shadow-xs'
+                    : 'bg-white text-gray-700 hover:bg-orange-100 border border-gray-100'
+                    }`}
                 >
                   {letter}
                 </button>
@@ -255,7 +254,7 @@ export default function BooksPageClient({
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-3 md:grid-cols-6 xl:grid-cols-8 gap-2 pb-4 border-b border-red-100">
+            <div className="grid grid-cols-2 md:grid-cols-6 xl:grid-cols-8 gap-2 pb-4 border-b border-red-100">
               {currentBooks.map((book) => {
                 const bookKey = book.slug || book.id || '';
                 return (
@@ -276,7 +275,7 @@ export default function BooksPageClient({
 
                     {/* বইয়ের তথ্য */}
                     <div className="mt-1 flex flex-col grow font-tarunima">
-                      <h3 className="text-lg text-center font-bold text-gray-900 group-hover:text-red-900 transition-colors line-clamp-2">
+                      <h3 className="text-base md:text-lg text-center font-bold text-gray-900 group-hover:text-red-900 transition-colors line-clamp-2">
                         {book.title}
                       </h3>
                       <p className="text-sm text-center text-gray-500 mt-1 uppercase tracking-tight">

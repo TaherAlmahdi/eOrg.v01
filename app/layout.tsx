@@ -36,12 +36,12 @@ const tarunima = localFont({
 
 export async function generateMetadata(): Promise<Metadata> {
   const headersList = await headers();
-  const host = headersList.get('host') || ''; 
+  const host = headersList.get('host') || '';
 
   // ১. ডোমেন থেকে সাবডোমেন আলাদা করা
   const hostname = host.split(':')[0]; // পোর্ট সরাতে (e.g. localhost:3000 -> localhost)
   const parts = hostname.split('.');
-  
+
   const isSubdomain =
     (hostname.includes('eduliture.org') && parts.length > 2 && parts[0] !== 'www') ||
     (hostname.includes('localhost') && parts.length > 1 && parts[0] !== 'localhost');
@@ -71,12 +71,12 @@ export async function generateMetadata(): Promise<Metadata> {
   const defaultTitle = siteData?.title || 'এডুলিচার';
   const mainDomainTitle = 'এডুলিচার';
   const dynamicTitle = subdomain ? `${defaultTitle}` : `${mainDomainTitle} ❀ বিশুদ্ধজ্ঞানের প্রত্যয়`;
-  
+
   // Dynamic OG Image Fallback Processing
   const ogTitleParam = encodeURIComponent(defaultTitle);
   const ogTaglineParam = encodeURIComponent('শিক্ষা, সাহিত্য ও সংস্কৃতি বিষয়ক বিশুদ্ধজ্ঞান প্ল্যাটফর্ম');
   const dynamicGeneratedOg = `${siteUrl}/api/og?title=${ogTitleParam}&tagline=${ogTaglineParam}`;
-  
+
   const ogImageUrl = siteData?.ogImage || dynamicGeneratedOg;
   const siteDescription = siteData?.description || `${defaultTitle} ❀ শিক্ষা, সাহিত্য ও সংস্কৃতি বিষয়ক বিশুদ্ধজ্ঞান প্ল্যাটফর্ম`;
 
@@ -146,7 +146,7 @@ export default async function RootLayout({
   let currentDomainKey = 'main';
 
   if (parts.length > 2 && parts[0] !== 'www') {
-    currentDomainKey = parts[0]; 
+    currentDomainKey = parts[0];
   } else if (parts.length === 2 && hostname.includes('localhost') && parts[0] !== 'localhost') {
     currentDomainKey = parts[0];
   }
@@ -159,11 +159,10 @@ export default async function RootLayout({
     >
       <head>
         {/* গুগল অ্যাডসেন্স */}
-        <Script
+        <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5551708286100565"
           crossOrigin="anonymous"
-          strategy="lazyOnload" 
         />
 
         {/* Google tag (gtag.js) */}
@@ -187,11 +186,11 @@ export default async function RootLayout({
 
         {/* ডাইনামিক ডোমেন কি প্রপ্স হিসেবে পাস করা হলো */}
         <Header domainKey={currentDomainKey} />
-        
+
         <main className="grow">
           {children}
         </main>
-        
+
         <Footer />
         <Analytics />
         <SpeedInsights />

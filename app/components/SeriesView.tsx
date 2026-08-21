@@ -168,11 +168,11 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
 
               {/* ডায়নামিক ফিল্টার বাটন */}
               {availableLetters.length > 0 && (
-                <div className="flex flex-wrap justify-center gap-1 sm:gap-1.5 pt-2">
+                <div className="flex flex-wrap justify-center gap-1 sm:gap-1 pt-2">
                   <button
                     onClick={() => setSelectedLetter(null)}
-                    className={`px-2.5 py-1 text-base rounded transition-colors ${selectedLetter === null
-                      ? "bg-[#7575a3] text-white font-semibold"
+                    className={`px-2 py-1 text-xs md:text-sm rounded transition-colors ${selectedLetter === null
+                      ? "bg-[#7575a3] text-white font-medium"
                       : "bg-white text-gray-600 border border-gray-200 hover:bg-orange-50"
                       }`}
                   >
@@ -186,7 +186,7 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
                       <button
                         key={letter}
                         onClick={() => setSelectedLetter(isSelected ? null : letter)}
-                        className={`px-2 py-1 text-base rounded font-semibold transition-colors ${isSelected
+                        className={`px-2 py-1 text-xs md:text-sm rounded font-semibold transition-colors ${isSelected
                           ? "bg-[#7575a3] text-white font-semibold"
                           : "bg-white text-gray-700 border border-gray-200 hover:bg-orange-50 hover:border-orange-300"
                           }`}
@@ -202,7 +202,7 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
         </header>
 
         {filteredBooks.length > 0 ? (
-          <div className="grid grid-cols-3 gap-2 sm:grid-cols-3 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-8 pb-4 border-b border-red-100">
+          <div className="grid grid-cols-2 gap-1 sm:grid-cols-3 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-8 pb-4 border-b border-red-100">
             {filteredBooks.map((book) => {
               const bookSlug = book.slug || book.id;
               return (
@@ -223,7 +223,7 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
                   </div>
 
                   <div className="mt-0 text-center flex flex-col justify-between bg-gray-200/50 p-2 grow">
-                    <h3 className="text-base font-semibold leading-snug text-gray-900 transition-colors group-hover:text-emerald-700 line-clamp-2">
+                    <h3 className="text-base md:text-lg font-semibold leading-snug text-gray-900 transition-colors group-hover:text-emerald-700 line-clamp-2">
                       {book.title}
                     </h3>
                     <p className="mt-1 text-xs md:text-sm text-gray-500 font-tarunima">

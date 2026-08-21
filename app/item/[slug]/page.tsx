@@ -1,26 +1,30 @@
+import { cache } from 'react';
 import Link from 'next/link';
 import { Home } from 'lucide-react';
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 
 import Notice from '@/app/components/Notice';
-import TableOfContents from '@/app/components/TableOfContents';
 import BookDetails from '@/app/components/BookDetails';
 
-import { getBookBySlug, BookDetail } from '@/app/lib/books';
 import { getSubdomainData, buildTabTitle } from '@/app/lib/get-site-data';
+import { getBookBySlug } from '@/app/lib/books/singleItemExtract';
 import { parseNoteShortcodes } from '@/app/lib/parse-shortcodes';
 
 // ==========================================
 // 📐 Interfaces
 // ==========================================
 
-interface ItemPageProps {
-  params: Promise<{
-    slug?: string[];
-  }>;
-  searchParams: Promise<{
+interface PageParams {
+  slug?: string | string[];
+  itemSlug?: string | string[];
+  titleSlug?: string;
+}
+
+interface PageProps {
+  params: Promise<PageParams>;
+  searchParams?: Promise<{
     page?: string;
   }>;
 }
@@ -37,11 +41,30 @@ interface SplitPage {
   pageNumber: number;
   contentHtml: string;
   notes: NoteItem[];
-  slug?: string;
+}
+
+export interface ItemDetail {
+  title: string;
+  subtitle?: string;
+  author?: string;
+  translator?: string;
+  editor?: string;
+  content?: string;
+  categoryName?: string; // যেমন: কবিতা, গল্প, নাটক
+  categorySlug?: string; // যেমন: kobita, golpo
+  meta_title?: string;
+  meta_description?: string;
+  og_image?: string;
+  cover_image?: string;
+  prevLink?: string;
+  prevLabel?: string;
+  nextLink?: string;
+  nextLabel?: string;
+  rawFrontmatter?: { notice?: string };
 }
 
 // ==========================================
-// 🛠️ Helper Functions
+// 🛠️ Helper Functions & Data Fetcher
 // ==========================================
 
 const toBengaliNumber = (num?: number | string): string =>
@@ -49,48 +72,71 @@ const toBengaliNumber = (num?: number | string): string =>
     ? num.toString().replace(/\d/g, (d) => '০১২৩৪৫৬৭৮৯'[parseInt(d, 10)])
     : '';
 
-// সাধারণ টাইটেল থেকে URL-friendly স্লাগ তৈরির হেল্পার
-const generateSlug = (text?: string): string => {
-  if (!text) return '';
-  return text
-    .trim()
-    .toLowerCase()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/[\s_-]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-};
+function extractTargetSlug(params: PageParams): string[] {
+  if (params.slug) {
+    return Array.isArray(params.slug) ? params.slug : [params.slug];
+  }
+  if (params.itemSlug) {
+    const itemSegments = Array.isArray(params.itemSlug) ? params.itemSlug : [params.itemSlug];
+    if (params.titleSlug) {
+      return [...itemSegments, params.titleSlug];
+    }
+    return itemSegments;
+  }
+  if (params.titleSlug) return [params.titleSlug];
+  return [];
+}
 
-// কন্টেন্ট থেকে সাব-পেজ/আইটেম বিভাজন পার্সিং
+function resolveRouteSegments(rawSegments: string[]) {
+  let cleanSegments = [...rawSegments];
+  let pageNumFromPath: number | null = null;
+  const lastSegment = rawSegments[rawSegments.length - 1];
+
+  if (/^\d+$/.test(lastSegment) && rawSegments.length > 1) {
+    pageNumFromPath = parseInt(lastSegment, 10);
+    cleanSegments = rawSegments.slice(0, -1);
+  }
+
+  const fullItemSlug = cleanSegments.join('/');
+
+  return {
+    fullItemSlug,
+    pageNumFromPath,
+    cleanSegments,
+  };
+}
+
+// 🎯 getBookBySlug এ ৩/৪টি প্যারামিটারের বদলে কেবল সিঙ্গেল স্ল্যাগ ও সাবডোমেইন পাঠানো হচ্ছে
+async function fetchItemData(itemSlug: string, subdomain: string) {
+  if (!itemSlug) return null;
+  return await getBookBySlug(itemSlug);
+}
+
+const getItemData = cache(fetchItemData);
+
 function parseItemSubPages(fullContent: string): SplitPage[] {
   if (!fullContent) return [];
 
   const pageSegments = fullContent.split(/<!--\s*nextpage(?:\s+([\s\S]*?))?\s*-->/gi);
   const splitPages: SplitPage[] = [];
 
-  // ১ম পেজ
   const firstChunk = pageSegments[0] || '';
   const parsedFirst = parseNoteShortcodes(firstChunk);
-  
   splitPages.push({
     title: undefined,
-    slug: '1',
     pageNumber: 1,
     contentHtml: parsedFirst.contentHtml,
     notes: parsedFirst.notes,
   });
 
-  // পরবর্তী পেজসমূহ
   let pageCounter = 2;
   for (let i = 1; i < pageSegments.length; i += 2) {
     const pageTitle = pageSegments[i] ? pageSegments[i].trim() : undefined;
     const pageBody = pageSegments[i + 1] || '';
     const parsed = parseNoteShortcodes(pageBody);
 
-    const resolvedTitle = pageTitle;
-
     splitPages.push({
-      title: resolvedTitle,
-      slug: generateSlug(resolvedTitle) || `${pageCounter}`,
+      title: pageTitle,
       pageNumber: pageCounter,
       contentHtml: parsed.contentHtml,
       notes: parsed.notes,
@@ -101,26 +147,20 @@ function parseItemSubPages(fullContent: string): SplitPage[] {
   return splitPages;
 }
 
-// স্লাগ বা পাতা নম্বর দিয়ে সক্রিয় পেজ ইনডেক্স নির্ধারণ
-function resolveActiveItemIndex(
+function resolveActivePageIndex(
   splitPages: SplitPage[],
-  routeSlugOrNum?: string,
+  pageNumFromPath: number | null,
   queryPage?: string
 ): number {
-  if (routeSlugOrNum) {
-    const foundIndex = splitPages.findIndex(
-      (p, idx) => p.slug === routeSlugOrNum || toBengaliNumber(idx + 1) === routeSlugOrNum || `${idx + 1}` === routeSlugOrNum
-    );
-    if (foundIndex !== -1) return foundIndex;
+  if (pageNumFromPath !== null && pageNumFromPath > 0 && pageNumFromPath <= splitPages.length) {
+    return pageNumFromPath - 1;
   }
-
   if (queryPage) {
     const queryNum = parseInt(queryPage, 10);
     if (!isNaN(queryNum) && queryNum > 0 && queryNum <= splitPages.length) {
       return queryNum - 1;
     }
   }
-
   return 0;
 }
 
@@ -128,29 +168,35 @@ function resolveActiveItemIndex(
 // 🏷️ Dynamic Metadata Export
 // ==========================================
 
-export async function generateMetadata({ params, searchParams }: ItemPageProps): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
   const resolvedParams = await params;
-  const resolvedSearchParams = await searchParams;
-  const rawSegments = resolvedParams.slug || [];
-
-  if (rawSegments.length === 0) return { title: 'আইটেম পাওয়া যায়নি | এডুলিচার' };
-
-  const itemSlug = rawSegments[0] || '';
-  const subItemSlugOrNum = rawSegments[1];
+  const resolvedSearchParams = searchParams ? await searchParams : {};
+  const rawSegments = extractTargetSlug(resolvedParams);
 
   const headersList = await headers();
   const host = headersList.get('host');
   const siteData = getSubdomainData(host);
+  const siteName = siteData?.title || 'এডুলিচার';
 
-  const item = await getBookBySlug(itemSlug, siteData.subdomain || 'library');
+  if (rawSegments.length === 0) {
+    return { title: `আইটেম পাওয়া যায়নি ❀ ${siteName}` };
+  }
 
-  if (!item) return { title: 'আইটেম পাওয়া যায়নি | এডুলিচার' };
+  const { fullItemSlug, pageNumFromPath } = resolveRouteSegments(rawSegments);
+
+  const item: ItemDetail | null = await getItemData(
+    fullItemSlug,
+    siteData.subdomain || 'library'
+  );
+
+  if (!item) {
+    return { title: `আইটেম পাওয়া যায়নি ❀ ${siteName}` };
+  }
 
   const splitPages = parseItemSubPages(item.content || '');
-  const activeIndex = resolveActiveItemIndex(splitPages, subItemSlugOrNum, resolvedSearchParams.page);
-
-  const currentSubPage = splitPages[activeIndex];
-  const currentPageNum = activeIndex + 1;
+  const activePageIndex = resolveActivePageIndex(splitPages, pageNumFromPath, resolvedSearchParams.page);
+  const currentSubPage = splitPages[activePageIndex];
+  const currentPageNum = activePageIndex + 1;
 
   const titleParts: string[] = [];
 
@@ -160,10 +206,7 @@ export async function generateMetadata({ params, searchParams }: ItemPageProps):
     titleParts.push(`পাতা ${toBengaliNumber(currentPageNum)}`);
   }
 
-  titleParts.push(item.title);
-
   const pageDisplayTitle = titleParts.join(' ❀ ');
-  const siteName = siteData?.title || 'এডুলিচার';
 
   const dynamicMetaTitle = buildTabTitle({
     metaTitle: item.meta_title,
@@ -172,16 +215,19 @@ export async function generateMetadata({ params, searchParams }: ItemPageProps):
     siteName: siteName,
   });
 
-  const description = item.meta_description || `${item.title}${item.author ? ` - ${item.author}` : ''} | এডুলিচার আইটেম সংকলন।`;
-  const domainUrl = siteData.subdomain 
-    ? `https://${siteData.subdomain}.eduliture.org` 
+  const description =
+    item.meta_description ||
+    `${item.title}${item.author ? ` - ${item.author}` : ''} | এডুলিচার সাহিত্য সংকলন।`;
+
+  const domainUrl = siteData.subdomain
+    ? `https://${siteData.subdomain}.eduliture.org`
     : 'https://eduliture.org';
-    
-  const canonicalUrl = `${domainUrl}/subdomains/library/item/${rawSegments.join('/')}`;
+
+  const canonicalUrl = `${domainUrl}/${rawSegments.join('/')}`;
 
   const fallbackOgUrl = `/api/og?title=${encodeURIComponent(item.title)}&subtitle=${encodeURIComponent(
-    currentSubPage?.title || siteName
-  )}&tagline=${encodeURIComponent('এডুলিচার অনলাইন সাহিত্য সংকলন')}`;
+    item.subtitle || siteName
+  )}&tagline=${encodeURIComponent('এডুলিচার অনলাইন বই ও সাহিত্য সংকলন')}`;
 
   const shareImage = item.og_image || item.cover_image || siteData.ogImage || fallbackOgUrl;
 
@@ -213,11 +259,10 @@ export async function generateMetadata({ params, searchParams }: ItemPageProps):
 // 📖 Main Page Component
 // ==========================================
 
-export default async function LibraryItemPage({ params, searchParams }: ItemPageProps) {
+export default async function SingleItemPage({ params, searchParams }: PageProps) {
   const resolvedParams = await params;
-  const resolvedSearchParams = await searchParams;
-
-  const rawSegments = resolvedParams.slug || [];
+  const resolvedSearchParams = searchParams ? await searchParams : {};
+  const rawSegments = extractTargetSlug(resolvedParams);
 
   if (rawSegments.length === 0) {
     notFound();
@@ -227,19 +272,22 @@ export default async function LibraryItemPage({ params, searchParams }: ItemPage
   const host = headersList.get('host');
   const siteData = getSubdomainData(host);
 
-  const itemSlug = rawSegments[0] || '';
-  const subItemSlugOrNum = rawSegments[1];
+  const { fullItemSlug, pageNumFromPath, cleanSegments } = resolveRouteSegments(rawSegments);
 
-  const item: BookDetail | null = await getBookBySlug(itemSlug, siteData.subdomain || 'library');
+  const item: ItemDetail | null = await getItemData(
+    fullItemSlug,
+    siteData.subdomain || 'library'
+  );
 
-  if (!item) notFound();
+  if (!item) {
+    notFound();
+  }
 
-  // 📝 <!--nextpage--> পার্সিং ও সাব-পেজ বিশ্লেষণ
   const splitPages = parseItemSubPages(item.content || '');
-  const activeIndex = resolveActiveItemIndex(splitPages, subItemSlugOrNum, resolvedSearchParams.page);
+  const activePageIndex = resolveActivePageIndex(splitPages, pageNumFromPath, resolvedSearchParams.page);
 
-  const currentSubPageData = splitPages[activeIndex] || splitPages[0];
-  const currentPageNum = activeIndex + 1;
+  const currentSubPageData = splitPages[activePageIndex] || splitPages[0];
+  const currentPageNum = activePageIndex + 1;
   const totalSubPages = splitPages.length;
 
   let activeSubtitle: string | undefined;
@@ -252,7 +300,7 @@ export default async function LibraryItemPage({ params, searchParams }: ItemPage
     activeSubtitle = pageSubtitle;
   }
 
-  const currentBasePath = `/subdomains/library/item/${itemSlug}`;
+  const currentBasePath = `/${cleanSegments.join('/')}`;
 
   const getSubPageLabel = (pageData?: SplitPage) => {
     if (!pageData) return '';
@@ -261,79 +309,77 @@ export default async function LibraryItemPage({ params, searchParams }: ItemPage
     return `পাতা ${toBengaliNumber(pageData.pageNumber)}`;
   };
 
-  // ---------------------------------------------------------
-  // 👈 ১. পূর্ববর্তী (Previous) আইটেম/পাতা নেভিগেশন
-  // ---------------------------------------------------------
-  let prevActionLink = '/subdomains/library/items';
-  let prevActionLabel = 'আইটেমস';
+  const categoryName = item.categoryName || 'কবিতা';
+  const categorySlug = item.categorySlug || 'kobita';
 
-  if (activeIndex > 0) {
-    const prevPageObj = splitPages[activeIndex - 1];
-    prevActionLink = activeIndex - 1 === 0 ? currentBasePath : `${currentBasePath}/${prevPageObj.slug}`;
+  // Prev Button Logic
+  let prevActionLink = item.prevLink || `/${categorySlug}`;
+  let prevActionLabel = item.prevLabel || categoryName;
+
+  if (currentPageNum > 1) {
+    const prevPageNum = currentPageNum - 1;
+    const prevPageObj = splitPages[prevPageNum - 1];
+    prevActionLink = prevPageNum === 1 ? currentBasePath : `${currentBasePath}/${prevPageNum}`;
     prevActionLabel = getSubPageLabel(prevPageObj);
   }
 
-  // ---------------------------------------------------------
-  // 👉 ২. পরবর্তী (Next) আইটেম/পাতা নেভিগেশন
-  // ---------------------------------------------------------
-  let nextActionLink = '/subdomains/library/items';
-  let nextActionLabel = 'আইটেমস';
+  // Next Button Logic
+  let nextActionLink = item.nextLink || `/${categorySlug}`;
+  let nextActionLabel = item.nextLabel || `${categoryName}-এ ফিরে যান`;
 
-  if (activeIndex < totalSubPages - 1) {
-    const nextPageObj = splitPages[activeIndex + 1];
-    nextActionLink = `${currentBasePath}/${nextPageObj.slug}`;
+  if (currentPageNum < totalSubPages) {
+    const nextPageNum = currentPageNum + 1;
+    const nextPageObj = splitPages[nextPageNum - 1];
+    nextActionLink = `${currentBasePath}/${nextPageNum}`;
     nextActionLabel = getSubPageLabel(nextPageObj);
   }
-
-  // 📂 TableOfContents স্ট্রাকচার
-  const currentSubPagesData =
-    totalSubPages > 1 
-      ? splitPages.map((p) => ({ pageNumber: p.pageNumber, title: getSubPageLabel(p), slug: p.slug || `${p.pageNumber}` })) 
-      : [];
-
-  const tocStructure = {
-    bookTitle: item.title,
-    currentVolume: '',
-    metaFiles: [],
-    items: currentSubPagesData.map((p) => ({
-      type: 'chapter' as const,
-      id: p.slug,
-      slug: p.slug,
-      title: p.title || '',
-      subPages: [],
-    })),
-  };
 
   const rawNotice = item.rawFrontmatter?.notice;
   const pageNotice: string | null = typeof rawNotice === 'string' && rawNotice.trim().length > 0 ? rawNotice.trim() : null;
 
-  const domainUrl = siteData.subdomain 
-    ? `https://${siteData.subdomain}.eduliture.org` 
+  const domainUrl = siteData.subdomain
+    ? `https://${siteData.subdomain}.eduliture.org`
     : 'https://eduliture.org';
 
-  const currentFullUrl = `${domainUrl}/subdomains/library/item/${rawSegments.join('/')}`;
+  const currentFullUrl = `${domainUrl}/${rawSegments.join('/')}`;
   const siteTitle = siteData.title || 'এডুলিচার';
-  
+
   const fallbackOgUrl = `/api/og?title=${encodeURIComponent(item.title)}&subtitle=${encodeURIComponent(
-    currentSubPageData?.title || siteTitle
+    activeSubtitle || siteTitle
   )}&tagline=${encodeURIComponent('এডুলিচার অনলাইন সাহিত্য সংকলন')}`;
 
   const jsonLdData = {
     '@context': 'https://schema.org',
     '@type': 'Article',
-    name: item.title,
+    headline: item.title,
     author: {
       '@type': 'Person',
       name: item.author || 'অজানা লেখক',
     },
+    ...(item.translator && {
+      translator: {
+        '@type': 'Person',
+        name: item.translator,
+      },
+    }),
+    ...(item.editor && {
+      editor: {
+        '@type': 'Person',
+        name: item.editor,
+      },
+    }),
     url: currentFullUrl,
     image: item.og_image || item.cover_image || siteData.ogImage || fallbackOgUrl,
-    description: item.meta_description || `${item.title}${item.author ? ` - ${item.author}` : ''} | এডুলিচার সংকলন।`,
+    description: item.meta_description || `${item.title}${item.author ? ` - ${item.author}` : ''} | এডুলিচার সাহিত্য সংকলন।`,
     inLanguage: 'bn',
     publisher: {
       '@type': 'Organization',
       name: siteTitle,
       url: domainUrl,
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': currentFullUrl,
     },
   };
 
@@ -341,36 +387,44 @@ export default async function LibraryItemPage({ params, searchParams }: ItemPage
     <main className="bg-[#fdfcf8] min-h-screen">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }} />
 
-      {/* ব্রেডক্রাম্ব নেভিগেশন: হোম / আইটেমস / আইটেম / টাইটেল */}
+      {/* Breadcrumb Navigation */}
       <nav className="w-full bg-[#7575a3] border-b border-gray-200 py-2 px-3 text-white overflow-x-auto no-scrollbar">
         <div className="flex items-center max-w-full mx-auto text-sm font-tarunima whitespace-nowrap">
           <Link href="/" className="transition-colors shrink-0 hover:text-red-100">
             <Home size={16} />
           </Link>
+
           <span className="mx-2 text-white/50 shrink-0">/</span>
-          <Link href="/subdomains/library/items" className="transition-colors hover:text-red-100 shrink-0">
-            আইটেমস
-          </Link>
-          <span className="mx-2 text-white/50 shrink-0">/</span>
-          <Link href={`/subdomains/library/item/${itemSlug}`} className="transition-colors hover:text-red-100 shrink-0">
-            {item.title}
+
+          <Link href="/series" className="transition-colors hover:text-red-100 shrink-0">
+            সিরিজ
           </Link>
 
-          {currentSubPageData?.title && currentPageNum > 1 && (
+          <span className="mx-2 text-white/50 shrink-0">/</span>
+
+          <Link href={`/${categorySlug}`} className="transition-colors hover:text-red-100 shrink-0">
+            {categoryName}
+          </Link>
+
+          <span className="mx-2 text-white/50 shrink-0">/</span>
+
+          <span className="font-medium text-white whitespace-nowrap">{item.title}</span>
+
+          {totalSubPages > 1 && currentPageNum > 1 && (
             <>
               <span className="mx-2 text-white/50 shrink-0">/</span>
-              <span className="font-medium text-white shrink-0">{currentSubPageData.title}</span>
+              <span className="font-medium text-white shrink-0">{getSubPageLabel(currentSubPageData)}</span>
             </>
           )}
         </div>
       </nav>
 
-      {/* কন্টেন্ট ও সাইডবার লেআউট */}
+      {/* Main Container */}
       <div className="grid max-w-full grid-cols-1 gap-0 mx-auto lg:grid-cols-12">
-        {/* কন্টেন্ট সেকশন */}
+        {/* Content Section */}
         <section className="order-1 lg:order-2 col-span-1 lg:col-span-9 bg-[#fff2e6] shadow-sm min-h-screen">
           <header className="mb-0 text-center font-tarunima bg-[#f0f0f5] p-3 md:p-6">
-            <h1 className="mb-2 text-lg font-semibold text-green-900 md:text-xl font-tarunima">
+            <h1 className="mb-2 text-lg font-semibold text-green-900 md:text-2xl font-tarunima">
               {item.title}
             </h1>
 
@@ -378,11 +432,8 @@ export default async function LibraryItemPage({ params, searchParams }: ItemPage
               <p className="mb-1 text-lg tracking-wide text-red-900 uppercase md:text-xl opacity-90">{activeSubtitle}</p>
             )}
 
-            {/* লেখক, অনুবাদক ও সম্পাদক তথ্য */}
             <div className="space-y-0.5 text-red-900 font-tarunima">
-              {item.author && (
-                <p className="text-lg font-medium">{item.author}</p>
-              )}
+              {item.author && <p className="text-lg font-medium">{item.author}</p>}
               {item.translator && (
                 <p className="text-base opacity-90">
                   অনুবাদ: <span className="font-medium">{item.translator}</span>
@@ -408,7 +459,7 @@ export default async function LibraryItemPage({ params, searchParams }: ItemPage
               />
             )}
 
-            {/* টিকা ও ফুটনোট */}
+            {/* Notes & Footnotes Section */}
             {currentSubPageData?.notes && currentSubPageData.notes.length > 0 && (
               <div className="pt-6 mt-10 border-t-2 border-orange-200/80">
                 <div className="flex items-center gap-2 mb-4">
@@ -450,7 +501,7 @@ export default async function LibraryItemPage({ params, searchParams }: ItemPage
             )}
           </article>
 
-          {/* 🧭 নেভিগেশন বাটন */}
+          {/* Navigation Buttons */}
           <div className="flex items-center justify-between p-3 md:p-6 mt-8 border-t border-orange-200 font-tarunima">
             <Link
               href={prevActionLink}
@@ -470,17 +521,10 @@ export default async function LibraryItemPage({ params, searchParams }: ItemPage
           </div>
         </section>
 
-        {/* সাইডবার */}
+        {/* Sidebar */}
         <aside className="order-2 col-span-1 px-3 py-4 space-y-4 lg:order-1 lg:col-span-3">
           <div className="space-y-4 lg:sticky lg:top-6">
             <BookDetails book={item} />
-            <TableOfContents
-              structure={tocStructure}
-              currentChapter={subItemSlugOrNum || ''}
-              currentPageNum={currentPageNum}
-              slug={itemSlug}
-              bookTitle={item?.title}
-            />
           </div>
         </aside>
       </div>

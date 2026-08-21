@@ -155,7 +155,7 @@ export default function ItemListView({
       {/* আইটেম কার্ড গ্রিড (Flex-basis responsive grid) */}
       {filteredItems.length === 0 ? (
         <div className="p-8 text-center text-gray-600 rounded bg-white/80 font-tarunima">
-          কোনো আইটেম পাওয়া যায়নি।
+          কোন প্রকরণ পাওয়া যায়নি।
         </div>
       ) : (
         <div className="flex flex-wrap gap-2 p-0">

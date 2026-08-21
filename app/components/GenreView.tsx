@@ -25,7 +25,7 @@ export default async function GenreView({ slug, authorSlug }: GenreViewProps) {
 
   return (
     <main className="p-4 font-tarunima">
-      <h1 className="text-2xl font-bold mb-6">
+      <h1 className="text-xl font-bold mb-6">
         {authorSlug ? `${authorSlug}-এর বই` : 'সকল বই'} — ঘরানা : {matchedGenreKey || slug}
       </h1>
 
@@ -35,7 +35,7 @@ export default async function GenreView({ slug, authorSlug }: GenreViewProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {books.map((book) => (
             <article key={book.id} className="p-4 border rounded shadow-sm bg-white">
-              <h2 className="text-lg font-semibold">{book.title}</h2>
+              <h2 className="text-base md:text-lg font-semibold">{book.title}</h2>
               {book.subtitle && (
                 <p className="text-sm text-gray-600">{book.subtitle}</p>
               )}
