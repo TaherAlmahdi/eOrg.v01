@@ -118,8 +118,8 @@ export default function TOCItem({
   if (currentIndex === -1) return null;
 
   // ৫. সিকোয়েন্স অনুযায়ী আগের ৫টি এবং পরের ৫টি আইটেম কেটে নেওয়া (Slice)
-  const startIndex = Math.max(0, currentIndex - 5);
-  const endIndex = Math.min(filteredList.length, currentIndex + 6);
+  const startIndex = Math.max(0, currentIndex - 10);
+  const endIndex = Math.min(filteredList.length, currentIndex + 11);
   const slicedList = filteredList.slice(startIndex, endIndex);
 
   // স্লাগ ফরম্যাট করার হেল্পার
