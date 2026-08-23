@@ -2,7 +2,7 @@
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
-import { getAllLibraryItems, getItemByParams, LibraryItemEntry } from './items';
+import { getAllLibraryItems, LibraryItemEntry } from './items';
 
 const BOOKS_DIRECTORY = path.join(process.cwd(), 'content/books');
 
@@ -31,7 +31,7 @@ export interface SingleBookItem {
   [key: string]: any;
 }
 
-// সাব-ফোল্ডার ও সাব-সাব-ফোল্ডারসহ সব .md ফাইল খুঁজে বের করার রিকার্সিভ ফাংশন (সিঙ্ক্রোনাস)
+// সাব-ফোল্ডারসহ সব .md ফাইল খুঁজে বের করার রিকার্সিভ ফাংশন (সিঙ্ক্রোনাস)
 function getAllMarkdownFiles(dirPath: string, arrayOfFiles: string[] = []): string[] {
   if (!fs.existsSync(dirPath)) return arrayOfFiles;
 
@@ -89,27 +89,31 @@ export async function getItemsByItemType(targetItemType?: string) {
  */
 export async function getBookBySlug(slug: string | string[]): Promise<SingleBookItem | null> {
   const rawSlug = Array.isArray(slug) ? slug.join('/') : slug;
-  const decodedSlug = decodeURIComponent(rawSlug).trim().toLowerCase();
+  const decodedSlug = decodeURIComponent(rawSlug).trim();
+  const lowerDecodedSlug = decodedSlug.toLowerCase();
 
-  // স্লাগের শেষ অংশ আলাদা করা (যেমন: /items/story/chokh থেকে 'chokh')
+  // স্লাগের শেষ অংশ আলাদা করা
   const slugSegments = decodedSlug.split('/').filter(Boolean);
   const lastSegment = slugSegments[slugSegments.length - 1] || decodedSlug;
+  const lowerLastSegment = lastSegment.toLowerCase();
 
-  // ১. মেথড: items.ts-এর পার্স করা ডাটা থেকে খোঁজা (সবচেয়ে নির্ভুল)
+  // ১. মেথড: items.ts-এর পার্স করা ডাটা থেকে খোঁজা (সবচেয়ে নির্ভরযোগ্য)
   const allItems = await getAllLibraryItems();
 
   const matchedItem = allItems.find((entry) => {
-    const tSlug = entry.titleSlug ? entry.titleSlug.toLowerCase() : '';
+    const tSlug = entry.titleSlug ? entry.titleSlug.trim() : '';
+    const fileSlug = entry.frontmatter.slug ? String(entry.frontmatter.slug).trim() : '';
     const href = entry.href ? entry.href.toLowerCase() : '';
-    const fileSlug = entry.frontmatter.slug ? String(entry.frontmatter.slug).toLowerCase() : '';
 
     return (
       tSlug === decodedSlug ||
-      tSlug === lastSegment ||
+      tSlug.toLowerCase() === lowerDecodedSlug ||
+      tSlug.toLowerCase() === lowerLastSegment ||
       fileSlug === decodedSlug ||
-      fileSlug === lastSegment ||
-      href.endsWith(`/${lastSegment}`) ||
-      href.includes(decodedSlug)
+      fileSlug.toLowerCase() === lowerDecodedSlug ||
+      fileSlug.toLowerCase() === lowerLastSegment ||
+      href.endsWith(`/${lowerLastSegment}`) ||
+      href.includes(lowerDecodedSlug)
     );
   });
 
@@ -137,14 +141,18 @@ export async function getBookBySlug(slug: string | string[]): Promise<SingleBook
     };
   }
 
-  // ২. ফলব্যাক মেথড: যদি সরাসরি ফাইল পাথ দিয়ে খোঁজা হয়
-  const targetPath = path.join(BOOKS_DIRECTORY, `${decodedSlug}.md`);
+  // ২. ফলব্যাক মেথড: ফাইল পাথ দিয়ে খোঁজা (বাধ্যতামূলক slug চেকসহ)
+  const targetPath = path.join(BOOKS_DIRECTORY, `${lastSegment}.md`);
   if (fs.existsSync(targetPath)) {
     const fileContent = fs.readFileSync(targetPath, 'utf8');
     const { data: frontmatter, content } = matter(fileContent);
 
+    if (!frontmatter.slug) {
+      throw new Error(`❌ ত্রুটি: ${targetPath} ফাইলে বাধ্যতামূলক 'slug' অনুপস্থিত!`);
+    }
+
     return {
-      slug: decodedSlug,
+      slug: String(frontmatter.slug).trim(),
       title: frontmatter.title || lastSegment,
       content,
       rawFrontmatter: frontmatter,
@@ -152,16 +160,20 @@ export async function getBookBySlug(slug: string | string[]): Promise<SingleBook
     };
   }
 
-  // ৩. ফলব্যাক মেথড: পুরো content/books ডিরেক্টরি রিকার্সিভলি ফিল্টার করা
+  // ৩. ফলব্যাক মেথড: পুরো ডিরেক্টরি রিকার্সিভলি চেক করা (বাধ্যতামূলক slug চেকসহ)
   const allFiles = getAllMarkdownFiles(BOOKS_DIRECTORY);
   for (const filePath of allFiles) {
-    const fileName = path.basename(filePath, '.md').toLowerCase();
-    if (fileName === lastSegment) {
+    const fileName = path.basename(filePath, '.md');
+    if (fileName.toLowerCase() === lowerLastSegment) {
       const fileContent = fs.readFileSync(filePath, 'utf8');
       const { data: frontmatter, content } = matter(fileContent);
 
+      if (!frontmatter.slug) {
+        throw new Error(`❌ ত্রুটি: ${filePath} ফাইলে বাধ্যতামূলক 'slug' অনুপস্থিত!`);
+      }
+
       return {
-        slug: frontmatter.slug || fileName,
+        slug: String(frontmatter.slug).trim(),
         title: frontmatter.title || fileName,
         content,
         rawFrontmatter: frontmatter,

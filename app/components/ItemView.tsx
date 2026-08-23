@@ -41,13 +41,13 @@ const extractFieldText = (field: unknown, fallback: string = ""): string => {
 const extractAuthorValue = (entry: LibraryItem): string => {
   const authorData = entry.author;
 
-  // ১. author যদি অবজেক্ট হয় (যেমন: { name: "...", slug: "..." })
+  // ১. author যদি অবজেক্ট হয়
   if (typeof authorData === "object" && authorData !== null && !Array.isArray(authorData)) {
     const authorObj = authorData as Record<string, unknown>;
     return String(authorObj.slug || authorObj.name || "").trim();
   }
 
-  // ২. author যদি অ্যারে হয়
+  // ২. author যদি অ্যারে হয়
   if (Array.isArray(authorData) && authorData.length > 0) {
     const first = authorData[0];
     if (typeof first === "object" && first !== null) {
@@ -69,6 +69,7 @@ const extractAuthorValue = (entry: LibraryItem): string => {
 // এন্ট্রি থেকে সব সম্ভাব্য প্রকরণ বা আইটেম স্লাগ/নাম বের করা
 const extractItemSlugsFromEntry = (entry: LibraryItem): string[] => {
   const rawValues: unknown[] = [];
+  
   const candidates = [
     entry.item,
     entry.items,
@@ -78,6 +79,8 @@ const extractItemSlugsFromEntry = (entry: LibraryItem): string[] => {
     entry.prakaronSlug,
     entry.category,
     entry.categorySlug,
+    entry.frontmatter?.prakaron,
+    entry.frontmatter?.itemType,
   ];
 
   candidates.forEach((cand) => {
@@ -134,7 +137,7 @@ export default async function ItemView({
   const rawLibraryItems = await getAllLibraryItems();
   const allLibraryItems = (rawLibraryItems || []) as unknown as LibraryItem[];
 
-  // নির্দিষ্ট আইটেম ও প্রকরণ অনুযায়ী ফিল্টারিং
+  // নির্দিষ্ট আইটেম ও প্রকরণ অনুযায়ী ফিল্টারিং
   const filteredItems = allLibraryItems.filter((entry) => {
     // ১. লেখক ফিল্টার (যদি থাকে)
     if (authorSlug) {
@@ -158,7 +161,9 @@ export default async function ItemView({
 
     return (
       entrySlugs.includes(targetNormalized) ||
-      (mappedNormalized && entrySlugs.includes(mappedNormalized))
+      (mappedNormalized && entrySlugs.includes(mappedNormalized)) ||
+      // ✅ বাধ্যতামূলক frontmatter.slug এর সাথে সরাসরি মেলানো
+      (entry.titleSlug && normalizeText(entry.titleSlug) === targetNormalized)
     );
   });
 

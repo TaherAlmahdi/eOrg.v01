@@ -9,17 +9,18 @@ export interface LibraryItemEntry {
   itemType: string;       // যেমন: 'story', 'poem', 'essay'
   itemTypeSlug: string;   // ইউআরএল ফ্রেন্ডলি আইটেম টাইপ স্লাগ (যেমন: 'story', 'poem')
   title: string;          // আইটেমের নিজস্ব শিরোনাম (যেমন: 'চোখ', 'বিদ্রোহী')
-  titleSlug: string;      // আইটেমের শিরোনাম স্লাগ
+  slug?: string;          // ফ্রন্টম্যাটারের নিজস্ব স্লাগ (যদি থাকে)
+  titleSlug: string;      // আইটেমের চূড়ান্ত স্লাগ (Slug অথবা ফলব্যাক Title থেকে তৈরি)
   bookTitle: string;      // মূল বইয়ের নাম
   bookSlug: string;       // মূল বইয়ের স্লাগ
   author: string;         // লেখকের নাম
   authorSlug: string;     // লেখকের স্লাগ
-  href: string;           // সিঙ্গেল আইটেম পড়ার ইউআরএল (/items/[itemSlug]/[title])
+  href: string;           // সিঙ্গেল আইটেম পড়ার ইউআরএল
   content: string;        // আইটেমের বিষয়বস্তু
   frontmatter: Record<string, any>;
 }
 
-// বাংলা ও ইংরেজি উভয় টেক্সট থেকে সঠিক স্লাগ তৈরির হেল্পার (এটি শুধু itemTypeSlug বা অন্যান্য বিষয়ের জন্য অপরিবর্তিত রাখা হলো)
+// বাংলা ও ইংরেজি উভয় টেক্সট থেকে সঠিক স্লাগ তৈরির হেল্পার
 function slugify(text: string): string {
   if (!text) return '';
   return text
@@ -31,7 +32,7 @@ function slugify(text: string): string {
     .replace(/--+/g, '-');
 }
 
-// ইংরেজি ম্যাপিং ফলব্যাক (যদি ফ্রন্টম্যাটারে বাংলা 'গল্প' থাকে তবে স্লাগ 'story' হবে)
+// ইংরেজি ম্যাপিং ফলব্যাক
 const ITEM_SLUG_MAP: Record<string, string> = {
   'গল্প': 'story',
   'ছোটগল্প': 'story',
@@ -121,12 +122,14 @@ export async function getAllLibraryItems(): Promise<LibraryItemEntry[]> {
               const itemTypes = extractItemsFromData(fileData);
 
               if (itemTypes.length > 0) {
+                // আইটেমের টাইটেল নির্ধারণ
                 const itemTitle = fileData.item_title || fileData.title || entry.name.replace(/\.md$/, '');
                 
-                // ✅ আপনার শর্তানুযায়ী: ফ্রন্টম্যাটারে slug থাকলে সেটা, না থাকলে সরাসরি itemTitle
-                const titleSlug = fileData.slug 
-                  ? String(fileData.slug).trim() 
-                  : itemTitle;
+                // ✅ ফ্রন্টম্যাটারের slug সংগ্রহ
+                const rawFrontmatterSlug = fileData.slug ? String(fileData.slug).trim() : undefined;
+
+                // ✅ ১ম প্রায়োরিটি: ফ্রন্টম্যাটারের slug, না থাকলে ফলব্যাক হিসেবে টাইটেল বা ফাইলের নাম
+                let titleSlug = rawFrontmatterSlug || slugify(itemTitle) || entry.name.replace(/\.md$/, '');
 
                 itemTypes.forEach((type) => {
                   const itemTypeSlug = getItemSlug(type);
@@ -136,6 +139,7 @@ export async function getAllLibraryItems(): Promise<LibraryItemEntry[]> {
                     itemType: type,
                     itemTypeSlug,
                     title: itemTitle,
+                    slug: rawFrontmatterSlug,
                     titleSlug,
                     bookTitle,
                     bookSlug,
@@ -162,14 +166,29 @@ export async function getAllLibraryItems(): Promise<LibraryItemEntry[]> {
 }
 
 /**
- * নির্দিষ্ট Item Type (যেমন: story, poem) এবং Title Slug দিয়ে সিঙ্গেল আইটেম ডাটা রিড করা
+ * নির্দিষ্ট Item Type এবং Title Slug দিয়ে সিঙ্গেল আইটেম ডাটা রিড করা (কেস ও ডিকোডিং সুরক্ষিত)
  */
 export async function getItemByParams(itemSlug: string, titleSlug: string) {
   const allItems = await getAllLibraryItems();
 
-  const currentIndex = allItems.findIndex(
-    (item) => item.itemTypeSlug === itemSlug && decodeURIComponent(item.titleSlug) === decodeURIComponent(titleSlug)
-  );
+  const decodedTargetItemSlug = decodeURIComponent(itemSlug).trim().toLowerCase();
+  const decodedTargetTitleSlug = decodeURIComponent(titleSlug).trim();
+  const lowerTargetTitleSlug = decodedTargetTitleSlug.toLowerCase();
+
+  const currentIndex = allItems.findIndex((item) => {
+    const currentItemTypeSlug = (item.itemTypeSlug || '').trim().toLowerCase();
+    const currentTitleSlug = (item.titleSlug || '').trim();
+    const currentTitleSlugLower = currentTitleSlug.toLowerCase();
+    const currentFrontmatterSlug = (item.slug || '').trim();
+
+    const isTypeMatch = currentItemTypeSlug === decodedTargetItemSlug;
+    const isTitleMatch = 
+      currentTitleSlug === decodedTargetTitleSlug || 
+      currentTitleSlugLower === lowerTargetTitleSlug ||
+      currentFrontmatterSlug === decodedTargetTitleSlug;
+
+    return isTypeMatch && isTitleMatch;
+  });
 
   if (currentIndex === -1) return null;
 
