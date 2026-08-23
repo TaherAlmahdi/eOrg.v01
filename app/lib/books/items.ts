@@ -19,7 +19,7 @@ export interface LibraryItemEntry {
   frontmatter: Record<string, any>;
 }
 
-// বাংলা ও ইংরেজি উভয় টেক্সট থেকে সঠিক স্লাগ তৈরির হেল্পার
+// বাংলা ও ইংরেজি উভয় টেক্সট থেকে সঠিক স্লাগ তৈরির হেল্পার (এটি শুধু itemTypeSlug বা অন্যান্য বিষয়ের জন্য অপরিবর্তিত রাখা হলো)
 function slugify(text: string): string {
   if (!text) return '';
   return text
@@ -113,7 +113,7 @@ export async function getAllLibraryItems(): Promise<LibraryItemEntry[]> {
             } else if (
               entry.isFile() && 
               entry.name.endsWith('.md') && 
-              entry.name.toLowerCase() !== 'index.md' // 🟢 index.md ফাইল স্কিপ করা হলো (যাতে জঁরা না আসে)
+              entry.name.toLowerCase() !== 'index.md'
             ) {
               const fileContent = await fs.readFile(fullPath, 'utf8');
               const { data: fileData, content } = matter(fileContent);
@@ -122,11 +122,15 @@ export async function getAllLibraryItems(): Promise<LibraryItemEntry[]> {
 
               if (itemTypes.length > 0) {
                 const itemTitle = fileData.item_title || fileData.title || entry.name.replace(/\.md$/, '');
-                const titleSlug = fileData.slug ? String(fileData.slug).trim() : slugify(itemTitle);
+                
+                // ✅ আপনার শর্তানুযায়ী: ফ্রন্টম্যাটারে slug থাকলে সেটা, না থাকলে সরাসরি itemTitle
+                const titleSlug = fileData.slug 
+                  ? String(fileData.slug).trim() 
+                  : itemTitle;
 
                 itemTypes.forEach((type) => {
                   const itemTypeSlug = getItemSlug(type);
-                  const href = `/items/${itemTypeSlug}/${titleSlug}`;
+                  const href = `/items/${itemTypeSlug}/${encodeURIComponent(titleSlug)}`;
 
                   allItems.push({
                     itemType: type,
@@ -164,7 +168,7 @@ export async function getItemByParams(itemSlug: string, titleSlug: string) {
   const allItems = await getAllLibraryItems();
 
   const currentIndex = allItems.findIndex(
-    (item) => item.itemTypeSlug === itemSlug && item.titleSlug === titleSlug
+    (item) => item.itemTypeSlug === itemSlug && decodeURIComponent(item.titleSlug) === decodeURIComponent(titleSlug)
   );
 
   if (currentIndex === -1) return null;

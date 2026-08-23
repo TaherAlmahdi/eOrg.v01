@@ -4,8 +4,9 @@ import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { Search, Home } from "lucide-react";
 
-// বাংলা ও ইউনিকোড নরমালাইজেশন (স্মার্ট সার্চের জন্য)
+// বাংলা ও ইউনিকোড নরমালাইজেশন
 const normalizeBengali = (text: string = ''): string => {
+  if (!text) return '';
   return text
     .normalize('NFC')
     .replace(/\u09af\u09bc/g, 'য়')
@@ -18,18 +19,17 @@ const normalizeBengali = (text: string = ''): string => {
     .trim();
 };
 
-/**
- * স্ট্রিপিং ও ইউআরএল বান্ধব স্লাগ তৈরির ফাংশন
- * স্লাগ না থাকলে সরাসরি টাইটেলকে স্লাগে রূপান্তর করবে
- */
 const slugify = (text: string = ''): string => {
   if (!text) return '';
   return text
     .toString()
     .trim()
     .toLowerCase()
-    .replace(/\s+/g, '-') // স্পেসের পরিবর্তে ড্যাশ (-)
-    .replace(/[^\w\u0980-\u09FF\-]/g, ''); // বাংলা ও ইংরেজি অক্ষর এবং ড্যাশ ছাড়া বাকি চিহ্ন রিমুভ
+    .replace(/[\u200B-\u200D\uFEFF]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9\u0980-\u09FF\-]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '');
 };
 
 const extractFieldText = (field: any, fallback: string = "—"): string => {
@@ -39,115 +39,140 @@ const extractFieldText = (field: any, fallback: string = "—"): string => {
   return fallback;
 };
 
-export default function ItemViewClient({ initialItems, displayTitle }: any) {
+const toBengaliNumber = (num: number | string): string =>
+  num.toString().replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[parseInt(d, 10)]);
+
+interface ItemViewClientProps {
+  initialItems?: any[];
+  displayTitle?: string;
+  itemSlug?: string;
+  slugsArray?: string[];
+}
+
+export default function ItemViewClient({
+  initialItems = [],
+  displayTitle = "",
+  itemSlug = "",
+}: ItemViewClientProps) {
   const [search, setSearch] = useState("");
   const [selectedLetter, setSelectedLetter] = useState<string | null>(null);
-
-  // স্ক্রিন সাইজ অনুযায়ী প্রাথমিক আইটেম সংখ্যা নির্ধারণের স্টেট
   const [itemsPerPage, setItemsPerPage] = useState<number>(30);
   const [visibleCount, setVisibleCount] = useState<number>(30);
 
-  // স্ক্রিন সাইজ ট্র্যাক করে ডাইনামিক পেজিনেশন লিমিট সেট করা
+  // স্ক্রিন সাইজ অনুযায়ী পেজিনেশন সাইজ নির্ধারণ
   useEffect(() => {
-    const updateItemsPerPage = () => {
-      const width = window.innerWidth;
-      if (width < 768) {
-        setItemsPerPage(25);
-        setVisibleCount(25);
-      } else if (width >= 1536) {
-        setItemsPerPage(60);
-        setVisibleCount(60);
-      } else {
-        setItemsPerPage(45);
-        setVisibleCount(45);
-      }
+    let timeoutId: NodeJS.Timeout;
+    const handleResize = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        const width = window.innerWidth;
+        const count = width < 768 ? 25 : width >= 1536 ? 60 : 45;
+        setItemsPerPage(count);
+      }, 150);
     };
 
-    updateItemsPerPage();
-    window.addEventListener('resize', updateItemsPerPage);
-    return () => window.removeEventListener('resize', updateItemsPerPage);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
-  // ১. ইউনিক আদ্যক্ষর (Alphabet) তালিকা তৈরি
-  const availableLetters = useMemo(() => {
-    const lettersSet = new Set<string>();
-    initialItems.forEach((item: any) => {
-      const title = extractFieldText(item.title);
-      if (title && title !== "—" && title !== "শিরোনামহীন") {
-        const firstChar = title.trim().charAt(0);
-        const formattedChar = /^[a-zA-Z]$/.test(firstChar) ? firstChar.toUpperCase() : firstChar;
-        lettersSet.add(formattedChar);
-      }
+  const currentPrakaronSlug = itemSlug ? slugify(itemSlug) : slugify(displayTitle);
+
+  // ১. প্রাথমিক ডাটা সর্টিং
+  const sortedItems = useMemo(() => {
+    if (!initialItems || !Array.isArray(initialItems)) return [];
+
+    return [...initialItems].sort((a: any, b: any) => {
+      const titleA = extractFieldText(a.title, "").normalize('NFC');
+      const titleB = extractFieldText(b.title, "").normalize('NFC');
+      return titleA.localeCompare(titleB, 'bn', { sensitivity: 'base' });
     });
-    return Array.from(lettersSet).sort((a, b) => a.localeCompare(b, 'bn'));
   }, [initialItems]);
 
-  // ২. সার্চ ও বর্ণানুক্রমিক ফিল্টারিং লজিক
+  // ২. টাইটেল থেকে ইউনিক প্রথম বর্ণমালা বের করা
+  const availableLetters = useMemo(() => {
+    const lettersSet = new Set<string>();
+
+    sortedItems.forEach((entry: any) => {
+      const title = extractFieldText(entry.title, "").normalize('NFC');
+      if (title && title !== "—" && title !== "শিরোনামহীন") {
+        const firstChar = title.trim().charAt(0);
+        if (firstChar) {
+          const formattedChar = /^[a-zA-Z]$/.test(firstChar) ? firstChar.toUpperCase() : firstChar;
+          lettersSet.add(formattedChar);
+        }
+      }
+    });
+
+    return Array.from(lettersSet).sort((a, b) => a.localeCompare(b, 'bn', { sensitivity: 'base' }));
+  }, [sortedItems]);
+
+  // ৩. সার্চ এবং বর্ণ অনুযায়ী লাইভ ফিল্টারিং
   const filtered = useMemo(() => {
-    return initialItems.filter((item: any) => {
-      const titleText = extractFieldText(item.title);
-      const bookText = extractFieldText(item.bookTitle || item.book);
-      const authorText = extractFieldText(item.author);
+    const query = normalizeBengali(search);
+
+    return sortedItems.filter((entry: any) => {
+      const rawTitle = extractFieldText(entry.title, "শিরোনামহীন");
+      const rawBook = extractFieldText(entry.bookTitle || entry.book, "");
+      const rawAuthor = extractFieldText(entry.author, "");
 
       if (selectedLetter) {
-        const firstChar = titleText.trim().charAt(0);
+        const firstChar = rawTitle.normalize('NFC').trim().charAt(0);
         const formattedChar = /^[a-zA-Z]$/.test(firstChar) ? firstChar.toUpperCase() : firstChar;
         if (formattedChar !== selectedLetter) return false;
       }
 
-      const query = normalizeBengali(search);
       if (!query) return true;
 
-      const title = normalizeBengali(titleText);
-      const book = normalizeBengali(bookText);
-      const author = normalizeBengali(authorText);
-
-      return title.includes(query) || book.includes(query) || author.includes(query);
+      return (
+        normalizeBengali(rawTitle).includes(query) ||
+        normalizeBengali(rawBook).includes(query) ||
+        normalizeBengali(rawAuthor).includes(query)
+      );
     });
-  }, [initialItems, search, selectedLetter]);
+  }, [sortedItems, search, selectedLetter]);
 
   useEffect(() => {
     setVisibleCount(itemsPerPage);
   }, [search, selectedLetter, itemsPerPage]);
 
-  const currentItems = useMemo(() => {
-    return filtered.slice(0, visibleCount);
-  }, [filtered, visibleCount]);
-
-  const handleLoadMore = () => {
-    setVisibleCount((prev) => prev + itemsPerPage);
-  };
+  const currentItems = useMemo(() => filtered.slice(0, visibleCount), [filtered, visibleCount]);
 
   return (
     <main className="w-full px-2 md:px-4 py-3 font-tarunima space-y-3">
-
-      {/* ব্রেডক্রাম সেকশন */}
+      {/* ব্রেডক্রাম্ব */}
       <nav className="w-full bg-[#7575a3] border-b border-gray-200 py-2 px-3 text-white overflow-x-auto no-scrollbar">
-        <div className="max-w-full mx-auto text-sm font-tarunima flex items-center whitespace-nowrap">
+        <div className="max-w-full mx-auto text-sm flex items-center whitespace-nowrap">
           <Link href="/" className="shrink-0"><Home size={16} /></Link>
           <span className="mx-2 text-white/50 shrink-0">/</span>
           <Link href="/items" className="hover:text-red-100 shrink-0">প্রকরণ</Link>
-          <span className="mx-2 text-white/50 shrink-0">/</span>
-          <span className="hover:text-red-100 shrink-0">{displayTitle}</span>
+          {displayTitle && displayTitle !== 'সকল আইটেম' && (
+            <>
+              <span className="mx-2 text-white/50 shrink-0">/</span>
+              <span className="hover:text-red-100 shrink-0">{displayTitle}</span>
+            </>
+          )}
         </div>
       </nav>
 
-      {/* হেডার সেকশন */}
+      {/* হেডার ও সার্চ */}
       <header className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-gray-200 pb-2 gap-2">
         <div>
           <h1 className="text-xl md:text-2xl font-bold text-gray-950">
-            প্রকরণ : <span className="text-[#008080]">{displayTitle}</span>
+            প্রকরণ : <span className="text-[#008080]">{displayTitle || 'নির্বাচিত প্রকরণ'}</span>
           </h1>
           <p className="text-sm text-gray-500 mt-1">
-            {displayTitle} প্রকরণে সর্বমোট {filtered.length.toLocaleString("bn-BD")} টি {displayTitle} রয়েছে!
+            সর্বমোট {toBengaliNumber(filtered.length)}টি পাতা রয়েছে
           </p>
         </div>
 
-        {/* সার্চবার */}
         <div className="relative w-full md:w-80 shrink-0">
           <input
             className="w-full px-4 py-2 pl-10 text-sm bg-white border border-teal-200 rounded focus:ring-1 focus:ring-[#008080] outline-none shadow-xs"
-            placeholder="শিরোনাম, মূল গ্রন্থ বা লেখক দিয়ে খুঁজুন..."
+            placeholder="শিরোনাম, মূল গ্রন্থ বা লেখক খুঁজুন..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -155,27 +180,31 @@ export default function ItemViewClient({ initialItems, displayTitle }: any) {
         </div>
       </header>
 
-      {/* ৩. বর্ণানুক্রমিক ফিল্টার বার */}
+      {/* বর্ণানুক্রমিক ফিল্টার বার */}
       {availableLetters.length > 0 && (
-        <div className="flex items-center gap-1 flex-wrap bg-teal-50/50 p-1 rounded border border-teal-100">
+        <div className="flex items-center justify-center gap-1 flex-wrap bg-teal-50/50 p-1 rounded border border-teal-100">
           <button
+            type="button"
             onClick={() => setSelectedLetter(null)}
-            className={`px-2 py-1 text-xs font-semibold rounded transition-colors cursor-pointer ${selectedLetter === null
+            className={`px-2 py-1 text-xs font-semibold rounded transition-colors cursor-pointer ${
+              selectedLetter === null
                 ? 'bg-[#008080] text-white shadow-xs'
                 : 'bg-white text-gray-700 hover:bg-teal-100 border border-teal-200'
-              }`}
+            }`}
           >
             সব
           </button>
 
-          {availableLetters.map((letter, idx) => (
+          {availableLetters.map((letter) => (
             <button
-              key={idx}
+              key={letter}
+              type="button"
               onClick={() => setSelectedLetter(selectedLetter === letter ? null : letter)}
-              className={`px-2 py-1 text-xs font-semibold rounded transition-colors cursor-pointer ${selectedLetter === letter
+              className={`px-2 py-1 text-xs font-semibold rounded transition-colors cursor-pointer ${
+                selectedLetter === letter
                   ? 'bg-[#008080] text-white shadow-xs'
                   : 'bg-white text-gray-700 hover:bg-teal-100 border border-teal-200'
-                }`}
+              }`}
             >
               {letter}
             </button>
@@ -183,31 +212,38 @@ export default function ItemViewClient({ initialItems, displayTitle }: any) {
         </div>
       )}
 
+      {/* কনটেন্ট গ্রিড */}
       {filtered.length === 0 ? (
         <div className="p-12 text-center text-gray-500 bg-white rounded border border-dashed border-gray-300">
-          আপনার অনুসন্ধান অনুযায়ী কোন {displayTitle} পাওয়া যায়নি।
+          কোনো পাতা পাওয়া যায়নি।
         </div>
       ) : (
         <>
-          {/* রেসপন্সিভ গ্রিড */}
           <div className="grid grid-cols-1 md:grid-cols-3 2xl:grid-cols-4 gap-1">
             {currentItems.map((item: any, idx: number) => {
               const itemTitle = extractFieldText(item.title, "শিরোনামহীন");
               const bookTitle = extractFieldText(item.bookTitle || item.book, "—");
               const authorName = extractFieldText(item.author, "—");
 
-              // যদি slug দেওয়া না থাকে, তবে সরাসরি title কে slugify করে ব্যবহার করা হবে
-              const itemSlug = item.slug ? item.slug : slugify(itemTitle);
+              // slugify ব্যবহার না করে সরাসরি টাইটেল বা ফ্রন্টম্যাটারের স্লাগ ব্যবহার করার সঠিক কোড:
+
+              const resolvedTitleSlug = item.slug 
+                ? String(item.slug).trim() 
+                : (item.itemSlug ? String(item.itemSlug).trim() : itemTitle);
+
+              const pageUrl = `/item/${currentPrakaronSlug}/${encodeURIComponent(resolvedTitleSlug)}`;
+              
               const bookSlug = item.bookSlug ? item.bookSlug : slugify(bookTitle);
               const authorSlug = item.authorSlug ? item.authorSlug : slugify(authorName);
 
               return (
-                <div key={idx} className="bg-white border border-teal-100 rounded p-2 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-center">
-
-                  {/* ১. ডেস্কটপ ভিউ */}
+                <div 
+                  key={item.id || `${resolvedTitleSlug}-${idx}`} 
+                  className="bg-white border border-teal-100 rounded p-2 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-center"
+                >
                   <div className="hidden md:flex items-center flex-wrap gap-x-2 text-base">
                     <Link
-                      href={`/item/${itemSlug}`}
+                      href={pageUrl}
                       className="font-bold text-[#008080] hover:text-[#cc7a00] no-underline transition-colors"
                     >
                       {itemTitle}
@@ -228,10 +264,9 @@ export default function ItemViewClient({ initialItems, displayTitle }: any) {
                     </Link>
                   </div>
 
-                  {/* ২. মোবাইল ভিউ */}
                   <div className="flex md:hidden flex-col space-y-2">
                     <Link
-                      href={`/item/${itemSlug}`}
+                      href={pageUrl}
                       className="text-base font-bold text-[#008080] hover:text-[#cc7a00] transition-colors"
                     >
                       {itemTitle}
@@ -252,20 +287,20 @@ export default function ItemViewClient({ initialItems, displayTitle }: any) {
                       </Link>
                     </div>
                   </div>
-
                 </div>
               );
             })}
           </div>
 
-          {/* লোড মোর (Load More) বাটন */}
+          {/* পেজিনেশন বাটন */}
           {visibleCount < filtered.length && (
             <div className="flex justify-center pt-4 pb-2">
               <button
-                onClick={handleLoadMore}
+                type="button"
+                onClick={() => setVisibleCount((prev) => prev + itemsPerPage)}
                 className="px-6 py-2.5 bg-[#008080] text-white font-medium text-sm rounded shadow-sm hover:bg-[#006666] transition-colors cursor-pointer"
               >
-                আরও {Math.min(itemsPerPage, filtered.length - visibleCount).toLocaleString("bn-BD")} টি দেখুন
+                আরও {toBengaliNumber(Math.min(itemsPerPage, filtered.length - visibleCount))} টি দেখুন
               </button>
             </div>
           )}
