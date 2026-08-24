@@ -9,10 +9,13 @@ first_published: 1904
 source_book: 
 genre:
   - "উপন্যাস"
+  - "রহস্য উপন্যাস"
 
 genre_links:
   - name: "উপন্যাস"
     link: "/genre/novel"
+  - name: "রহস্য উপন্যাস"
+    link: "mystery-novel"
 
 cover: "/cover/haridaser-guptakotha.webp"
 notice: "এই পাতাটি মূলগ্রন্থের অংশ নয়!"

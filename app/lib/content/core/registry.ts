@@ -58,6 +58,7 @@ export const CONTENT_REGISTRY = {
     "childrens-literature": "শিশুসাহিত্য",
     "classic": "ধ্রুপদী সাহিত্য",
     "detective-fiction": "গুপ্তচর কাহিনী",
+    "mystery-novel": "রহস্য উপন্যাস",
     "drama": "নাটক",
     "drama-fiction": "নাট্য কাহিনী",
     "essay": "প্রবন্ধ",

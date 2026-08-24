@@ -25,7 +25,7 @@ export default function BookDetails({ book, series: explicitSeries }: BookDetail
   // book.series, book.series_name অথবা প্রপস থেকে আসা explicitSeries গ্রহণ
   const seriesData = book.series || book.series_name || explicitSeries;
 
-  // সিরিজের লিঙ্ক পাওয়ার জন্য হেল্পার ফাংশন
+  // সিরিজের লিঙ্ক পাওয়ার জন্য হেল্পার ফাংশন
   const getSeriesLink = (seriesName: string): string => {
     // ১. যদি series_links এ্যারে থেকে নাম ম্যাচ করে
     const matchedLink = book.series_links?.find(
@@ -36,7 +36,7 @@ export default function BookDetails({ book, series: explicitSeries }: BookDetail
     // ২. যদি সরাসরি book.series_link থাকে
     if (book.series_link) return book.series_link;
 
-    // ৩. কোনো নির্দিষ্ট লিঙ্ক না থাকলে ডায়নামিক স্লাগ রুট ফলব্যাক
+    // ৩. কোনো নির্দিষ্ট লিঙ্ক না থাকলে ডায়নামিক স্লাগ রুট ফলব্যাক
     return `/series/${encodeURIComponent(seriesName)}`;
   };
 
@@ -48,16 +48,27 @@ export default function BookDetails({ book, series: explicitSeries }: BookDetail
       {/* ২. পুস্তক বিবরণীর বিস্তারিত তথ্যের মূল কার্ড (নিচে থাকবে) */}
       <div className="p-2 bg-white border border-gray-100 rounded shadow-sm">
         <div className="space-y-2 text-sm text-gray-800">
-          {/* বইয়ের নাম */}
-          {book.title && (
+          
+          {/* ১. আইটেম / প্রকরণ (যেমন: কবিতা) : বর্তমান পাতার টাইটেল (যেমন: অধঃপতন সঙ্গীত) */}
+          {/* এখানে book.item হলো প্রকরণ (কবিতা/গল্প ইত্যাদি) এবং book.title হলো বর্তমান পাতার টাইটেল */}
+          {book.item && book.title && (
             <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
-              <span className="font-bold">বই</span>
+              <span className="font-bold">{book.item}</span>
               <span className="text-gray-400">:</span>
               <span>{book.title}</span>
             </div>
           )}
 
-          {/* লেখক */}
+          {/* ২. বই : মূল বইয়ের নাম (যা ফ্রন্টমেটারের book: "" থেকে আসবে, যেমন: বাল্যরচনা) */}
+          {book.book && (
+            <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
+              <span className="font-bold">বই</span>
+              <span className="text-gray-400">:</span>
+              <span>{book.book}</span>
+            </div>
+          )}
+
+          {/* ৩. লেখক */}
           {book.author && (
             <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
               <span className="font-bold">লেখক</span>

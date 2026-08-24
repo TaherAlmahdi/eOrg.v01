@@ -9,8 +9,8 @@ export interface CustomLink {
 }
 
 export interface ItemDetailsBook {
-  item?: string | CustomLink;
-  title?: string | CustomLink;
+  item?: string | { title?: string; [key: string]: unknown } | CustomLink;
+  title?: string | CustomLink; // মূল বইয়ের নাম (মেইন ফোল্ডারের ইনডেক্স ফাইল থেকে)
   author?: string | CustomLink;
   translator?: string | CustomLink;
   editor?: string | CustomLink;
@@ -41,12 +41,16 @@ const toBengaliNumber = (num?: number | string): string =>
     ? num.toString().replace(/\d/g, (d) => '০১২৩৪৫৬৭৮৯'[parseInt(d, 10)])
     : '';
 
-// যেকোনো ভ্যালু সেফভাবে টেক্সট বা লিংকে রূপান্তর করার জন্য হেল্পার
 const renderValue = (val: unknown): string => {
   if (val === null || val === undefined) return '';
   if (typeof val === 'string' || typeof val === 'number') return String(val);
-  if (typeof val === 'object' && val !== null && 'name' in val) {
-    return String((val as CustomLink).name || '');
+  if (typeof val === 'object' && val !== null) {
+    if ('title' in val && typeof (val as any).title === 'string') {
+      return String((val as any).title);
+    }
+    if ('name' in val && typeof (val as any).name === 'string') {
+      return String((val as any).name);
+    }
   }
   return '';
 };
@@ -70,14 +74,20 @@ export default function ItemDetails({ book, series: explicitSeries }: ItemDetail
       <div className="p-2 bg-white border border-gray-100 rounded shadow-sm">
         <div className="space-y-2 text-sm text-gray-800">
           
+          {/* ১. বর্তমান পাতার নাম (আইটেম টাইটেল) */}
           {book.item && (
             <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
-              <span className="font-bold">আইটেম</span>
+              <span className="font-bold">প্রকরণ</span>
               <span className="text-gray-400">:</span>
-              <span>{renderValue(book.item)}</span>
+              <span>
+                {typeof book.item === 'object' && book.item !== null && 'title' in book.item 
+                  ? renderValue((book.item as any).title) 
+                  : renderValue(book.item)}
+              </span>
             </div>
           )}
 
+          {/* ২. মূল বইয়ের নাম (মেইন ফোল্ডারের ইনডেক্স ফাইল থেকে আসা book.title) */}
           {book.title && (
             <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
               <span className="font-bold">বই</span>
