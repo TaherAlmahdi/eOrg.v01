@@ -182,15 +182,14 @@ export default function ItemViewClient({
 
       {/* বর্ণানুক্রমিক ফিল্টার বার */}
       {availableLetters.length > 0 && (
-        <div className="flex items-center justify-center gap-1 flex-wrap bg-teal-50/50 p-1 rounded border border-teal-100">
+        <div className="flex items-center justify-center gap-1 flex-wrap bg-teal-50/50 px-2 rounded border border-teal-100">
           <button
             type="button"
             onClick={() => setSelectedLetter(null)}
-            className={`px-2 py-1 text-xs font-semibold rounded transition-colors cursor-pointer ${
-              selectedLetter === null
+            className={`px-2 py-1 text-xs font-semibold rounded transition-colors cursor-pointer ${selectedLetter === null
                 ? 'bg-[#008080] text-white shadow-xs'
                 : 'bg-white text-gray-700 hover:bg-teal-100 border border-teal-200'
-            }`}
+              }`}
           >
             সব
           </button>
@@ -200,11 +199,10 @@ export default function ItemViewClient({
               key={letter}
               type="button"
               onClick={() => setSelectedLetter(selectedLetter === letter ? null : letter)}
-              className={`px-2 py-1 text-xs font-semibold rounded transition-colors cursor-pointer ${
-                selectedLetter === letter
+              className={`px-2 py-1 text-xs font-semibold rounded transition-colors cursor-pointer ${selectedLetter === letter
                   ? 'bg-[#008080] text-white shadow-xs'
                   : 'bg-white text-gray-700 hover:bg-teal-100 border border-teal-200'
-              }`}
+                }`}
             >
               {letter}
             </button>
@@ -227,21 +225,21 @@ export default function ItemViewClient({
 
               // slugify ব্যবহার না করে সরাসরি টাইটেল বা ফ্রন্টম্যাটারের স্লাগ ব্যবহার করার সঠিক কোড:
 
-              const resolvedTitleSlug = item.slug 
-                ? String(item.slug).trim() 
+              const resolvedTitleSlug = item.slug
+                ? String(item.slug).trim()
                 : (item.itemSlug ? String(item.itemSlug).trim() : itemTitle);
 
               const pageUrl = `/item/${currentPrakaronSlug}/${encodeURIComponent(resolvedTitleSlug)}`;
-              
+
               const bookSlug = item.bookSlug ? item.bookSlug : slugify(bookTitle);
               const authorSlug = item.authorSlug ? item.authorSlug : slugify(authorName);
 
               return (
-                <div 
-                  key={item.id || `${resolvedTitleSlug}-${idx}`} 
+                <div
+                  key={item.id || `${resolvedTitleSlug}-${idx}`}
                   className="bg-white border border-teal-100 rounded p-2 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-center"
                 >
-                  <div className="hidden md:flex items-center flex-wrap gap-x-2 text-base">
+                  <div className="hidden md:flex items-center flex-wrap gap-x-2 px-2 text-base">
                     <Link
                       href={pageUrl}
                       className="font-bold text-[#008080] hover:text-[#cc7a00] no-underline transition-colors"

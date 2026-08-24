@@ -38,6 +38,7 @@
    ২. ক্লাস-ভিত্তিক কম্পোনেন্ট স্টাইল (Class-Based Architecture)
    ========================================== */
 @layer components {
+
   /* ----------------------------------
      ক. সাধারণ টাইপোগ্রাফি ও প্যারাগ্রাফ
      ---------------------------------- */
@@ -133,37 +134,85 @@
     align-items: flex-start;
     gap: 0px;
     padding: 5px 10px;
-    background-color: #f0f5f5; /* হালকা নীল ব্যাকগ্রাউন্ড */
-    border-left: 4px solid #0284c7 !important; /* বামের নীল বর্ডার */
+    background-color: #f0f5f5;
+    /* হালকা নীল ব্যাকগ্রাউন্ড */
+    border-left: 4px solid #0284c7 !important;
+    /* বামের নীল বর্ডার */
     color: #0f172a;
     text-align: justify;
   }
- 
-.quote p, .quote p.normal {
-  text-indent: 0px;
-  margin-bottom: 0.4rem !important;
-  font-size: inherit !important;
-  color: inherit !important;
-}
 
-.quote p, .quote p.normal {
-  text-indent: 30px;
-  margin-bottom: 0.4rem !important;
-}
+  .quote p,
+  .quote p.normal {
+    text-indent: 0px;
+    margin-bottom: 0.4rem !important;
+    font-size: inherit !important;
+    color: inherit !important;
+  }
 
-.quote p.right {
-  text-align: right !important;
-  margin-bottom: 0.4rem !important;
-  font-size: inherit !important;
-  color: inherit !important;
-}
+  .quote p,
+  .quote p.normal {
+    text-indent: 30px;
+    margin-bottom: 0.4rem !important;
+  }
 
-.quote p.pc {
-  text-align: center !important;
-  margin-bottom: 0.4rem !important;
-  font-size: inherit !important;
-  color: inherit !important;
-}
+  .quote p.right {
+    text-align: right !important;
+    margin-bottom: 0.4rem !important;
+    font-size: inherit !important;
+    color: inherit !important;
+  }
+
+  .quote p.pc {
+    text-align: center !important;
+    margin-bottom: 0.4rem !important;
+    font-size: inherit !important;
+    color: inherit !important;
+  }
+
+  .qte {
+    font-size: clamp(0.8rem, 1.2vw + 0.2rem, 1.1rem) !important;
+    line-height: 1.55;
+    background-color: wheat !important;
+    color: var(--text-main);
+    border-left: 4px solid #0284c7 !important;
+    margin-left: 30px;
+    position: relative;
+    display: block;
+    align-items: flex-start;
+    gap: 0px;
+    padding: 5px 10px;
+    text-align: justify;
+  }
+
+  .qte p.first {
+    text-indent: 0px;
+  }
+
+  .qte p.normal {
+    text-indent: 30px;
+  }
+
+  .qte p.first,
+  .qte p.normal {
+    margin-bottom: 0.4rem !important;
+    font-size: inherit !important;
+    color: inherit !important;
+  }
+
+  .qte p.right {
+    text-align: right !important;
+    margin-bottom: 0.4rem !important;
+    font-size: inherit !important;
+    color: inherit !important;
+  }
+
+  .qte p.pc {
+    text-align: center !important;
+    margin-bottom: 0.4rem !important;
+    font-size: inherit !important;
+    color: inherit !important;
+  }
 
   .first,
   .dcap,
@@ -192,11 +241,10 @@
   .dcap::first-letter {
     float: left;
     line-height: 1;
-    font-size: clamp(
-      1.5rem,
-      1.3vw + 1rem,
-      2rem
-    ); /* 🎯 আল্ট্রা ওয়াইড স্ক্রিনে আর ছোট দেখাবে না */
+    font-size: clamp(1.5rem,
+        1.3vw + 1rem,
+        2rem);
+    /* 🎯 আল্ট্রা ওয়াইড স্ক্রিনে আর ছোট দেখাবে না */
     color: whitesmoke;
     font-family: var(--font-tarunima), serif;
     padding: clamp(0.5rem, 1.2vw, 0.7rem);
@@ -204,7 +252,8 @@
     margin-top: 8px;
     background: var(--bg-gold);
     display: flex;
-    justify-content: center; /* ডানে-বায়ে সেন্টারে রাখবে */
+    justify-content: center;
+    /* ডানে-বায়ে সেন্টারে রাখবে */
     align-items: center;
     border-radius: 5px;
   }
@@ -260,9 +309,12 @@
   .poem {
     display: block !important;
     width: fit-content !important;
-    max-width: 95% !important; /* স্ক্রিনের বাইরে চলে যাওয়া ঠেকাতে */
-    margin-inline: auto !important; /* ডানে ও বামে সমান মার্জিন (margin-left & margin-right: auto) */
-    margin-block: 0rem; /* উপরে ও নিচে ০ মার্জিন */
+    max-width: 95% !important;
+    /* স্ক্রিনের বাইরে চলে যাওয়া ঠেকাতে */
+    margin-inline: auto !important;
+    /* ডানে ও বামে সমান মার্জিন (margin-left & margin-right: auto) */
+    margin-block: 0rem;
+    /* উপরে ও নিচে ০ মার্জিন */
     font-size: clamp(1rem, 1.2vw + 0.2rem, 1.3rem) !important;
     line-height: 1.55;
     color: var(--text-main);
@@ -337,6 +389,7 @@
   .dcap a {
     color: #cc0044;
   }
+
   .normal a:hover,
   .first a:hover,
   .dcap a:hover {
@@ -379,23 +432,28 @@
     text-align: right !important;
     font-size: inherit !important;
   }
+
   .center,
   .pc,
   .pcb {
     text-align: center !important;
   }
+
   .indent {
     text-indent: 30px !important;
     font-size: inherit !important;
   }
+
   .right {
     text-align: right;
   }
+
   .pl {
     width: 50%;
     float: left;
     text-align: left;
   }
+
   .pr {
     width: 50%;
     float: right;
@@ -406,22 +464,27 @@
   .hgap {
     margin: 0 10%;
   }
+
   .pgap {
     margin: 0 50px;
   }
+
   .ngap {
     margin: 0 15px;
   }
+
   .pcg {
     margin: 25px 0 5px 0;
     font-size: 1rem;
     text-align: center;
     color: var(--accent-blue);
   }
+
   .pcb {
     font-weight: bold !important;
     text-align: center;
   }
+
   /* ----------------------------------
      ছ. লিস্ট স্টাইল (Lists)
      ---------------------------------- */
@@ -493,7 +556,8 @@
     max-width: 95% !important;
     margin-left: auto !important;
     margin-right: auto !important;
-    text-align: left; /* কবিতার লাইনগুলোর বাম দিক সোজা রাখার জন্য */
+    text-align: left;
+    /* কবিতার লাইনগুলোর বাম দিক সোজা রাখার জন্য */
   }
 
   .not-prose .right {
@@ -755,6 +819,7 @@ div:has(> .gap) {
   margin: auto;
   width: 60%;
 }
+
 .col_4_1 {
   float: left;
   width: 10%;
@@ -964,8 +1029,10 @@ span.forty {
   align-items: flex-start;
   gap: 12px;
   padding: 12px 16px;
-  background-color: #f0f9ff; /* হালকা নীল ব্যাকগ্রাউন্ড */
-  border-left: 4px solid #0284c7; /* বামের নীল বর্ডার */
+  background-color: #f0f9ff;
+  /* হালকা নীল ব্যাকগ্রাউন্ড */
+  border-left: 4px solid #0284c7;
+  /* বামের নীল বর্ডার */
   border-radius: 6px;
   color: #0f172a;
   font-size: 15px;
@@ -981,15 +1048,18 @@ span.forty {
   justify-content: center;
   min-width: 22px;
   height: 22px;
-  background-color: #0284c7; /* আইকন বাটনের ব্যাকগ্রাউন্ড */
-  color: #ffffff; /* 'i' অক্ষরের কালার */
+  background-color: #0284c7;
+  /* আইকন বাটনের ব্যাকগ্রাউন্ড */
+  color: #ffffff;
+  /* 'i' অক্ষরের কালার */
   font-weight: bold;
   font-family: sans-serif;
   font-size: 13px;
   font-style: italic;
   border-radius: 50%;
   flex-shrink: 0;
-  margin-top: 2px; /* টেক্সটের সাথে অ্যালাইনমেন্ট ঠিক রাখার জন্য */
+  margin-top: 2px;
+  /* টেক্সটের সাথে অ্যালাইনমেন্ট ঠিক রাখার জন্য */
 }
 
 .dark .info {
@@ -997,6 +1067,7 @@ span.forty {
   color: #f1f5f9;
   border-left-color: #38bdf8;
 }
+
 .dark .info::before {
   background-color: #38bdf8;
   color: #0f172a;
@@ -1019,23 +1090,27 @@ span.forty {
 /* ২. মোবাইল/ছোট স্ক্রিন (ডিফল্ট: ডানের ভাগ আগে আসবে) */
 .fleft,
 .float-left {
-  order: 2; /* মোবাইলে বামের ভাগটি নিচে থাকবে */
+  order: 2;
+  /* মোবাইলে বামের ভাগটি নিচে থাকবে */
   text-align: left;
   width: 100%;
 }
 
 .fright,
 .float-right {
-  order: 1; /* মোবাইলে ডানের ভাগটি উপরে/প্রথমে থাকবে */
+  order: 1;
+  /* মোবাইলে ডানের ভাগটি উপরে/প্রথমে থাকবে */
   text-align: left;
   width: 100%;
 }
 
 /* ৩. বড় স্ক্রিন (Tablet / Desktop - min-width: 640px) */
 @media (min-width: 640px) {
+
   .fleft,
   .float-left {
-    order: 1; /* বড় স্ক্রিনে সাধারণ নিয়ম অনুযায়ী বামে থাকবে */
+    order: 1;
+    /* বড় স্ক্রিনে সাধারণ নিয়ম অনুযায়ী বামে থাকবে */
     float: left;
     width: calc(50% - 0.75rem);
     text-align: left;
@@ -1043,7 +1118,8 @@ span.forty {
 
   .fright,
   .float-right {
-    order: 2; /* বড় স্ক্রিনে ডানে থাকবে */
+    order: 2;
+    /* বড় স্ক্রিনে ডানে থাকবে */
     float: right;
     width: calc(50% - 0.75rem);
     text-align: right;
@@ -1062,16 +1138,20 @@ span.forty {
 
 /* প্যারেন্ট ডিভকে ডিসপ্লে ব্লক/ফ্লেক্স দিয়ে আইসোলেট করে ফেলা */
 .letter-footer {
-  display: flow-root; /* আধুনিক সিএসএস: এটি নিখুঁতভাবে সব ফ্লট ক্লিয়ার করে দেয় */
+  display: flow-root;
+  /* আধুনিক সিএসএস: এটি নিখুঁতভাবে সব ফ্লট ক্লিয়ার করে দেয় */
   width: 100%;
 }
 
 table {
   width: fit-content !important;
-  max-width: 100% !important; /* স্ক্রিনের বাইরে চলে যাওয়া রোধ করতে */
-  margin-left: auto !important; /* ডানে ও বামে সমান মার্জিন */
+  max-width: 100% !important;
+  /* স্ক্রিনের বাইরে চলে যাওয়া রোধ করতে */
+  margin-left: auto !important;
+  /* ডানে ও বামে সমান মার্জিন */
   margin-right: auto !important;
-  font-size: inherit; /* প্যারেন্ট এলিমেন্টের ফন্ট সাইজ পাবে */
+  font-size: inherit;
+  /* প্যারেন্ট এলিমেন্টের ফন্ট সাইজ পাবে */
 }
 
 /* অন্যান্য নির্দেশ বা নির্দিষ্ট টেক্সট অ্যালাইন না থাকলে ডিফল্ট সেন্টার হবে */
@@ -1104,12 +1184,15 @@ sup {
 .hgap {
   margin: 0 10%;
 }
+
 .pgap {
   margin: 0 50px;
 }
+
 .ngap {
   margin: 0 15px;
 }
+
 .pcg {
   margin: 25px 0 5px 0;
   font-size: 1.1em;
@@ -1119,8 +1202,10 @@ sup {
 
 hr {
   border: none;
-  border-top: 1px solid #e5e7eb; /* হালকা ধূসর কালার */
-  margin: 1.5rem 0; /* উপরে ও নিচে মার্জিন */
+  border-top: 1px solid #e5e7eb;
+  /* হালকা ধূসর কালার */
+  margin: 1.5rem 0;
+  /* উপরে ও নিচে মার্জিন */
 }
 
 .hr150 {
@@ -1137,6 +1222,7 @@ hr {
 .bgap {
   padding-bottom: 15px;
 }
+
 .ugap {
   padding-top: 15px;
 }
@@ -1150,15 +1236,19 @@ hr {
 .two {
   columns: 2;
 }
+
 .three {
   columns: 2;
 }
+
 .four {
   columns: 2;
 }
+
 .five {
   columns: 2;
 }
+
 .six {
   columns: 2;
 }
@@ -1169,15 +1259,19 @@ hr {
   .two {
     columns: 2;
   }
+
   .three {
     columns: 3;
   }
+
   .four {
     columns: 3;
   }
+
   .five {
     columns: 3;
   }
+
   .six {
     columns: 3;
   }
@@ -1189,15 +1283,19 @@ hr {
   .two {
     columns: 2;
   }
+
   .three {
     columns: 3;
   }
+
   .four {
     columns: 4;
   }
+
   .five {
     columns: 5;
   }
+
   .six {
     columns: 6;
   }
@@ -1209,15 +1307,19 @@ hr {
   .two {
     columns: 2;
   }
+
   .three {
     columns: 3;
   }
+
   .four {
     columns: 4;
   }
+
   .five {
     columns: 5;
   }
+
   .six {
     columns: 6;
   }
@@ -1229,15 +1331,16 @@ hr {
 .four,
 .five,
 .six {
-  column-gap: 1.5rem; /* কলামগুলোর মাঝের খালি জায়গা */
+  column-gap: 1.5rem;
+  /* কলামগুলোর মাঝের খালি জায়গা */
 }
 
 /* কলামের ভেতর কোনো আইটেম/প্যারাগ্রাফ যেন মাঝপথে কেটে না যায় */
-.two > *,
-.three > *,
-.four > *,
-.five > *,
-.six > * {
+.two>*,
+.three>*,
+.four>*,
+.five>*,
+.six>* {
   break-inside: avoid;
 }
 
@@ -1280,7 +1383,8 @@ span.right {
   content: " ❀ ";
   text-align: center;
   color: green;
-  opacity: 0.6; /* 0.1 খুব বেশি হালকা, তাই 0.5-0.7 ব্যবহার করা ভালো */
+  opacity: 0.6;
+  /* 0.1 খুব বেশি হালকা, তাই 0.5-0.7 ব্যবহার করা ভালো */
   line-height: 1.5;
   display: block;
   margin: 10px 0;
@@ -1345,20 +1449,24 @@ span.right {
   margin: 15px 0;
   padding: 0 5%;
   min-height: 50px;
-  
+
   /* Flexbox দিয়ে উভয় পাশে সাজানো এবং ভার্টিক্যালি সেন্টার করা */
   display: flex;
-  align-items: center; /* ভার্টিক্যালি সেন্টার করবে */
-  justify-content: space-between; /* দুই পাশ বরাবর কন্টেন্ট রাখবে */
+  align-items: center;
+  /* ভার্টিক্যালি সেন্টার করবে */
+  justify-content: space-between;
+  /* দুই পাশ বরাবর কন্টেন্ট রাখবে */
   box-sizing: border-box;
 }
 
 .intro_left {
-  text-align: left; /* বাম পাশের লেখা লেফ্ট এলাইন */
+  text-align: left;
+  /* বাম পাশের লেখা লেফ্ট এলাইন */
   font-size: inherit !important;
 }
 
 .intro_right {
-  text-align: center; /* ডান পাশের লেখা সেন্টার এলাইন */
+  text-align: center;
+  /* ডান পাশের লেখা সেন্টার এলাইন */
   font-size: inherit !important;
 }

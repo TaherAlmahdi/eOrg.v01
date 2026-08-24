@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Home, BookOpen, Search, X, Layers } from "lucide-react";
 
-// 🔹 মূল বইয়ের টাইপ (টাইপ-এরর সমাধানের জন্য আপডেট করা হয়েছে)
+// 🔹 মূল বইয়ের টাইপ (টাইপ-এরর সমাধানের জন্য আপডেট করা হয়েছে)
 export interface SeriesBook {
   id?: string;
   slug: string;
@@ -126,77 +126,81 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
 
       {/* মূল কন্টেন্ট */}
       <div className="px-3 py-6 mx-auto max-w-full">
-        <header className="pb-3 mb-6 border-b border-orange-200">
-          <div className="flex justify-center mt-3 mb-2">
-            <div className="inline-flex flex-col items-center justify-center gap-2 px-4 py-3 rounded bg-teal-50/90 text-[#008080] mb-0 border border-teal-100 shadow-xs text-center backdrop-blur-md">
-              <div className="flex items-center gap-2">
-                <Layers size={22} className="shrink-0 animate-pulse" />
-                <h1 className="text-xl font-black leading-none tracking-tight text-gray-900 md:text-2xl font-tarunima">
+        <header className="mb-3 space-y-3 bg-white/95 backdrop-blur-md shadow-xs">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+
+            {/* বামপাশে ডাইনামিক পেজ টাইটেল */}
+            <div className="rounded bg-teal-50/90 text-[#008080] border border-teal-200 shadow-xs backdrop-blur-md self-start md:self-auto">
+              <div className="p-2.5 inline-flex items-center gap-2">
+                <Layers size={22} className="shrink-0 animate-pulse text-[#008080]" />
+                <h1 className="text-xl md:text-2xl font-bold text-gray-950 leading-none">
                   <span className="text-[#008080]">{seriesTitle}</span>
                 </h1>
               </div>
-              <p className="italic text-center text-gray-500">
-                {books.length > 0
-                  ? `এই সিরিজে মোট ${toBengaliNumber(books.length)}টি বই রয়েছে`
-                  : "এই সিরিজে বর্তমানে কোনো বই নেই"}
+              <p className="text-xs md:text-sm text-gray-500 mt-1">
+                <span className="w-full text-xs md:text-sm font-normal text-teal-700 bg-teal-100/70 px-2 py-1 border-t border-teal-200 inline-block">
+                  {books.length > 0
+                    ? `এই সিরিজে মোট ${toBengaliNumber(books.length)}টি বই রয়েছে`
+                    : "এই সিরিজে বর্তমানে কোনো বই নেই"}
+                </span>
               </p>
             </div>
-          </div>
 
-          {/* 🔍 সার্চ বার ও ডায়নামিক বহুভাষিক আদ্যক্ষর ফিল্টার */}
-          {books.length > 0 && (
-            <div className="mt-6 max-w-4xl mx-auto space-y-4">
-              {/* সার্চ ইনপুট */}
-              <div className="relative max-w-md mx-auto">
+            {/* ডানপাশে সার্চবার */}
+            {books.length > 0 && (
+              <div className="relative w-full md:w-80 shrink-0">
+                <Search className="absolute w-4 h-4 text-teal-600 -translate-y-1/2 left-3 top-1/2 pointer-events-none" />
                 <input
                   type="text"
                   placeholder="বই বা লেখকের নাম দিয়ে খুঁজুন..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-10 py-2 text-base bg-white border border-orange-200 rounded focus:outline-none focus:ring-2 focus:ring-[#7575a3] transition-all text-gray-800 placeholder-gray-400 shadow-sm"
+                  className="w-full pl-9 pr-8 py-2 border border-teal-200 rounded focus:outline-none focus:ring-1 focus:ring-[#008080] text-sm bg-teal-50/30 text-gray-800 shadow-xs placeholder-gray-400"
                 />
-                <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery("")}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   >
                     <X size={16} />
                   </button>
                 )}
               </div>
+            )}
 
-              {/* ডায়নামিক ফিল্টার বাটন */}
-              {availableLetters.length > 0 && (
-                <div className="flex flex-wrap justify-center gap-1 sm:gap-1 pt-2">
-                  <button
-                    onClick={() => setSelectedLetter(null)}
-                    className={`px-2 py-1 text-xs md:text-sm rounded transition-colors ${selectedLetter === null
-                      ? "bg-[#7575a3] text-white font-medium"
-                      : "bg-white text-gray-600 border border-gray-200 hover:bg-orange-50"
-                      }`}
-                  >
-                    সব
-                  </button>
+          </div>
 
-                  {availableLetters.map((letter) => {
-                    const isSelected = selectedLetter === letter;
+          {/* নিচে: সেন্টারে আদ্যক্ষর ফিল্টার বার */}
+          {books.length > 0 && availableLetters.length > 0 && (
+            <div className="p-2 border border-teal-100 rounded bg-teal-50/90 backdrop-blur-md shadow-xs">
+              <div className="flex flex-wrap items-center justify-center gap-1">
+                <button
+                  onClick={() => setSelectedLetter(null)}
+                  className={`px-2 py-1 text-xs md:text-sm font-semibold rounded transition-colors cursor-pointer ${selectedLetter === null
+                      ? "bg-[#008080] text-white shadow-xs"
+                      : "bg-gray-100 hover:bg-teal-50 text-gray-700 hover:text-[#008080] border border-transparent hover:border-teal-200"
+                    }`}
+                >
+                  সব
+                </button>
 
-                    return (
-                      <button
-                        key={letter}
-                        onClick={() => setSelectedLetter(isSelected ? null : letter)}
-                        className={`px-2 py-1 text-xs md:text-sm rounded font-semibold transition-colors ${isSelected
-                          ? "bg-[#7575a3] text-white font-semibold"
-                          : "bg-white text-gray-700 border border-gray-200 hover:bg-orange-50 hover:border-orange-300"
-                          }`}
-                      >
-                        {letter}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
+                {availableLetters.map((letter) => {
+                  const isSelected = selectedLetter === letter;
+
+                  return (
+                    <button
+                      key={letter}
+                      onClick={() => setSelectedLetter(isSelected ? null : letter)}
+                      className={`px-2 py-1 text-xs md:text-sm font-semibold rounded transition-colors cursor-pointer ${isSelected
+                          ? "bg-[#008080] text-white shadow-xs"
+                          : "bg-gray-100 hover:bg-teal-50 text-gray-700 hover:text-[#008080] border border-transparent hover:border-teal-200"
+                        }`}
+                    >
+                      {letter}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           )}
         </header>

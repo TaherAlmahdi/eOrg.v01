@@ -3,11 +3,26 @@
 import type { FC } from "react";
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { 
-  BookOpen, Search, BookMarked, Bookmark, Feather, Scroll, Layers, 
-  FileText, Languages, Laugh, BookText, Compass, History, GraduationCap, 
-  Music, Flame, MoonStar, Cross, Sun, Flower2 
+import {
+  BookOpen, Search, BookMarked, Bookmark, Feather, Scroll, Layers,
+  FileText, Languages, Laugh, BookText, Compass, History, GraduationCap,
+  Music, Flame, MoonStar, Cross, Sun, Flower2
 } from "lucide-react";
+
+// 🔹 বাংলা বর্ণ ও স্পেস নরমালাইজ করার হেল্পার ফাংশন
+const normalizeBengaliText = (text: string): string => {
+  if (!text) return "";
+  return text
+    .normalize("NFC") // ইউনিকোড নরমাল এনকোডিং
+    .toLowerCase()
+    // সমতুল্য বাংলা বর্ণ ও নুকতা সামঞ্জস্যকরণ
+    .replace(/য়/g, "য")
+    .replace(/ড়/g, "র")
+    .replace(/ঢ়/g, "র")
+    .replace(/ব়/g, "র")
+    .replace(/়/g, "") // যেকোনো অবশিষ্ট নুকতা রিমুভ
+    .replace(/[\s\-_]+/g, ""); // স্পেস, হাইফেন ও আন্ডারস্কোর রিমুভ (যেমন: হিমু সমগ্র -> হিমুসমগ্র)
+};
 
 // ১. Lucide icons mapping
 const SERIES_ICONS: Record<string, FC<{ className?: string }>> = {
@@ -80,16 +95,16 @@ export const SeriesListView: FC<SeriesListViewProps> = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLetter, setSelectedLetter] = useState("সব");
 
-  // 🔹 ১. ফিল্টারিং ও সাজানো
+  // 🔹 ১. ফিল্টারিং ও বর্ণানুক্রমে সাজানো
   const validSeriesList = useMemo(() => {
     const filtered = seriesList.filter((item) => {
       if (!item.label || !item.slug) return false;
       const cleanLabel = item.label.trim().toLowerCase();
       const cleanSlug = item.slug.trim().toLowerCase();
-      
+
       return !(
-        cleanLabel === "" || 
-        cleanLabel === "অন্যান্য" || 
+        cleanLabel === "" ||
+        cleanLabel === "অন্যান্য" ||
         cleanLabel === "others" ||
         cleanSlug === "others" ||
         cleanSlug === "other"
@@ -99,7 +114,6 @@ export const SeriesListView: FC<SeriesListViewProps> = ({
     if (isHomePage) {
       return filtered.slice(0, 20);
     } else {
-      // সিরিজ কার্ডের নামগুলোকে বাংলা বর্ণানুক্রমে সাজানো
       return [...filtered].sort((a, b) =>
         a.label.trim().localeCompare(b.label.trim(), "bn", { sensitivity: "base" })
       );
@@ -113,7 +127,7 @@ export const SeriesListView: FC<SeriesListViewProps> = ({
     const lettersSet = new Set<string>();
 
     validSeriesList.forEach((item) => {
-      const firstChar = item.label.trim().charAt(0);
+      const firstChar = item.label.trim().charAt(0).normalize("NFC");
       if (firstChar) {
         lettersSet.add(firstChar);
       }
@@ -126,52 +140,80 @@ export const SeriesListView: FC<SeriesListViewProps> = ({
     return ["সব", ...sortedLetters];
   }, [validSeriesList, isHomePage]);
 
-  // 🔹 ৩. সার্চ ও আদ্যক্ষর ফিল্টারিং
+  // 🔹 ৩. সার্চ ও আদ্যক্ষর ফিল্টারিং (সমতুল্য বাংলা বর্ণ ও স্পেস সমস্যার সমাধান সহ)
   const filteredSeries = useMemo(() => {
     if (isHomePage) return validSeriesList;
 
+    const normalizedQuery = normalizeBengaliText(searchQuery);
+
     return validSeriesList.filter((item) => {
-      const matchesSearch = item.label.toLowerCase().includes(searchQuery.toLowerCase());
-      const firstChar = item.label.trim().charAt(0);
+      const normalizedLabel = normalizeBengaliText(item.label);
+      const matchesSearch = normalizedLabel.includes(normalizedQuery);
+
+      const firstChar = item.label.trim().charAt(0).normalize("NFC");
       const matchesLetter = selectedLetter === "সব" || firstChar === selectedLetter;
 
       return matchesSearch && matchesLetter;
     });
   }, [validSeriesList, searchQuery, selectedLetter, isHomePage]);
 
+  const displayTotalCount = totalSeriesCount ?? validSeriesList.length;
+
   return (
-    <div className="w-full px-0">
+    <div className="w-full font-tarunima px-2 py-3">
       {!isHomePage && (
-        <div className="p-4 mb-3 space-y-4 border border-teal-100 rounded shadow-sm bg-white/90 backdrop-blur-md">
-          {/* লাইভ সার্চ বার */}
-          <div className="relative max-w-md mx-auto">
-            <Search className="absolute w-5 h-5 text-teal-600 -translate-y-1/2 left-3 top-1/2" />
-            <input
-              type="text"
-              placeholder="সিরিজের নাম দিয়ে খুঁজুন..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-teal-200 rounded focus:outline-none focus:ring-2 focus:ring-[#008080] font-tarunima text-sm bg-teal-50/30 text-gray-800"
-            />
+        <div className="mb-3 space-y-3 bg-white/95 backdrop-blur-md shadow-xs">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+
+            {/* বামপাশে ডাইনামিক পেজ টাইটেল */}
+            <div className="rounded bg-teal-50/90 text-[#008080] border border-teal-200 shadow-xs backdrop-blur-md self-start md:self-auto">
+              <div className="p-2.5 inline-flex items-center gap-2">
+                <Layers size={22} className="shrink-0 animate-pulse text-[#008080]" />
+                <h1 className="text-xl md:text-2xl font-bold text-gray-950 leading-none">
+                  <span className="text-[#008080]">সিরিজ</span> <span className="text-[#cc7a00]">নির্ঘণ্ট</span>
+                </h1>
+              </div>
+              <p className="text-xs md:text-sm text-gray-500 mt-1">
+                {displayTotalCount > 0 && (
+                  <span className="w-full text-xs md:text-sm font-normal text-teal-700 bg-teal-100/70 px-2 py-1 border-t border-teal-200 inline-block">
+                    সিরিজ সংখ্যা সর্বমোট {toBengaliNumber(displayTotalCount)}টি
+                  </span>
+                )}
+              </p>
+            </div>
+
+            {/* ডানপাশে সার্চবার */}
+            <div className="relative w-full md:w-80 shrink-0">
+              <Search className="absolute w-4 h-4 text-teal-600 -translate-y-1/2 left-3 top-1/2 pointer-events-none" />
+              <input
+                type="text"
+                placeholder="সিরিজের নাম দিয়ে খুঁজুন..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-4 py-2 border border-teal-200 rounded focus:outline-none focus:ring-1 focus:ring-[#008080] text-sm bg-teal-50/30 text-gray-800 shadow-xs placeholder-gray-400"
+              />
+            </div>
+
           </div>
 
-          {/* আদ্যক্ষর ফিল্টার বার */}
+          {/* নিচে: সেন্টারে আদ্যক্ষর ফিল্টার বার */}
           {availableLetters.length > 1 && (
-            <div className="flex flex-wrap items-center justify-center gap-1 pt-2 border-t border-gray-100 font-tarunima">
-              {availableLetters.map((letter) => (
-                <button
-                  key={letter}
-                  type="button"
-                  onClick={() => setSelectedLetter(letter)}
-                  className={`px-2.5 py-1 text-xs md:text-sm font-semibold rounded transition-colors ${
-                    selectedLetter === letter
+            <div className="p-2 border border-teal-100 rounded bg-teal-50/90 backdrop-blur-md shadow-xs">
+              <div className="flex flex-wrap items-center justify-center gap-1">
+                {availableLetters.map((letter) => (
+                  <button
+                    key={letter}
+                    type="button"
+                    onClick={() => setSelectedLetter(letter)}
+                    className={`px-2 py-1 text-xs md:text-sm font-semibold rounded transition-colors cursor-pointer ${selectedLetter === letter
                       ? "bg-[#008080] text-white shadow-xs"
-                      : "bg-gray-100 hover:bg-teal-50 text-gray-700 hover:text-[#008080]"
-                  }`}
-                >
-                  {letter}
-                </button>
-              ))}
+                      : "bg-gray-100 hover:bg-teal-50 text-gray-700 hover:text-[#008080] border border-transparent hover:border-teal-200"
+                      }`}
+                  >
+                    {letter}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
         </div>
@@ -179,11 +221,11 @@ export const SeriesListView: FC<SeriesListViewProps> = ({
 
       {/* সিরিজ তালিকা */}
       {filteredSeries.length === 0 ? (
-        <div className="p-8 text-center text-gray-600 rounded bg-white/80 font-tarunima">
+        <div className="p-8 text-center text-gray-500 rounded bg-white border border-dashed border-gray-300">
           কোনো সিরিজ পাওয়া যায়নি।
         </div>
       ) : (
-        <div className="flex flex-wrap gap-2 p-0">
+        <div className="flex flex-wrap gap-2">
           {filteredSeries.map(({ slug, label, rawSeries, count }, index) => {
             const IconComponent = getSeriesIcon(slug, rawSeries);
 
@@ -191,18 +233,18 @@ export const SeriesListView: FC<SeriesListViewProps> = ({
               <Link
                 key={`${slug}-${index}`}
                 href={`/series/${slug}`}
-                className="flex-1 min-w-55 sm:min-w-65 flex items-center justify-between gap-2 px-2.5 py-2.5 rounded bg-white/90 text-[#008080] border border-teal-100 shadow-sm transition-all duration-300 backdrop-blur-sm hover:bg-teal-50 hover:shadow-md hover:border-teal-300 hover:scale-[1.01] group cursor-pointer"
+                className="flex items-center justify-between gap-2 px-2.5 py-2 rounded bg-white text-[#008080] border border-teal-100 shadow-xs transition-all duration-200 hover:bg-teal-50/50 hover:shadow-md hover:border-teal-300 shrink-0 grow basis-full sm:basis-[calc(50%-0.35rem)] lg:basis-[calc(33.333%-0.45rem)] xl:basis-[calc(25%-0.5rem)] 2xl:basis-[calc(20%-0.5rem)] max-w-full group cursor-pointer"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="p-2.5 rounded bg-orange-50 text-[#cc7a00] group-hover:bg-[#cc7a00] group-hover:text-white transition-colors duration-300 shrink-0">
-                    <IconComponent className="w-5 h-5 md:w-6 md:h-6 shrink-0" />
+                  <div className="p-2 rounded bg-orange-50 text-[#cc7a00] group-hover:bg-[#cc7a00] group-hover:text-white transition-colors duration-200 shrink-0">
+                    <IconComponent className="w-5 h-5 shrink-0" />
                   </div>
-                  <h3 className="text-[#008080] group-hover:text-[#cc7a00] text-base font-semibold leading-relaxed py-1 font-tarunima truncate transition-colors">
+                  <h3 className="text-[#008080] group-hover:text-[#cc7a00] text-sm md:text-base font-semibold leading-snug truncate transition-colors">
                     {label}
                   </h3>
                 </div>
 
-                <div className="text-right shrink-0 flex items-center gap-1.5 bg-teal-50 text-[#008080] border border-teal-100 px-2.5 py-1 rounded text-xs md:text-sm font-semibold">
+                <div className="text-right shrink-0 flex items-center gap-1.5 bg-teal-50 text-[#008080] border border-teal-100 px-2 py-0.5 rounded text-xs font-semibold">
                   <BookOpen size={14} className="shrink-0" />
                   <span>{toBengaliNumber(count)} টি</span>
                 </div>

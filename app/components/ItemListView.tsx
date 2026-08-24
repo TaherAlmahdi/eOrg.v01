@@ -9,19 +9,24 @@ import {
   Music, Flame, MoonStar, Cross, Sun, Flower2
 } from "lucide-react";
 
-// বাংলা ও ইউনিকোড নরমালাইজেশন (স্পেস ও য়, ড়, ঢ়, র্/র/ব় সমাধানসহ)
-const normalizeBengali = (text: string = ''): string => {
-  if (!text) return '';
+// 🔹 বাংলা বর্ণ ও স্পেস নরমালাইজ করার হেল্পার ফাংশন
+const normalizeBengaliText = (text: string): string => {
+  if (!text) return "";
   return text
-    .normalize('NFC')
-    .replace(/\u09af\u09bc/g, 'য়')
-    .replace(/\u09a1\u09bc/g, 'ড়')
-    .replace(/\u09a2\u09bc/g, 'ঢ়')
-    .replace(/\u09b0\u09bc/g, 'র')
-    .replace(/[\u200B-\u200D\uFEFF]/g, '')
+    .normalize("NFC") // ইউনিকোড নরমাল এনকোডিং
     .toLowerCase()
-    .replace(/\s+/g, '') // স্পেস বাদ দেওয়া যাতে 'সাহিত্য সমালোচনা' এবং 'সাহিত্যসমালোচনা' এক হয়ে যায়
-    .trim();
+    // সমতুল্য বাংলা বর্ণ ও নুকতা সামঞ্জস্যকরণ
+    .replace(/\u09af\u09bc/g, "য়")
+    .replace(/\u09a1\u09bc/g, "ড়")
+    .replace(/\u09a2\u09bc/g, "ঢ়")
+    .replace(/\u09b0\u09bc/g, "র")
+    .replace(/য়/g, "য")
+    .replace(/ড়/g, "র")
+    .replace(/ঢ়/g, "র")
+    .replace(/ব়/g, "র")
+    .replace(/়/g, "") // যেকোনো অবশিষ্ট নুকতা রিমুভ
+    .replace(/[\u200B-\u200D\uFEFF]/g, "")
+    .replace(/[\s\-_]+/g, ""); // স্পেস, হাইফেন ও আন্ডারস্কোর রিমুভ
 };
 
 // ১. Lucide icons mapping
@@ -51,8 +56,8 @@ const GENRE_ICONS: Record<string, FC<{ className?: string }>> = {
 
 // ২. স্মার্ট আইকন ডিটেক্টর
 const getItemIcon = (slug: string, rawText: string): FC<{ className?: string }> => {
-  const cleanSlug = normalizeBengali(slug);
-  const cleanText = normalizeBengali(rawText);
+  const cleanSlug = normalizeBengaliText(slug);
+  const cleanText = normalizeBengaliText(rawText);
 
   if (GENRE_ICONS[cleanSlug]) return GENRE_ICONS[cleanSlug];
   if (GENRE_ICONS[cleanText]) return GENRE_ICONS[cleanText];
@@ -108,6 +113,7 @@ interface ItemListViewProps {
 export default function ItemListView({
   items = [],
   isHomePage = false,
+  totalItemsCount,
 }: ItemListViewProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLetter, setSelectedLetter] = useState("সব");
@@ -119,7 +125,7 @@ export default function ItemListView({
     const lettersSet = new Set<string>();
 
     items.forEach((item) => {
-      const normalizedLabel = (item.label || "").normalize('NFC');
+      const normalizedLabel = (item.label || "").normalize("NFC");
       const firstChar = normalizedLabel.trim().charAt(0);
       if (firstChar) {
         lettersSet.add(firstChar);
@@ -137,39 +143,47 @@ export default function ItemListView({
   const filteredItems = useMemo(() => {
     if (isHomePage) return items;
 
-    const normalizedQuery = normalizeBengali(searchQuery);
+    const normalizedQuery = normalizeBengaliText(searchQuery);
 
     return items.filter((item) => {
-      const normalizedLabel = normalizeBengali(item.label);
+      const normalizedLabel = normalizeBengaliText(item.label);
       const matchesSearch = !normalizedQuery || normalizedLabel.includes(normalizedQuery);
 
-      const firstChar = (item.label || "").normalize('NFC').trim().charAt(0);
+      const firstChar = (item.label || "").normalize("NFC").trim().charAt(0);
       const matchesLetter = selectedLetter === "সব" || firstChar === selectedLetter;
 
       return matchesSearch && matchesLetter;
     });
   }, [items, searchQuery, selectedLetter, isHomePage]);
 
+  const displayTotalCount = totalItemsCount ?? items.length;
+
   return (
-    <div className="w-full px-0 font-tarunima">
+    <div className="w-full font-tarunima px-2 py-3">
       {!isHomePage && (
-        <div className="p-3 md:p-4 mb-3 space-y-3 border border-teal-100 rounded bg-white/95 backdrop-blur-md shadow-xs">
-          
-          {/* হেডার ও সার্চবার সেকশন */}
+        <div className="mb-3 space-y-3 bg-white/95 backdrop-blur-md shadow-xs">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-            {/* বামে: হেডার ও সাবটাইটেল/ট্যাগলাইন */}
-            <div>
-              <h1 className="text-xl md:text-2xl font-bold text-gray-950">
-                প্রকরণ <span className="text-[#008080]">সম্ভার</span>
-              </h1>
-              <p className="text-xs md:text-sm text-gray-500 mt-0.5">
-                সর্বমোট {toBengaliNumber(filteredItems.length)}টি প্রকরণ পাওয়া গেছে
+
+            {/* বামপাশে ডাইনামিক পেজ টাইটেল */}
+            <div className="rounded bg-teal-50/90 text-[#008080] border border-teal-200 shadow-xs backdrop-blur-md self-start md:self-auto">
+              <div className="p-2.5 inline-flex items-center gap-2">
+                <Layers size={22} className="shrink-0 animate-pulse text-[#008080]" />
+                <h1 className="text-xl md:text-2xl font-bold text-gray-950 leading-none">
+                  <span className="text-[#008080]">প্রকরণ</span> <span className="text-[#008080]">সম্ভার</span>
+                </h1>
+              </div>
+              <p className="text-xs md:text-sm text-gray-500 mt-1">
+                {displayTotalCount > 0 && (
+                  <span className="w-full text-xs md:text-sm font-normal text-teal-700 bg-teal-100/70 px-2 py-1 border-t border-teal-200 inline-block">
+                    প্রকরণ সংখ্যা সর্বমোট {toBengaliNumber(displayTotalCount)}টি
+                  </span>
+                )}
               </p>
             </div>
 
-            {/* ডানে: লাইভ সার্চবার */}
+            {/* ডানপাশে সার্চবার */}
             <div className="relative w-full md:w-80 shrink-0">
-              <Search className="absolute w-4 h-4 text-teal-600 -translate-y-1/2 left-3 top-1/2" />
+              <Search className="absolute w-4 h-4 text-teal-600 -translate-y-1/2 left-3 top-1/2 pointer-events-none" />
               <input
                 type="text"
                 placeholder="প্রকরণ খুঁজুন..."
@@ -178,25 +192,27 @@ export default function ItemListView({
                 className="w-full pl-9 pr-4 py-2 border border-teal-200 rounded focus:outline-none focus:ring-1 focus:ring-[#008080] text-sm bg-teal-50/30 text-gray-800 shadow-xs placeholder-gray-400"
               />
             </div>
+
           </div>
 
-          {/* নিচে: বর্ণানুক্রমিক ফিল্টার বার (সেন্টার অ্যালাইন করা) */}
+          {/* নিচে: সেন্টারে আদ্যক্ষর ফিল্টার বার */}
           {availableLetters.length > 1 && (
-            <div className="flex flex-wrap items-center justify-center gap-1 pt-2.5 border-t border-teal-50">
-              {availableLetters.map((letter) => (
-                <button
-                  type="button"
-                  key={letter}
-                  onClick={() => setSelectedLetter(letter)}
-                  className={`px-2 py-1 text-xs md:text-sm font-semibold rounded transition-colors cursor-pointer ${
-                    selectedLetter === letter
+            <div className="p-2 border border-teal-100 rounded bg-teal-50/90 backdrop-blur-md shadow-xs">
+              <div className="flex flex-wrap items-center justify-center gap-1">
+                {availableLetters.map((letter) => (
+                  <button
+                    key={letter}
+                    type="button"
+                    onClick={() => setSelectedLetter(letter)}
+                    className={`px-2 py-1 text-xs md:text-sm font-semibold rounded transition-colors cursor-pointer ${selectedLetter === letter
                       ? "bg-[#008080] text-white shadow-xs"
                       : "bg-gray-100 hover:bg-teal-50 text-gray-700 hover:text-[#008080] border border-transparent hover:border-teal-200"
-                  }`}
-                >
-                  {letter}
-                </button>
-              ))}
+                      }`}
+                  >
+                    {letter}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
         </div>
@@ -208,7 +224,7 @@ export default function ItemListView({
           কোন প্রকরণ পাওয়া যায়নি।
         </div>
       ) : (
-        <div className="flex flex-wrap gap-2 p-0">
+        <div className="flex flex-wrap gap-2">
           {filteredItems.map(({ slug, label, rawGenre, count }) => {
             const IconComponent = getItemIcon(slug, rawGenre || label);
             const resolvedSlug = generateSlugFallback(slug, label);
@@ -229,7 +245,7 @@ export default function ItemListView({
                 </div>
 
                 <div className="text-right shrink-0 flex items-center gap-1.5 bg-teal-50 text-[#008080] border border-teal-100 px-2 py-0.5 rounded text-xs font-semibold">
-                  <BookOpen size={13} className="shrink-0" />
+                  <BookOpen size={14} className="shrink-0" />
                   <span>{toBengaliNumber(count)} টি</span>
                 </div>
               </Link>

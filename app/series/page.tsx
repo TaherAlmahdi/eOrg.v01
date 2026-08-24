@@ -48,20 +48,9 @@ export default async function SeriesPage() {
         </div>
       </nav>
 
-      {/* হেডার সেকশন */}
-      <header>
-        <div className="flex justify-center mt-5">
-          <div className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded bg-teal-50/90 text-[#008080] mb-8 border border-teal-100 shadow-sm text-center backdrop-blur-md">
-            <Layers size={24} className="shrink-0 animate-pulse" />
-            <h1 className="text-lg font-black leading-none tracking-tight text-gray-900 md:text-xl font-tarunima">
-              <span className="text-[#008080]">পাঠশালা</span> সিরিজ <span className="text-[#cc7a00]">নির্ঘণ্ট</span>
-            </h1>
-          </div>
-        </div>
-      </header>
 
       {/* সিরিজ লিস্ট সেকশন */}
-      <div className="max-w-8xl mx-auto py-2 px-2">
+      <div className="w-full mx-auto">
         <SeriesList sortBy="alphabetical" />
       </div>
     </main>
