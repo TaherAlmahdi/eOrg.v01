@@ -2,21 +2,26 @@
 
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
-import { Search, Home } from "lucide-react";
+import { Search, Home, Layers, BookOpen } from "lucide-react";
 
-// বাংলা ও ইউনিকোড নরমালাইজেশন
-const normalizeBengali = (text: string = ''): string => {
+// 🔹 বাংলা বর্ণ ও স্পেস নরমালাইজ করার উন্নত হেল্পার ফাংশন
+const normalizeBengaliText = (text: string = ''): string => {
   if (!text) return '';
   return text
-    .normalize('NFC')
-    .replace(/\u09af\u09bc/g, 'য়')
-    .replace(/\u09a1\u09bc/g, 'ড়')
-    .replace(/\u09a2\u09bc/g, 'ঢ়')
-    .replace(/\u09b0\u09bc/g, 'র')
-    .replace(/[\u200B-\u200D\uFEFF]/g, '')
+    .normalize('NFC') // ইউনিকোড নরমাল এনকোডিং
     .toLowerCase()
-    .replace(/\s+/g, '')
-    .trim();
+    // সমতুল্য বাংলা বর্ণ ও নুকতা সামঞ্জস্যকরণ
+    .replace(/\u09af\u09bc/g, "য়")
+    .replace(/\u09a1\u09bc/g, "ড়")
+    .replace(/\u09a2\u09bc/g, "ঢ়")
+    .replace(/\u09b0\u09bc/g, "র")
+    .replace(/য়/g, "য")
+    .replace(/ড়/g, "র")
+    .replace(/ঢ়/g, "র")
+    .replace(/ব়/g, "র")
+    .replace(/়/g, "") // যেকোনো অবশিষ্ট নুকতা রিমুভ
+    .replace(/[\u200B-\u200D\uFEFF]/g, "") // জিরো-উইডথ ক্যারেক্টার রিমুভ
+    .replace(/[\s\-_]+/g, ""); // স্পেস, হাইফেন ও আন্ডারস্কোর রিমুভ
 };
 
 const slugify = (text: string = ''): string => {
@@ -55,7 +60,7 @@ export default function ItemViewClient({
   itemSlug = "",
 }: ItemViewClientProps) {
   const [search, setSearch] = useState("");
-  const [selectedLetter, setSelectedLetter] = useState<string | null>(null);
+  const [selectedLetter, setSelectedLetter] = useState("সব");
   const [itemsPerPage, setItemsPerPage] = useState<number>(30);
   const [visibleCount, setVisibleCount] = useState<number>(30);
 
@@ -92,7 +97,7 @@ export default function ItemViewClient({
     });
   }, [initialItems]);
 
-  // ২. টাইটেল থেকে ইউনিক প্রথম বর্ণমালা বের করা
+  // ২. টাইটেল থেকে ইউনিক আদ্যক্ষর বের করা
   const availableLetters = useMemo(() => {
     const lettersSet = new Set<string>();
 
@@ -107,30 +112,35 @@ export default function ItemViewClient({
       }
     });
 
-    return Array.from(lettersSet).sort((a, b) => a.localeCompare(b, 'bn', { sensitivity: 'base' }));
+    const sortedLetters = Array.from(lettersSet).sort((a, b) =>
+      a.localeCompare(b, 'bn', { sensitivity: 'base' })
+    );
+
+    return ["সব", ...sortedLetters];
   }, [sortedItems]);
 
-  // ৩. সার্চ এবং বর্ণ অনুযায়ী লাইভ ফিল্টারিং
+  // ৩. সার্চ এবং বর্ণ অনুযায়ী নরমালাইজড ফিল্টারিং
   const filtered = useMemo(() => {
-    const query = normalizeBengali(search);
+    const normalizedQuery = normalizeBengaliText(search);
 
     return sortedItems.filter((entry: any) => {
       const rawTitle = extractFieldText(entry.title, "শিরোনামহীন");
       const rawBook = extractFieldText(entry.bookTitle || entry.book, "");
       const rawAuthor = extractFieldText(entry.author, "");
 
-      if (selectedLetter) {
-        const firstChar = rawTitle.normalize('NFC').trim().charAt(0);
-        const formattedChar = /^[a-zA-Z]$/.test(firstChar) ? firstChar.toUpperCase() : firstChar;
-        if (formattedChar !== selectedLetter) return false;
-      }
+      // আদ্যক্ষর ফিল্টারিং
+      const firstChar = rawTitle.normalize('NFC').trim().charAt(0);
+      const formattedChar = /^[a-zA-Z]$/.test(firstChar) ? firstChar.toUpperCase() : firstChar;
+      const matchesLetter = selectedLetter === "সব" || formattedChar === selectedLetter;
 
-      if (!query) return true;
+      if (!matchesLetter) return false;
+      if (!normalizedQuery) return true;
 
+      // নরমালাইজড টেক্সট সার্চ
       return (
-        normalizeBengali(rawTitle).includes(query) ||
-        normalizeBengali(rawBook).includes(query) ||
-        normalizeBengali(rawAuthor).includes(query)
+        normalizeBengaliText(rawTitle).includes(normalizedQuery) ||
+        normalizeBengaliText(rawBook).includes(normalizedQuery) ||
+        normalizeBengaliText(rawAuthor).includes(normalizedQuery)
       );
     });
   }, [sortedItems, search, selectedLetter]);
@@ -142,104 +152,112 @@ export default function ItemViewClient({
   const currentItems = useMemo(() => filtered.slice(0, visibleCount), [filtered, visibleCount]);
 
   return (
-    <main className="w-full px-2 md:px-4 py-3 font-tarunima space-y-3">
+    <main className="w-full font-tarunima px-2 py-3 space-y-3">
       {/* ব্রেডক্রাম্ব */}
-      <nav className="w-full bg-[#7575a3] border-b border-gray-200 py-2 px-3 text-white overflow-x-auto no-scrollbar">
+      <nav className="w-full bg-[#7575a3] border-b border-gray-200 py-2 px-3 text-white overflow-x-auto no-scrollbar shadow-xs rounded-t">
         <div className="max-w-full mx-auto text-sm flex items-center whitespace-nowrap">
-          <Link href="/" className="shrink-0"><Home size={16} /></Link>
+          <Link href="/" className="shrink-0 hover:text-teal-200 transition-colors">
+            <Home size={16} />
+          </Link>
           <span className="mx-2 text-white/50 shrink-0">/</span>
-          <Link href="/items" className="hover:text-red-100 shrink-0">প্রকরণ</Link>
+          <Link href="/items" className="hover:text-teal-200 transition-colors shrink-0">
+            প্রকরণ
+          </Link>
           {displayTitle && displayTitle !== 'সকল আইটেম' && (
             <>
               <span className="mx-2 text-white/50 shrink-0">/</span>
-              <span className="hover:text-red-100 shrink-0">{displayTitle}</span>
+              <span className="text-teal-100 shrink-0">{displayTitle}</span>
             </>
           )}
         </div>
       </nav>
 
-      {/* হেডার ও সার্চ */}
-      <header className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-gray-200 pb-2 gap-2">
-        <div>
-          <h1 className="text-xl md:text-2xl font-bold text-gray-950">
-            প্রকরণ : <span className="text-[#008080]">{displayTitle || 'নির্বাচিত প্রকরণ'}</span>
-          </h1>
-          <p className="text-sm text-gray-500 mt-1">
-            সর্বমোট {toBengaliNumber(filtered.length)}টি পাতা রয়েছে
-          </p>
+      {/* পেজ টাইটেল, কাউন্টার ও সার্চবার */}
+      <div className="mb-3 space-y-3 bg-white/95 backdrop-blur-md shadow-xs">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+
+          {/* বামপাশে ডাইনামিক পেজ টাইটেল */}
+          <div className="rounded bg-teal-50/90 text-[#008080] border border-teal-200 shadow-xs backdrop-blur-md self-start md:self-auto overflow-hidden">
+            <div className="p-2.5 inline-flex items-center gap-2">
+              <Layers size={22} className="shrink-0 animate-pulse text-[#008080]" />
+              <h1 className="text-xl md:text-2xl font-bold text-gray-950 leading-none">
+                <span className="text-[#008080]">{displayTitle || 'নির্বাচিত প্রকরণ'}</span>{' '}
+                <span className="text-[#008080]">সম্ভার</span>
+              </h1>
+            </div>
+            {filtered.length > 0 && (
+              <p className="text-xs md:text-sm text-gray-500">
+                <span className="w-full text-xs md:text-sm font-normal text-teal-700 bg-teal-100/70 px-2 py-1 border-t border-teal-200 inline-block">
+                  সর্বমোট {toBengaliNumber(filtered.length)}টি {displayTitle || 'নির্বাচিত প্রকরণ'} রয়েছে
+                </span>
+              </p>
+            )}
+          </div>
+
+          {/* ডানপাশে সার্চবার */}
+          <div className="relative w-full md:w-80 shrink-0">
+            <Search className="absolute w-4 h-4 text-teal-600 -translate-y-1/2 left-3 top-1/2 pointer-events-none" />
+            <input
+              type="text"
+              placeholder="শিরোনাম, মূল গ্রন্থ বা লেখক খুঁজুন..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-9 pr-4 py-2 border border-teal-200 rounded focus:outline-none focus:ring-1 focus:ring-[#008080] text-sm bg-teal-50/30 text-gray-800 shadow-xs placeholder-gray-400"
+            />
+          </div>
+
         </div>
 
-        <div className="relative w-full md:w-80 shrink-0">
-          <input
-            className="w-full px-4 py-2 pl-10 text-sm bg-white border border-teal-200 rounded focus:ring-1 focus:ring-[#008080] outline-none shadow-xs"
-            placeholder="শিরোনাম, মূল গ্রন্থ বা লেখক খুঁজুন..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
-        </div>
-      </header>
-
-      {/* বর্ণানুক্রমিক ফিল্টার বার */}
-      {availableLetters.length > 0 && (
-        <div className="flex items-center justify-center gap-1 flex-wrap bg-teal-50/50 px-2 rounded border border-teal-100">
-          <button
-            type="button"
-            onClick={() => setSelectedLetter(null)}
-            className={`px-2 py-1 text-xs font-semibold rounded transition-colors cursor-pointer ${selectedLetter === null
-                ? 'bg-[#008080] text-white shadow-xs'
-                : 'bg-white text-gray-700 hover:bg-teal-100 border border-teal-200'
-              }`}
-          >
-            সব
-          </button>
-
-          {availableLetters.map((letter) => (
-            <button
-              key={letter}
-              type="button"
-              onClick={() => setSelectedLetter(selectedLetter === letter ? null : letter)}
-              className={`px-2 py-1 text-xs font-semibold rounded transition-colors cursor-pointer ${selectedLetter === letter
-                  ? 'bg-[#008080] text-white shadow-xs'
-                  : 'bg-white text-gray-700 hover:bg-teal-100 border border-teal-200'
-                }`}
-            >
-              {letter}
-            </button>
-          ))}
-        </div>
-      )}
+        {/* সেন্টারে আদ্যক্ষর ফিল্টার বার */}
+        {availableLetters.length > 1 && (
+          <div className="p-2 border border-teal-100 rounded bg-teal-50/90 backdrop-blur-md shadow-xs">
+            <div className="flex flex-wrap items-center justify-center gap-1">
+              {availableLetters.map((letter) => (
+                <button
+                  key={letter}
+                  type="button"
+                  onClick={() => setSelectedLetter(letter)}
+                  className={`px-2 py-1 text-xs md:text-sm font-semibold rounded transition-colors cursor-pointer ${selectedLetter === letter
+                    ? "bg-[#008080] text-white shadow-xs"
+                    : "bg-gray-100 hover:bg-teal-50 text-gray-700 hover:text-[#008080] border border-transparent hover:border-teal-200"
+                    }`}
+                >
+                  {letter}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* কনটেন্ট গ্রিড */}
       {filtered.length === 0 ? (
-        <div className="p-12 text-center text-gray-500 bg-white rounded border border-dashed border-gray-300">
+        <div className="p-8 text-center text-gray-500 rounded bg-white border border-dashed border-gray-300">
           কোনো পাতা পাওয়া যায়নি।
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-3 2xl:grid-cols-4 gap-1">
+          <div className="grid grid-cols-1 md:grid-cols-3 2xl:grid-cols-4 gap-2">
             {currentItems.map((item: any, idx: number) => {
               const itemTitle = extractFieldText(item.title, "শিরোনামহীন");
               const bookTitle = extractFieldText(item.bookTitle || item.book, "—");
               const authorName = extractFieldText(item.author, "—");
-
-              // slugify ব্যবহার না করে সরাসরি টাইটেল বা ফ্রন্টম্যাটারের স্লাগ ব্যবহার করার সঠিক কোড:
 
               const resolvedTitleSlug = item.slug
                 ? String(item.slug).trim()
                 : (item.itemSlug ? String(item.itemSlug).trim() : itemTitle);
 
               const pageUrl = `/item/${currentPrakaronSlug}/${encodeURIComponent(resolvedTitleSlug)}`;
-
               const bookSlug = item.bookSlug ? item.bookSlug : slugify(bookTitle);
               const authorSlug = item.authorSlug ? item.authorSlug : slugify(authorName);
 
               return (
                 <div
                   key={item.id || `${resolvedTitleSlug}-${idx}`}
-                  className="bg-white border border-teal-100 rounded p-2 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-center"
+                  className="bg-white border border-teal-100 rounded p-2.5 shadow-xs hover:shadow-md hover:border-teal-300 transition-all duration-200 flex flex-col justify-center"
                 >
-                  <div className="hidden md:flex items-center flex-wrap gap-x-2 px-2 text-base">
+                  {/* ডেস্কটপ ও ট্যাবলেট ভিউ */}
+                  <div className="hidden md:flex items-center flex-wrap gap-x-2 text-sm md:text-base">
                     <Link
                       href={pageUrl}
                       className="font-bold text-[#008080] hover:text-[#cc7a00] no-underline transition-colors"
@@ -249,27 +267,28 @@ export default function ItemViewClient({
                     <span className="text-gray-300">|</span>
                     <Link
                       href={`/book/${bookSlug}`}
-                      className="text-teal-700 hover:text-[#cc7a00] no-underline transition-colors"
+                      className="text-teal-700 hover:text-[#cc7a00] no-underline transition-colors text-sm"
                     >
                       {bookTitle}
                     </Link>
                     <span className="text-gray-300">|</span>
                     <Link
                       href={`/author/${authorSlug}`}
-                      className="text-gray-600 hover:text-[#cc7a00] no-underline transition-colors"
+                      className="text-gray-600 hover:text-[#cc7a00] no-underline transition-colors text-sm"
                     >
                       {authorName}
                     </Link>
                   </div>
 
-                  <div className="flex md:hidden flex-col space-y-2">
+                  {/* মোবাইল ভিউ */}
+                  <div className="flex md:hidden flex-col space-y-1.5">
                     <Link
                       href={pageUrl}
                       className="text-base font-bold text-[#008080] hover:text-[#cc7a00] transition-colors"
                     >
                       {itemTitle}
                     </Link>
-                    <div className="flex items-center flex-wrap gap-x-2 text-xs text-gray-600 pt-1 border-t border-gray-100">
+                    <div className="flex items-center flex-wrap gap-x-2 text-xs text-gray-600 pt-1 border-t border-teal-50">
                       <Link
                         href={`/book/${bookSlug}`}
                         className="text-teal-700 hover:text-[#cc7a00] no-underline transition-colors"
@@ -290,7 +309,7 @@ export default function ItemViewClient({
             })}
           </div>
 
-          {/* পেজিনেশন বাটন */}
+          {/* লোড মোর বাটন */}
           {visibleCount < filtered.length && (
             <div className="flex justify-center pt-4 pb-2">
               <button
