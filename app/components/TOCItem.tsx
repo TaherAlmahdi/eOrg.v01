@@ -47,32 +47,30 @@ const SubPageList = memo(function SubPageList({
   if (!subPages || subPages.length <= 1) return null;
 
   return (
-    <ul className="pl-4 mt-1 space-y-0.5 border-l-2 border-red-900/20 ml-2">
+    <div className="pl-2 mt-0 ml-4 space-y-1 border-l-2 border-orange-100/70">
       {subPages.map((sub) => {
         const subUrl = sub.pageNumber === 1 ? basePath : `${basePath}/${sub.pageNumber}`;
         const isCurrentSub = isCurrentItem && currentPageNum === sub.pageNumber;
-        const baseLabel = sub.title || `পাতা ${sub.pageNumber}`;
-        const subLabel = sub.subtitle ? `${baseLabel} : ${sub.subtitle}` : baseLabel;
+        const subLabel = sub.title || `পাতা ${sub.pageNumber}`;
 
         return (
-          <li key={sub.pageNumber}>
-            <Link
-              href={subUrl}
-              onClick={onItemClick}
-              className={`flex items-center gap-1 px-2 py-1 text-xs md:text-sm rounded truncate transition-colors ${
-                isCurrentSub
-                  ? 'bg-red-800 text-white font-medium shadow-xs'
-                  : 'text-gray-600 hover:bg-orange-50 hover:text-red-900'
-              }`}
-              title={subLabel}
-            >
-              <FileText size={12} opacity={0.6} />
-              <span>{subLabel}</span>
-            </Link>
-          </li>
+          <Link
+            key={sub.pageNumber}
+            href={subUrl}
+            onClick={onItemClick}
+            className={`flex items-center gap-1 text-xs py-1 px-2 rounded transition-colors ${
+              isCurrentSub
+                ? 'bg-red-800 text-white font-medium shadow-xs'
+                : 'text-gray-600 hover:text-red-900 hover:bg-orange-50'
+            }`}
+            title={subLabel}
+          >
+            <FileText size={12} opacity={0.6} />
+            <span>{subLabel}</span>
+          </Link>
         );
       })}
-    </ul>
+    </div>
   );
 });
 
@@ -117,7 +115,7 @@ export default function TOCItem({
 
   if (currentIndex === -1) return null;
 
-  // ৫. সিকোয়েন্স অনুযায়ী আগের ৫টি এবং পরের ৫টি আইটেম কেটে নেওয়া (Slice)
+  // ৫. সিকোয়েন্স অনুযায়ী আগের ১০টি এবং পরের ১০টি আইটেম কেটে নেওয়া (Slice)
   const startIndex = Math.max(0, currentIndex - 10);
   const endIndex = Math.min(filteredList.length, currentIndex + 11);
   const slicedList = filteredList.slice(startIndex, endIndex);
@@ -130,22 +128,42 @@ export default function TOCItem({
       .replace(/\s+/g, '-')
       .replace(/[^\w\u0980-\u09FF\-]/g, '');
 
-  // ৬. কন্টেন্ট থেকে nextpage সাব-পেজগুলো পার্স করার ফাংশন
-  const parseSubPages = (content?: string): SubPageInfo[] => {
-    if (!content) return [];
-    const pageSegments = content.split(/<!--\s*nextpage(?:\s+([\s\S]*?))?\s*-->/gi);
-    if (pageSegments.length <= 1) return [];
-
+  // ৬. কন্টেন্ট থেকে nextpage এবং মূল আইটেমের সাবটাইটেল পার্স করার ফাংশন
+  const parseSubPages = (item: typeof currentItem): SubPageInfo[] => {
     const subPages: SubPageInfo[] = [];
-    subPages.push({ pageNumber: 1 });
+    const hasNextPages = item.content ? /<!--\s*nextpage/i.test(item.content) : false;
+
+    // যদি সাবটাইটেল অথবা nextpage থাকে, তবেই সাব-পেজ তালিকা তৈরি শুরু হবে
+    if (item.subtitle) {
+      subPages.push({
+        pageNumber: 1,
+        title: item.subtitle,
+      });
+    } else if (hasNextPages) {
+      subPages.push({
+        pageNumber: 1,
+        title: 'পাতা ১',
+      });
+    }
+
+    if (!item.content) return subPages;
+
+    const pageSegments = item.content.split(/<!--\s*nextpage(?:\s+([\s\S]*?))?\s*-->/gi);
+    if (pageSegments.length <= 1) return subPages;
+
+    // যদি সাবটাইটেল বা ডিফল্ট 'পাতা ১' অলরেডি পুশ করা না থাকে এবং nextpage থাকে
+    if (subPages.length === 0) {
+      subPages.push({ pageNumber: 1, title: 'পাতা ১' });
+    }
 
     for (let i = 1, pageCounter = 2; i < pageSegments.length; i += 2, pageCounter++) {
-      const pageTitle = pageSegments[i] ? pageSegments[i].trim() : undefined;
+      const pageTitle = pageSegments[i] ? pageSegments[i].trim() : `পাতা ${pageCounter}`;
       subPages.push({
         pageNumber: pageCounter,
         title: pageTitle,
       });
     }
+
     return subPages;
   };
 
@@ -176,51 +194,50 @@ export default function TOCItem({
 
   // ৭. মূল সূচিপত্র রেন্ডার করার ফাংশন
   const renderTocContent = () => (
-    <ul className="space-y-1 text-sm overflow-y-auto max-h-[65vh] lg:max-h-[75vh] relative pr-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+    <div className="space-y-1 font-tarunima overflow-y-auto max-h-[65vh] lg:max-h-[75vh] relative pr-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
       {slicedList.map((item, idx) => {
         const itemSlug = item.slug || slugify(item.title);
         const isCurrentItem = itemSlug === activeItemSlug;
         const itemUrl = `/item/${itemSlug}`;
-        const subPages = parseSubPages(item.content);
+        const subPages = parseSubPages(item);
+        
+        // সাব-পেজ বা সাবটাইটেল থাকলে তবেই ড্রপডাউন/টগল কার্যকর হবে
         const hasSubPages = subPages.length > 1;
         const isOpen = openStates[itemSlug] ?? isCurrentItem;
-        const itemDisplayTitle = item.subtitle ? `${item.title} : ${item.subtitle}` : item.title;
+        
+        const itemDisplayTitle = item.title;
 
         return (
-          <li key={idx} className="rounded transition-colors">
-            <div
-              className={`flex items-center justify-between px-2 py-1.5 rounded transition-colors ${
-                isCurrentItem && currentPageNum === 1
-                  ? 'bg-red-900 text-white font-medium'
-                  : 'text-gray-700 hover:bg-orange-50 hover:text-red-900'
-              }`}
-            >
-              {/* মূল পেজের লিংক */}
+          <div key={idx} className="space-y-0.5">
+            <div className="flex items-center justify-between w-full">
               <Link
                 href={itemUrl}
                 onClick={handleCloseMobile}
-                className="flex-1 truncate text-xs md:text-sm"
+                className={`flex items-center gap-1.5 grow text-sm py-1.5 px-2 rounded transition-colors ${
+                  isCurrentItem && currentPageNum === 1
+                    ? 'bg-red-900 text-white font-bold shadow-sm'
+                    : 'text-gray-700 hover:text-red-900 hover:bg-orange-50'
+                }`}
                 title={itemDisplayTitle}
               >
-                {itemDisplayTitle}
+                <FileText size={14} opacity={0.7} />
+                <span className="truncate">{itemDisplayTitle}</span>
               </Link>
 
-              {/* সাব-পেজ থাকলে টোগল বাটন */}
+              {/* টগল বাটনটি শুধুমাত্র তখনই দেখাবে যখন সাবটাইটেল বা একাধিক নেক্সটপেজ থাকবে */}
               {hasSubPages && (
                 <button
                   type="button"
                   onClick={(e) => toggleAccordion(itemSlug, e)}
-                  className={`p-0.5 ml-1 rounded transition-colors ${
-                    isCurrentItem ? 'hover:bg-red-800 text-white/90' : 'hover:bg-orange-100 text-gray-500'
-                  }`}
-                  aria-label="Toggle subpages"
+                  className="p-1.5 transition-colors rounded hover:bg-orange-100 text-gray-600"
+                  aria-label="Toggle Subpages"
                 >
                   {isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                 </button>
               )}
             </div>
 
-            {/* সাব-পেজ লিস্ট (হায়ারার্কি স্টাইল) */}
+            {/* সাব-পেজ ও সাবটাইটেল লিস্ট */}
             {hasSubPages && isOpen && (
               <SubPageList
                 subPages={subPages}
@@ -230,26 +247,26 @@ export default function TOCItem({
                 isCurrentItem={isCurrentItem}
               />
             )}
-          </li>
+          </div>
         );
       })}
-    </ul>
+    </div>
   );
 
   return (
     <>
       {/* ১. ডেক্সটপ ভিউ */}
-      <div className="hidden lg:block font-tarunima">
-        <div className="p-3 bg-white border border-gray-100 rounded shadow-sm">
-          <h3 className="mb-2.5 text-base font-medium text-red-900 border-b border-gray-100 pb-1.5 truncate">
+      <div className="hidden lg:block">
+        <div className="p-3 bg-white border border-gray-100 rounded shadow-sm font-tarunima">
+          <h3 className="pb-2 mb-3 font-bold text-red-900 border-b border-gray-200 text-md truncate">
             {displayTitle}
           </h3>
           {renderTocContent()}
         </div>
       </div>
 
-      {/* ২. মোবাইল ভিউ (ফ্লোটিং বাটন এবং রেসপন্সিভ ড্রয়ার) */}
-      <div className="lg:hidden font-tarunima">
+      {/* ২. মোবাইল ভিউ */}
+      <div className="lg:hidden">
         <button
           type="button"
           onClick={() => setIsMobileOpen(true)}
@@ -267,11 +284,11 @@ export default function TOCItem({
             onClick={handleCloseMobile}
           >
             <div
-              className="w-full max-w-lg p-4 bg-white rounded-t-xl shadow-2xl max-h-[80vh] flex flex-col"
+              className="w-full max-w-lg p-4 bg-white rounded shadow-2xl max-h-[80vh] flex flex-col font-tarunima"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between pb-3 mb-2 border-b border-gray-200">
-                <h3 className="font-bold text-red-900 text-base truncate pr-2">
+                <h3 className="font-bold text-red-900 text-md truncate pr-2">
                   {displayTitle}
                 </h3>
                 <button

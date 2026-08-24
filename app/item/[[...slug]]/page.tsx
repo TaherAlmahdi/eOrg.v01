@@ -38,7 +38,7 @@ interface NoteItem {
 }
 
 interface SplitPage {
-  title?: string; // nextpage-এর মাধ্যমে আসা সাব-টাইটেল বা subtitle
+  title?: string;
   pageNumber: number;
   contentHtml: string;
   notes: NoteItem[];
@@ -136,10 +136,10 @@ const getItemTypeName = (itemObj: any): string => {
 const getItemTypeDisplayName = (itemObj: any): string => {
   const typeSlug = getItemTypeName(itemObj);
   const typeMap: Record<string, string> = {
-    'story': 'গল্প',
-    'poem': 'কবিতা',
-    'books': 'বই',
-    'articles': 'প্রবন্ধ',
+    story: 'গল্প',
+    poem: 'কবিতা',
+    books: 'বই',
+    articles: 'প্রবন্ধ',
   };
   return typeMap[typeSlug] || typeSlug || 'প্রকরণ';
 };
@@ -240,8 +240,8 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
   const dynamicMetaTitle = buildTabTitle({
     metaTitle: item.meta_title,
     currentPageTitle: pageDisplayTitle || undefined,
-    bookTitle: pageTitle,
-    siteName,
+    bookTitle: item.title,
+    siteName: siteName,
   });
 
   const description =
@@ -394,7 +394,7 @@ export default async function SingleItemPage({ params, searchParams }: PageProps
     <main className="bg-[#fdfcf8] min-h-screen">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }} />
 
-      {/* Breadcrumb Navigation: সাব-পেজ বা পাতার জন্য ডাইনামিক লিংকসহ */}
+      {/* Breadcrumb Navigation */}
       <nav className="w-full bg-[#7575a3] border-b border-gray-200 py-2 px-3 text-white overflow-x-auto no-scrollbar">
         <div className="flex items-center max-w-full mx-auto text-sm font-tarunima whitespace-nowrap">
           <Link href="/" className="transition-colors shrink-0 hover:text-red-100" title="হোম">
@@ -410,7 +410,6 @@ export default async function SingleItemPage({ params, searchParams }: PageProps
           </Link>
           <span className="mx-2 text-white/50 shrink-0">/</span>
           
-          {/* যদি সাব-পেজ থাকে, তবে মূল পেজ টাইটেলও লিংকে রূপান্তর হবে */}
           {(nextpageSubtitle || currentPageNum > 1) ? (
             <>
               <Link href={`/item/${effectiveSlug}`} className="transition-colors hover:text-red-100 shrink-0">
@@ -538,7 +537,7 @@ export default async function SingleItemPage({ params, searchParams }: PageProps
             {nextActionLink ? (
               <Link
                 href={nextActionLink}
-                className="bg-red-900 text-white px-4 py-2 rounded font-normal hover:bg-red-800 transition-all flex items-center group shadow-md text-sm md:text-base max-w-48%"
+                className="bg-red-900 text-white px-4 py-2 rounded font-normal hover:bg-red-800 transition-all flex items-center group shadow-md text-sm md:text-base max-w-[48%]"
               >
                 <span className="truncate whitespace-nowrap">{nextActionLabel}</span>
                 <span className="ml-2 transition-transform transform group-hover:translate-x-1 shrink-0">→</span>

@@ -224,7 +224,7 @@ export async function generateMetadata({ params, searchParams }: UnifiedPageProp
   // Dynamic OG Image Fallback Endpoint
   const fallbackOgUrl = `/api/og?title=${encodeURIComponent(book.title)}&subtitle=${encodeURIComponent(
     displayVolumeTitle || resolvedChapterTitle || siteName
-  )}&tagline=${encodeURIComponent('এডুলিচার অনলাইন বই ও সাহিত্য সংকলন')}`;
+  )}&tagline=${encodeURIComponent('বিশুদ্ধজ্ঞানের শিক্ষামূলক প্রতিষ্ঠান')}`;
 
   const shareImage = book.og_image || book.cover_image || siteData.ogImage || fallbackOgUrl;
 

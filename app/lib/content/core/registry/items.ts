@@ -266,6 +266,10 @@ export const ITEM_REGISTRY: Record<string, ItemMeta> = {
     name: "সাহিত্য সমালোচনা",
     slug: "literary-criticism",
   },
+  "scientific-essay": {
+    name: "বৈজ্ঞানিক প্রবন্ধ",
+    slug: "scientific-essay",
+  }
 };
 
 // ⚡ ও অপটিমাইজড লুকআপ ম্যাপ (O(1) Lookup Performance)
