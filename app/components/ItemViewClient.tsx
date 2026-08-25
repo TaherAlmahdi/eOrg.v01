@@ -152,7 +152,7 @@ export default function ItemViewClient({
   const currentItems = useMemo(() => filtered.slice(0, visibleCount), [filtered, visibleCount]);
 
   return (
-    <main className="w-full font-tarunima px-2 py-3 space-y-3">
+    <main className="w-full font-tarunima px-0 py-0 space-y-3">
       {/* ব্রেডক্রাম্ব */}
       <nav className="w-full bg-[#7575a3] border-b border-gray-200 py-2 px-3 text-white overflow-x-auto no-scrollbar shadow-xs rounded-t">
         <div className="max-w-full mx-auto text-sm flex items-center whitespace-nowrap">

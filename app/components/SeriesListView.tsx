@@ -160,7 +160,7 @@ export const SeriesListView: FC<SeriesListViewProps> = ({
   const displayTotalCount = totalSeriesCount ?? validSeriesList.length;
 
   return (
-    <div className="w-full font-tarunima px-2 py-3">
+    <div className="w-full font-tarunima">
       {!isHomePage && (
         <div className="mb-3 space-y-3 bg-white/95 backdrop-blur-md shadow-xs">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
@@ -183,7 +183,7 @@ export const SeriesListView: FC<SeriesListViewProps> = ({
             </div>
 
             {/* ডানপাশে সার্চবার */}
-            <div className="relative w-full md:w-80 shrink-0">
+            <div className="relative w-full md:w-80 shrink-0 px-2">
               <Search className="absolute w-4 h-4 text-teal-600 -translate-y-1/2 left-3 top-1/2 pointer-events-none" />
               <input
                 type="text"
@@ -225,7 +225,7 @@ export const SeriesListView: FC<SeriesListViewProps> = ({
           কোনো সিরিজ পাওয়া যায়নি।
         </div>
       ) : (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5">
           {filteredSeries.map(({ slug, label, rawSeries, count }, index) => {
             const IconComponent = getSeriesIcon(slug, rawSeries);
 

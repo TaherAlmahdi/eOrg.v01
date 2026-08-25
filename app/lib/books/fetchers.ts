@@ -29,7 +29,7 @@ function isSubdomainAllowed(bookSubdomains: string[], currentSubdomain?: string)
 }
 
 /**
- * সমস্ত লেখক ও বইয়ের ডিরেক্টরি পাথ একত্রে রিটার্ন করে
+ * সমস্ত লেখক ও বইয়ের ডিরেক্টরি পাথ একত্রে রিটার্ন করে
  */
 async function getAllBookFolders(): Promise<Array<{ authorFolder: string; bookFolder: string; bookPath: string }>> {
   if (!existsSync(booksDirectory)) return [];
@@ -64,7 +64,7 @@ function mapBookData(
   data: Record<string, any>,
   authorFolderName: string,
   bookFolderName: string,
-  extractedItems: any[]
+  extractedItems: any
 ): Book {
   const bookSlug = data.slug ? String(data.slug).trim() : bookFolderName;
   const bookSubdomains = parseSubdomains(data.subdomain, authorFolderName);
@@ -160,6 +160,8 @@ export async function getLibraryBooks(currentSubdomain?: string): Promise<{
   latestBooks: Book[];
   booksByGenre: Record<string, Book[]>;
   booksBySeries: Record<string, Book[]>;
+  booksByItem: Record<string, Book[]>;
+  totalItems: number;
 }> {
   const allBooks: Book[] = [];
 
@@ -178,7 +180,11 @@ export async function getLibraryBooks(currentSubdomain?: string): Promise<{
         if (!isSubdomainAllowed(bookSubdomains, currentSubdomain)) continue;
 
         const extractedItems = collectChapterItemsDeep(bookPath);
+        console.log(`Book path: ${bookPath} | Extracted Items Count:`, Array.isArray(extractedItems) ? extractedItems.length : 'Not an array');
+
         const book = mapBookData(data, authorFolder, bookFolder, extractedItems);
+        // rawFrontmatter যুক্ত করে দেওয়া যাতে পরের লজিকে ধরতেও সুবিধা হয়
+        (book as any).rawFrontmatter = data;
 
         allBooks.push(book);
       } catch (err) {
@@ -186,21 +192,25 @@ export async function getLibraryBooks(currentSubdomain?: string): Promise<{
       }
     }
 
-    // প্রকাশনার তারিখ অনুযায়ী সর্টিং
+    // প্রকাশনার তারিখ অনুযায়ী সর্টিং
     const sortedBooks = allBooks.sort((a, b) =>
       (b.publishDate || '').localeCompare(a.publishDate || '')
     );
 
-    // জেনার ও সিরিজ অনুযায়ী গ্রুপিং
+    // জেনার, সিরিজ ও আইটেম অনুযায়ী গ্রুপিং
     const booksByGenre: Record<string, Book[]> = {};
     const booksBySeries: Record<string, Book[]> = {};
+    const booksByItem: Record<string, Book[]> = {};
+    const globalItemSet = new Set<string>();
 
     for (const book of sortedBooks) {
+      // জেনার গ্রুপিং
       for (const gName of book.genres) {
         if (!booksByGenre[gName]) booksByGenre[gName] = [];
         booksByGenre[gName].push(book);
       }
 
+      // সিরিজ গ্রুপিং
       if (book.seriesList && book.seriesList.length > 0) {
         for (const sItem of book.seriesList) {
           const sName = sItem.name;
@@ -212,6 +222,42 @@ export async function getLibraryBooks(currentSubdomain?: string): Promise<{
         if (!booksBySeries[sName]) booksBySeries[sName] = [];
         booksBySeries[sName].push(book);
       }
+
+      // আইটেম (প্রকরণ) গ্রুপিং
+      const rawItemSources = [
+        book.items,
+        (book as any).item,
+        (book as any).rawFrontmatter?.item,
+        (book as any).rawFrontmatter?.items,
+      ];
+
+      const itemNamesSet = new Set<string>();
+
+      rawItemSources.forEach((rawItemProp) => {
+        if (!rawItemProp) return;
+
+        if (Array.isArray(rawItemProp)) {
+          rawItemProp.forEach((i) => {
+            if (i && typeof i === 'object' && (i.name || i.title || i.slug)) {
+              itemNamesSet.add(String(i.name || i.title || i.slug).trim());
+            } else if (typeof i === 'string' && i.trim()) {
+              itemNamesSet.add(i.trim());
+            }
+          });
+        } else if (typeof rawItemProp === 'object' && (rawItemProp.name || rawItemProp.title || rawItemProp.slug)) {
+          itemNamesSet.add(String(rawItemProp.name || rawItemProp.title || rawItemProp.slug).trim());
+        } else if (typeof rawItemProp === 'string' && rawItemProp.trim()) {
+          itemNamesSet.add(rawItemProp.trim());
+        }
+      });
+
+      itemNamesSet.forEach((itemName) => {
+        if (itemName) {
+          globalItemSet.add(itemName);
+          if (!booksByItem[itemName]) booksByItem[itemName] = [];
+          booksByItem[itemName].push(book);
+        }
+      });
     }
 
     // সিরিজের ক্রম অনুসারে বই সর্টিং
@@ -228,10 +274,13 @@ export async function getLibraryBooks(currentSubdomain?: string): Promise<{
       });
     }
 
-    return { latestBooks: sortedBooks, booksByGenre, booksBySeries };
+    // ইউনিক প্রকরণের সঠিক সংখ্যা
+    const totalItems = globalItemSet.size > 0 ? globalItemSet.size : Object.keys(booksByItem).length;
+
+    return { latestBooks: sortedBooks, booksByGenre, booksBySeries, booksByItem, totalItems };
   } catch (error) {
     console.error('Library scanning error:', error);
-    return { latestBooks: [], booksByGenre: {}, booksBySeries: {} };
+    return { latestBooks: [], booksByGenre: {}, booksBySeries: {}, booksByItem: {}, totalItems: 0 };
   }
 }
 
@@ -290,7 +339,6 @@ export async function getBookBySlug(
         const fileContents = await fs.readFile(targetFilePath, 'utf8');
         const { data: pageData, content } = matter(fileContents);
 
-        // আইটেমস রিট্রিভ করা
         let pageItems = extractItemsFromData(pageData);
         if (pageItems.length === 0 && targetFilePath !== indexMdPath) {
           pageItems = extractItemsFromData(pageData);
@@ -298,7 +346,6 @@ export async function getBookBySlug(
           pageItems = collectChapterItemsDeep(bookPath);
         }
 
-        // নেভিগেশন লিংক তৈরি (Previous / Next)
         let prevLink = '/books';
         let prevLabel = 'গ্রন্থাগার';
         let nextLink = '/books';
@@ -324,7 +371,6 @@ export async function getBookBySlug(
           }
         }
 
-        // বেস বুক ডাটা মেপিং
         const baseBook = mapBookData(
           mainData,
           authorFolder,

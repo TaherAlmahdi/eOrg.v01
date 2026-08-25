@@ -13,9 +13,8 @@ import {
 const normalizeBengaliText = (text: string): string => {
   if (!text) return "";
   return text
-    .normalize("NFC") // ইউনিকোড নরমাল এনকোডিং
+    .normalize("NFC")
     .toLowerCase()
-    // সমতুল্য বাংলা বর্ণ ও নুকতা সামঞ্জস্যকরণ
     .replace(/\u09af\u09bc/g, "য়")
     .replace(/\u09a1\u09bc/g, "ড়")
     .replace(/\u09a2\u09bc/g, "ঢ়")
@@ -24,9 +23,9 @@ const normalizeBengaliText = (text: string): string => {
     .replace(/ড়/g, "র")
     .replace(/ঢ়/g, "র")
     .replace(/ব়/g, "র")
-    .replace(/়/g, "") // যেকোনো অবশিষ্ট নুকতা রিমুভ
+    .replace(/়/g, "")
     .replace(/[\u200B-\u200D\uFEFF]/g, "")
-    .replace(/[\s\-_]+/g, ""); // স্পেস, হাইফেন ও আন্ডারস্কোর রিমুভ
+    .replace(/[\s\-_]+/g, "");
 };
 
 // ১. Lucide icons mapping
@@ -118,7 +117,7 @@ export default function ItemListView({
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLetter, setSelectedLetter] = useState("সব");
 
-  // ৪. বর্ণ তালিকা তৈরি (ইউনিকোড ফিক্স সহ)
+  // ৪. বর্ণ তালিকা তৈরি (আইটেম পেজের জন্য)
   const availableLetters = useMemo(() => {
     if (isHomePage) return [];
 
@@ -139,31 +138,43 @@ export default function ItemListView({
     return ["সব", ...sortedLetters];
   }, [items, isHomePage]);
 
-  // ৫. সার্চ ও বর্ণানুক্রমিক ফিল্টারিং
-  const filteredItems = useMemo(() => {
-    if (isHomePage) return items;
+  // ৫. প্রসেসিং, সর্টিং, সার্চ ও ফিল্টারিং লজিক
+  const processedItems = useMemo(() => {
+    // কপি তৈরি করে নেওয়া যাতে অরিজিনাল অ্যারে মিউটেট না হয়
+    let result = [...items];
 
-    const normalizedQuery = normalizeBengaliText(searchQuery);
+    if (isHomePage) {
+      // হোমপেজে সংখ্যা (count) অনুযায়ী বড় থেকে ছোট (Descending) সর্ট হবে এবং সর্বোচ্চ ১০টি নেওয়া হবে
+      result.sort((a, b) => b.count - a.count);
+      return result.slice(0, 10);
+    } else {
+      // আইটেম পেজে বর্ণানুক্রমিক (Alphabetical) সর্ট হবে
+      result.sort((a, b) =>
+        (a.label || "").localeCompare(b.label || "", "bn", { sensitivity: "base" })
+      );
 
-    return items.filter((item) => {
-      const normalizedLabel = normalizeBengaliText(item.label);
-      const matchesSearch = !normalizedQuery || normalizedLabel.includes(normalizedQuery);
+      const normalizedQuery = normalizeBengaliText(searchQuery);
 
-      const firstChar = (item.label || "").normalize("NFC").trim().charAt(0);
-      const matchesLetter = selectedLetter === "সব" || firstChar === selectedLetter;
+      return result.filter((item) => {
+        const normalizedLabel = normalizeBengaliText(item.label);
+        const matchesSearch = !normalizedQuery || normalizedLabel.includes(normalizedQuery);
 
-      return matchesSearch && matchesLetter;
-    });
+        const firstChar = (item.label || "").normalize("NFC").trim().charAt(0);
+        const matchesLetter = selectedLetter === "সব" || firstChar === selectedLetter;
+
+        return matchesSearch && matchesLetter;
+      });
+    }
   }, [items, searchQuery, selectedLetter, isHomePage]);
 
   const displayTotalCount = totalItemsCount ?? items.length;
 
   return (
-    <div className="w-full font-tarunima px-2 py-3">
+    <div className="w-full font-tarunima bg-teal-25">
+      {/* শিরোনাম, কাউন্ট, সার্চবার ও বর্ণ ফিল্টার শুধু আইটেম পেজে দেখাবে */}
       {!isHomePage && (
-        <div className="mb-3 space-y-3 bg-white/95 backdrop-blur-md shadow-xs">
+        <div className="mb-3 space-y-3 backdrop-blur-md shadow-xs">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-
             {/* বামপাশে ডাইনামিক পেজ টাইটেল */}
             <div className="rounded bg-teal-50/90 text-[#008080] border border-teal-200 shadow-xs backdrop-blur-md self-start md:self-auto">
               <div className="p-2.5 inline-flex items-center gap-2">
@@ -192,10 +203,9 @@ export default function ItemListView({
                 className="w-full pl-9 pr-4 py-2 border border-teal-200 rounded focus:outline-none focus:ring-1 focus:ring-[#008080] text-sm bg-teal-50/30 text-gray-800 shadow-xs placeholder-gray-400"
               />
             </div>
-
           </div>
 
-          {/* নিচে: সেন্টারে আদ্যক্ষর ফিল্টার বার */}
+          {/* আদ্যক্ষর ফিল্টার বার */}
           {availableLetters.length > 1 && (
             <div className="p-2 border border-teal-100 rounded bg-teal-50/90 backdrop-blur-md shadow-xs">
               <div className="flex flex-wrap items-center justify-center gap-1">
@@ -204,10 +214,11 @@ export default function ItemListView({
                     key={letter}
                     type="button"
                     onClick={() => setSelectedLetter(letter)}
-                    className={`px-2 py-1 text-xs md:text-sm font-semibold rounded transition-colors cursor-pointer ${selectedLetter === letter
-                      ? "bg-[#008080] text-white shadow-xs"
-                      : "bg-gray-100 hover:bg-teal-50 text-gray-700 hover:text-[#008080] border border-transparent hover:border-teal-200"
-                      }`}
+                    className={`px-2 py-1 text-xs md:text-sm font-semibold rounded transition-colors cursor-pointer ${
+                      selectedLetter === letter
+                        ? "bg-[#008080] text-white shadow-xs"
+                        : "bg-gray-100 hover:bg-teal-50 text-gray-700 hover:text-[#008080] border border-transparent hover:border-teal-200"
+                    }`}
                   >
                     {letter}
                   </button>
@@ -219,13 +230,13 @@ export default function ItemListView({
       )}
 
       {/* আইটেম কার্ড গ্রিড */}
-      {filteredItems.length === 0 ? (
+      {processedItems.length === 0 ? (
         <div className="p-8 text-center text-gray-500 rounded bg-white border border-dashed border-gray-300">
           কোন প্রকরণ পাওয়া যায়নি।
         </div>
       ) : (
         <div className="flex flex-wrap gap-2">
-          {filteredItems.map(({ slug, label, rawGenre, count }) => {
+          {processedItems.map(({ slug, label, rawGenre, count }) => {
             const IconComponent = getItemIcon(slug, rawGenre || label);
             const resolvedSlug = generateSlugFallback(slug, label);
 

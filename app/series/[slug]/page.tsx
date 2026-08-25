@@ -97,10 +97,12 @@ export default async function SeriesPage({ params, searchParams }: PageProps) {
   const sortedBooks = sortSeriesBooks(filteredBooks, targetBengaliSeries);
 
   return (
+    
     <SeriesView
       seriesTitle={String(targetBengaliSeries)}
       books={sortedBooks}
       subdomain={subdomain}
     />
+    
   );
 }

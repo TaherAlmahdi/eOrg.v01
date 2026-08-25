@@ -83,7 +83,7 @@ export default async function SingleItemsPage({ params }: PageProps) {
   const searchSlugs = Array.from(new Set([rawSlug, registrySlug, bengaliName].filter(Boolean)));
 
   return (
-    <div className="py-0">
+    <div className="flex w-full items-center justify-between mt-0 px-2 sm:px-4 md:px-4 py-2 mb-4">
       <ItemView slug={registrySlug} slugsArray={searchSlugs} />
     </div>
   );

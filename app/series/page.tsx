@@ -50,7 +50,7 @@ export default async function SeriesPage() {
 
 
       {/* সিরিজ লিস্ট সেকশন */}
-      <div className="w-full mx-auto">
+      <div className="w-full mx-auto px-2 py-4">
         <SeriesList sortBy="alphabetical" />
       </div>
     </main>

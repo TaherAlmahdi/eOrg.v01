@@ -125,7 +125,7 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
       </nav>
 
       {/* মূল কন্টেন্ট */}
-      <div className="px-3 py-6 mx-auto max-w-full">
+      <div className="mx-auto max-w-full px-4 py-4">
         <header className="mb-3 space-y-3 bg-white/95 backdrop-blur-md shadow-xs">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
 
@@ -206,14 +206,14 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
         </header>
 
         {filteredBooks.length > 0 ? (
-          <div className="grid grid-cols-2 gap-1 sm:grid-cols-3 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-8 pb-4 border-b border-red-100">
+          <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-8 pb-4 border-b border-red-100">
             {filteredBooks.map((book) => {
               const bookSlug = book.slug || book.id;
               return (
                 <Link
                   key={book.id || book.slug}
                   href={`/book/${bookSlug}`}
-                  className="flex flex-col h-full group bg-white p-0 rounded border border-gray-200/80 shadow-xs transition-all duration-300 hover:-translate-y-1.5 hover:shadow-md hover:border-orange-200"
+                  className="flex flex-col h-full group bg-teal-25 p-0 rounded border border-gray-200/80 shadow-xs transition-all duration-300 hover:-translate-y-1.5 hover:shadow-md hover:border-orange-200"
                 >
                   <div className="relative aspect-[2/3] overflow-hidden rounded-t border-b border-gray-200/50 bg-gray-50">
                     <Image
@@ -226,7 +226,7 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
                     <div className="absolute inset-0 transition-opacity opacity-0 bg-black/5 group-hover:opacity-100" />
                   </div>
 
-                  <div className="mt-0 text-center flex flex-col justify-between bg-gray-200/50 p-2 grow">
+                  <div className="mt-0 text-center flex flex-col items-center justify-center bg-gray-200/50 p-2 grow">
                     <h3 className="text-base md:text-lg font-semibold leading-snug text-gray-900 transition-colors group-hover:text-emerald-700 line-clamp-2">
                       {book.title}
                     </h3>

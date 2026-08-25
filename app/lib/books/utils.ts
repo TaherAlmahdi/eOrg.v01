@@ -9,9 +9,9 @@ export const booksDirectory = path.resolve(process.cwd(), 'content', 'books');
 /**
  * বাংলা ইউনিকোড এনকোডিং নরম্যালাইজার (য়, ড়, ঢ়, ব় এনকোডিং ফিক্স সহ)
  */
-export function normalizeBanglaText(text: string): string {
-  if (!text) return '';
-  return String(text)
+export function normalizeBanglaText(text: unknown): string {
+  if (typeof text !== 'string' || !text) return '';
+  return text
     .normalize('NFC')
     .replace(/\u09AF\u09BC/g, '\u09DF') // য + ় = য়
     .replace(/\u09A1\u09BC/g, '\u09DC') // ড + ় = ড়
@@ -19,7 +19,7 @@ export function normalizeBanglaText(text: string): string {
     .replace(/\u09AC\u09BC/g, '\u09E0'); // ব + ় = ব়
 }
 
-export const naturalSort = (a: string, b: string) => {
+export const naturalSort = (a: string, b: string): number => {
   const normA = normalizeBanglaText(a);
   const normB = normalizeBanglaText(b);
   return normA.localeCompare(normB, undefined, { numeric: true, sensitivity: 'base' });
@@ -40,9 +40,10 @@ function parseNumberValue(val: unknown): number {
   return isNaN(num) ? Infinity : num;
 }
 
-export function slugify(text: string): string {
-  if (!text) return '';
-  return normalizeBanglaText(text)
+export function slugify(text: unknown): string {
+  const normalized = normalizeBanglaText(text);
+  if (!normalized) return '';
+  return normalized
     .trim()
     .toLowerCase()
     .replace(/\s+/g, '-')
@@ -56,7 +57,7 @@ export function parseSubdomains(subdomainRaw: unknown, defaultAuthorFolder: stri
     return subdomainRaw.map((s) => String(s).trim().toLowerCase());
   }
 
-  if (typeof subdomainRaw === 'string') {
+  if (typeof subdomainRaw === 'string' && subdomainRaw.trim()) {
     return subdomainRaw.split(',').map((s) => s.trim().toLowerCase());
   }
 
@@ -72,7 +73,9 @@ export function extractGenresFromData(data: Record<string, unknown> | null | und
     genresSet.add(normalizeBanglaText(rawGenre.trim()));
   } else if (Array.isArray(rawGenre)) {
     rawGenre.forEach((g) => {
-      if (typeof g === 'string' && g.trim()) genresSet.add(normalizeBanglaText(g.trim()));
+      if (typeof g === 'string' && g.trim()) {
+        genresSet.add(normalizeBanglaText(g.trim()));
+      }
     });
   }
 
@@ -96,7 +99,6 @@ export function extractSeriesFromData(data: Record<string, unknown> | null | und
   if (!data) return [];
   const seriesList: SeriesItem[] = [];
 
-  // series_list, series_info অথবা series (যদি অবজেক্ট অ্যারে হিসেবে থাকে)
   const rawSeriesList =
     data.series_list ||
     data.series_info ||
@@ -106,7 +108,7 @@ export function extractSeriesFromData(data: Record<string, unknown> | null | und
     for (const item of rawSeriesList) {
       if (typeof item === 'object' && item !== null && 'name' in item) {
         const itemObj = item as Record<string, unknown>;
-        const sName = normalizeBanglaText(String(itemObj.name).trim());
+        const sName = normalizeBanglaText(itemObj.name);
         const sSlug = itemObj.slug
           ? String(itemObj.slug).trim()
           : getSlug('series', sName) || slugify(sName);
@@ -115,26 +117,27 @@ export function extractSeriesFromData(data: Record<string, unknown> | null | und
           sName,
           sSlug
         );
+
         seriesList.push({
           name: sName,
           slug: sSlug,
           link: sLink,
           order: String(itemObj.order || itemObj.series_order || ''),
-          title: normalizeBanglaText(String(itemObj.title || '')),
+          title: normalizeBanglaText(itemObj.title),
         });
       }
     }
     if (seriesList.length > 0) return seriesList;
   }
 
-  // স্ট্রিং বা স্ট্রিং অ্যারে হ্যান্ডলিং
   if (data.series) {
     const rawSeries = data.series;
     if (typeof rawSeries === 'string' && rawSeries.trim()) {
-      const sName = normalizeBanglaText(rawSeries.trim());
+      const sName = normalizeBanglaText(rawSeries);
       const sSlug = data.seriesSlug
         ? String(data.seriesSlug).trim()
         : getSlug('series', sName) || slugify(sName);
+
       seriesList.push({
         name: sName,
         slug: sSlug,
@@ -144,17 +147,19 @@ export function extractSeriesFromData(data: Record<string, unknown> | null | und
           sSlug
         ),
         order: String(data.series_order || data.series_index || ''),
-        title: normalizeBanglaText(String(data.series_title || '')),
+        title: normalizeBanglaText(data.series_title),
       });
     } else if (Array.isArray(rawSeries)) {
       rawSeries.forEach((s) => {
         if (typeof s === 'string' && s.trim()) {
-          const sName = normalizeBanglaText(s.trim());
+          const sName = normalizeBanglaText(s);
           const sSlug = getSlug('series', sName) || slugify(sName);
           seriesList.push({
             name: sName,
             slug: sSlug,
             link: generateSeriesLink(undefined, sName, sSlug),
+            order: '',
+            title: '',
           });
         }
       });
@@ -193,7 +198,9 @@ export function extractItemsFromData(data: Record<string, unknown> | null | unde
     itemsSet.add(normalizeBanglaText(rawItem.trim()));
   } else if (Array.isArray(rawItem)) {
     rawItem.forEach((i) => {
-      if (typeof i === 'string' && i.trim()) itemsSet.add(normalizeBanglaText(i.trim()));
+      if (typeof i === 'string' && i.trim()) {
+        itemsSet.add(normalizeBanglaText(i.trim()));
+      }
     });
   }
 
@@ -208,6 +215,19 @@ export function collectChapterItemsDeep(bookFolderPath: string): string[] {
   }
 
   try {
+    // ১. সবার আগে মূল বইয়ের নিজস্ব index.md ফাইলের ফ্রন্টম্যাটার থেকে আইটেমগুলো যুক্ত করা হলো
+    const mainIndexPath = path.join(bookFolderPath, 'index.md');
+    if (existsSync(mainIndexPath)) {
+      try {
+        const mainContent = readFileSync(mainIndexPath, 'utf8');
+        const { data: mainData } = matter(mainContent);
+        extractItemsFromData(mainData).forEach((i) => itemsSet.add(i));
+      } catch {
+        // Read error ignored
+      }
+    }
+
+    // ২. এরপর সাব-ফোল্ডার বা সাব-ফাইলগুলো স্ক্যান করা হবে
     const scanDir = (dirPath: string) => {
       const entries = readdirSync(dirPath, { withFileTypes: true });
       for (const entry of entries) {
@@ -222,14 +242,14 @@ export function collectChapterItemsDeep(bookFolderPath: string): string[] {
             const { data: fileData } = matter(fileContent);
             extractItemsFromData(fileData).forEach((i) => itemsSet.add(i));
           } catch {
-            // Read error ignore
+            // Read error ignored
           }
         }
       }
     };
     scanDir(bookFolderPath);
   } catch {
-    // Directory traversal error ignore
+    // Directory traversal error ignored
   }
 
   return Array.from(itemsSet);
@@ -246,7 +266,7 @@ function getTargetSeriesOrder(book: Record<string, any>, targetSeries?: string):
     if (Array.isArray(rawSeriesList)) {
       for (const item of rawSeriesList) {
         if (typeof item === 'object' && item !== null) {
-          const sName = normalizeBanglaText(String(item.name || '').trim());
+          const sName = normalizeBanglaText(item.name);
           const sSlug = item.slug ? String(item.slug).trim() : slugify(sName);
 
           if (sSlug === targetSlug || slugify(sName) === targetSlug) {
@@ -295,7 +315,7 @@ export function sortSeriesBooks<T extends Partial<Book> & Record<string, any>>(
       return 1;
     }
 
-    // ২. Order না থাকলে first_published তারিখ অনুযায়ী সর্ট হবে
+    // ২. Order না থাকলে first_published তারিখ অনুযায়ী সর্ট হবে
     const firstPubA = a.first_published ?? a.firstPublished ?? a.year;
     const firstPubB = b.first_published ?? b.firstPublished ?? b.year;
 

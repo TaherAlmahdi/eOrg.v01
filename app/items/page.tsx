@@ -24,7 +24,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function AllItemsPage() {
   return (
-    <div className="py-0">
+    <div className="flex w-full items-center justify-between mt-4 px-3 sm:px-4 py-2 mb-4"> 
       {/* 🔹 সরাসরি ItemList কম্পোনেন্ট রেন্ডার করা হলো */}
       <ItemList />
     </div>

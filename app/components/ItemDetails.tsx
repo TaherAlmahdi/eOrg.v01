@@ -1,61 +1,40 @@
 'use client';
 
-import React from 'react';
 import Link from 'next/link';
+import BookCover from '@/app/components/BookCover';
 
-export interface CustomLink {
-  name: string;
-  link: string;
-}
-
-export interface ItemDetailsBook {
-  item?: string | { title?: string; [key: string]: unknown } | CustomLink;
-  title?: string | CustomLink; // মূল বইয়ের নাম (মেইন ফোল্ডারের ইনডেক্স ফাইল থেকে)
-  author?: string | CustomLink;
-  translator?: string | CustomLink;
-  editor?: string | CustomLink;
-  pub_medium?: string | CustomLink;
-  first_published?: string | number | CustomLink;
-  publisher?: string | CustomLink;
-  source_book?: string | number | CustomLink;
-  series?: string | string[] | CustomLink | CustomLink[];
-  series_name?: string | string[];
-  series_links?: CustomLink[];
-  series_link?: string;
-  seriesOrder?: string | number;
-  part?: string | number;
-  volume?: string | number;
-  genre?: string | string[] | CustomLink | CustomLink[];
-  genre_links?: CustomLink[];
-  [key: string]: unknown;
-}
-
-export interface ItemDetailsProps {
-  book: ItemDetailsBook | null;
-  series?: string | string[];
-  [key: string]: unknown;
-}
-
+// সংখ্যা বাংলায় রূপান্তরের হেল্পার
 const toBengaliNumber = (num?: number | string): string =>
   num !== undefined && num !== null && num !== ''
     ? num.toString().replace(/\d/g, (d) => '০১২৩৪৫৬৭৮৯'[parseInt(d, 10)])
     : '';
 
+// যেকোনো ভ্যালুকে নিরাপদভাবে স্ট্রিংয়ে রূপান্তর করার হেল্পার (অবজেক্ট ক্র্যাশ রোধ করতে)
 const renderValue = (val: unknown): string => {
   if (val === null || val === undefined) return '';
   if (typeof val === 'string' || typeof val === 'number') return String(val);
   if (typeof val === 'object' && val !== null) {
-    if ('title' in val && typeof (val as any).title === 'string') {
-      return String((val as any).title);
-    }
     if ('name' in val && typeof (val as any).name === 'string') {
       return String((val as any).name);
+    }
+    if ('title' in val && typeof (val as any).title === 'string') {
+      return String((val as any).title);
     }
   }
   return '';
 };
 
-export default function ItemDetails({ book, series: explicitSeries }: ItemDetailsProps) {
+interface CustomLink {
+  name: string;
+  link: string;
+}
+
+export interface BookDetailsProps {
+  book: any;
+  series?: any; 
+}
+
+export default function BookDetails({ book, series: explicitSeries }: BookDetailsProps) {
   if (!book) return null;
 
   const seriesData = book.series || book.series_name || explicitSeries;
@@ -71,31 +50,32 @@ export default function ItemDetails({ book, series: explicitSeries }: ItemDetail
 
   return (
     <div className="space-y-3 font-tarunima">
+      {/* ১. কভার বাটন ও কভার ছবির আলাদা কার্ড */}
+      <BookCover coverImage={book.cover_image} title={renderValue(book.title)} />
+
+      {/* ২. পুস্তক বিবরণীর বিস্তারিত তথ্যের মূল কার্ড */}
       <div className="p-2 bg-white border border-gray-100 rounded shadow-sm">
         <div className="space-y-2 text-sm text-gray-800">
           
-          {/* ১. বর্তমান পাতার নাম (আইটেম টাইটেল) */}
-          {book.item && (
+          {/* আইটেম / প্রকরণ : বর্তমান পাতার টাইটেল */}
+          {book.item && book.title && (
             <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
-              <span className="font-bold">প্রকরণ</span>
-              <span className="text-gray-400">:</span>
-              <span>
-                {typeof book.item === 'object' && book.item !== null && 'title' in book.item 
-                  ? renderValue((book.item as any).title) 
-                  : renderValue(book.item)}
-              </span>
-            </div>
-          )}
-
-          {/* ২. মূল বইয়ের নাম (মেইন ফোল্ডারের ইনডেক্স ফাইল থেকে আসা book.title) */}
-          {book.title && (
-            <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
-              <span className="font-bold">বই</span>
+              <span className="font-bold">{renderValue(book.item)}</span>
               <span className="text-gray-400">:</span>
               <span>{renderValue(book.title)}</span>
             </div>
           )}
 
+          {/* বই */}
+          {book.book && (
+            <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
+              <span className="font-bold">বই</span>
+              <span className="text-gray-400">:</span>
+              <span>{renderValue(book.book)}</span>
+            </div>
+          )}
+
+          {/* লেখক */}
           {book.author && (
             <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
               <span className="font-bold">লেখক</span>
@@ -104,6 +84,7 @@ export default function ItemDetails({ book, series: explicitSeries }: ItemDetail
             </div>
           )}
 
+          {/* অনুবাদক */}
           {book.translator && (
             <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
               <span className="font-bold">অনুবাদক</span>
@@ -112,6 +93,7 @@ export default function ItemDetails({ book, series: explicitSeries }: ItemDetail
             </div>
           )}
 
+          {/* সম্পাদক */}
           {book.editor && (
             <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
               <span className="font-bold">সম্পাদক</span>
@@ -120,6 +102,7 @@ export default function ItemDetails({ book, series: explicitSeries }: ItemDetail
             </div>
           )}
 
+          {/* প্রথম প্রকাশ */}
           {book.pub_medium && (
             <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
               <span className="font-bold">প্রথম প্রকাশ</span>
@@ -128,6 +111,7 @@ export default function ItemDetails({ book, series: explicitSeries }: ItemDetail
             </div>
           )}
 
+          {/* গ্রন্থরূপ */}
           {book.first_published && (
             <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
               <span className="font-bold">গ্রন্থরূপ</span>
@@ -136,6 +120,7 @@ export default function ItemDetails({ book, series: explicitSeries }: ItemDetail
             </div>
           )}
 
+          {/* প্রকাশক */}
           {book.publisher && (
             <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
               <span className="font-bold">প্রকাশক</span>
@@ -144,6 +129,7 @@ export default function ItemDetails({ book, series: explicitSeries }: ItemDetail
             </div>
           )}
 
+          {/* অনুস্মৃতি */}
           {book.source_book && (
             <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
               <span className="font-bold">অনুস্মৃতি</span>
@@ -152,6 +138,7 @@ export default function ItemDetails({ book, series: explicitSeries }: ItemDetail
             </div>
           )}
 
+          {/* সিরিজ */}
           {seriesData && (
             <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
               <span className="font-bold">সিরিজ</span>
@@ -159,9 +146,9 @@ export default function ItemDetails({ book, series: explicitSeries }: ItemDetail
               <span className="flex flex-wrap gap-x-1 items-baseline">
                 {Array.isArray(seriesData) ? (
                   seriesData.map((s: unknown, index: number) => {
-                    const seriesName = renderValue(s);
-                    if (!seriesName) return null;
-                    const href = getSeriesLink(seriesName);
+                    const sName = renderValue(s);
+                    if (!sName) return null;
+                    const href = getSeriesLink(sName);
                     const isLast = index === (seriesData as unknown[]).length - 1;
 
                     return (
@@ -170,7 +157,7 @@ export default function ItemDetails({ book, series: explicitSeries }: ItemDetail
                           href={href}
                           className="text-blue-600 hover:underline transition-colors"
                         >
-                          {seriesName}
+                          {sName}
                         </Link>
                         {!isLast && <span className="mr-1">,</span>}
                       </span>
@@ -194,6 +181,7 @@ export default function ItemDetails({ book, series: explicitSeries }: ItemDetail
             </div>
           )}
 
+          {/* ঘরানা */}
           {book.genre && (
             <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
               <span className="font-bold">ঘরানা</span>
@@ -201,25 +189,25 @@ export default function ItemDetails({ book, series: explicitSeries }: ItemDetail
               <span className="flex flex-wrap gap-x-1">
                 {Array.isArray(book.genre) ? (
                   book.genre.map((g: unknown, index: number) => {
-                    const genreName = renderValue(g);
-                    if (!genreName) return null;
-                    
+                    const gName = renderValue(g);
+                    if (!gName) return null;
+
                     const linkObj = book.genre_links?.find(
-                      (l: CustomLink) => l.name === genreName
+                      (l: CustomLink) => l.name === gName
                     ) || (typeof g === 'object' && g !== null && 'link' in g ? g : null);
 
                     const isLast = index === (book.genre as unknown[]).length - 1;
                     return (
                       <span key={index}>
-                        {linkObj && typeof linkObj === 'object' && 'link' in linkObj && linkObj.link ? (
+                        {linkObj && typeof linkObj === 'object' && 'link' in linkObj && (linkObj as any).link ? (
                           <Link
-                            href={String(linkObj.link)}
+                            href={String((linkObj as any).link)}
                             className="text-blue-600 hover:underline"
                           >
-                            {toBengaliNumber(genreName)}
+                            {toBengaliNumber(gName)}
                           </Link>
                         ) : (
-                          toBengaliNumber(genreName)
+                          toBengaliNumber(gName)
                         )}
                         {!isLast && <span className="mr-1">,</span>}
                       </span>
@@ -231,7 +219,6 @@ export default function ItemDetails({ book, series: explicitSeries }: ItemDetail
               </span>
             </div>
           )}
-
         </div>
       </div>
     </div>

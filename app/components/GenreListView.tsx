@@ -117,7 +117,7 @@ export const GenreListView: FC<GenreListViewProps> = ({
   return (
     <div className="w-full px-0">
       {!isHomePage && (
-        <div className="p-4 mb-3 space-y-4 border border-teal-100 rounded shadow-sm bg-white/90 backdrop-blur-md">
+        <div className="px-2 py-3 mb-3 space-y-4 border border-teal-100 rounded shadow-sm bg-white/90 backdrop-blur-md">
           {/* লাইভ সার্চ বার */}
           <div className="relative max-w-md mx-auto">
             <Search className="absolute w-5 h-5 text-teal-600 -translate-y-1/2 left-3 top-1/2" />
@@ -132,7 +132,7 @@ export const GenreListView: FC<GenreListViewProps> = ({
 
           {/* 🔹 ডাইনামিক আদ্যক্ষর কুইক ফিল্টার বার */}
           {availableLetters.length > 1 && (
-            <div className="mt-3 w-full flex flex-wrap items-center justify-center gap-0.5 py-1 px-2 bg-orange-50/50 rounded border border-orange-100 text-xs sm:text-sm md:text-base lg:text-lg font-tarunima shadow-xs">
+            <div className="mt-2 w-full flex flex-wrap items-center justify-center gap-0.5 py-1 px-2 bg-orange-50/50 rounded border border-orange-100 text-xs sm:text-sm md:text-base lg:text-lg font-tarunima shadow-xs">
               {availableLetters.map((letter) => (
                 <button
                   key={letter}
