@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { Home, Search, BookOpen } from "lucide-react";
 import { buildTabTitle } from '@/app/lib/get-site-data';
 
-// ইংরেজি সংখ্যাকে বাংলায় রূপান্তর করার ফাংশন
-const toBengaliNumber = (num: number | string) => {
+// 🔹 ইংরেজি সংখ্যাকে বাংলায় রূপান্তর করার ফাংশন
+const toBengaliNumber = (num: number | string): string => {
   const englishToBengali: Record<string, string> = {
     '0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪',
     '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯'
@@ -14,7 +14,7 @@ const toBengaliNumber = (num: number | string) => {
   return num.toString().replace(/\d/g, (digit) => englishToBengali[digit] || digit);
 };
 
-// বাংলা ক্যারেক্টার নরমালাইজেশন
+// 🔹 বাংলা ক্যারেক্টার নরমালাইজেশন
 const normalizeBengali = (text: string = ''): string => {
   return text
     .normalize('NFC')
@@ -50,22 +50,18 @@ export default function BooksPageClient({
   siteTitle,
   genreTitle
 }: BooksPageClientProps) {
-
-  // সার্ভার ও ক্লায়েন্ট উভয় ক্ষেত্রে প্রথম রেন্ডারে নিরাপদ ডিফল্ট মান ৩০ রাখা হলো (Hydration Mismatch এড়াতে)
   const [limit, setLimit] = useState(30);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedLetter, setSelectedLetter] = useState('সব');
+  const [visibleCount, setVisibleCount] = useState(limit);
 
-  // ব্রাউজারে মাউন্ট হওয়ার পর সঠিক স্ক্রিন সাইজ অনুযায়ী লিমিট আপডেট হবে
+  // স্ক্রিন সাইজ অনুযায়ী ইনিশিয়াল লিমিট নির্ধারণ (হাইড্রেশন মিসম্যাচ এড়াতে)
   useEffect(() => {
     if (window.innerWidth >= 1280) {
       setLimit(40);
     }
   }, []);
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedLetter, setSelectedLetter] = useState('সব');
-  const [visibleCount, setVisibleCount] = useState(limit);
-
-  // লিমিট পরিবর্তন হলে দৃশ্যমান কাউন্ট আপডেট করা
   useEffect(() => {
     setVisibleCount(limit);
   }, [limit]);
@@ -114,6 +110,7 @@ export default function BooksPageClient({
             : Array.isArray(book.genre)
               ? book.genre
               : [];
+        
         const matchesGenre = bookGenres.some((g) =>
           normalizeBengali(g).includes(normalizedGenre)
         );
@@ -154,7 +151,7 @@ export default function BooksPageClient({
 
   const hasMore = visibleCount < filteredBooks.length;
 
-  // ৪. ডায়নামিক ব্রাউজার ট্যাবটাইটেল আপডেট
+  // ৪. ডায়নামিক ব্রাউজার ট্যাবটাইটেল আপডেট (সেকেন্ডের মধ্যে বদলে যাওয়া রোধ করতে)
   useEffect(() => {
     const baseTitle = genreTitle || 'গ্রন্থাগার';
     let currentPageTitle = baseTitle;
@@ -189,7 +186,7 @@ export default function BooksPageClient({
       </nav>
 
       {/* বইয়ের গ্রিড ও ফিল্টার হেডার */}
-      <div className="max-w-full mx-auto py-2 px-2">
+      <div className="max-w-full mx-auto py-4 px-4">
         <div className="mb-2 border-b border-orange-200 pb-2">
 
           {/* হেডার রো: বামে টাইটেল, ডানে সার্চবার */}
@@ -234,10 +231,11 @@ export default function BooksPageClient({
                 <button
                   key={letter}
                   onClick={() => setSelectedLetter(letter)}
-                  className={`px-2 py-0.5 rounded transition-all cursor-pointer ${selectedLetter === letter
-                    ? 'bg-[#996633] text-white font-bold shadow-xs'
-                    : 'bg-white text-gray-700 hover:bg-orange-100 border border-gray-100'
-                    }`}
+                  className={`px-2 py-0.5 rounded transition-all cursor-pointer ${
+                    selectedLetter === letter
+                      ? 'bg-[#996633] text-white font-bold shadow-xs'
+                      : 'bg-white text-gray-700 hover:bg-orange-100 border border-gray-100'
+                  }`}
                 >
                   {letter}
                 </button>
@@ -266,7 +264,7 @@ export default function BooksPageClient({
                     {/* কভার ইমেজ কার্ড */}
                     <div className="relative aspect-2/3 overflow-hidden rounded shadow-lg bg-white border border-gray-100 transition-transform duration-300 group-hover:-translate-y-2 group-hover:shadow-2xl">
                       <img
-                        src={book.cover_image || book.cover || '/default-cover.jpg'}
+                        src={(book.cover_image as string) || (book.cover as string) || '/default-cover.jpg'}
                         alt={book.title}
                         className="w-full h-full object-cover"
                       />
@@ -279,7 +277,7 @@ export default function BooksPageClient({
                         {book.title}
                       </h3>
                       <p className="text-sm text-center text-gray-500 mt-1 uppercase tracking-tight">
-                        {book.author || 'অজানা লেখক'}
+                        {(book.author as string) || 'অজানা লেখক'}
                       </p>
                     </div>
                   </Link>

@@ -1,61 +1,37 @@
-import { headers } from 'next/headers';
 import { Metadata } from 'next';
-import { getSubdomainData, buildTabTitle } from '@/app/lib/get-site-data';
 import { getAllBooks, Book } from '@/app/lib/books';
 import BooksPageClient from './BooksPageClient';
 
-// 🔹 টাইপ-সেফ বুকস ডাটা এক্সট্র্যাক্টর হেলপার
 function parseBooksData(booksResponse: unknown): Book[] {
-  if (Array.isArray(booksResponse)) {
-    return booksResponse as Book[];
-  }
-
+  if (Array.isArray(booksResponse)) return booksResponse as Book[];
   if (booksResponse && typeof booksResponse === 'object') {
     const res = booksResponse as Record<string, unknown>;
-    if (Array.isArray(res.books)) {
-      return res.books as Book[];
-    }
-    if (Array.isArray(res.data)) {
-      return res.data as Book[];
-    }
+    if (Array.isArray(res.books)) return res.books as Book[];
+    if (Array.isArray(res.data)) return res.data as Book[];
   }
-
   return [];
 }
 
-// 🔹 ডাইনামিক মেটাডেটা ফাংশন
+// 🟢 এখানে আপনার ইচ্ছেমতো কারেন্ট পেজ টাইটেল বসিয়ে দিন
 export async function generateMetadata(): Promise<Metadata> {
-  const headersList = await headers();
-  const host = headersList.get('host');
-  const siteData = getSubdomainData(host);
-
-  const siteName = siteData?.title || 'এডুলিচার';
-  const dynamicMetaTitle = buildTabTitle({
-    currentPageTitle: 'গ্রন্থাগার',
-    siteName,
-  });
+  const currentPageTitle = 'গ্রন্থাগার'; // অন্য পেজে গেলে এখানে শুধু নাম বদল হবে (যেমন: 'বইয়ের বিবরণ', 'যোগাযোগ' ইত্যাদি)
+  const fullTitle = `${currentPageTitle} ❀ এডুলিচার পাঠশালা ❀ এডুলিচার`;
 
   return {
-    title: dynamicMetaTitle,
-    openGraph: { title: dynamicMetaTitle },
-    twitter: { title: dynamicMetaTitle },
+    title: fullTitle,
+    openGraph: { title: fullTitle },
+    twitter: { title: fullTitle },
   };
 }
 
-// 🔹 মেইন পেজ কম্পোনেন্ট
 export default async function BooksPage() {
-  const headersList = await headers();
-  const host = headersList.get('host');
-  const siteData = getSubdomainData(host);
-  const currentSubdomain = siteData?.subdomain || 'library';
-
-  const booksResponse = await getAllBooks(currentSubdomain);
+  const booksResponse = await getAllBooks('library');
   const booksData = parseBooksData(booksResponse);
 
   return (
     <BooksPageClient
       initialBooks={booksData}
-      siteTitle={siteData?.title || 'এডুলিচার'}
+      siteTitle="এডুলিচার পাঠশালা"
     />
   );
 }
