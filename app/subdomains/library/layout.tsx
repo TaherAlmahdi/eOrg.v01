@@ -8,18 +8,11 @@ export const viewport: Viewport = {
   maximumScale: 1,
 };
 
+// লেআউটের মেটাডেটা একদম সাধারণ রাখা হলো, যাতে পেজ ফাইলের টাইটেল সরাসরি বসে
 export const metadata: Metadata = {
-  title: 'এডুলিচার পাঠশালা ❀ এডুলিচার', // ফ্যালব্যাক বা ডিফল্ট টাইটেল
+  title: 'এডুলিচার পাঠশালা',
   description: 'বাংলা ভাষায় সর্বাধিক গ্রন্থের সমাহার',
   manifest: '/manifest.webmanifest',
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: 'default',
-    title: 'এডুলিচার পাঠশালা',
-  },
-  formatDetection: {
-    telephone: false,
-  },
 };
 
 export default function LibraryLayout({ children }: { children: React.ReactNode }) {
