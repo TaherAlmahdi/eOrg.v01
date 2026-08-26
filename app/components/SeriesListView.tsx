@@ -8,21 +8,7 @@ import {
   FileText, Languages, Laugh, BookText, Compass, History, GraduationCap,
   Music, Flame, MoonStar, Cross, Sun, Flower2
 } from "lucide-react";
-
-// 🔹 বাংলা বর্ণ ও স্পেস নরমালাইজ করার হেল্পার ফাংশন
-const normalizeBengaliText = (text: string): string => {
-  if (!text) return "";
-  return text
-    .normalize("NFC") // ইউনিকোড নরমাল এনকোডিং
-    .toLowerCase()
-    // সমতুল্য বাংলা বর্ণ ও নুকতা সামঞ্জস্যকরণ
-    .replace(/য়/g, "য")
-    .replace(/ড়/g, "র")
-    .replace(/ঢ়/g, "র")
-    .replace(/ব়/g, "র")
-    .replace(/়/g, "") // যেকোনো অবশিষ্ট নুকতা রিমুভ
-    .replace(/[\s\-_]+/g, ""); // স্পেস, হাইফেন ও আন্ডারস্কোর রিমুভ (যেমন: হিমু সমগ্র -> হিমুসমগ্র)
-};
+import { normalizeKey } from "@/app/lib/normalizeHelpers";
 
 // ১. Lucide icons mapping
 const SERIES_ICONS: Record<string, FC<{ className?: string }>> = {
@@ -95,13 +81,15 @@ export const SeriesListView: FC<SeriesListViewProps> = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLetter, setSelectedLetter] = useState("সব");
 
-  // 🔹 ১. ফিল্টারিং ও বর্ণানুক্রমে সাজানো
+  // 🔹 ১. "অন্যান্য" বা "others" সম্পর্কিত সব ক্যাটাগরি তালিকা থেকে স্থায়ীভাবে ফিল্টার করে বাদ দেওয়া
   const validSeriesList = useMemo(() => {
     const filtered = seriesList.filter((item) => {
-      if (!item.label || !item.slug) return false;
+      if (!item || !item.label || !item.slug) return false;
+
       const cleanLabel = item.label.trim().toLowerCase();
       const cleanSlug = item.slug.trim().toLowerCase();
 
+      // "অন্যান্য", "others", "other" হলে বাদ পড়বে
       return !(
         cleanLabel === "" ||
         cleanLabel === "অন্যান্য" ||
@@ -120,14 +108,15 @@ export const SeriesListView: FC<SeriesListViewProps> = ({
     }
   }, [seriesList, isHomePage]);
 
-  // 🔹 ২. প্রথমাংশ ডাইনামিক্যালি বের করা
+  // 🔹 ২. প্রথমাংশ (আদ্যক্ষর) বের করা
   const availableLetters = useMemo(() => {
     if (isHomePage) return [];
 
     const lettersSet = new Set<string>();
 
     validSeriesList.forEach((item) => {
-      const firstChar = item.label.trim().charAt(0).normalize("NFC");
+      const cleanLabel = item.label.trim().replace(/^[\s\-_–—\.,'\/\(\)]+/, "");
+      const firstChar = cleanLabel.charAt(0).normalize("NFC");
       if (firstChar) {
         lettersSet.add(firstChar);
       }
@@ -140,24 +129,26 @@ export const SeriesListView: FC<SeriesListViewProps> = ({
     return ["সব", ...sortedLetters];
   }, [validSeriesList, isHomePage]);
 
-  // 🔹 ৩. সার্চ ও আদ্যক্ষর ফিল্টারিং (সমতুল্য বাংলা বর্ণ ও স্পেস সমস্যার সমাধান সহ)
+  // 🔹 ৩. সার্চ ও আদ্যক্ষর ফিল্টারিং (normalizeKey ব্যবহারের মাধ্যমে)
   const filteredSeries = useMemo(() => {
     if (isHomePage) return validSeriesList;
 
-    const normalizedQuery = normalizeBengaliText(searchQuery);
+    const normalizedQuery = normalizeKey(searchQuery);
 
     return validSeriesList.filter((item) => {
-      const normalizedLabel = normalizeBengaliText(item.label);
+      const normalizedLabel = normalizeKey(item.label);
       const matchesSearch = normalizedLabel.includes(normalizedQuery);
 
-      const firstChar = item.label.trim().charAt(0).normalize("NFC");
+      const cleanLabel = item.label.trim().replace(/^[\s\-_–—\.,'\/\(\)]+/, "");
+      const firstChar = cleanLabel.charAt(0).normalize("NFC");
       const matchesLetter = selectedLetter === "সব" || firstChar === selectedLetter;
 
       return matchesSearch && matchesLetter;
     });
   }, [validSeriesList, searchQuery, selectedLetter, isHomePage]);
 
-  const displayTotalCount = totalSeriesCount ?? validSeriesList.length;
+  // 🔹 "অন্যান্য" বাদ দেওয়ার পর ফিল্টারকৃত তালিকার দৈর্ঘ্যই চূড়ান্ত কাউন্ট হিসেবে ব্যবহার করা
+  const displayTotalCount = validSeriesList.length;
 
   return (
     <div className="w-full font-tarunima">
@@ -176,7 +167,7 @@ export const SeriesListView: FC<SeriesListViewProps> = ({
               <p className="text-xs md:text-sm text-gray-500 mt-1">
                 {displayTotalCount > 0 && (
                   <span className="w-full text-xs md:text-sm font-normal text-teal-700 bg-teal-100/70 px-2 py-1 border-t border-teal-200 inline-block">
-                    সিরিজ সংখ্যা সর্বমোট {toBengaliNumber(displayTotalCount)}টি
+                    সিরিজ সংখ্যা সর্বমোট {toBengaliNumber(displayTotalCount)} টি
                   </span>
                 )}
               </p>
@@ -206,8 +197,8 @@ export const SeriesListView: FC<SeriesListViewProps> = ({
                     type="button"
                     onClick={() => setSelectedLetter(letter)}
                     className={`px-2 py-1 text-xs md:text-sm font-semibold rounded transition-colors cursor-pointer ${selectedLetter === letter
-                      ? "bg-[#008080] text-white shadow-xs"
-                      : "bg-gray-100 hover:bg-teal-50 text-gray-700 hover:text-[#008080] border border-transparent hover:border-teal-200"
+                        ? "bg-[#008080] text-white shadow-xs"
+                        : "bg-gray-100 hover:bg-teal-50 text-gray-700 hover:text-[#008080] border border-transparent hover:border-teal-200"
                       }`}
                   >
                     {letter}

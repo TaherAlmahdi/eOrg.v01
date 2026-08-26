@@ -334,7 +334,7 @@ export default async function LibraryHomePage() {
               <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
           </div>
-          <GenreList limit={10} />
+          <GenreList limit={20} />
         </section>
 
         {/* ৪. প্রকরণ নির্ঘণ্ট সেকশন */}
@@ -354,7 +354,7 @@ export default async function LibraryHomePage() {
               <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
           </div>
-          <ItemList limit={10} />
+          <ItemList limit={20} />
         </section>
 
         {/* ৫. সিরিজ নির্ঘণ্ট সেকশন */}
@@ -374,7 +374,7 @@ export default async function LibraryHomePage() {
               <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
           </div>
-          <SeriesList limit={10} />
+          <SeriesList limit={20} />
         </section>
 
         {/* ৬. লেখক নির্ঘণ্ট সেকশন */}
@@ -394,7 +394,7 @@ export default async function LibraryHomePage() {
               <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
           </div>
-          <AuthorList limit={10} />
+          <AuthorList limit={20} />
         </section>
 
       </div>

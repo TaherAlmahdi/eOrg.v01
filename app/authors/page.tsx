@@ -13,7 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const siteName = siteData?.title || 'এডুলিচার';
 
   const dynamicMetaTitle = buildTabTitle({
-    currentPageTitle: 'লেখক',
+    currentPageTitle: 'লেখক নির্ঘণ্ট',
     siteName,
   });
 
@@ -38,21 +38,10 @@ export default async function AuthorsPage() {
         </div>
       </nav>
 
-      {/* হেডার সেকশন */}
-      <header>
-        <div className="flex justify-center mt-5">
-          <div className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded bg-teal-50/90 text-[#008080] mb-8 border border-teal-100 shadow-xs text-center backdrop-blur-md">
-            <Users size={24} className="shrink-0 animate-pulse" />
-            <h1 className="text-lg md:text-xl font-tarunima font-black text-gray-900 leading-none tracking-tight">
-              <span className="text-[#008080]">পাঠশালা</span> লেখক{' '}
-              <span className="text-[#cc7a00]">নির্ঘণ্ট</span>
-            </h1>
-          </div>
-        </div>
-      </header>
+
 
       {/* লেখক সেকশন */}
-      <div className="max-w-8xl mx-auto py-2 px-2">
+      <div className="max-w-8xl mx-auto py-4 px-4">
         <AuthorList sortBy="alphabetical" />
       </div>
     </main>

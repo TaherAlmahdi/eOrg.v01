@@ -6,8 +6,9 @@ import Link from "next/link";
 import {
   BookOpen, Search, BookMarked, Bookmark, Feather, Scroll, Layers,
   FileText, Languages, Laugh, BookText, Compass, History, GraduationCap,
-  Music, Flame, MoonStar, Cross, Sun, Flower2
+  Music, Flame, MoonStar, Cross, Sun, Flower2, Tags
 } from "lucide-react";
+import { normalizeKey } from "@/app/lib/normalizeHelpers";
 
 // ১. Lucide icons mapping
 const GENRE_ICONS: Record<string, FC<{ className?: string }>> = {
@@ -59,7 +60,7 @@ const getGenreIcon = (slug: string, rawText: string): FC<{ className?: string }>
 const toBengaliNumber = (num: number | string): string =>
   num.toString().replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[parseInt(d, 10)]);
 
-interface GenreItem {
+export interface GenreItem {
   slug: string;
   label: string;
   rawGenre: string;
@@ -69,113 +70,160 @@ interface GenreItem {
 interface GenreListViewProps {
   genres: GenreItem[];
   isHomePage?: boolean;
-  totalGenresCount: number;
+  totalGenresCount?: number;
 }
 
 export const GenreListView: FC<GenreListViewProps> = ({
-  genres,
+  genres = [],
   isHomePage = false,
   totalGenresCount,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLetter, setSelectedLetter] = useState("সব");
 
-  // 🔹 ১. বিদ্যমান জনরাগুলোর প্রথম বর্ণ ডাইনামিক্যালি বের করা ও বাংলা বর্ণানুক্রমিকভাবে সাজানো
+  // 🔹 ১. শুধুমাত্র অবৈধ/ফাঁকা ডাটা ফিল্টার করা (অন্যান্য ক্যাটাগরি বাদ দেওয়া হচ্ছে না)
+  const validGenresList = useMemo(() => {
+    const filtered = genres.filter((item) => {
+      if (!item || !item.label || !item.slug) return false;
+      return item.label.trim() !== "" && item.slug.trim() !== "";
+    });
+
+    if (isHomePage) {
+      return filtered.slice(0, 20);
+    } else {
+      return [...filtered].sort((a, b) =>
+        a.label.trim().localeCompare(b.label.trim(), "bn", { sensitivity: "base" })
+      );
+    }
+  }, [genres, isHomePage]);
+
+  // 🔹 ২. প্রথমাংশ (আদ্যক্ষর) বের করা
   const availableLetters = useMemo(() => {
     if (isHomePage) return [];
 
     const lettersSet = new Set<string>();
 
-    genres.forEach((item) => {
-      const firstChar = item.label.trim().charAt(0);
+    validGenresList.forEach((item) => {
+      const cleanLabel = item.label.trim().replace(/^[\s\-_–—\.,'\/\(\)]+/, "");
+      const firstChar = cleanLabel.charAt(0).normalize("NFC");
       if (firstChar) {
         lettersSet.add(firstChar);
       }
     });
 
-    // বাংলা বর্ণানুক্রমিক সর্টিং (অ, আ, ই ... ক, খ ...)
     const sortedLetters = Array.from(lettersSet).sort((a, b) =>
       a.localeCompare(b, "bn", { sensitivity: "base" })
     );
 
     return ["সব", ...sortedLetters];
-  }, [genres, isHomePage]);
+  }, [validGenresList, isHomePage]);
 
-  // 🔹 ২. ফিল্টারিং লজিক (সার্চ বার ও ডাইনামিক আদ্যক্ষর ফিল্টার)
+  // 🔹 ৩. সার্চ ও আদ্যক্ষর ফিল্টারিং
   const filteredGenres = useMemo(() => {
-    if (isHomePage) return genres;
+    if (isHomePage) return validGenresList;
 
-    return genres.filter((item) => {
-      const matchesSearch = item.label.toLowerCase().includes(searchQuery.toLowerCase());
-      const firstChar = item.label.trim().charAt(0);
+    const normalizedQuery = normalizeKey(searchQuery);
+
+    return validGenresList.filter((item) => {
+      const normalizedLabel = normalizeKey(item.label);
+      const matchesSearch = normalizedLabel.includes(normalizedQuery);
+
+      const cleanLabel = item.label.trim().replace(/^[\s\-_–—\.,'\/\(\)]+/, "");
+      const firstChar = cleanLabel.charAt(0).normalize("NFC");
       const matchesLetter = selectedLetter === "সব" || firstChar === selectedLetter;
 
       return matchesSearch && matchesLetter;
     });
-  }, [genres, searchQuery, selectedLetter, isHomePage]);
+  }, [validGenresList, searchQuery, selectedLetter, isHomePage]);
+
+  const displayTotalCount = totalGenresCount ?? validGenresList.length;
 
   return (
-    <div className="w-full px-0">
+    <div className="w-full font-tarunima">
       {!isHomePage && (
-        <div className="px-2 py-3 mb-3 space-y-4 border border-teal-100 rounded shadow-sm bg-white/90 backdrop-blur-md">
-          {/* লাইভ সার্চ বার */}
-          <div className="relative max-w-md mx-auto">
-            <Search className="absolute w-5 h-5 text-teal-600 -translate-y-1/2 left-3 top-1/2" />
-            <input
-              type="text"
-              placeholder="ঘরানার নাম দিয়ে খুঁজুন..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-teal-200 rounded focus:outline-none focus:ring-2 focus:ring-[#008080] font-tarunima text-sm bg-teal-50/30 text-gray-800"
-            />
+        <div className="mb-3 space-y-3 bg-white/95 backdrop-blur-md shadow-xs">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+
+            {/* বামপাশে ডাইনামিক পেজ টাইটেল */}
+            <div className="rounded bg-teal-50/90 text-[#008080] border border-teal-200 shadow-xs backdrop-blur-md self-start md:self-auto">
+              <div className="p-2.5 inline-flex items-center gap-2">
+                <Tags size={22} className="shrink-0 animate-pulse text-[#008080]" />
+                <h1 className="text-xl md:text-2xl font-bold text-gray-950 leading-none">
+                  <span className="text-[#008080]">বিষয়</span> <span className="text-[#cc7a00]">নির্ঘণ্ট</span>
+                </h1>
+              </div>
+              <p className="text-xs md:text-sm text-gray-500 mt-1">
+                {displayTotalCount > 0 && (
+                  <span className="w-full text-xs md:text-sm font-normal text-teal-700 bg-teal-100/70 px-2 py-1 border-t border-teal-200 inline-block">
+                    বিষয় সংখ্যা সর্বমোট {toBengaliNumber(displayTotalCount)} টি
+                  </span>
+                )}
+              </p>
+            </div>
+
+            {/* ডানপাশে সার্চবার */}
+            <div className="relative w-full md:w-80 shrink-0 px-2">
+              <Search className="absolute w-4 h-4 text-teal-600 -translate-y-1/2 left-3 top-1/2 pointer-events-none" />
+              <input
+                type="text"
+                placeholder="ঘরানার নাম দিয়ে খুঁজুন..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-4 py-2 border border-teal-200 rounded focus:outline-none focus:ring-1 focus:ring-[#008080] text-sm bg-teal-50/30 text-gray-800 shadow-xs placeholder-gray-400"
+              />
+            </div>
+
           </div>
 
-          {/* 🔹 ডাইনামিক আদ্যক্ষর কুইক ফিল্টার বার */}
+          {/* নিচে: সেন্টারে আদ্যক্ষর ফিল্টার বার */}
           {availableLetters.length > 1 && (
-            <div className="mt-2 w-full flex flex-wrap items-center justify-center gap-0.5 py-1 px-2 bg-orange-50/50 rounded border border-orange-100 text-xs sm:text-sm md:text-base lg:text-lg font-tarunima shadow-xs">
-              {availableLetters.map((letter) => (
-                <button
-                  key={letter}
-                  onClick={() => setSelectedLetter(letter)}
-                  className={`px-2.5 py-1 text-xs md:text-sm font-semibold rounded transition-colors ${selectedLetter === letter
-                    ? "bg-[#008080] text-white shadow-xs"
-                    : "bg-gray-100 hover:bg-teal-50 text-gray-700 hover:text-[#008080]"
-                    }`}
-                >
-                  {letter}
-                </button>
-              ))}
+            <div className="p-2 border border-teal-100 rounded bg-teal-50/90 backdrop-blur-md shadow-xs">
+              <div className="flex flex-wrap items-center justify-center gap-1">
+                {availableLetters.map((letter) => (
+                  <button
+                    key={letter}
+                    type="button"
+                    onClick={() => setSelectedLetter(letter)}
+                    className={`px-2 py-1 text-xs md:text-sm font-semibold rounded transition-colors cursor-pointer ${selectedLetter === letter
+                        ? "bg-[#008080] text-white shadow-xs"
+                        : "bg-gray-100 hover:bg-teal-50 text-gray-700 hover:text-[#008080] border border-transparent hover:border-teal-200"
+                      }`}
+                  >
+                    {letter}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
         </div>
       )}
 
-      {/* ঘরানা কার্ড গ্রিড */}
+      {/* ঘরানা তালিকা */}
       {filteredGenres.length === 0 ? (
-        <div className="p-8 text-center text-gray-600 rounded bg-white/80 font-tarunima">
-          কোন ঘরানা পাওয়া যায়নি।
+        <div className="p-8 text-center text-gray-500 rounded bg-white border border-dashed border-gray-300">
+          কোনো ঘরানার তথ্য পাওয়া যায়নি।
         </div>
       ) : (
-        <div className="flex flex-wrap gap-2 p-0">
-          {filteredGenres.map(({ slug, label, rawGenre, count }) => {
+        <div className="flex flex-wrap gap-1.5">
+          {filteredGenres.map(({ slug, label, rawGenre, count }, index) => {
             const IconComponent = getGenreIcon(slug, rawGenre);
 
             return (
               <Link
-                key={slug}
+                key={`${slug}-${index}`}
                 href={`/genre/${slug}`}
-                className="flex items-center justify-between gap-2 px-2 py-2 rounded bg-white/90 text-[#008080] border border-teal-100 shadow-sm transition-all duration-300 backdrop-blur-sm hover:bg-teal-50 hover:shadow-lg hover:border-teal-300 hover:scale-[1.02] shrink-0 grow basis-full sm:basis-[calc(50%-0.35rem)] lg:basis-[calc(33.333%-0.45rem)] xl:basis-[calc(25%-0.5rem)] 2xl:basis-[calc(20%-0.5rem)] max-w-full group cursor-pointer"
+                className="flex items-center justify-between gap-2 px-2.5 py-2 rounded bg-white text-[#008080] border border-teal-100 shadow-xs transition-all duration-200 hover:bg-teal-50/50 hover:shadow-md hover:border-teal-300 shrink-0 grow basis-full sm:basis-[calc(50%-0.35rem)] lg:basis-[calc(33.333%-0.45rem)] xl:basis-[calc(25%-0.5rem)] 2xl:basis-[calc(20%-0.5rem)] max-w-full group cursor-pointer"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="p-2.5 rounded bg-orange-50 text-[#cc7a00] group-hover:bg-[#cc7a00] group-hover:text-[#ffffff] transition-colors duration-300 shrink-0">
-                    <IconComponent className="w-5 h-5 md:w-6 md:h-6 shrink-0" />
+                  <div className="p-2 rounded bg-orange-50 text-[#cc7a00] group-hover:bg-[#cc7a00] group-hover:text-white transition-colors duration-200 shrink-0">
+                    <IconComponent className="w-5 h-5 shrink-0" />
                   </div>
-                  <h3 className="text-[#008080] group-hover:text-[#cc7a00] text-base font-semibold leading-snug font-tarunima truncate transition-colors">
+                  <h3 className="text-[#008080] group-hover:text-[#cc7a00] text-sm md:text-base font-semibold leading-snug truncate transition-colors">
                     {label}
                   </h3>
                 </div>
 
-                <div className="text-right shrink-0 flex items-center gap-1.5 bg-teal-50 text-[#008080] border border-teal-100 px-2.5 py-1 rounded text-xs md:text-sm font-semibold">
+                <div className="text-right shrink-0 flex items-center gap-1.5 bg-teal-50 text-[#008080] border border-teal-100 px-2 py-0.5 rounded text-xs font-semibold">
                   <BookOpen size={14} className="shrink-0" />
                   <span>{toBengaliNumber(count)} টি</span>
                 </div>
@@ -184,7 +232,6 @@ export const GenreListView: FC<GenreListViewProps> = ({
           })}
         </div>
       )}
-
     </div>
   );
 };

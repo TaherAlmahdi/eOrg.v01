@@ -1,15 +1,21 @@
-// ১. বাংলা ও ইংরেজি টেক্সট নরম্যালাইজেশন (স্পেস, নুকতা ও কেস ক্লিন করা)
+// app/lib/normalizeHelpers.ts
+
+// ১. বাংলা ও ইংরেজি টেক্সট নরম্যালাইজেশন (স্পেস, চিহ্ন, নুকতা, স্বরচিহ্ন ও কেস ক্লিন করা)
 export const normalizeKey = (text: string): string => {
     if (!text || typeof text !== "string") return "";
     return text
         .normalize("NFC")
         .toLowerCase()
-        .replace(/য়/g, "য")
-        .replace(/ড়/g, "র")
-        .replace(/ঢ়/g, "র")
-        .replace(/ব়/g, "র")
-        .replace(/়/g, "") // নুকতা রিমুভ
-        .replace(/[\s\-_]+/g, "") // স্পেস, হাইফেন, আন্ডারস্কোর রিমুভ
+        // সুনির্দিষ্ট ক্যারেক্টার ও স্বরচিহ্ন নরম্যালাইজেশন
+        .replace(/ি/g, "ী") // হ্রস্ব-ই (ি) কে দীর্ঘ-ই (ী) তে পরিবর্তন
+        .replace(/্/g, "্‌") // সাধারণ হসন্ত কে জিরো-উইডথ হসন্ত (্‌) এ পরিবর্তন
+        .replace(/ব়/g, "র") // ব় কে র তে পরিবর্তন
+        .replace(/য়/g, "য়") // য় অপরিবর্তিত
+        .replace(/ড়/g, "ড়") // ড় অপরিবর্তিত
+        .replace(/ঢ়/g, "ঢ়") // ঢ় অপরিবর্তিত
+        .replace(/়/g, "") // যেকোনো অবশিষ্ট নুকতা রিমুভ
+        // স্পেস, হাইফেন, আন্ডারস্কোর, ড্যাশ এবং সকল ধরণের স্পেশাল ক্যারেক্টার / বিরামচিহ্ন রিমুভ
+        .replace(/[\s\-_–—\.,'\/\(\)\[\]\{\}\?\!:]+/g, "")
         .trim();
 };
 
@@ -25,7 +31,8 @@ export const extractCleanNames = (rawInput: any): string[] => {
         } else if (Array.isArray(val)) {
             val.forEach(process);
         } else if (typeof val === "object" && val !== null) {
-            const found = val.name || val.title || val.label || val.type || val.item || val.slug;
+            const found =
+                val.name || val.title || val.label || val.type || val.item || val.slug;
             if (found && typeof found === "string" && found.trim()) {
                 namesSet.add(found.trim());
             }
