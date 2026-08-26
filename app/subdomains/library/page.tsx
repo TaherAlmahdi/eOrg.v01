@@ -5,14 +5,35 @@ import { Metadata } from 'next';
 import { headers } from 'next/headers';
 import GenreList from '@/app/components/GenreList';
 import AuthorList from '@/app/components/AuthorList';
+import SeriesList from '@/app/components/SeriesList';
+import ItemList from '@/app/components/ItemList';
+import { LibraryStats } from '@/app/components/LibraryStats';
 import { BookCopy, Calendar, ChevronRight, Layers, Users } from 'lucide-react';
 import { getLibraryBooks } from '../../lib/books';
 import { getSlug, getAuthorSlugFromTitle } from '../../lib/content/core/registry';
 import { getSubdomainData, buildTabTitle } from '@/app/lib/get-site-data';
 import { headerConfig } from '../../lib/headerConfig';
-import SeriesList from '@/app/components/SeriesList';
-import ItemList from '@/app/components/ItemList';
-import { LibraryStats } from '@/app/components/LibraryStats';
+import { getLibraryStats } from '@/app/lib/getLibraryStats';
+
+// 🔹 টাইপ ডেফিনিশন
+interface BookItem {
+  id?: string;
+  slug?: string;
+  title?: string;
+  author?: string;
+  authorSlug?: string;
+  cover?: string;
+  published?: string | number;
+  [key: string]: unknown;
+}
+
+interface LibraryData {
+  latestBooks?: BookItem[];
+  booksByGenre?: Record<string, BookItem[]>;
+  booksBySeries?: Record<string, BookItem[]>;
+  booksByItem?: Record<string, BookItem[] | { books?: BookItem[] } | BookItem>;
+  totalItems?: number;
+}
 
 // 🏷️ Dynamic Metadata Export
 export async function generateMetadata(): Promise<Metadata> {
@@ -21,7 +42,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   const siteData = getSubdomainData(host);
   const subdomain = siteData.subdomain || 'library';
-  
+
   const currentConfig = headerConfig[subdomain] || headerConfig.library || headerConfig.main;
 
   const dynamicMetaTitle = buildTabTitle({
@@ -30,7 +51,7 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 
   const description = `${currentConfig.siteName}-এর পাঠশালায় নতুন প্রকাশিত বই, লেখক এবং বিভিন্ন ঘরানার সমৃদ্ধ সংগ্রহ দেখুন।`;
-  
+
   const ogTitle = currentConfig.siteName || 'এডুলিচার পাঠশালা';
   const dynamicOgImage = `https://eduliture.org/api/og?title=${encodeURIComponent(ogTitle)}&tagline=${encodeURIComponent('অনলাইন লাইব্রেরি ও পাঠশালা')}`;
   const shareImage = siteData?.ogImage || dynamicOgImage;
@@ -60,61 +81,48 @@ export default async function LibraryHomePage() {
   const subdomain = siteData.subdomain || 'library';
   const currentConfig = headerConfig[subdomain] || headerConfig.library || headerConfig.main;
 
-  // getLibraryBooks() থেকে সরাসরি totalItems সহ ডেটা রিসিভ করা হলো
-  const libraryData = (await getLibraryBooks()) as {
-    latestBooks?: any[];
-    booksByGenre?: Record<string, any[]>;
-    booksBySeries?: Record<string, any[]>;
-    booksByItem?: Record<string, any[] | any>;
-    totalItems?: number;
-  };
+  // getLibraryBooks() থেকে ডেটা রিসিভ করা
+  const libraryData = (await getLibraryBooks()) as LibraryData;
 
   const {
     latestBooks = [],
     booksByGenre = {},
     booksBySeries = {},
     booksByItem = {},
-    totalItems = 0,
   } = libraryData;
 
-  const bookMap = new Map<string, Record<string, unknown>>();
+  const bookMap = new Map<string, BookItem>();
 
-  // সব সোর্স থেকে বইগুলো ম্যাপে যুক্ত করা
+  // সব সোর্স থেকে ইউনিক বই সংগ্রহ
   const registerBooks = (bookCollection: unknown) => {
     if (!bookCollection) return;
-    
-    // যদি একটিমাত্র অবজেক্ট বা বই পাস হয়
-    if (!Array.isArray(bookCollection)) {
-      if (typeof bookCollection === 'object' && bookCollection !== null) {
-        const item = bookCollection as Record<string, unknown>;
-        const id = String(item.id || item.slug || item.title || '');
-        if (id) bookMap.set(id, item);
-      }
-      return;
-    }
 
-    // যদি অ্যারে হয়
-    bookCollection.forEach((book) => {
-      if (!book) return;
-      const item = book as Record<string, unknown>;
+    if (Array.isArray(bookCollection)) {
+      bookCollection.forEach((book) => {
+        if (book && typeof book === 'object') {
+          const item = book as BookItem;
+          const id = String(item.id || item.slug || item.title || '');
+          if (id) bookMap.set(id, item);
+        }
+      });
+    } else if (typeof bookCollection === 'object') {
+      const item = bookCollection as BookItem;
       const id = String(item.id || item.slug || item.title || '');
       if (id) bookMap.set(id, item);
-    });
+    }
   };
 
   registerBooks(latestBooks);
   Object.values(booksByGenre).forEach(registerBooks);
   Object.values(booksBySeries).forEach(registerBooks);
-  
-  // 🛠️ booksByItem থেকে বইগুলো বা প্রকরণগুলো যেকোনো ফরম্যাটেই আসুক না কেন, তা নিরাপদে ও নির্ভুলভাবে প্রসেস করা হলো
+
   if (booksByItem && typeof booksByItem === 'object') {
     Object.values(booksByItem).forEach((itemGroup) => {
       if (Array.isArray(itemGroup)) {
         registerBooks(itemGroup);
       } else if (itemGroup && typeof itemGroup === 'object') {
-        // যদি অবজেক্টের ভেতর আবার বইয়ের অ্যারে বা প্রপার্টি থাকে
-        if ('books' in itemGroup && Array.isArray((itemGroup as any).books)) {
-          registerBooks((itemGroup as any).books);
+        if ('books' in itemGroup && Array.isArray(itemGroup.books)) {
+          registerBooks(itemGroup.books);
         } else {
           registerBooks(itemGroup);
         }
@@ -124,20 +132,13 @@ export default async function LibraryHomePage() {
 
   const allBooksList = Array.from(bookMap.values());
 
-  // লেখক বা কন্ট্রিবিউটর গণনা
-  const contributorSet = new Set(
-    allBooksList
-      .map((b) => String(b.author || '').trim())
-      .filter(Boolean)
-  );
+  // 🔹 সেন্ট্রালাইজড হেল্পার দিয়ে সঠিক স্ট্যাটস বের করা
+  const stats = getLibraryStats(allBooksList);
 
-  // সিরিজ গণনা (অবজেক্টের কি এবং বইয়ের প্রপার্টি উভয় থেকে)
-  const seriesSet = new Set([
-    ...Object.keys(booksBySeries),
-    ...allBooksList.map((b) => String(b.series || '').trim()).filter(Boolean)
-  ]);
+  // 🔹 মোট জঁরা (Genre) সংখ্যা গণনা
+  const totalGenresCount = Object.keys(booksByGenre).length;
 
-  const getAuthorSlug = (bookItem: Record<string, unknown>): string => {
+  const getAuthorSlug = (bookItem: BookItem): string => {
     const authorName = String(bookItem.author || '').trim();
 
     if (authorName) {
@@ -156,8 +157,8 @@ export default async function LibraryHomePage() {
 
   const sortedLatestBooks = [...latestBooks]
     .sort((a, b) => {
-      const pubA = (a as Record<string, unknown>).published;
-      const pubB = (b as Record<string, unknown>).published;
+      const pubA = a.published;
+      const pubB = b.published;
 
       const timeA = pubA ? new Date(Date.parse(String(pubA))).getTime() : 0;
       const timeB = pubB ? new Date(Date.parse(String(pubB))).getTime() : 0;
@@ -174,6 +175,7 @@ export default async function LibraryHomePage() {
     .slice(0, 16);
 
   const currentUrl = `https://${siteData.subdomain ? `${siteData.subdomain}.` : ''}eduliture.org`;
+
   const jsonLdData = [
     {
       '@context': 'https://schema.org',
@@ -191,10 +193,9 @@ export default async function LibraryHomePage() {
       'mainEntity': {
         '@type': 'ItemList',
         'itemListElement': sortedLatestBooks.map((book, idx) => {
-          const item = book as Record<string, unknown>;
-          const rawBookSlug = item.slug || book.id;
+          const rawBookSlug = book.slug || book.id;
           const bookSlug = String(rawBookSlug);
-          
+
           return {
             '@type': 'ListItem',
             'position': idx + 1,
@@ -206,7 +207,7 @@ export default async function LibraryHomePage() {
                 'name': book.author || 'অজানা লেখক'
               },
               'url': `${currentUrl}/book/${encodeURIComponent(bookSlug)}`,
-              'image': book.cover || undefined
+              ...(book.cover && { 'image': book.cover })
             }
           };
         })
@@ -215,7 +216,7 @@ export default async function LibraryHomePage() {
   ];
 
   return (
-    <div 
+    <div
       className="relative w-full min-h-screen px-2 py-4 bg-fixed bg-center bg-no-repeat bg-cover sm:px-4"
       style={{ backgroundImage: "url('/bg01.png')" }}
     >
@@ -227,23 +228,23 @@ export default async function LibraryHomePage() {
       />
 
       <div className="relative w-full h-auto mt-2 overflow-x-clip font-tarunima">
-        
+
         {/* ১. Library Stats */}
         <section aria-labelledby="library-stats-heading">
           <div className="relative w-full h-auto overflow-x-clip">
             <div className="relative z-20 w-full mx-auto max-w-none">
-              <LibraryStats 
-                totalAuthors={contributorSet.size}
-                totalBooks={allBooksList.length}
-                totalSeries={seriesSet.size}
-                totalItems={totalItems}
+              <LibraryStats
+                totalAuthors={stats.totalAuthors}
+                totalBooks={stats.totalBooks}
+                totalSeries={stats.totalSeries}
+                totalGenres={totalGenresCount}
               />
             </div>
           </div>
         </section>
 
         {/* ২. নতুন বই সেকশন */}
-        <section aria-labelledby="latest-books-heading">            
+        <section aria-labelledby="latest-books-heading">
           <div className="flex w-full items-center justify-between mt-4 px-3 sm:px-4 py-2 mb-4 rounded bg-teal-50/90 text-[#008080] border border-teal-100 shadow-xs backdrop-blur-md">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
               <Calendar size={22} className="shrink-0 animate-pulse text-emerald-600 sm:w-6 sm:h-6" />
@@ -251,36 +252,31 @@ export default async function LibraryHomePage() {
                 <span className="text-[#008080]">নতুন</span> <span className="text-[#cc7a00]">বই</span>
               </h2>
             </div>
-            <Link 
-              href="/books" 
+            <Link
+              href="/books"
               className="text-xs sm:text-sm md:text-base font-medium font-tarunima text-emerald-600 hover:text-emerald-700 flex items-center gap-0.5 transition-colors group shrink-0"
             >
-              সব বই 
+              সব বই
               <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
           </div>
-          
+
           {sortedLatestBooks.length === 0 ? (
             <p className="py-6 text-sm text-slate-500">কোনো নতুন বই পাওয়া যায়নি।</p>
           ) : (
             <div className="grid grid-cols-2 gap-1.5 md:gap-2 lg:gap-2 p-0 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-8 bg-gray-200/50">
               {sortedLatestBooks.map((book, index) => {
-                const item = book as Record<string, unknown>;
-                const rawBookSlug = item.slug || book.id;
+                const rawBookSlug = book.slug || book.id;
                 const bookSlug = String(rawBookSlug);
-                const authorSlug = getAuthorSlug(item);
+                const authorSlug = getAuthorSlug(book);
 
-                const responsiveVisibilityClass = 
-                  index >= 16 
-                    ? "block sm:hidden xl:block"       
-                    : index >= 8 
-                      ? "block sm:hidden md:block"        
-                      : "block";                        
+                // রেসপন্সিভ ভিজিবিলিটি লজিক
+                const responsiveVisibilityClass = index >= 8 ? "hidden sm:flex" : "flex";
 
                 return (
-                  <div 
-                    key={bookSlug} 
-                    className={`flex flex-col bg-white rounded border border-slate-200 shadow-sm transition-all hover:shadow-md group ${responsiveVisibilityClass}`}
+                  <div
+                    key={bookSlug}
+                    className={`flex-col bg-white rounded border border-slate-200 shadow-sm transition-all hover:shadow-md group ${responsiveVisibilityClass}`}
                   >
                     <Link href={`/book/${encodeURIComponent(bookSlug)}`} className="relative block w-full overflow-hidden rounded-t aspect-2/3 bg-slate-100">
                       <Image
@@ -291,7 +287,7 @@ export default async function LibraryHomePage() {
                         className="object-cover group-hover:scale-[1.03] transition-transform duration-300"
                       />
                     </Link>
-                    
+
                     <div className="flex flex-col justify-between p-3 grow">
                       <div className="text-center">
                         <h3 className="text-base font-semibold leading-snug text-gray-900 transition-colors group-hover:text-emerald-700 line-clamp-2">
@@ -299,10 +295,10 @@ export default async function LibraryHomePage() {
                             {book.title || 'শিরোনামহীন'}
                           </Link>
                         </h3>
-                        
+
                         <p className="mt-1 text-xs md:text-sm text-gray-500 font-tarunima">
                           {book.author ? (
-                            <Link 
+                            <Link
                               href={`/author/${encodeURIComponent(authorSlug)}`}
                               className="transition-colors hover:text-emerald-600 hover:underline"
                             >
@@ -330,11 +326,11 @@ export default async function LibraryHomePage() {
                 <span className="text-[#008080]">ঘরানা</span> <span className="text-[#cc7a00]">নির্ঘণ্ট</span>
               </h2>
             </div>
-            <Link 
-              href="/genres" 
+            <Link
+              href="/genres"
               className="text-base font-medium font-tarunima text-emerald-600 hover:text-emerald-700 flex items-center gap-0.5 transition-colors group shrink-0"
             >
-              সব ঘরানা 
+              সব ঘরানা
               <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
           </div>
@@ -350,16 +346,16 @@ export default async function LibraryHomePage() {
                 <span className="text-[#008080]">প্রকরণ</span> <span className="text-[#cc7a00]">নির্ঘণ্ট</span>
               </h2>
             </div>
-            <Link 
-              href="/items" 
+            <Link
+              href="/items"
               className="text-base font-medium font-tarunima text-emerald-600 hover:text-emerald-700 flex items-center gap-0.5 transition-colors group shrink-0"
             >
-              সব প্রকরণ 
+              সব প্রকরণ
               <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
           </div>
           <ItemList limit={10} />
-        </section>        
+        </section>
 
         {/* ৫. সিরিজ নির্ঘণ্ট সেকশন */}
         <section data-aos="fade-down" className="relative">
@@ -370,31 +366,31 @@ export default async function LibraryHomePage() {
                 <span className="text-[#008080]">সিরিজ</span> <span className="text-[#cc7a00]">নির্ঘণ্ট</span>
               </h2>
             </div>
-            <Link 
-              href="/series" 
+            <Link
+              href="/series"
               className="text-xs sm:text-sm md:text-base font-medium font-tarunima text-emerald-600 hover:text-emerald-700 flex items-center gap-0.5 transition-colors group shrink-0"
             >
-              সব সিরিজ 
+              সব সিরিজ
               <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
           </div>
           <SeriesList limit={10} />
-        </section>        
+        </section>
 
         {/* ৬. লেখক নির্ঘণ্ট সেকশন */}
         <section data-aos="fade-up" className="relative">
-          <div className="flex w-full items-center justify-between mt-4 px-3 sm:px-4 py-2 mb-4 rounded bg-teal-50/90 text-[#008080] border border-teal-100 shadow-xs backdrop-blur-md"> 
+          <div className="flex w-full items-center justify-between mt-4 px-3 sm:px-4 py-2 mb-4 rounded bg-teal-50/90 text-[#008080] border border-teal-100 shadow-xs backdrop-blur-md">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
               <Users size={22} className="shrink-0 animate-pulse sm:w-6 sm:h-6" />
               <h2 className="text-base sm:text-lg md:text-xl font-black text-slate-800 font-tarunima truncate">
                 <span className="text-[#008080]">লেখক</span> <span className="text-[#cc7a00]">নির্ঘণ্ট</span>
               </h2>
             </div>
-            <Link 
-              href="/authors" 
+            <Link
+              href="/authors"
               className="text-xs sm:text-sm md:text-base font-medium font-tarunima text-emerald-600 hover:text-emerald-700 flex items-center gap-0.5 transition-colors group shrink-0"
             >
-              সব লেখক 
+              সব লেখক
               <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
           </div>

@@ -1,14 +1,21 @@
 import type { FC } from "react";
-import { Users, Library, Layers, FileText } from "lucide-react";
+import { Users, Library, Layers, Tags } from "lucide-react";
 
-const toBengaliNumber = (num: number | string): string =>
-  num.toString().replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[parseInt(d, 10)]);
+const toBengaliNumber = (num: number | string): string => {
+  const parsedNum = Number(num);
+  const validNum = isNaN(parsedNum) ? 0 : parsedNum;
+  return validNum.toString().replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[parseInt(d, 10)]);
+};
 
-interface LibraryStatsProps {
-  totalAuthors: number;
-  totalBooks: number;
-  totalSeries: number;
-  totalItems: number;
+export interface LibraryStatsProps {
+  totalAuthors?: number;
+  totalBooks?: number;
+  totalSeries?: number;
+  totalGenres?: number;
+  authorsCount?: number;
+  booksCount?: number;
+  seriesCount?: number;
+  genresCount?: number;
 }
 
 interface StatItem {
@@ -23,17 +30,17 @@ interface StatItem {
   countColor: string;
 }
 
-export const LibraryStats: FC<LibraryStatsProps> = ({
-  totalAuthors,
-  totalBooks,
-  totalSeries,
-  totalItems,
-}) => {
+export const LibraryStats: FC<LibraryStatsProps> = (props) => {
+  const authors = props.totalAuthors ?? props.authorsCount ?? 0;
+  const books = props.totalBooks ?? props.booksCount ?? 0;
+  const series = props.totalSeries ?? props.seriesCount ?? 0;
+  const genres = props.totalGenres ?? props.genresCount ?? 0;
+
   const statsData: StatItem[] = [
     {
       title: "আমাদের পরিবারে",
       subtitle: "সম্মানিত লেখক",
-      count: totalAuthors,
+      count: authors,
       unit: "জন",
       icon: Users,
       bgColor: "bg-teal-50",
@@ -43,8 +50,8 @@ export const LibraryStats: FC<LibraryStatsProps> = ({
     },
     {
       title: "এডুলিচার পাঠশালায়",
-      subtitle: "প্রকাশিত গ্রন্থ সংখ্যা",
-      count: totalBooks,
+      subtitle: "প্রকাশিত গ্রন্থ",
+      count: books,
       unit: "টি",
       icon: Library,
       bgColor: "bg-amber-50",
@@ -55,7 +62,7 @@ export const LibraryStats: FC<LibraryStatsProps> = ({
     {
       title: "বিশেষ আয়োজন",
       subtitle: "মোট সিরিজ",
-      count: totalSeries,
+      count: series,
       unit: "টি",
       icon: Layers,
       bgColor: "bg-indigo-50",
@@ -64,11 +71,11 @@ export const LibraryStats: FC<LibraryStatsProps> = ({
       countColor: "text-[#4f46e5]",
     },
     {
-      title: "সংকলন ও বিন্যাস",
-      subtitle: "মোট প্রকরণ",
-      count: totalItems,
+      title: "বিষয় ও ভাবধারা",
+      subtitle: "মোট ঘরানা",
+      count: genres,
       unit: "টি",
-      icon: FileText,
+      icon: Tags,
       bgColor: "bg-rose-50",
       textColor: "text-[#e11d48]",
       borderColor: "border-rose-100/50",
@@ -77,23 +84,23 @@ export const LibraryStats: FC<LibraryStatsProps> = ({
   ];
 
   return (
-    <div className="grid w-full grid-cols-1 gap-2 p-0 mb-3 sm:grid-cols-2 md:grid-cols-4">
+    <div className="grid w-full grid-cols-1 gap-2 p-0 mb-3 sm:grid-cols-2 md:grid-cols-4 font-tarunima">
       {statsData.map((item, index) => {
         const IconComponent = item.icon;
         return (
           <div
             key={index}
-            className="flex items-center justify-between p-2 transition-all duration-300 border rounded shadow-sm bg-white/90 backdrop-blur-md border-white/60 hover:shadow-md"
+            className="flex items-center justify-between p-2.5 transition-all duration-300 border rounded shadow-xs bg-white/90 backdrop-blur-md border-teal-100/60 hover:shadow-md"
           >
-            <div className="flex items-center gap-4">
-              <div className={`p-2 rounded ${item.bgColor} ${item.textColor} border ${item.borderColor}`}>
-                <IconComponent size={32} className="shrink-0" />
+            <div className="flex items-center gap-3.5">
+              <div className={`p-2.5 rounded ${item.bgColor} ${item.textColor} border ${item.borderColor} shrink-0`}>
+                <IconComponent size={28} className="shrink-0" />
               </div>
               <div>
-                <p className="text-base font-semibold text-gray-500">{item.title}</p>
-                <h2 className="text-lg font-bold text-gray-800 md:text-xl">
+                <p className="text-xs md:text-sm font-semibold text-gray-500">{item.title}</p>
+                <h2 className="text-sm md:text-base font-bold text-gray-800 leading-tight">
                   {item.subtitle}{" "}
-                  <span className={`${item.countColor} font-black text-2xl md:text-3xl mx-1`}>
+                  <span className={`${item.countColor} font-black text-xl md:text-2xl mx-0.5 inline-block`}>
                     {toBengaliNumber(item.count)}
                   </span>{" "}
                   {item.unit}
