@@ -49,6 +49,7 @@ export const CONTENT_REGISTRY = {
     "bhuban-chandra-mukhopadhyay": "ভুবনচন্দ্র মুখোপাধ্যায়",
     "mahbub-siddiki": "মাহবুব সিদ্দিকী",
     "johan-august-strindberg": "অগুস্ত স্ত্রিন্দবারি",
+    "mohammad-najibar-rahman": "মোহাম্মদ নজিবর রহমান",
   } as Record<string, string>,
 
   // English Slug -> Bengali Value
