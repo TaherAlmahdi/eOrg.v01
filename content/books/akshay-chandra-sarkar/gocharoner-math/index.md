@@ -5,23 +5,21 @@ author: "অক্ষয়কুমার সরকার"
 subdomain: "library"
 type: "book_index"
 
-first_published: 1888
+first_published: 1879
 published: 2026-08-23
 
-pub_medium: "১৮৮৮ সালে গ্রন্থাকারে প্রথম প্রকাশিত হয়; অক্ষয়কুমার সরকার রচিত রূপক ও ব্যঙ্গাত্মক কাব্যগ্রন্থ।"
+pub_medium: "১৮৭৯ সালে গ্রন্থাকারে প্রথম প্রকাশিত হয়; অক্ষয়কুমার সরকার রচিত রূপক ও ব্যঙ্গাত্মক কাব্যগ্রন্থ।"
 
 publisher: "বর্ণমিছিল"
 
 genre:
   - "কাব্য"
-  - "ব্যঙ্গকাব্য"
 
 genre_links:
   - { name: "কাব্য", link: "/genre/poetry" }
-  - { name: "ব্যঙ্গকাব্য", link: "/genre/satirical-poetry" }
 
 cover_image: "/cover/gocharoner-math.webp"
-order: 1888
+order: 1879
 
 meta_description: "অক্ষয়কুমার সরকার রচিত ‘গোচারণের মাঠ’ উনবিংশ শতাব্দীর শেষভাগে লিখিত একটি অনন্য রূপক ও নীতিশিক্ষামূলক ব্যঙ্গকাব্যগ্রন্থ।"
 
