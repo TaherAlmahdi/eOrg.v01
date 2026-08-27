@@ -125,6 +125,8 @@ export const CONTENT_REGISTRY = {
     "epistolary-novel": "পত্রোপন্যাস",
     "liberation-war-novel": "মুক্তিযুদ্ধের উপন্যাস",
     "parapsychology": "পরামনোবিজ্ঞান",
+    "screenplay": "চিত্রনাট্য",
+    
   } as Record<string, string>,
 
   // English Slug -> Bengali Value

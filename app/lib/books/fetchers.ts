@@ -9,7 +9,6 @@ import {
   extractGenresFromData,
   extractSeriesFromData,
   generateGenreLinks,
-  collectChapterItemsDeep,
   extractItemsFromData,
 } from './utils';
 import { getBookHierarchy } from './hierarchy';
@@ -179,11 +178,10 @@ export async function getLibraryBooks(currentSubdomain?: string): Promise<{
         const bookSubdomains = parseSubdomains(data.subdomain, authorFolder);
         if (!isSubdomainAllowed(bookSubdomains, currentSubdomain)) continue;
 
-        const extractedItems = collectChapterItemsDeep(bookPath);
-        console.log(`Book path: ${bookPath} | Extracted Items Count:`, Array.isArray(extractedItems) ? extractedItems.length : 'Not an array');
+        // 🟢 ভারী ও ধীরগতির collectChapterItemsDeep স্ক্যানিং বাদ দেওয়া হলো (ফ্রন্টম্যাটার থেকে ডাটা নেওয়া হবে)
+        const extractedItems = extractItemsFromData(data);
 
         const book = mapBookData(data, authorFolder, bookFolder, extractedItems);
-        // rawFrontmatter যুক্ত করে দেওয়া যাতে পরের লজিকে ধরতেও সুবিধা হয়
         (book as any).rawFrontmatter = data;
 
         allBooks.push(book);
@@ -343,7 +341,7 @@ export async function getBookBySlug(
         if (pageItems.length === 0 && targetFilePath !== indexMdPath) {
           pageItems = extractItemsFromData(pageData);
         } else if (targetFilePath === indexMdPath) {
-          pageItems = collectChapterItemsDeep(bookPath);
+          pageItems = extractItemsFromData(mainData);
         }
 
         let prevLink = '/books';
