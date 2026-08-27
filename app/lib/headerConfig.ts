@@ -75,9 +75,13 @@ export const headerConfig: Record<string, DomainConfig> = {
     bgColor: "bg-[#f4fbf7]", 
     themeColor: "emerald",
     menu: [
-      { label: "আলয়", url: "goto:main:", icon: "Home", desc: "এডুলিচারের প্রধান প্রবেশক" },
-      { label: "সব বই", url: "/books", icon: "BookOpen", desc: "লাইব্রেরির সর্বমোট বই সংগ্রহ" },
-      { label: "বিভাগসমূহ", url: "/genres", icon: "Library", desc: "ক্যাটাগরি ভিত্তিক বইয়ের তালিকা" },
+      { label: "আলয়", url: "/", icon: "Home", desc: "পাঠশালা প্রবেশক" },
+      { label: "গ্রন্থাগার", url: "/books", icon: "BookOpen", desc: "বর্ণভিত্তিক গ্রন্থ সম্ভার" },
+      { label: "ঘরানা সম্ভার", url: "/genres", icon: "Layers", desc: "ঘরানাভিত্তিক শ্রেণী বিন্যাস" },
+      { label: "প্রকরণ সম্ভার", url: "/items", icon: "Tags", desc: "প্রকরণভিত্তিক শ্রেণী বিন্যাস" },
+      { label: "সিরিজ সম্ভার", url: "/series", icon: "Library", desc: "সিরিজভিত্তিক শ্রেণী বিন্যাস" },
+      { label: "লেখক নির্ঘণ্ট", url: "/authors", icon: "Users", desc: "সম্মানিত লেখকমণ্ডলী" },
+      { label: "এডুলিচার", url: "goto:main:", icon: "Home", desc: "এডুলিচারের প্রধান প্রবেশক" },            
       { label: "প্রকল্প পরিচয়", url: "/about", icon: "Info", desc: "বিশুদ্ধজ্ঞান প্রকল্পের লক্ষ্য ও উদ্দেশ্য", color: "gray" }
     ]
   },

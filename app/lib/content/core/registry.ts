@@ -46,7 +46,9 @@ export const CONTENT_REGISTRY = {
     "muhammad-jalaluddin-biswas": "মুহম্মদ জালালউদ্দীন বিশ্বাস",
     "abhik-chatterjee": "অভীক চট্টোপাধ্যায়",
     "neelima-ibrahim": "নীলিমা ইব্রাহীম",
-    "bhuban-chandra-mukhopadhyay": "ভুবনচন্দ্র মুখোপাধ্যায়"
+    "bhuban-chandra-mukhopadhyay": "ভুবনচন্দ্র মুখোপাধ্যায়",
+    "mahbub-siddiki": "মাহবুব সিদ্দিকী",
+    "johan-august-strindberg": "অগুস্ত স্ত্রিন্দবারি",
   } as Record<string, string>,
 
   // English Slug -> Bengali Value

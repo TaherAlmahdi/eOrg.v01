@@ -25,7 +25,7 @@ export default function BookDetails({ book, series: explicitSeries }: BookDetail
   // book.series, book.series_name অথবা প্রপস থেকে আসা explicitSeries গ্রহণ
   const seriesData = book.series || book.series_name || explicitSeries;
 
-  // সিরিজের লিঙ্ক পাওয়ার জন্য হেল্পার ফাংশন
+  // সিরিজের লিঙ্ক পাওয়ার জন্য হেল্পার ফাংশন
   const getSeriesLink = (seriesName: string): string => {
     // ১. যদি series_links এ্যারে থেকে নাম ম্যাচ করে
     const matchedLink = book.series_links?.find(
@@ -36,7 +36,7 @@ export default function BookDetails({ book, series: explicitSeries }: BookDetail
     // ২. যদি সরাসরি book.series_link থাকে
     if (book.series_link) return book.series_link;
 
-    // ৩. কোনো নির্দিষ্ট লিঙ্ক না থাকলে ডায়নামিক স্লাগ রুট ফলব্যাক
+    // ৩. কোনো নির্দিষ্ট লিঙ্ক না থাকলে ডায়নামিক স্লাগ রুট ফলব্যাক
     return `/series/${encodeURIComponent(seriesName)}`;
   };
 
@@ -50,7 +50,7 @@ export default function BookDetails({ book, series: explicitSeries }: BookDetail
         <div className="space-y-2 text-sm text-gray-800">
           {/* বইয়ের নাম */}
           {book.title && (
-            <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
+            <div className="grid grid-cols-[70px_10px_1fr] items-baseline">
               <span className="font-bold">বই</span>
               <span className="text-gray-400">:</span>
               <span>{book.title}</span>
@@ -59,34 +59,76 @@ export default function BookDetails({ book, series: explicitSeries }: BookDetail
 
           {/* লেখক */}
           {book.author && (
-            <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
+            <div className="grid grid-cols-[70px_10px_1fr] items-baseline">
               <span className="font-bold">লেখক</span>
               <span className="text-gray-400">:</span>
-              <span>{book.author}</span>
+              <span className="flex flex-wrap gap-x-1">
+                {Array.isArray(book.author) ? (
+                  book.author.map((a: string, index: number) => {
+                    const isLast = index === (book.author as string[]).length - 1;
+                    return (
+                      <span key={index}>
+                        <span>{a}</span>
+                        {!isLast && <span className="mr-1">,</span>}
+                      </span>
+                    );
+                  })
+                ) : (
+                  <span>{book.author}</span>
+                )}
+              </span>
             </div>
           )}
 
           {/* অনুবাদক */}
           {book.translator && (
-            <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
+            <div className="grid grid-cols-[70px_10px_1fr] items-baseline">
               <span className="font-bold">অনুবাদক</span>
               <span className="text-gray-400">:</span>
-              <span>{book.translator}</span>
+              <span className="flex flex-wrap gap-x-1">
+                {Array.isArray(book.translator) ? (
+                  book.translator.map((t: string, index: number) => {
+                    const isLast = index === (book.translator as string[]).length - 1;
+                    return (
+                      <span key={index}>
+                        <span>{t}</span>
+                        {!isLast && <span className="mr-1">,</span>}
+                      </span>
+                    );
+                  })
+                ) : (
+                  <span>{book.translator}</span>
+                )}
+              </span>
             </div>
           )}
 
           {/* সম্পাদক */}
           {book.editor && (
-            <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
+            <div className="grid grid-cols-[70px_10px_1fr] items-baseline">
               <span className="font-bold">সম্পাদক</span>
               <span className="text-gray-400">:</span>
-              <span>{book.editor}</span>
+              <span className="flex flex-wrap gap-x-1">
+                {Array.isArray(book.editor) ? (
+                  book.editor.map((e: string, index: number) => {
+                    const isLast = index === (book.editor as string[]).length - 1;
+                    return (
+                      <span key={index}>
+                        <span>{e}</span>
+                        {!isLast && <span className="mr-1">,</span>}
+                      </span>
+                    );
+                  })
+                ) : (
+                  <span>{book.editor}</span>
+                )}
+              </span>
             </div>
           )}
 
           {/* প্রথম প্রকাশ */}
           {book.pub_medium && (
-            <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
+            <div className="grid grid-cols-[70px_10px_1fr] items-baseline">
               <span className="font-bold">প্রথম প্রকাশ</span>
               <span className="text-gray-400">:</span>
               <span>{book.pub_medium}</span>
@@ -95,7 +137,7 @@ export default function BookDetails({ book, series: explicitSeries }: BookDetail
 
           {/* গ্রন্থরূপ */}
           {book.first_published && (
-            <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
+            <div className="grid grid-cols-[70px_10px_1fr] items-baseline">
               <span className="font-bold">গ্রন্থরূপ</span>
               <span className="text-gray-400">:</span>
               <span>{toBengaliNumber(book.first_published)}</span>
@@ -104,16 +146,30 @@ export default function BookDetails({ book, series: explicitSeries }: BookDetail
 
           {/* প্রকাশক */}
           {book.publisher && (
-            <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
+            <div className="grid grid-cols-[70px_10px_1fr] items-baseline">
               <span className="font-bold">প্রকাশক</span>
               <span className="text-gray-400">:</span>
-              <span>{book.publisher}</span>
+              <span className="flex flex-wrap gap-x-1">
+                {Array.isArray(book.publisher) ? (
+                  book.publisher.map((p: string, index: number) => {
+                    const isLast = index === (book.publisher as string[]).length - 1;
+                    return (
+                      <span key={index}>
+                        <span>{p}</span>
+                        {!isLast && <span className="mr-1">,</span>}
+                      </span>
+                    );
+                  })
+                ) : (
+                  <span>{book.publisher}</span>
+                )}
+              </span>
             </div>
           )}
 
           {/* অনুস্মৃতি */}
           {book.source_book && (
-            <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
+            <div className="grid grid-cols-[70px_10px_1fr] items-baseline">
               <span className="font-bold">অনুস্মৃতি</span>
               <span className="text-gray-400">:</span>
               <span>{toBengaliNumber(book.source_book)}</span>
@@ -122,7 +178,7 @@ export default function BookDetails({ book, series: explicitSeries }: BookDetail
 
           {/* সিরিজ / গ্রন্থমালা */}
           {seriesData && (
-            <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
+            <div className="grid grid-cols-[70px_10px_1fr] items-baseline">
               <span className="font-bold">সিরিজ</span>
               <span className="text-gray-400">:</span>
               <span className="flex flex-wrap gap-x-1 items-baseline">
@@ -164,7 +220,7 @@ export default function BookDetails({ book, series: explicitSeries }: BookDetail
 
           {/* ঘরানা */}
           {book.genre && (
-            <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
+            <div className="grid grid-cols-[70px_10px_1fr] items-baseline">
               <span className="font-bold">ঘরানা</span>
               <span className="text-gray-400">:</span>
               <span className="flex flex-wrap gap-x-1">
