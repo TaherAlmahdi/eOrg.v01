@@ -448,16 +448,19 @@
     text-align: right;
   }
 
+  .plr {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 2rem;
+    width: 100%;
+  }
+
   .pl {
-    width: 50%;
-    float: left;
-    text-align: left;
+    text-align: right;
   }
 
   .pr {
-    width: 50%;
-    float: right;
-    text-align: right;
+    text-align: left;
   }
 
   /* গ্যাপ ও মার্জিন */
