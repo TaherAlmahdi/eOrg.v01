@@ -595,21 +595,29 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
             )}
 
             {/* লেখক, অনুবাদক ও সম্পাদক তথ্য */}
-            <div className="space-y-0.5 text-red-900 font-tarunima">
-              {book.author && (
-                <p className="text-lg font-medium">{book.author}</p>
-              )}
-              {book.translator && (
-                <p className="text-base opacity-90">
-                  অনুবাদ: <span className="font-medium">{book.translator}</span>
-                </p>
-              )}
-              {book.editor && (
-                <p className="text-base opacity-90">
-                  সম্পাদনা: <span className="font-medium">{book.editor}</span>
-                </p>
-              )}
-            </div>
+<div className="space-y-0.5 text-red-900 font-tarunima">
+  {book.author && (
+    <p className="text-lg font-medium">
+      {Array.isArray(book.author) ? book.author.join(', ') : book.author}
+    </p>
+  )}
+  {book.translator && (
+    <p className="text-base opacity-90">
+      অনুবাদ:{' '}
+      <span className="font-medium">
+        {Array.isArray(book.translator) ? book.translator.join(', ') : book.translator}
+      </span>
+    </p>
+  )}
+  {book.editor && (
+    <p className="text-base opacity-90">
+      সম্পাদনা:{' '}
+      <span className="font-medium">
+        {Array.isArray(book.editor) ? book.editor.join(', ') : book.editor}
+      </span>
+    </p>
+  )}
+</div>
 
             <div className="w-48 h-0.5 bg-red-900/40 mx-auto mt-3"></div>
           </header>
