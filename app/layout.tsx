@@ -95,10 +95,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const siteDescription = siteData?.description || `${defaultTitle} ❀ শিক্ষা, সাহিত্য ও সংস্কৃতি বিষয়ক বিশুদ্ধজ্ঞান প্ল্যাটফর্ম`;
 
   return {
-    title: {
-      template: '%s ❀ এডুলিচার',
-      default: dynamicTitle,
-    },
+    // টেমপ্লেট সরিয়ে সরাসরি টাইটেল সেট করা হলো, যাতে ট্যাবে অতিরিক্ত নাম না আসে
+    title: dynamicTitle,
     description: siteDescription,
     metadataBase: new URL(siteUrl),
     alternates: {
