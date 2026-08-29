@@ -320,6 +320,8 @@
     color: var(--text-main);
   }
 
+  
+
   .poem .right {
     display: inline-block;
     width: 100%;
@@ -607,63 +609,25 @@ div:has(> .gap) {
   opacity: 0.8;
 }
 
-.kabita0 {
-  margin-left: -5%;
+/* লাইনগুলোর জন্য নির্দিষ্ট গ্যাপ ও লেফট অ্যালাইনমেন্ট */
+.poem p, 
+.poem div, 
+[class*="kabita"] {
+  text-align: left !important;
+  width: 100%;
 }
 
-.kabita {
-  text-align: justify;
-}
-
-.kabita1 {
-  text-align: justify;
-  margin-left: 5%;
-}
-
-.kabita2 {
-  text-align: justify;
-  margin-left: 10%;
-}
-
-.kabita3 {
-  text-align: justify;
-  margin-left: 15%;
-}
-
-.kabita4 {
-  text-align: justify;
-  margin-left: 20%;
-}
-
-.kabita5 {
-  text-align: justify;
-  margin-left: 25%;
-}
-
-.kabita6 {
-  text-align: justify;
-  margin-left: 30%;
-}
-
-.kabita7 {
-  text-align: justify;
-  margin-left: 35%;
-}
-
-.kabita8 {
-  text-align: justify;
-  margin-left: 40%;
-}
-
-.kabita9 {
-  text-align: justify;
-  margin-left: 45%;
-}
-
-.kabita10 {
-  text-align: justify;
-  margin-left: 50%;
-}
+.kabita0  { padding-left: 0px; }
+.kabita1  { padding-left: 25px; }
+.kabita2  { padding-left: 50px; }
+.kabita3  { padding-left: 75px; }
+.kabita4  { padding-left: 100px; }
+.kabita5  { padding-left: 125px; }
+.kabita6  { padding-left: 150px; }
+.kabita7  { padding-left: 175px; }
+.kabita8  { padding-left: 200px; }
+.kabita9  { padding-left: 225px; }
+.kabita10 { padding-left: 250px; }
 
 .bgap {
   padding-bottom: 15px;

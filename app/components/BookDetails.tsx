@@ -16,7 +16,7 @@ interface CustomLink {
 
 export interface BookDetailsProps {
   book: any;
-  series?: any; // অভিভাবক ফাইল থেকে এক্সপ্লিসিটলি পাস করলেও যেন TypeScript এরর না দেয়
+  series?: any; // অভিভাবক ফাইল থেকে এক্সপ্লিসিটলি পাস করলেও যেন যেন TypeScript এরর না দেয়
 }
 
 export default function BookDetails({ book, series: explicitSeries }: BookDetailsProps) {
@@ -253,6 +253,51 @@ export default function BookDetails({ book, series: explicitSeries }: BookDetail
               </span>
             </div>
           )}
+
+{/* প্রকরণ */}
+          {book.item && (Array.isArray(book.item) ? book.item.length > 0 : String(book.item).trim() !== '') && (
+            <div className="grid grid-cols-[70px_10px_1fr] items-baseline">
+              <span className="font-bold">প্রকরণ</span>
+              <span className="text-gray-400">:</span>
+              <span className="flex flex-wrap gap-x-1">
+                {Array.isArray(book.item) ? (
+                  book.item.map((itemVal: any, index: number) => {
+                    const itemName = typeof itemVal === 'object' && itemVal !== null ? itemVal.name : itemVal;
+                    const itemLink = typeof itemVal === 'object' && itemVal !== null ? itemVal.link : book.item_links?.find((l: CustomLink) => l.name === itemName)?.link;
+                    
+                    const isLast = index === (book.item as any[]).length - 1;
+
+                    return (
+                      <span key={index}>
+                        {itemLink ? (
+                          <Link
+                            href={itemLink}
+                            className="text-blue-600 hover:underline"
+                          >
+                            {toBengaliNumber(itemName)}
+                          </Link>
+                        ) : (
+                          toBengaliNumber(itemName)
+                        )}
+                        {!isLast && <span className="mr-1">,</span>}
+                      </span>
+                    );
+                  })
+                ) : typeof book.item === 'object' && book.item !== null ? (
+                  book.item.link ? (
+                    <Link href={book.item.link} className="text-blue-600 hover:underline">
+                      {toBengaliNumber(book.item.name)}
+                    </Link>
+                  ) : (
+                    toBengaliNumber(book.item.name)
+                  )
+                ) : (
+                  toBengaliNumber(book.item)
+                )}
+              </span>
+            </div>
+          )}
+
         </div>
       </div>
     </div>
