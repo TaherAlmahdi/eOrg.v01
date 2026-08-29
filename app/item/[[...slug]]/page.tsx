@@ -8,6 +8,7 @@ import { notFound } from 'next/navigation';
 import Notice from '@/app/components/Notice';
 import TOCItem from '@/app/components/TOCItem';
 import ItemDetails from '@/app/components/ItemDetails';
+
 import { getSubdomainData, buildTabTitle } from '@/app/lib/get-site-data';
 import { getBookBySlug, getItemsByItemType } from '@/app/lib/books/singleItemExtract';
 import { parseNoteShortcodes } from '@/app/lib/parse-shortcodes';
@@ -236,15 +237,12 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
 
   const pageDisplayTitle = getPageDisplayTitle(pageTitle, subPageSubtitle, currentPageNum);
   
-  // 🔹 রিফ্যাক্টর করা অংশ: নতুন `buildTabTitle` এর বুক স্ট্রাকচার অনুযায়ী পাস করা হলো
   const dynamicMetaTitle = buildTabTitle({
-    
     metaTitle: item.meta_title,
     currentPageTitle: pageDisplayTitle || undefined,
     bookTitle: item.title,
-    
+    siteName: siteName,
   });
-
 
   const description =
     item.meta_description ||
