@@ -16,6 +16,13 @@ export interface LibraryStatsProps {
   booksCount?: number;
   seriesCount?: number;
   genresCount?: number;
+  totalEditors?: number;
+  editorsCount?: number;
+  editorCount?: number;
+  totalTranslators?: number;
+  translatorsCount?: number;
+  translatorCount?: number;
+  authorCount?: number;
 }
 
 interface StatItem {
@@ -31,7 +38,13 @@ interface StatItem {
 }
 
 export const LibraryStats: FC<LibraryStatsProps> = (props) => {
-  const authors = props.totalAuthors ?? props.authorsCount ?? 0;
+  const authors = props.totalAuthors ?? props.authorsCount ?? props.authorCount ?? 0;
+  const editors = props.totalEditors ?? props.editorsCount ?? props.editorCount ?? 0;
+  const translators = props.totalTranslators ?? props.translatorsCount ?? props.translatorCount ?? 0;
+  
+  // লেখক, এডিটর এবং ট্রান্সলেটর একসাথে যোগ করা হলো
+  const combinedAuthors = authors + editors + translators;
+
   const books = props.totalBooks ?? props.booksCount ?? 0;
   const series = props.totalSeries ?? props.seriesCount ?? 0;
   const genres = props.totalGenres ?? props.genresCount ?? 0;
@@ -40,7 +53,7 @@ export const LibraryStats: FC<LibraryStatsProps> = (props) => {
     {
       title: "আমাদের পরিবারে",
       subtitle: "সম্মানিত লেখক",
-      count: authors,
+      count: combinedAuthors,
       unit: "জন",
       icon: Users,
       bgColor: "bg-teal-50",

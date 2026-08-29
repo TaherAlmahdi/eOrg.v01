@@ -229,16 +229,43 @@ export default async function LibraryHomePage() {
 
       <div className="relative w-full h-auto mt-2 overflow-x-clip font-tarunima">
 
-        {/* ১. Library Stats */}
+       {/* ১. Library Stats */}
         <section aria-labelledby="library-stats-heading">
           <div className="relative w-full h-auto overflow-x-clip">
             <div className="relative z-20 w-full mx-auto max-w-none">
-              <LibraryStats
-                totalAuthors={stats.totalAuthors}
-                totalBooks={stats.totalBooks}
-                totalSeries={stats.totalSeries}
-                totalGenres={totalGenresCount}
-              />
+              {(() => {
+                const combinedPeople = new Set<string>();
+                allBooksList.forEach((b: any) => {
+                  // নামগুলোকে পরিষ্কার করে (extra space বাদ দিয়ে) যোগ করা হচ্ছে
+                  if (b.author) {
+                    String(b.author).split(',').forEach(name => {
+                      const cleanName = name.trim();
+                      if (cleanName) combinedPeople.add(cleanName);
+                    });
+                  }
+                  if (b.editor) {
+                    String(b.editor).split(',').forEach(name => {
+                      const cleanName = name.trim();
+                      if (cleanName) combinedPeople.add(cleanName);
+                    });
+                  }
+                  if (b.translator) {
+                    String(b.translator).split(',').forEach(name => {
+                      const cleanName = name.trim();
+                      if (cleanName) combinedPeople.add(cleanName);
+                    });
+                  }
+                });
+
+                return (
+                  <LibraryStats
+                    totalAuthors={combinedPeople.size}
+                    totalBooks={stats.totalBooks}
+                    totalSeries={stats.totalSeries}
+                    totalGenres={totalGenresCount}
+                  />
+                );
+              })()}
             </div>
           </div>
         </section>
@@ -270,7 +297,6 @@ export default async function LibraryHomePage() {
                 const bookSlug = String(rawBookSlug);
                 const authorSlug = getAuthorSlug(book);
 
-                // রেসপন্সিভ ভিজিবিলিটি লজিক
                 const responsiveVisibilityClass = index >= 8 ? "hidden sm:flex" : "flex";
 
                 return (
@@ -328,7 +354,7 @@ export default async function LibraryHomePage() {
             </div>
             <Link
               href="/genres"
-              className="text-base font-medium font-tarunima text-emerald-600 hover:text-emerald-700 flex items-center gap-0.5 transition-colors group shrink-0"
+              className="text-xs sm:text-sm md:text-base font-medium font-tarunima text-emerald-600 hover:text-emerald-700 flex items-center gap-0.5 transition-colors group shrink-0"
             >
               সব ঘরানা
               <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
@@ -348,7 +374,7 @@ export default async function LibraryHomePage() {
             </div>
             <Link
               href="/items"
-              className="text-base font-medium font-tarunima text-emerald-600 hover:text-emerald-700 flex items-center gap-0.5 transition-colors group shrink-0"
+              className="text-xs sm:text-sm md:text-base font-medium font-tarunima text-emerald-600 hover:text-emerald-700 flex items-center gap-0.5 transition-colors group shrink-0"
             >
               সব প্রকরণ
               <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />

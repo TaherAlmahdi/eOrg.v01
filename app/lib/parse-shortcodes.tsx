@@ -39,15 +39,29 @@ export function parseNoteShortcodes(content: string): ParsedShortcodeResult {
 
     // শর্টকোডের আগের অংশ
     if (match.index > lastIndex) {
-      const textBefore = normalizedContent.substring(lastIndex, match.index);
-      htmlString += textBefore;
-      parts.push(
-        <span 
-          key={`text-${lastIndex}`} 
-          className="inline"
-          dangerouslySetInnerHTML={{ __html: textBefore }} 
-        />
-      );
+      let textBefore = normalizedContent.substring(lastIndex, match.index);
+      
+      // আগের টেক্সটের শেষের স্পেস আলাদা করে ফেলা, যাতে `sup` ট্যাগের আগে কোনো অতিরিক্ত স্পেস না থাকে
+      const trailingSpaceMatch = textBefore.match(/\s+$/);
+      const trailingSpace = trailingSpaceMatch ? trailingSpaceMatch[0] : '';
+      textBefore = textBefore.replace(/\s+$/, '');
+
+      if (textBefore) {
+        htmlString += textBefore;
+        parts.push(
+          <span 
+            key={`text-${lastIndex}`} 
+            className="inline"
+            dangerouslySetInnerHTML={{ __html: textBefore }} 
+          />
+        );
+      }
+
+      // স্পেসটুকু আলাদাভাবে এইচটিএমএল ও পার্টসে যুক্ত করা (যদি থাকে)
+      if (trailingSpace) {
+        htmlString += trailingSpace;
+        parts.push(trailingSpace);
+      }
     }
 
     // মার্ক নির্ধারণ
@@ -62,24 +76,23 @@ export function parseNoteShortcodes(content: string): ParsedShortcodeResult {
       text: noteText,
     });
 
-    // ✅ সংশোধিত: HTML স্ট্রিং-এ className এর জায়গায় সঠিক HTML class ব্যবহার করা হয়েছে
-    const noteRefHtml = `<sup class="inline font-tarunima text-base ml-0.5 leading-none select-none"><a href="#fn-${currentId}" id="fnref-${currentId}" class="text-blue-600 hover:text-red-700 font-normal no-underline inline">[${label}]</a></sup>`;
+    // HTML স্ট্রিং-এর জন্য (whitespace-nowrap দিয়ে মুড়ে দেওয়া হয়েছে যাতে শব্দ ও নোট আলাদা লাইনে না ভাঙে)
+    const noteRefHtml = `<span class="whitespace-nowrap inline"><sup class="inline font-tarunima text-base ml-0.5 leading-none select-none"><a href="#fn-${currentId}" id="fnref-${currentId}" class="text-blue-600 hover:text-red-700 font-normal no-underline inline">[${label}]</a></sup></span>`;
     htmlString += noteRefHtml;
 
     // React Component পার্টসে পুশ করা
     parts.push(
-      <sup 
-        key={`note-ref-${match.index}`} 
-        className="inline font-sans text-xs ml-0.5 leading-none select-none"
-      >
-        <a 
-          href={`#fn-${currentId}`} 
-          id={`fnref-${currentId}`}
-          className="text-blue-600 hover:text-red-700 font-bold no-underline inline"
-        >
-          [{label}]
-        </a>
-      </sup>
+      <span key={`note-wrapper-${match.index}`} className="whitespace-nowrap inline">
+        <sup 
+          className="inline font-sans text-xs ml-0.5 leading-none select-none"
+        ><a 
+            href={`#fn-${currentId}`} 
+            id={`fnref-${currentId}`}
+            className="text-blue-600 hover:text-red-700 font-bold no-underline inline"
+          >[{label}]
+          </a>
+        </sup>
+      </span>
     );
 
     lastIndex = regex.lastIndex;
