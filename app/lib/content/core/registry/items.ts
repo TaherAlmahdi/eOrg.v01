@@ -91,7 +91,7 @@ export const ITEM_REGISTRY: Record<string, ItemMeta> = {
     slug: "short-story",
   },
   "rhyme": {
-    name: "ছড়া",
+    name: "ছড়া",
     slug: "rhyme",
   },
   "letter": {
@@ -107,7 +107,7 @@ export const ITEM_REGISTRY: Record<string, ItemMeta> = {
     slug: "note",
   },
   "commentary": {
-    name: "টীকা-ভাষ্য",
+    name: "টীকা",
     slug: "commentary",
   },
   "diary": {
@@ -126,16 +126,16 @@ export const ITEM_REGISTRY: Record<string, ItemMeta> = {
     name: "নিবন্ধ",
     slug: "article",
   },
-  "dedication-nivedan": {
+  "nivedan": {
     name: "নিবেদন",
     slug: "dedication",
   },
-  "letter-patra": {
+  "patra": {
     name: "পত্র",
     slug: "letter",
   },
   "correspondence": {
-    name: "পত্রাবলি",
+    name: "পত্রাবলী",
     slug: "correspondence",
   },
   "retelling": {
@@ -182,12 +182,12 @@ export const ITEM_REGISTRY: Record<string, ItemMeta> = {
     name: "ভূমিকা-লেখা",
     slug: "introductory-note",
   },
-  "commentary-bhashya": {
+  "bhassya": {
     name: "ভাষ্য",
-    slug: "commentary",
+    slug: "bhassya",
   },
   "travelogue": {
-    name: "ভ্রমণকাহিনি",
+    name: "ভ্রমণকাহিনী",
     slug: "travelogue",
   },
   "travel-account": {

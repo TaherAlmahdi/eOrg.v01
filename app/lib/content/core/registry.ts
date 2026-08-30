@@ -99,6 +99,7 @@ export const CONTENT_REGISTRY = {
     "philosophy": "দর্শন",
     "poem": "কবিতা",
     "poetry": "কাব্য",
+    "rhyme": "ছড়া",
     "prison-story": "কারা কাহিনী",
     "poetry-collection": "কবিতা সঙ্কলন",
     "psychological-novel": "মনস্তাত্ত্বিক উপন্যাস",
