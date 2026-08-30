@@ -82,6 +82,11 @@ export const ITEM_REGISTRY: Record<string, ItemMeta> = {
     name: "গান",
     slug: "song",
   },
+  "lyrics": {
+    name: "গীতি",
+    slug: "lyrics",
+  },  
+  
   "story": {
     name: "গল্প",
     slug: "story",
