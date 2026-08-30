@@ -320,7 +320,7 @@
     color: var(--text-main);
   }
 
-  
+
 
   .poem .right {
     display: inline-block;
@@ -610,24 +610,56 @@ div:has(> .gap) {
 }
 
 /* লাইনগুলোর জন্য নির্দিষ্ট গ্যাপ ও লেফট অ্যালাইনমেন্ট */
-.poem p, 
-.poem div, 
+.poem p,
+.poem div,
 [class*="kabita"] {
   text-align: left !important;
   width: 100%;
 }
 
-.kabita0  { padding-left: 0px; }
-.kabita1  { padding-left: 25px; }
-.kabita2  { padding-left: 50px; }
-.kabita3  { padding-left: 75px; }
-.kabita4  { padding-left: 100px; }
-.kabita5  { padding-left: 125px; }
-.kabita6  { padding-left: 150px; }
-.kabita7  { padding-left: 175px; }
-.kabita8  { padding-left: 200px; }
-.kabita9  { padding-left: 225px; }
-.kabita10 { padding-left: 250px; }
+.kabita {
+  padding-left: 0px;
+}
+
+.kabita1 {
+  padding-left: 25px;
+}
+
+.kabita2 {
+  padding-left: 50px;
+}
+
+.kabita3 {
+  padding-left: 75px;
+}
+
+.kabita4 {
+  padding-left: 100px;
+}
+
+.kabita5 {
+  padding-left: 125px;
+}
+
+.kabita6 {
+  padding-left: 150px;
+}
+
+.kabita7 {
+  padding-left: 175px;
+}
+
+.kabita8 {
+  padding-left: 200px;
+}
+
+.kabita9 {
+  padding-left: 225px;
+}
+
+.kabita10 {
+  padding-left: 250px;
+}
 
 .bgap {
   padding-bottom: 15px;
