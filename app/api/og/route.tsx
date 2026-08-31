@@ -8,15 +8,16 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
 
-    // ১. ইউআরএল থেকে ডাইনামিক ডেটা নেওয়া (Query Parameters)
+    // ১. ইউআরএল থেকে ডাইনামিক ডেটা নেওয়া (Query Parameters)
     const title = searchParams.get('title') || 'এডুলিচার – অনলাইন জ্ঞানকোষ ও লাইব্রেরি';
     const subtitle = searchParams.get('subtitle') || 'অনলাইন বই ও সাহিত্য সংকলন';
     const tagline = searchParams.get('tagline') || 'সহজ ভাষায় সকল বই ও অনুচ্ছেদ পড়ুন';
 
-    // ২. Tarunima ফন্ট লোড করা এবং ArrayBuffer-এ রূপান্তর (নিরাপদ উপায়)
+    // ২. Tarunima ফন্ট লোড করা এবং ArrayBuffer-এ রূপান্তর
     let fontData: ArrayBuffer | null = null;
     try {
-      const buffer = await readFile(join(process.cwd(), 'public/fonts/tarunima.ttf'));
+      const fontPath = join(process.cwd(), 'public/fonts/tarunima.ttf');
+      const buffer = await readFile(fontPath);
       fontData = buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
     } catch (err) {
       console.error('Font load error:', err);
@@ -165,6 +166,7 @@ export async function GET(request: Request) {
                 name: 'Tarunima',
                 data: fontData,
                 style: 'normal',
+                weight: 400,
               },
             ]
           : [],
