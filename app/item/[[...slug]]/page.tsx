@@ -140,6 +140,7 @@ const getItemTypeDisplayName = (itemObj: any): string => {
     poem: 'কবিতা',
     books: 'বই',
     articles: 'প্রবন্ধ',
+letter: 'চিঠি'
   };
   return typeMap[typeSlug] || typeSlug || 'প্রকরণ';
 };
