@@ -9,7 +9,7 @@ const toBengaliNumber = (num?: number | string): string =>
     ? num.toString().replace(/\d/g, (d) => '০১২৩৪৫৬৭৮৯'[parseInt(d, 10)])
     : '';
 
-// যেকোনো ভ্যালুকে নিরাপদভাবে স্ট্রিংয়ে রূপান্তর করার হেল্পার (অবজেক্ট ক্র্যাশ রোধ করতে)
+// যেকোনো ভ্যালুকে নিরাপদভাবে স্ট্রিংয়ে রূপান্তর করার হেল্পার
 const renderValue = (val: unknown): string => {
   if (val === null || val === undefined) return '';
   if (typeof val === 'string' || typeof val === 'number') return String(val);
@@ -29,49 +29,54 @@ interface CustomLink {
   link: string;
 }
 
-export interface BookDetailsProps {
-  book: any;
-  series?: any; 
+export interface ItemDetailsProps {
+  book: any;      // মূল ডেটা অবজেক্ট
+  items?: any; 
 }
 
-export default function BookDetails({ book, series: explicitSeries }: BookDetailsProps) {
+export default function BookDetails({ book, items: explicititems }: ItemDetailsProps) {
   if (!book) return null;
 
-  const seriesData = book.series || book.series_name || explicitSeries;
+  // আপনার সংজ্ঞায়ন অনুযায়ী নামগুলো আলাদা করা হলো:
+  const bookName = renderValue(book.book || book.title); // মূল বইয়ের নাম
+  const itemName = renderValue(book.item);                // প্রকরণের নাম (যেমন: প্রবন্ধ/গল্প)
+  const currentTitle = renderValue(book.current_title || book.page_title || book.title); // বর্তমান পাতার নাম
 
-  const getSeriesLink = (seriesName: string): string => {
-    const matchedLink = book.series_links?.find(
-      (l: CustomLink) => l.name === seriesName
+  const itemsData = book.items || book.items_name || explicititems;
+
+  const getItemsLink = (itemsName: string): string => {
+    const matchedLink = book.items_links?.find(
+      (l: CustomLink) => l.name === itemsName
     )?.link;
     if (matchedLink) return matchedLink;
-    if (book.series_link) return book.series_link;
-    return `/series/${encodeURIComponent(seriesName)}`;
+    if (book.items_link) return book.items_link;
+    return `/items/${encodeURIComponent(itemsName)}`;
   };
 
   return (
     <div className="space-y-3 font-tarunima">
       {/* ১. কভার বাটন ও কভার ছবির আলাদা কার্ড */}
-      <BookCover coverImage={book.cover_image} title={renderValue(book.title)} />
+      <BookCover coverImage={book.cover_image} title={currentTitle || bookName} />
 
       {/* ২. পুস্তক বিবরণীর বিস্তারিত তথ্যের মূল কার্ড */}
       <div className="p-2 bg-white border border-gray-100 rounded shadow-sm">
         <div className="space-y-2 text-sm text-gray-800">
           
-          {/* আইটেম / প্রকরণ : বর্তমান পাতার টাইটেল */}
-          {book.item && book.title && (
+          {/* প্রকরণ (Item) এবং বর্তমান পাতার নাম (Title) */}
+          {itemName && currentTitle && (
             <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
-              <span className="font-bold">{renderValue(book.item)}</span>
+              <span className="font-bold">{itemName}</span>
               <span className="text-gray-400">:</span>
-              <span>{renderValue(book.title)}</span>
+              <span>{currentTitle}</span>
             </div>
           )}
 
-          {/* বই */}
-          {book.book && (
+          {/* মূল বইয়ের নাম (Book) */}
+          {bookName && (
             <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
               <span className="font-bold">বই</span>
               <span className="text-gray-400">:</span>
-              <span>{renderValue(book.book)}</span>
+              <span>{bookName}</span>
             </div>
           )}
 
@@ -139,17 +144,17 @@ export default function BookDetails({ book, series: explicitSeries }: BookDetail
           )}
 
           {/* সিরিজ */}
-          {seriesData && (
+          {itemsData && (
             <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
               <span className="font-bold">সিরিজ</span>
               <span className="text-gray-400">:</span>
               <span className="flex flex-wrap gap-x-1 items-baseline">
-                {Array.isArray(seriesData) ? (
-                  seriesData.map((s: unknown, index: number) => {
+                {Array.isArray(itemsData) ? (
+                  itemsData.map((s: unknown, index: number) => {
                     const sName = renderValue(s);
                     if (!sName) return null;
-                    const href = getSeriesLink(sName);
-                    const isLast = index === (seriesData as unknown[]).length - 1;
+                    const href = getItemsLink(sName);
+                    const isLast = index === (itemsData as unknown[]).length - 1;
 
                     return (
                       <span key={index}>
@@ -165,16 +170,16 @@ export default function BookDetails({ book, series: explicitSeries }: BookDetail
                   })
                 ) : (
                   <Link
-                    href={getSeriesLink(renderValue(seriesData))}
+                    href={getItemsLink(renderValue(itemsData))}
                     className="text-blue-600 hover:underline transition-colors"
                   >
-                    {renderValue(seriesData)}
+                    {renderValue(itemsData)}
                   </Link>
                 )}
 
-                {(book.seriesOrder || book.part || book.volume) && (
+                {(book.itemsOrder || book.part || book.volume) && (
                   <span className="text-gray-500 ml-1">
-                    (পর্ব {toBengaliNumber(renderValue(book.seriesOrder || book.part || book.volume))})
+                    (পর্ব {toBengaliNumber(renderValue(book.itemsOrder || book.part || book.volume))})
                   </span>
                 )}
               </span>
