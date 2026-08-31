@@ -526,7 +526,7 @@ export default async function SingleItemPage({ params, searchParams }: PageProps
             {prevActionLink ? (
               <Link
                 href={prevActionLink}
-                className="bg-red-900 text-white px-4 py-2 rounded font-normal hover:bg-red-800 transition-all flex items-center group shadow-md text-sm md:text-base max-w-[48%]"
+                className="bg-red-900 text-white px-4 py-2 rounded font-normal hover:bg-red-800 transition-all flex items-center group shadow-md text-sm md:text-base max-w-[48.5%]"
               >
                 <span className="mr-2 transition-transform transform group-hover:-translate-x-1">←</span>
                 <span className="truncate whitespace-nowrap">{prevActionLabel}</span>
@@ -538,7 +538,7 @@ export default async function SingleItemPage({ params, searchParams }: PageProps
             {nextActionLink ? (
               <Link
                 href={nextActionLink}
-                className="bg-red-900 text-white px-4 py-2 rounded font-normal hover:bg-red-800 transition-all flex items-center group shadow-md text-sm md:text-base max-w-[48%]"
+                className="bg-red-900 text-white px-4 py-2 rounded font-normal hover:bg-red-800 transition-all flex items-center group shadow-md text-sm md:text-base max-w-[48.5%]"
               >
                 <span className="truncate whitespace-nowrap">{nextActionLabel}</span>
                 <span className="ml-2 transition-transform transform group-hover:translate-x-1 shrink-0">→</span>
