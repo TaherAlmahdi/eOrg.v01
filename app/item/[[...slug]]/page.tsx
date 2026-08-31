@@ -12,7 +12,7 @@ import ItemDetails from '@/app/components/ItemDetails';
 import { getSubdomainData, buildTabTitle } from '@/app/lib/get-site-data';
 import { getBookBySlug, getItemsByItemType } from '@/app/lib/books/singleItemExtract';
 import { parseNoteShortcodes } from '@/app/lib/parse-shortcodes';
-import { getItemSlug } from '@/app/lib/content/core/registry/items';
+import { getItemSlug, getItemMeta } from '@/app/lib/content/core/registry/items';
 
 // ==========================================
 // 📐 Interfaces
@@ -134,16 +134,10 @@ const getItemTypeName = (itemObj: any): string => {
 };
 
 const getItemTypeDisplayName = (itemObj: any): string => {
-  const typeSlug = getItemTypeName(itemObj);
-  const typeMap: Record<string, string> = {
-    story: 'গল্প',
-    poem: 'কবিতা',
-    books: 'বই',
-    articles: 'নিবন্ধ',
-essay: 'প্রবন্ধ',
-letter: 'চিঠি'
-  };
-  return typeMap[typeSlug] || typeSlug || 'প্রকরণ';
+  const rawItem = itemObj?.item || itemObj?.type;
+  if (!rawItem) return '';
+  const meta = getItemMeta(rawItem);
+  return meta?.name || getItemSlug(rawItem);
 };
 
 function parseItemSubPages(fullContent: string): SplitPage[] {
