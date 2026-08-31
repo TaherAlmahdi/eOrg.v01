@@ -103,6 +103,7 @@
   .col_2_0,
   .intro,
   .intro_right,
+  .intro_left
   ul,
   ul.none,
   .pc,
@@ -1446,7 +1447,7 @@ span.right {
 .intro {
   width: 100%;
   margin: 15px 0;
-  padding: 0 5%;
+  padding: 0 1.5%;
   min-height: 50px;
 
   /* Flexbox দিয়ে উভয় পাশে সাজানো এবং ভার্টিক্যালি সেন্টার করা */
