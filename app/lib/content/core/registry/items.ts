@@ -112,7 +112,7 @@ export const ITEM_REGISTRY: Record<string, ItemMeta> = {
     slug: "note",
   },
   "commentary": {
-    name: "টীকা",
+    name: "মন্তব্য",
     slug: "commentary",
   },
   "diary": {
@@ -133,11 +133,11 @@ export const ITEM_REGISTRY: Record<string, ItemMeta> = {
   },
   "nivedan": {
     name: "নিবেদন",
-    slug: "dedication",
+    slug: "nivedan",
   },
   "patra": {
     name: "পত্র",
-    slug: "letter",
+    slug: "patra",
   },
   "correspondence": {
     name: "পত্রাবলী",
@@ -301,6 +301,7 @@ SLUG_LOOKUP_MAP.set("letter", "letter");
 SLUG_LOOKUP_MAP.set("patra", "letter");
 SLUG_LOOKUP_MAP.set("bhashya", "commentary");
 SLUG_LOOKUP_MAP.set("nivedan", "dedication");
+SLUG_LOOKUP_MAP.set("article", "articles");
 
 /**
  * বাংলা নাম, স্লাগ বা অবজেক্ট থেকে নিরাপদভাবে স্লাগ খুঁজে বের করার হেল্পার
