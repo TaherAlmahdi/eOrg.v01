@@ -176,7 +176,7 @@ export default function ItemListView({
         <div className="mb-3 space-y-3 backdrop-blur-md shadow-xs">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             {/* বামপাশে ডাইনামিক পেজ টাইটেল */}
-           <div className="w-full md:w-auto rounded bg-teal-50/90 text-[#008080] border border-teal-200 shadow-xs backdrop-blur-md overflow-hidden">
+           <div className="w-full md:w-auto rounded bg-teal-50/90 text-[#008080] text-center border border-teal-200 shadow-xs backdrop-blur-md overflow-hidden">
               <div className="p-2.5 inline-flex items-center gap-2">
                 <Layers size={22} className="shrink-0 animate-pulse text-[#008080]" />
                 <h1 className="text-xl md:text-2xl font-bold text-gray-950 leading-none">
