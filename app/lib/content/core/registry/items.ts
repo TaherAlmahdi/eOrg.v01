@@ -156,7 +156,7 @@ export const ITEM_REGISTRY: Record<string, ItemMeta> = {
     slug: "farce",
   },
   "preface": {
-    name: "প্রস্তাবনা",
+    name: "মুখবন্ধ",
     slug: "preface",
   },
   "report": {

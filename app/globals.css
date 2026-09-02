@@ -56,6 +56,8 @@
   ol.bnlist,
   ol.plist,
   ul.custom-list,
+  ul.circle,
+  ul.square,
   .none,
   .gapkabita,
   .gapkabita_left,
@@ -501,6 +503,20 @@
     list-style-type: bengali;
     text-align: justify;
   }
+
+  ul.circle {
+    margin-left: 45px;
+    list-style-type: circle;
+    text-align: justify;
+  }
+  
+  ul.square {
+    margin-left: 45px;
+    list-style-type: square;
+    text-align: justify;
+  }
+  
+
 
   ul,
   ul.none {
