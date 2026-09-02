@@ -53,6 +53,11 @@ export const CONTENT_REGISTRY = {
     "samaresh-majumdar": "সমরেশ মজুমদার",
     "subodh-kumar-mukhopadhyay": "সুবোধকুমার মুখোপাধ্যায়",
     "akbar-ali-khan": "আকবর আলি খান",
+    "akshayakshay-kumar-sarkar": "অক্ষয়কুমার সরকার",
+    "satyen-chakraborty": "সত্যেন চক্রবর্তী",
+    "akshay-kumar-maitreya": "অক্ষয়কুমার মৈত্রেয়",
+    "henrik-ibsen": "হেনরিক ইবসেন",
+    
   } as Record<string, string>,
 
   // English Slug -> Bengali Value
