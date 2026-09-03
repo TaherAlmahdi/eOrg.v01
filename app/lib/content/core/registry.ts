@@ -65,6 +65,7 @@ export const CONTENT_REGISTRY = {
     "sukanta-bhattacharya": "সুকান্ত ভট্টাচার্য",
     "sanjib-chandra-chattopadhyay": "সঞ্জীবচন্দ্র চট্টোপাধ্যায়",
     "sanjib-chatterjee": "সঞ্জীব চট্টোপাধ্যায়",
+    "sushil-chaudhury": "সুশীল চৌধুরী",
 
   } as Record<string, string>,
 
@@ -146,6 +147,8 @@ export const CONTENT_REGISTRY = {
     "liberation-war-novel": "মুক্তিযুদ্ধের উপন্যাস",
     "parapsychology": "পরামনোবিজ্ঞান",
     "screenplay": "চিত্রনাট্য",
+    "research": "গবেষণা",
+    "political-novel": "রাজনৈতিক উপন্যাস",
 
   } as Record<string, string>,
 
