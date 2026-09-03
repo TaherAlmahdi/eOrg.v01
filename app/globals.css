@@ -1171,6 +1171,7 @@ table {
 /* ডেস্কটপ বা বড় স্ক্রিনের জন্য (যেমন: ৭৬৮ পিক্সেল বা তার বেশি চওড়া স্ক্রিন) */
 @media screen and (max-width: 768px) {
   table, table.saroni {
+    width: fit-content !important;
     display: block;
     overflow-x: auto;
     white-space: nowrap;
