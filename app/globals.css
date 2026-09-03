@@ -1161,7 +1161,7 @@ span.forty {
 
 table {
   width: fit-content !important;
-  max-width: 100% !important;
+  max-width: 95% !important;
   /* স্ক্রিনের বাইরে চলে যাওয়া রোধ করতে */
   margin-left: auto !important;
   /* ডানে ও বামে সমান মার্জিন */
