@@ -12,13 +12,16 @@ export interface BookItem {
   id?: string;
   title: string;
   slug?: string;
-  author?: string;
-  author_name?: string;
-  writer?: string;
-  translator?: string;
-  translator_name?: string;
-  editor?: string;
-  editor_name?: string;
+  author?: string | string[];
+  author_name?: string | string[];
+  writer?: string | string[];
+  authors?: string | string[];        // 👈 এটি যোগ করুন
+  translator?: string | string[];
+  translator_name?: string | string[];
+  translators?: string | string[];     // 👈 এটি যোগ করুন
+  editor?: string | string[];
+  editor_name?: string | string[];
+  editors?: string | string[];         // 👈 এটি যোগ করুন
   coverImage?: string;
   cover?: string;
   cover_image?: string;
@@ -27,8 +30,31 @@ export interface BookItem {
 interface AuthorBookSearchGridProps {
   books?: BookItem[];
   siteName?: string;
-  personName: string; // 👈 যে নামে ক্লিক করা হয়েছে (বাধ্যতামূলক প্রপস)
+  personName: string; 
 }
+
+// 🔹 সিঙ্গেল বা মাল্টিপল (অ্যারে) কন্ট্রিবিউটরের নাম নির্ভুলভাবে মেলানোর ফাংশন
+const isFieldMatch = (field: unknown, targetName: string): boolean => {
+  if (!field) return false;
+  const target = targetName.trim().toLowerCase();
+
+  if (Array.isArray(field)) {
+    return field.some((item) => {
+      if (typeof item === 'string') {
+        const val = item.trim().toLowerCase();
+        return val === target || val.includes(target);
+      }
+      return false;
+    });
+  }
+
+  if (typeof field === 'string') {
+    const val = field.trim().toLowerCase();
+    return val === target || val.includes(target);
+  }
+
+  return false;
+};
 
 export default function AuthorBookSearchGrid({
   books = [],
@@ -38,30 +64,32 @@ export default function AuthorBookSearchGrid({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLetter, setSelectedLetter] = useState('সব');
 
-  // 🔹 ১. যে ব্যক্তির নাম পাস করা হয়েছে, তাঁর সাথে সম্পর্কিত বইগুলো আগে আলাদা করা
   const personBooks = useMemo(() => {
     const safeBooks = Array.isArray(books) ? books : [];
     if (!personName.trim()) return safeBooks;
 
-    const targetName = personName.trim().toLowerCase();
+    const targetName = personName.trim();
 
     return safeBooks.filter((book) => {
       if (!book) return false;
 
-      const author = (book.author || book.author_name || book.writer || '').toLowerCase();
-      const translator = (book.translator || book.translator_name || '').toLowerCase();
-      const editor = (book.editor || book.editor_name || '').toLowerCase();
-
-      // লেখক, অনুবাদক বা সম্পাদক - যেকোনো এক জায়গায় নাম মিললেই বইটি নিবে
-      return (
-        author.includes(targetName) ||
-        translator.includes(targetName) ||
-        editor.includes(targetName)
+      const matchesAuthor = isFieldMatch(
+        book.author || book.author_name || book.writer || book.authors, 
+        targetName
       );
+      const matchesTranslator = isFieldMatch(
+        book.translator || book.translator_name || book.translators, 
+        targetName
+      );
+      const matchesEditor = isFieldMatch(
+        book.editor || book.editor_name || book.editors, 
+        targetName
+      );
+
+      return matchesAuthor || matchesTranslator || matchesEditor;
     });
   }, [books, personName]);
 
-  // 🔹 ২. ফিল্টার করা বইগুলোর নাম থেকে আদ্যক্ষরের তালিকা (Alphabet filter)
   const dynamicLetters = useMemo(() => {
     const lettersSet = new Set<string>();
 
@@ -81,7 +109,6 @@ export default function AuthorBookSearchGrid({
     return ['সব', ...sortedLetters];
   }, [personBooks]);
 
-  // 🔹 ৩. সার্চ বক্স এবং আদ্যক্ষর অনুযায়ী বই ফিল্টার করা
   const filteredBooks = useMemo(() => {
     return personBooks.filter((book) => {
       if (!book || !book.title) return false;
@@ -101,7 +128,6 @@ export default function AuthorBookSearchGrid({
 
   return (
     <div className="space-y-5 w-full">
-      {/* 🔹 ডাইনামিক হেডার: যে নামে ক্লিক করা হয়েছে সেই নামই আসবে */}
       <div className="text-center font-tarunima mb-2">
         <h2 className="text-lg md:text-xl font-bold text-[#008080]">
           {personName ? `${personName} রচনাবলী` : 'গ্রন্থাবলী'}
@@ -111,7 +137,6 @@ export default function AuthorBookSearchGrid({
         </p>
       </div>
 
-      {/* 🔹 সার্চ ইনপুট */}
       <div className="relative w-full md:w-96 md:mx-auto">
         <input
           type="text"
@@ -131,7 +156,6 @@ export default function AuthorBookSearchGrid({
         )}
       </div>
 
-      {/* 🔹 আদ্যক্ষর ফিল্টার বার */}
       {dynamicLetters.length > 1 && (
         <div className="w-full bg-white/70 backdrop-blur-xs p-2.5 rounded border border-teal-100/80 shadow-xs">
           <div className="flex flex-wrap items-center justify-center gap-1.5">
@@ -155,7 +179,6 @@ export default function AuthorBookSearchGrid({
         </div>
       )}
 
-      {/* 🔹 বইয়ের গ্রিড বা নো-ডাটা বার্তা */}
       {filteredBooks.length === 0 ? (
         <div className="text-center py-12 bg-white/50 rounded border border-dashed border-gray-300">
           <p className="text-gray-500 text-sm">

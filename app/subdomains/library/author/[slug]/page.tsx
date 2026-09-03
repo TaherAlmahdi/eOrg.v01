@@ -12,59 +12,122 @@ interface PageProps {
   }>;
 }
 
-// 🔹 হেলপার ফাংশন: যেকোনো নামের (লেখক/অনুবাদক/সম্পাদক) স্ল্যাগ বের করার নিয়ম
-function resolveRoleSlug(nameVal: unknown, slugVal: unknown): { name: string; slug: string } {
-  const name = String(nameVal || '').trim();
-  let slug = '';
-
-  if (name) {
-    slug = getAuthorSlugFromTitle(name) || getSlug('authors', name) || '';
-  }
-
-  if (!slug && slugVal) {
-    slug = String(slugVal).trim();
-  }
-
-  if (!slug && name) {
-    slug = name.toLowerCase().replace(/\s+/g, '-');
-  }
-
-  return { name, slug };
+// 🔹 ইউনিকোড ও বানানগত ভিন্নতা (ই/ঈ, উ/ঊ, য়/য়, ড়/ড়) দূর করার নরমালাইজেশন ফাংশন
+function normalizeBengaliSlug(text: string): string {
+  if (!text) return '';
+  return text
+    .normalize('NFC') // ইউনিকোড প্রি-কম্পোজড ফর্ম নিশ্চিত করা
+    .toLowerCase()
+    // ই/ঈ, উ/ঊ এবং বর্ণগুলোর ভিন্ন রূপগুলো একীভূত করা যাতে বানান ভুল বা ভিন্নতা থাকলেও ম্যাচ করে
+    .replace(/[ঈই]/g, 'ই')
+    .replace(/[ঊউ]/g, 'উ')
+    .replace(/য়/g, 'য়')
+    .replace(/ড়/g, 'ড়')
+    .replace(/ঢ়/g, 'ঢ়')
+    .replace(/\s+/g, '-')
+    .replace(/[^\w\u0980-\u09FF-]+/g, '') // ইংরেজি, বাংলা ইউনিকোড এবং হাইফেন রাখা
+    .replace(/--+/g, '-');
 }
 
-// 🔹 হেলপার ফাংশন: লেখক, অনুবাদক ও সম্পাদক সংক্রান্ত ডাটা এবং সংশ্লিষ্ট বই ফিল্টার করা
+// 🔹 হেলপার ফাংশন: একক বা একাধিক নাম/অ্যারে থেকে নিখুঁতভাবে নাম ও স্লাগ রিট্রিভ করা
+function resolveContributorRoles(fieldVal: unknown, slugVal: unknown): Array<{ name: string; slug: string; normalizedSlug: string }> {
+  if (!fieldVal) return [];
+
+  const rawNames: string[] = [];
+  if (Array.isArray(fieldVal)) {
+    fieldVal.forEach((v) => {
+      if (typeof v === 'string') rawNames.push(v.trim());
+      else if (v && typeof v === 'object') {
+        const n = (v as any).name || (v as any).title || (v as any).label;
+        if (n) rawNames.push(String(n).trim());
+      }
+    });
+  } else if (typeof fieldVal === 'string' || typeof fieldVal === 'number') {
+    const splitNames = String(fieldVal).split(/,|\s+এবং\s+/).map((s) => s.trim()).filter(Boolean);
+    rawNames.push(...splitNames);
+  }
+
+  return rawNames.map((name, idx) => {
+    let slug = '';
+    if (name) {
+      slug = getAuthorSlugFromTitle(name) || getSlug('authors', name) || '';
+    }
+    if (!slug && slugVal) {
+      if (Array.isArray(slugVal)) {
+        slug = String(slugVal[idx] || slugVal[0] || '').trim();
+      } else {
+        slug = String(slugVal).trim();
+      }
+    }
+    if (!slug && name) {
+      slug = normalizeBengaliSlug(name);
+    }
+    return { 
+      name, 
+      slug: slug.toLowerCase(), 
+      normalizedSlug: normalizeBengaliSlug(name) 
+    };
+  });
+}
+
+// 🔹 হেলপার ফাংশন: বাংলা/ইংরেজি উভয় স্লাগ, বানান ভুল বা ভিন্ন রূপ মিলিয়ে বই ফিল্টার করা
 async function getAuthorDataAndBooks(rawSlug: string) {
   const libraryData = await getLibraryBooks();
   const booksToFilter = (libraryData as any)?.allBooks || (libraryData as any)?.latestBooks || [];
 
   let matchedPersonName: string | null = null;
+  const decodedRawSlug = decodeURIComponent(rawSlug).trim();
+  const normalizedRawSlug = normalizeBengaliSlug(decodedRawSlug);
 
   const authorBooks = booksToFilter.filter((book: any) => {
     const item = book as Record<string, unknown>;
 
-    // ১. লেখক (Author) ডাটা চেক
-    const authorData = resolveRoleSlug(item.author, item.authorSlug);
-    // ২. অনুবাদক (Translator) ডাটা চেক
-    const translatorData = resolveRoleSlug(item.translator, item.translatorSlug);
-    // ৩. সম্পাদক (Editor) ডাটা চেক
-    const editorData = resolveRoleSlug(item.editor, item.editorSlug);
+    const authors = resolveContributorRoles(item.author || item.authors || item.writer, item.authorSlug || item.authorsSlug);
+    const translators = resolveContributorRoles(item.translator || item.translators, item.translatorSlug || item.translatorsSlug);
+    const editors = resolveContributorRoles(item.editor || item.editors, item.editorSlug || item.editorsSlug);
 
-    // স্ল্যাগ বা নামের সাথে ম্যাচ করছে কিনা তা যাচাই
-    const isAuthorMatch = authorData.slug === rawSlug || authorData.name === rawSlug;
-    const isTranslatorMatch = translatorData.slug === rawSlug || translatorData.name === rawSlug;
-    const isEditorMatch = editorData.slug === rawSlug || editorData.name === rawSlug;
+    let isMatchFound = false;
 
-    // যদি যেকোনো একটি ভূমিকায় ম্যাচ করে
-    if (isAuthorMatch || isTranslatorMatch || isEditorMatch) {
-      if (!matchedPersonName) {
-        if (isAuthorMatch && authorData.name) matchedPersonName = authorData.name;
-        else if (isTranslatorMatch && translatorData.name) matchedPersonName = translatorData.name;
-        else if (isEditorMatch && editorData.name) matchedPersonName = editorData.name;
+    const checkMatch = (person: { name: string; slug: string; normalizedSlug: string }) => {
+      const personNormName = normalizeBengaliSlug(person.name);
+      return (
+        normalizedRawSlug === person.normalizedSlug ||
+        normalizedRawSlug === normalizeBengaliSlug(person.slug) ||
+        normalizeBengaliSlug(decodedRawSlug.toLowerCase()) === person.normalizedSlug ||
+        person.normalizedSlug.includes(normalizedRawSlug) ||
+        normalizedRawSlug.includes(person.normalizedSlug)
+      );
+    };
+
+    for (const author of authors) {
+      if (checkMatch(author)) {
+        isMatchFound = true;
+        if (!matchedPersonName) matchedPersonName = author.name;
+        break;
       }
-      return true;
     }
 
-    return false;
+    if (!isMatchFound) {
+      for (const translator of translators) {
+        if (checkMatch(translator)) {
+          isMatchFound = true;
+          if (!matchedPersonName) matchedPersonName = translator.name;
+          break;
+        }
+      }
+    }
+
+    if (!isMatchFound) {
+      for (const editor of editors) {
+        if (checkMatch(editor)) {
+          isMatchFound = true;
+          if (!matchedPersonName) matchedPersonName = editor.name;
+          break;
+        }
+      }
+    }
+
+    return isMatchFound;
   });
 
   return {
@@ -78,12 +141,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const resolvedParams = await params;
   const rawSlug = decodeURIComponent(resolvedParams.slug);
 
-  // ১.১ হোস্টনেম থেকে সাবডোমেন/ডোমেনের সাইট ডাটা রিট্রিভ করা
   const headersList = await headers();
   const host = headersList.get('host') || '';
   const siteData = getSubdomainData(host);
 
-  // ১.২ ব্যক্তির নাম বের করা
   const { authorName } = await getAuthorDataAndBooks(rawSlug);
 
   const fallbackName = rawSlug
@@ -92,7 +153,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const displayAuthorName = authorName || fallbackName;
 
-  // ১.৩ ডাইনামিক ট্যাব টাইটেল বিল্ড করা
   const dynamicMetaTitle = buildTabTitle({
     currentPageTitle: displayAuthorName,
     siteName: siteData?.title || 'এডুলিচার',
@@ -121,7 +181,6 @@ export default async function SingleAuthorPage({ params }: PageProps) {
   const displayAuthorName = authorName || fallbackName;
   const currentFullUrl = `https://${siteData.subdomain ? `${siteData.subdomain}.` : ''}eduliture.org/author/${encodeURIComponent(rawSlug)}`;
 
-  // 🌐 JSON-LD (Structured Data) তৈরি
   const jsonLdData = {
     '@context': 'https://schema.org',
     '@type': 'ProfilePage',
@@ -141,12 +200,10 @@ export default async function SingleAuthorPage({ params }: PageProps) {
 
   return (
     <div className="w-full min-h-screen py-3 px-2 mx-auto font-tarunima">
-      {/* 🚀 JSON-LD Structured Data Schema */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }}
       />
-      {/* 🔹 প্রপস হিসেবে সঠিক ব্যক্তির নাম এবং সাইট নেম পাস করা হলো */}
       <AuthorBookSearchGrid 
         books={authorBooks as any} 
         personName={displayAuthorName}

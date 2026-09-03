@@ -33,7 +33,7 @@ export default async function AuthorsPage() {
           </Link>
           <span className="mx-2 text-white/50 shrink-0">/</span>
           <Link href="/authors" className="hover:text-red-100 shrink-0">
-            লেখক
+            লেখক নির্ঘণ্ট
           </Link>
         </div>
       </nav>
@@ -41,7 +41,7 @@ export default async function AuthorsPage() {
 
 
       {/* লেখক সেকশন */}
-      <div className="max-w-8xl mx-auto py-4 px-4">
+      <div className="max-w-full mx-auto py-4 px-4">
         <AuthorList sortBy="alphabetical" />
       </div>
     </main>

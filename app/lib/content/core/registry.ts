@@ -17,6 +17,10 @@ export const CONTENT_REGISTRY = {
   // English Slug -> Bengali Value
   authors: {
     "abu-ishaque": "আবু ইসহাক",
+    "achintyarup-roy": "অচিন্ত্যরূপ রায়",
+    "adwaita-mallabarman": "অদ্বৈত মল্লবর্মণ",
+    "jasim-uddin": "জসীম উদ্‌দীন",
+    "ajit-gangopadhyay": "অজিত গঙ্গোপাধ্যায়",
     "bankim-chandra-chatterjee": "বঙ্কিমচন্দ্র চট্টোপাধ্যায়",
     "bibhutibhushan-bandyopadhyay": "বিভূতিভূষণ বন্দ্যোপাধ্যায়",
     "bibhutibhushan-mukhopadhyay": "বিভূতিভূষণ মুখোপাধ্যায়",
@@ -48,7 +52,7 @@ export const CONTENT_REGISTRY = {
     "neelima-ibrahim": "নীলিমা ইব্রাহীম",
     "bhuban-chandra-mukhopadhyay": "ভুবনচন্দ্র মুখোপাধ্যায়",
     "mahbub-siddiki": "মাহবুব সিদ্দিকী",
-    "johan-august-strindberg": "অগুস্ত স্ত্রিন্দবারি",
+    "johan-august-strindberg": "অগাস্ট স্ট্রিন্ডবার্গ",
     "mohammad-najibar-rahman": "মোহাম্মদ নজিবর রহমান",
     "samaresh-majumdar": "সমরেশ মজুমদার",
     "subodh-kumar-mukhopadhyay": "সুবোধকুমার মুখোপাধ্যায়",
@@ -57,6 +61,8 @@ export const CONTENT_REGISTRY = {
     "satyen-chakraborty": "সত্যেন চক্রবর্তী",
     "akshay-kumar-maitreya": "অক্ষয়কুমার মৈত্রেয়",
     "henrik-ibsen": "হেনরিক ইবসেন",
+    "amitav-ghosh": "অমিতাভ ঘোষ",
+    "sukanta-bhattacharya": "সুকান্ত ভট্টাচার্য",
     
   } as Record<string, string>,
 

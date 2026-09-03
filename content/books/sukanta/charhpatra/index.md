@@ -1,6 +1,6 @@
 ---
 title: "ছাড়পত্র"
-author: "সুকান্ত ভট্টাচার্য্য"
+author: "সুকান্ত ভট্টাচার্য"
 type: "book_index"
 slug: "charhpatra"
 subdomain: "library"

@@ -1,6 +1,6 @@
 ---
 title: "মিঠেকড়া"
-author: "সুকান্ত ভট্টাচার্য্য"
+author: "সুকান্ত ভট্টাচার্য"
 type: "book_index"
 slug: "mithekorha"
 subdomain: "library"

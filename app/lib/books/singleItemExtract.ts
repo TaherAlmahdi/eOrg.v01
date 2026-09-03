@@ -13,15 +13,15 @@ export interface SingleBookItem {
   slug: string;
   title: string;
   subtitle?: string;
-  author?: string;
+  author?: string | string[];
   authorSlug?: string;
   bookTitle?: string;
   bookSlug?: string;
   itemType?: string;
   itemTypeSlug?: string;
   href?: string;
-  translator?: string;
-  editor?: string;
+  translator?: string | string[];
+  editor?: string | string[];
   meta_title?: string;
   meta_description?: string;
   og_image?: string;
@@ -122,7 +122,7 @@ export async function getBookBySlug(slug: string | string[]): Promise<SingleBook
       slug: matchedItem.titleSlug,
       title: matchedItem.title,
       subtitle: matchedItem.frontmatter.subtitle || '',
-      author: matchedItem.author,
+      author: matchedItem.author || matchedItem.frontmatter.author || '',
       authorSlug: matchedItem.authorSlug,
       bookTitle: matchedItem.bookTitle,
       bookSlug: matchedItem.bookSlug,

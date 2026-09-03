@@ -6,21 +6,22 @@ import matter from 'gray-matter';
 const booksDirectory = path.join(process.cwd(), 'content/books');
 
 export interface LibraryItemEntry {
-  itemType: string;       // যেমন: 'story', 'poem', 'essay'
-  itemTypeSlug: string;   // ইউআরএল ফ্রেন্ডলি আইটেম টাইপ স্লাগ (যেমন: 'story', 'poem')
-  title: string;          // আইটেমের নিজস্ব শিরোনাম (যেমন: 'চোখ', 'বিদ্রোহী')
-  slug?: string;          // ফ্রন্টম্যাটারের নিজস্ব স্লাগ (যদি থাকে)
-  titleSlug: string;      // আইটেমের চূড়ান্ত স্লাগ (Slug অথবা ফলব্যাক Title থেকে তৈরি)
-  bookTitle: string;      // মূল বইয়ের নাম
-  bookSlug: string;       // মূল বইয়ের স্লাগ
-  author: string;         // লেখকের নাম
-  authorSlug: string;     // লেখকের স্লাগ
-  href: string;           // সিঙ্গেল আইটেম পড়ার ইউআরএল
-  content: string;        // আইটেমের বিষয়বস্তু
+  itemType: string;        
+  itemTypeSlug: string;    
+  title: string;           
+  slug?: string;           
+  titleSlug: string;       
+  bookTitle: string;       
+  bookSlug: string;        
+  author: string | string[];       
+  authorSlug: string;      
+  translator?: string | string[];  
+  editor?: string | string[];      
+  href: string;            
+  content: string;         
   frontmatter: Record<string, any>;
 }
 
-// বাংলা ও ইংরেজি উভয় টেক্সট থেকে সঠিক স্লাগ তৈরির হেল্পার
 function slugify(text: string): string {
   if (!text) return '';
   return text
@@ -32,7 +33,6 @@ function slugify(text: string): string {
     .replace(/--+/g, '-');
 }
 
-// ইংরেজি ম্যাপিং ফলব্যাক
 const ITEM_SLUG_MAP: Record<string, string> = {
   'গল্প': 'story',
   'ছোটগল্প': 'story',
@@ -58,6 +58,21 @@ function parseItemName(itemVal: any): string {
   return String(itemVal).trim();
 }
 
+// 🔹 একাধিক অনুবাদক, লেখক বা সম্পাদককে স্ট্রিং বা অ্যারে আকারে নিরাপদে পার্স করার ফাংশন
+function parseContributorField(val: any, fallback?: string): string | string[] | undefined {
+  if (!val) return fallback;
+  if (Array.isArray(val)) {
+    const cleaned = val.map((v) => parseItemName(v)).filter(Boolean);
+    if (cleaned.length === 0) return fallback;
+    return cleaned.length === 1 ? cleaned[0] : cleaned; // একটি উপাদান থাকলে সরাসরি স্ট্রিং, একাধিক থাকলে অ্যারে রিটার্ন করবে
+  }
+  if (typeof val === 'string' || typeof val === 'number') {
+    const str = String(val).trim();
+    return str || fallback;
+  }
+  return fallback;
+}
+
 function extractItemsFromData(data: Record<string, any>): string[] {
   const rawItem = data.item || data.items;
   if (!rawItem) return [];
@@ -70,9 +85,6 @@ function extractItemsFromData(data: Record<string, any>): string[] {
   return parsed ? [parsed] : [];
 }
 
-/**
- * সকল বই ও তার সাব-ফোল্ডার স্ক্যান করে 'item' যুক্ত সমস্ত ফাইল রিটার্ন করবে
- */
 export async function getAllLibraryItems(): Promise<LibraryItemEntry[]> {
   const allItems: LibraryItemEntry[] = [];
 
@@ -99,10 +111,17 @@ export async function getAllLibraryItems(): Promise<LibraryItemEntry[]> {
 
         const bookTitle = bookData.title || bookDir.name;
         const bookSlug = bookData.slug ? String(bookData.slug).trim() : bookDir.name;
-        const authorName = bookData.author || 'অজ্ঞাত লেখক';
+        
+        const rawAuthor = bookData.author || bookData.author_name || bookData.writer || bookData.authors;
+        const rawTranslator = bookData.translator || bookData.translator_name || bookData.translators;
+        const rawEditor = bookData.editor || bookData.editor_name || bookData.editors;
+
+        const authorName = parseContributorField(rawAuthor, 'অজ্ঞাত লেখক')!;
+        const translatorName = parseContributorField(rawTranslator);
+        const editorName = parseContributorField(rawEditor);
+
         const authorSlug = bookData.authorSlug ? String(bookData.authorSlug).trim() : authorDir.name;
 
-        // সাব-ফোল্ডারসহ সকল MD ফাইল রিকার্সিভলি স্ক্যান
         const scanRecursively = async (currentDir: string) => {
           const entries = await fs.readdir(currentDir, { withFileTypes: true });
 
@@ -122,13 +141,8 @@ export async function getAllLibraryItems(): Promise<LibraryItemEntry[]> {
               const itemTypes = extractItemsFromData(fileData);
 
               if (itemTypes.length > 0) {
-                // আইটেমের টাইটেল নির্ধারণ
                 const itemTitle = fileData.item_title || fileData.title || entry.name.replace(/\.md$/, '');
-                
-                // ✅ ফ্রন্টম্যাটারের slug সংগ্রহ
                 const rawFrontmatterSlug = fileData.slug ? String(fileData.slug).trim() : undefined;
-
-                // ✅ ১ম প্রায়োরিটি: ফ্রন্টম্যাটারের slug, না থাকলে ফলব্যাক হিসেবে টাইটেল বা ফাইলের নাম
                 let titleSlug = rawFrontmatterSlug || slugify(itemTitle) || entry.name.replace(/\.md$/, '');
 
                 itemTypes.forEach((type) => {
@@ -145,6 +159,8 @@ export async function getAllLibraryItems(): Promise<LibraryItemEntry[]> {
                     bookSlug,
                     author: authorName,
                     authorSlug,
+                    translator: translatorName,
+                    editor: editorName,
                     href,
                     content,
                     frontmatter: fileData,
@@ -165,9 +181,6 @@ export async function getAllLibraryItems(): Promise<LibraryItemEntry[]> {
   return allItems.sort((a, b) => a.title.localeCompare(b.title, 'bn'));
 }
 
-/**
- * নির্দিষ্ট Item Type এবং Title Slug দিয়ে সিঙ্গেল আইটেম ডাটা রিড করা (কেস ও ডিকোডিং সুরক্ষিত)
- */
 export async function getItemByParams(itemSlug: string, titleSlug: string) {
   const allItems = await getAllLibraryItems();
 
@@ -193,7 +206,6 @@ export async function getItemByParams(itemSlug: string, titleSlug: string) {
   if (currentIndex === -1) return null;
 
   const currentItem = allItems[currentIndex];
-  
   const prevItem = currentIndex > 0 ? allItems[currentIndex - 1] : null;
   const nextItem = currentIndex < allItems.length - 1 ? allItems[currentIndex + 1] : null;
 
