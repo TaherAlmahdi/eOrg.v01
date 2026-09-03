@@ -48,9 +48,9 @@ export interface ItemDetail {
   slug?: string;
   title: string;
   subtitle?: string;
-  author?: string;
-  translator?: string;
-  editor?: string;
+  author?: string | string[];
+  translator?: string | string[];
+  editor?: string | string[];
   content?: string;
   meta_title?: string;
   meta_description?: string;
@@ -240,9 +240,10 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
     siteName: siteName,
   });
 
+  const authorStr = Array.isArray(item.author) ? item.author.join(', ') : item.author;
   const description =
     item.meta_description ||
-    `${pageTitle}${subPageSubtitle ? ` - ${subPageSubtitle}` : ''}${item.author ? ` | ${item.author}` : ''} | এডুলিচার পাঠশালা।`;
+    `${pageTitle}${subPageSubtitle ? ` - ${subPageSubtitle}` : ''}${authorStr ? ` | ${authorStr}` : ''} | এডুলিচার পাঠশালা।`;
 
   const domainUrl = siteData?.subdomain
     ? `https://${siteData.subdomain}.eduliture.org`
@@ -371,13 +372,17 @@ export default async function SingleItemPage({ params, searchParams }: PageProps
     activeSubtitle || siteTitle
   )}&tagline=${encodeURIComponent('এডুলিচার অনলাইন সাহিত্য সংকলন')}`;
 
+  const authorName = Array.isArray(item.author) ? item.author.join(', ') : item.author || 'অজানা লেখক';
+  const translatorName = Array.isArray(item.translator) ? item.translator.join(', ') : item.translator;
+  const editorName = Array.isArray(item.editor) ? item.editor.join(', ') : item.editor;
+
   const jsonLdData = {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: pageTitle,
-    author: { '@type': 'Person', name: item.author || 'অজানা লেখক' },
-    ...(item.translator && { translator: { '@type': 'Person', name: item.translator } }),
-    ...(item.editor && { editor: { '@type': 'Person', name: item.editor } }),
+    author: { '@type': 'Person', name: authorName },
+    ...(translatorName && { translator: { '@type': 'Person', name: translatorName } }),
+    ...(editorName && { editor: { '@type': 'Person', name: editorName } }),
     url: currentFullUrl,
     image: item.og_image || item.cover_image || siteData?.ogImage || fallbackOgUrl,
     description: item.meta_description || `${pageTitle}${activeSubtitle ? ` - ${activeSubtitle}` : ''} | এডুলিচার সাহিত্য সংকলন।`,
@@ -447,15 +452,15 @@ export default async function SingleItemPage({ params, searchParams }: PageProps
               )}
 
               <div className="space-y-0.5 text-red-900 font-tarunima">
-                {item.author && <p className="text-lg font-medium">{item.author}</p>}
-                {item.translator && (
+                {item.author && <p className="text-lg font-medium">{authorName}</p>}
+                {translatorName && (
                   <p className="text-base opacity-90">
-                    অনুবাদ: <span className="font-medium">{item.translator}</span>
+                    অনুবাদ: <span className="font-medium">{translatorName}</span>
                   </p>
                 )}
-                {item.editor && (
+                {editorName && (
                   <p className="text-base opacity-90">
-                    সম্পাদনা: <span className="font-medium">{item.editor}</span>
+                    সম্পাদনা: <span className="font-medium">{editorName}</span>
                   </p>
                 )}
               </div>

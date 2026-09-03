@@ -9,10 +9,16 @@ const toBengaliNumber = (num?: number | string): string =>
     ? num.toString().replace(/\d/g, (d) => '০১২৩৪৫৬৭৮৯'[parseInt(d, 10)])
     : '';
 
-// যেকোনো ভ্যালুকে নিরাপদভাবে স্ট্রিংয়ে রূপান্তর করার হেল্পার
+// যেকোনো ভ্যালুকে (স্ট্রিং, নম্বর, অ্যারে বা অবজেক্ট) নিরাপদভাবে রেন্ডার করার হেল্পার
 const renderValue = (val: unknown): string => {
   if (val === null || val === undefined) return '';
   if (typeof val === 'string' || typeof val === 'number') return String(val);
+  
+  // যদি একাধিক মান (যেমন একাধিক লেখক বা অনুবাদক) অ্যারে হিসেবে আসে
+  if (Array.isArray(val)) {
+    return val.map((v) => renderValue(v)).filter(Boolean).join(', ');
+  }
+
   if (typeof val === 'object' && val !== null) {
     if ('name' in val && typeof (val as any).name === 'string') {
       return String((val as any).name);
@@ -29,18 +35,42 @@ interface CustomLink {
   link: string;
 }
 
+// ItemDetail ইন্টারফেসের সাথে সামঞ্জস্যপূর্ণ প্রপস টাইপ
 export interface ItemDetailsProps {
-  book: any;      // মূল ডেটা অবজেক্ট
+  book: {
+    title?: string;
+    book?: string;
+    item?: string;
+    current_title?: string;
+    page_title?: string;
+    cover_image?: string;
+    author?: string | string[];
+    translator?: string | string[];
+    editor?: string | string[];
+    pub_medium?: string;
+    first_published?: string | number;
+    publisher?: string;
+    source_book?: string | number;
+    items?: any;
+    items_name?: string | string[];
+    items_link?: string;
+    items_links?: CustomLink[];
+    itemsOrder?: string | number;
+    part?: string | number;
+    volume?: string | number;
+    genre?: string | string[] | any;
+    genre_links?: CustomLink[];
+    [key: string]: unknown;
+  }; 
   items?: any; 
 }
 
 export default function BookDetails({ book, items: explicititems }: ItemDetailsProps) {
   if (!book) return null;
 
-  // আপনার সংজ্ঞায়ন অনুযায়ী নামগুলো আলাদা করা হলো:
-  const bookName = renderValue(book.book || book.title); // মূল বইয়ের নাম
-  const itemName = renderValue(book.item);                // প্রকরণের নাম (যেমন: প্রবন্ধ/গল্প)
-  const currentTitle = renderValue(book.current_title || book.page_title || book.title); // বর্তমান পাতার নাম
+  const bookName = renderValue(book.book || book.title); 
+  const itemName = renderValue(book.item);               
+  const currentTitle = renderValue(book.current_title || book.page_title || book.title); 
 
   const itemsData = book.items || book.items_name || explicititems;
 
@@ -49,7 +79,7 @@ export default function BookDetails({ book, items: explicititems }: ItemDetailsP
       (l: CustomLink) => l.name === itemsName
     )?.link;
     if (matchedLink) return matchedLink;
-    if (book.items_link) return book.items_link;
+    if (typeof book.items_link === 'string') return book.items_link;
     return `/items/${encodeURIComponent(itemsName)}`;
   };
 
@@ -62,7 +92,6 @@ export default function BookDetails({ book, items: explicititems }: ItemDetailsP
       <div className="p-2 bg-white border border-gray-100 rounded shadow-sm">
         <div className="space-y-2 text-sm text-gray-800">
           
-          {/* প্রকরণ (Item) এবং বর্তমান পাতার নাম (Title) */}
           {itemName && currentTitle && (
             <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
               <span className="font-bold">{itemName}</span>
@@ -71,7 +100,6 @@ export default function BookDetails({ book, items: explicititems }: ItemDetailsP
             </div>
           )}
 
-          {/* মূল বইয়ের নাম (Book) */}
           {bookName && (
             <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
               <span className="font-bold">বই</span>
