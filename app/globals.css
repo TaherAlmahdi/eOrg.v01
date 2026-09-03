@@ -1511,3 +1511,65 @@ table.saroni td:nth-child(2) {
             font-size: 14px;
             text-align: left;
         }
+
+
+
+/* সুখ ও সামাজিক চাহিদার সম্পর্ক চিত্র */
+
+.relationship-chart {
+    width: 100%;
+    max-width: 700px;
+    margin: 30px auto;
+}
+
+.relationship-chart svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.relationship-chart .chart-title {
+    font-size: 20px;
+    font-weight: 700;
+    text-anchor: middle;
+}
+
+.relationship-chart .chart-subtitle {
+    font-size: 16px;
+    text-anchor: middle;
+}
+
+.relationship-chart .chart-axis {
+    stroke: #111;
+    stroke-width: 2;
+}
+
+.relationship-chart .chart-graph {
+    stroke: #111;
+    stroke-width: 2.5;
+    fill: none;
+}
+
+.relationship-chart .chart-label-box {
+    fill: #fff;
+    stroke: #111;
+    stroke-width: 1.5;
+}
+
+.relationship-chart .chart-label-text {
+    font-size: 15px;
+    text-anchor: middle;
+}
+
+.relationship-chart .chart-axis-text {
+    font-size: 15px;
+}
+
+.relationship-chart .chart-small-text {
+    font-size: 14px;
+}
+
+.relationship-chart .chart-arrow-line {
+    stroke: #111;
+    stroke-width: 1.5;
+}        
