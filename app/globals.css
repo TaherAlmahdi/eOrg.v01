@@ -303,6 +303,7 @@
     margin-top: 15px !important;
     margin-bottom: 0px !important;
     padding: 0px !important;
+    text-align: justify;
   }
 
   /* ----------------------------------
@@ -1161,14 +1162,22 @@ span.forty {
 
 table {
   width: fit-content !important;
-  max-width: 95% !important;
-  /* স্ক্রিনের বাইরে চলে যাওয়া রোধ করতে */
+  max-width: 100% !important;
   margin-left: auto !important;
-  /* ডানে ও বামে সমান মার্জিন */
   margin-right: auto !important;
   font-size: inherit;
-  /* প্যারেন্ট এলিমেন্টের ফন্ট সাইজ পাবে */
 }
+
+/* ডেস্কটপ বা বড় স্ক্রিনের জন্য (যেমন: ৭৬৮ পিক্সেল বা তার বেশি চওড়া স্ক্রিন) */
+@media screen and (max-width: 768px) {
+  table, table.saroni {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
 
 table td:nth-child(1) {
             text-align: left; /* দেশের নাম বাঁয়ে সারিবদ্ধ করার জন্য */
@@ -1494,23 +1503,24 @@ span.right {
 
 
 table.saroni {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: center;
-            margin-top: 20px;
-            font-size: clamp(1rem, 1.2vw + 0.2rem, 1.3rem) !important;
-            line-height: 1.55;
-            color: var(--text-main);
-        }
+    width: fit-content !important;
+    max-width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    margin-top: 20px;
+    font-size: clamp(1rem, 1.2vw + 0.2rem, 1.3rem) !important;
+    line-height: 1.55;
+    color: var(--text-main);
+}
 table.saroni td:nth-child(2) {
-            text-align: left; /* দেশের নাম বাঁয়ে সারিবদ্ধ করার জন্য */
-        }
+    text-align: left; /* দেশের নাম বাঁয়ে সারিবদ্ধ করার জন্য */
+}
 
-        .source {
-            margin-top: 15px;
-            font-size: 14px;
-            text-align: left;
-        }
+.source {
+    margin-top: 15px;
+    font-size: 14px;
+    text-align: left;
+}
 
 
 
