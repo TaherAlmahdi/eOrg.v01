@@ -1170,6 +1170,10 @@ table {
   /* প্যারেন্ট এলিমেন্টের ফন্ট সাইজ পাবে */
 }
 
+table td:nth-child(1) {
+            text-align: left; /* দেশের নাম বাঁয়ে সারিবদ্ধ করার জন্য */
+        }
+
 /* অন্যান্য নির্দেশ বা নির্দিষ্ট টেক্সট অ্যালাইন না থাকলে ডিফল্ট সেন্টার হবে */
 table th,
 table td {
@@ -1178,6 +1182,7 @@ table td {
   color: inherit;
   border: 1px solid ivory;
   padding: 0.5rem 1rem;
+  text-align: center;
 }
 
 table th {
@@ -1486,3 +1491,23 @@ span.right {
   /* ডান পাশের লেখা সেন্টার এলাইন */
   font-size: inherit !important;
 }
+
+
+table.saroni {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+            margin-top: 20px;
+            font-size: clamp(1rem, 1.2vw + 0.2rem, 1.3rem) !important;
+            line-height: 1.55;
+            color: var(--text-main);
+        }
+table.saroni td:nth-child(2) {
+            text-align: left; /* দেশের নাম বাঁয়ে সারিবদ্ধ করার জন্য */
+        }
+
+        .source {
+            margin-top: 15px;
+            font-size: 14px;
+            text-align: left;
+        }
