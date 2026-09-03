@@ -14,7 +14,7 @@ genre:
   - "ধর্মতত্ত্ব"
 
 genre_links:
-  - name: "ধর্মীয় সাহিত্য"
+  - name: "ধর্মীয় সাহিত্য"
     link: "/genre/religious"
   - name: "হিন্দুধর্ম"
     link: "/genre/hinduism"

@@ -105,8 +105,7 @@
   .col_2_0,
   .intro,
   .intro_right,
-  .intro_left
-  ul,
+  .intro_left ul,
   ul.none,
   .pc,
   .pcb,
@@ -510,13 +509,13 @@
     list-style-type: circle;
     text-align: justify;
   }
-  
+
   ul.square {
     margin-left: 45px;
     list-style-type: square;
     text-align: justify;
   }
-  
+
 
 
   ul,
@@ -1170,7 +1169,9 @@ table {
 
 /* ডেস্কটপ বা বড় স্ক্রিনের জন্য (যেমন: ৭৬৮ পিক্সেল বা তার বেশি চওড়া স্ক্রিন) */
 @media screen and (max-width: 768px) {
-  table, table.saroni {
+
+  table,
+  table.saroni {
     width: fit-content !important;
     display: block;
     overflow-x: auto;
@@ -1181,8 +1182,9 @@ table {
 
 
 table td:nth-child(1) {
-            text-align: left; /* দেশের নাম বাঁয়ে সারিবদ্ধ করার জন্য */
-        }
+  text-align: left;
+  /* দেশের নাম বাঁয়ে সারিবদ্ধ করার জন্য */
+}
 
 /* অন্যান্য নির্দেশ বা নির্দিষ্ট টেক্সট অ্যালাইন না থাকলে ডিফল্ট সেন্টার হবে */
 table th,
@@ -1504,23 +1506,25 @@ span.right {
 
 
 table.saroni {
-    width: fit-content !important;
-    max-width: 100%;
-    border-collapse: collapse;
-    text-align: center;
-    margin-top: 20px;
-    font-size: clamp(1rem, 1.2vw + 0.2rem, 1.3rem) !important;
-    line-height: 1.55;
-    color: var(--text-main);
+  width: fit-content !important;
+  max-width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+  margin-top: 20px;
+  font-size: clamp(1rem, 1.2vw + 0.2rem, 1.3rem) !important;
+  line-height: 1.55;
+  color: var(--text-main);
 }
+
 table.saroni td:nth-child(2) {
-    text-align: left; /* দেশের নাম বাঁয়ে সারিবদ্ধ করার জন্য */
+  text-align: left;
+  /* দেশের নাম বাঁয়ে সারিবদ্ধ করার জন্য */
 }
 
 .source {
-    margin-top: 15px;
-    font-size: 14px;
-    text-align: left;
+  margin-top: 15px;
+  font-size: 14px;
+  text-align: left;
 }
 
 
@@ -1528,59 +1532,106 @@ table.saroni td:nth-child(2) {
 /* সুখ ও সামাজিক চাহিদার সম্পর্ক চিত্র */
 
 .relationship-chart {
-    width: 100%;
-    max-width: 700px;
-    margin: 30px auto;
+  width: 100%;
+  max-width: 700px;
+  margin: 30px auto;
 }
 
 .relationship-chart svg {
-    display: block;
-    width: 100%;
-    height: auto;
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 .relationship-chart .chart-title {
-    font-size: 20px;
-    font-weight: 700;
-    text-anchor: middle;
+  font-size: 20px;
+  font-weight: 700;
+  text-anchor: middle;
 }
 
 .relationship-chart .chart-subtitle {
-    font-size: 16px;
-    text-anchor: middle;
+  font-size: 16px;
+  text-anchor: middle;
 }
 
 .relationship-chart .chart-axis {
-    stroke: #111;
-    stroke-width: 2;
+  stroke: #111;
+  stroke-width: 2;
 }
 
 .relationship-chart .chart-graph {
-    stroke: #111;
-    stroke-width: 2.5;
-    fill: none;
+  stroke: #111;
+  stroke-width: 2.5;
+  fill: none;
 }
 
 .relationship-chart .chart-label-box {
-    fill: #fff;
-    stroke: #111;
-    stroke-width: 1.5;
+  fill: #fff;
+  stroke: #111;
+  stroke-width: 1.5;
 }
 
 .relationship-chart .chart-label-text {
-    font-size: 15px;
-    text-anchor: middle;
+  font-size: 15px;
+  text-anchor: middle;
 }
 
 .relationship-chart .chart-axis-text {
-    font-size: 15px;
+  font-size: 15px;
 }
 
 .relationship-chart .chart-small-text {
-    font-size: 14px;
+  font-size: 14px;
 }
 
 .relationship-chart .chart-arrow-line {
-    stroke: #111;
-    stroke-width: 1.5;
-}        
+  stroke: #111;
+  stroke-width: 1.5;
+}
+
+blockquote {
+  position: relative;
+  margin: .5em 0;
+  padding: .5em 1.5em .5em 3.5em;
+  background: #fff8f0;
+  border-left: 4px solid #d97706;
+  color: #451a03;
+  font-family: var(--font-tarunima), serif;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  border-radius: 0px;
+  text-align: justify;
+  font-style: oblique 10deg !important;
+  font-synthesis: style;
+}
+
+/* বাঁ পাশে বড় কোটেশন মার্ক */
+blockquote::before {
+  content: "\201C";
+  position: absolute;
+  top: -10px;
+  left: 10px;
+  font-size: 4rem;
+  color: #f59e0b;
+  opacity: 0.3;
+  font-family: var(--font-tarunima), serif;
+}
+
+/* ডান পাশে বড় কোটেশন মার্ক */
+blockquote::after {
+  content: "\201D";
+  position: absolute;
+  bottom: -20px;
+  right: 15px;
+  font-size: 4rem;
+  color: #f59e0b;
+  opacity: 0.3;
+  font-family: var(--font-tarunima), serif;
+  line-height: 1;
+}
+
+blockquote p {
+  margin: 0;
+  display: inline-block;
+  transform: skewX(5deg);
+}

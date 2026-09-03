@@ -17,7 +17,7 @@ genre_links:
   - name: "কাব্য"
     link: "/genre/poetry"
   - name: "বিবিধ"
-    link: "/genre/others"
+    link: "/genre/miscellaneous"
 
 cover_image: "/cover/balyarachana.webp"
 

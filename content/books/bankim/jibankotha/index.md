@@ -10,7 +10,7 @@ notice: "এই নিবন্ধটি মূল গ্রন্থের অ�
 genre: ["জীবনী", "বিবিধ"]
 genre_links:
   - { name: "জীবনী", link: "/genre/biography" }
-  - { name: "বিবিধ", link: "/genre/others" }
+  - { name: "বিবিধ", link: "/genre/miscellaneous" }
 cover_image: "/cover/jibankotha.webp"
 meta_description: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়ের 'জীবনকথা' আত্মজীবনীমূলক স্মৃতিচারণধর্মী রচনা। এতে তাঁর শৈশব, পারিবারিক পরিবেশ, শিক্ষা, ব্যক্তিগত অভিজ্ঞতা এবং সমকালীন সমাজজীবনের নানা দিক সংক্ষেপে প্রতিফলিত হয়েছে।"
 

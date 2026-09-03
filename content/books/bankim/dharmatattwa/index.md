@@ -12,7 +12,7 @@ source_book: "১৮৮৮ খ্রিষ্টাব্দের মে মা
 genre: ["হিন্দুধর্ম", "ধর্মীয় সাহিত্য", "দর্শন", "প্রবন্ধাবলী", "ধর্মতত্ত্ব"]
 genre_links:
   - { name: "হিন্দুধর্ম", link: "/genre/hinduism" }
-  - { name: "ধর্মীয় সাহিত্য", link: "/genre/religious" }
+  - { name: "ধর্মীয় সাহিত্য", link: "/genre/religious" }
   - { name: "দর্শন", link: "/genre/philosophy" }
   - { name: "প্রবন্ধাবলী", link: "/genre/essays" }
   - { name: "ধর্মতত্ত্ব", link: "/genre/theology" }

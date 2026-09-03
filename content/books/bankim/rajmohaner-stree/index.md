@@ -12,7 +12,7 @@ genre_links:
   - { name: "সামাজিক উপন্যাস", link: "/genre/social-novel" }
   - { name: "উপন্যাস", link: "/genre/novel" }
   - { name: "অপ্রকাশিত রচনা", link: "/genre/unpublished-works" }
-  - { name: "বিবিধ", link: "/genre/others" }
+  - { name: "বিবিধ", link: "/genre/miscellaneous" }
 cover_image: "/cover/rajmohaner-stree.webp"
 meta_description: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়ের একমাত্র ইংরেজি উপন্যাস 'Rajmohan's Wife'-এর অসমাপ্ত বাংলা রূপান্তর 'রাজমোহনের স্ত্রী'। ১৯১৮ সালে প্রথম গ্রন্থাকারে প্রকাশিত এই আখ্যানে মাতঙ্গিনীর অসীম সাহসের চিত্র ফুটে উঠেছে।"
 tags: ["বঙ্কিমচন্দ্র", "রাজমোহনের স্ত্রী", "মাতঙ্গিনী", "বাংলা উপন্যাস", "অপ্রকাশিত রচনা", "বঙ্কিম রচনাবলী"]

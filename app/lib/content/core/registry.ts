@@ -63,7 +63,9 @@ export const CONTENT_REGISTRY = {
     "henrik-ibsen": "হেনরিক ইবসেন",
     "amitav-ghosh": "অমিতাভ ঘোষ",
     "sukanta-bhattacharya": "সুকান্ত ভট্টাচার্য",
-    
+    "sanjib-chandra-chattopadhyay": "সঞ্জীবচন্দ্র চট্টোপাধ্যায়",
+    "sanjib-chatterjee": "সঞ্জীব চট্টোপাধ্যায়",
+
   } as Record<string, string>,
 
   // English Slug -> Bengali Value
@@ -115,14 +117,16 @@ export const CONTENT_REGISTRY = {
     "prison-story": "কারা কাহিনী",
     "poetry-collection": "কবিতা সঙ্কলন",
     "psychological-novel": "মনস্তাত্ত্বিক উপন্যাস",
-    "religious": "ধর্মীয় সাহিত্য",
+    "religious": "ধর্মীয় সাহিত্য",
     "religious-criticism": "ধর্মীয় সমালোচনা",
     "religious-essay": "ধর্মীয় প্রবন্ধ",
     "religious-translation": "ধর্মীয় অনুবাদ",
     "romance-fiction": "রোমান্টিক কাহিনী",
     "romantic-novel": "রোমান্টিক উপন্যাস",
-    "satire": "ব্যঙ্গাত্মক কাহিনী",
+    "satire": "ব্যঙ্গ",
     "science": "বিজ্ঞান",
+    "criticism": "সমালোচনা",
+    "textbook": "পাঠ্যপুস্তক",
     "science-criticism": "বিজ্ঞান সমালোচনা",
     "science-essay": "বিজ্ঞান প্রবন্ধ",
     "science-fiction": "বিজ্ঞান কল্পকাহিনী",
@@ -142,7 +146,7 @@ export const CONTENT_REGISTRY = {
     "liberation-war-novel": "মুক্তিযুদ্ধের উপন্যাস",
     "parapsychology": "পরামনোবিজ্ঞান",
     "screenplay": "চিত্রনাট্য",
-    
+
   } as Record<string, string>,
 
   // English Slug -> Bengali Value
