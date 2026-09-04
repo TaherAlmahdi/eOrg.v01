@@ -670,7 +670,7 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
                       <li
                         key={note.id}
                         id={`fn-${note.id}`}
-                        className="flex-auto min-w-25 p-1 bg-white/70 hover:bg-white not-prose rounded border border-orange-100 hover:border-orange-300 shadow-xs hover:shadow-md transition-all duration-200 text-sm md:text-base text-gray-800 flex items-start gap-1 font-tarunima"
+                        className="flex-auto min-w-auto p-1 bg-white/70 hover:bg-white not-prose rounded border border-orange-100 hover:border-orange-300 shadow-xs hover:shadow-md transition-all duration-200 text-sm md:text-base text-gray-800 flex items-start gap-1 font-tarunima"
                       >
                         <span className="shrink-0 px-1.5 py-0.5 text-sm font-semibold text-blue-900 bg-blue-50 border border-blue-200/60 rounded transition-colors">
                           {note.label}.
