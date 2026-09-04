@@ -215,10 +215,10 @@ export async function generateMetadata({ params, searchParams }: UnifiedPageProp
   const description = book.meta_description || `${book.title}${book.author ? ` - ${book.author}` : ''} | এডুলিচার সাহিত্য সংকলন।`;
   const currentPath = rawSegments.join('/');
 
-  const domainUrl = siteData.subdomain 
-    ? `https://${siteData.subdomain}.eduliture.org` 
+  const domainUrl = siteData.subdomain
+    ? `https://${siteData.subdomain}.eduliture.org`
     : 'https://eduliture.org';
-    
+
   const canonicalUrl = `${domainUrl}/book/${currentPath}`;
 
   // Dynamic OG Image Fallback Endpoint
@@ -425,37 +425,37 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
     items:
       volumes.length > 0
         ? volumes.map((v: VolumeItem) => {
-            const displayTitle = (v.id === currentVolumeSlug && displayVolumeTitle) || v.volume_title || v.title;
-            const isThisVolumeActive = v.id === currentVolumeSlug || v.id === volumeOrChapterSlug;
+          const displayTitle = (v.id === currentVolumeSlug && displayVolumeTitle) || v.volume_title || v.title;
+          const isThisVolumeActive = v.id === currentVolumeSlug || v.id === volumeOrChapterSlug;
 
-            return {
-              type: 'volume' as const,
-              id: v.id,
-              title: displayTitle,
-              subPages: isThisVolumeActive && !chapterSlug ? currentSubPagesData : [],
-              chapters: (v.chapters || []).map((c: ChapterItem) => {
-                const isThisChapterActive = c.slug === chapterSlug || c.slug === volumeOrChapterSlug;
+          return {
+            type: 'volume' as const,
+            id: v.id,
+            title: displayTitle,
+            subPages: isThisVolumeActive && !chapterSlug ? currentSubPagesData : [],
+            chapters: (v.chapters || []).map((c: ChapterItem) => {
+              const isThisChapterActive = c.slug === chapterSlug || c.slug === volumeOrChapterSlug;
 
-                return {
-                  id: c.slug,
-                  slug: c.slug,
-                  title: c.title,
-                  subPages: isThisChapterActive ? currentSubPagesData : [],
-                };
-              }),
-            };
-          })
+              return {
+                id: c.slug,
+                slug: c.slug,
+                title: c.title,
+                subPages: isThisChapterActive ? currentSubPagesData : [],
+              };
+            }),
+          };
+        })
         : directChapters.map((c) => {
-            const isThisChapterActive = c.slug === volumeOrChapterSlug || c.slug === chapterSlug;
+          const isThisChapterActive = c.slug === volumeOrChapterSlug || c.slug === chapterSlug;
 
-            return {
-              type: 'chapter' as const,
-              id: c.slug,
-              slug: c.slug,
-              title: c.title,
-              subPages: isThisChapterActive ? currentSubPagesData : [],
-            };
-          }),
+          return {
+            type: 'chapter' as const,
+            id: c.slug,
+            slug: c.slug,
+            title: c.title,
+            subPages: isThisChapterActive ? currentSubPagesData : [],
+          };
+        }),
   };
 
   const currentVolumeData = isVolumePage ? volumes.find((v) => v.id === volumeOrChapterSlug) : null;
@@ -472,13 +472,13 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
   const rawNotice = book.rawFrontmatter?.notice;
   const pageNotice: string | null = typeof rawNotice === 'string' && rawNotice.trim().length > 0 ? rawNotice.trim() : null;
 
-  const domainUrl = siteData.subdomain 
-    ? `https://${siteData.subdomain}.eduliture.org` 
+  const domainUrl = siteData.subdomain
+    ? `https://${siteData.subdomain}.eduliture.org`
     : 'https://eduliture.org';
 
   const currentFullUrl = `${domainUrl}/book/${rawSegments.join('/')}`;
   const siteTitle = siteData.title || 'এডুলিচার';
-  
+
   const fallbackOgUrl = `/api/og?title=${encodeURIComponent(book.title)}&subtitle=${encodeURIComponent(
     displayVolumeTitle || displayChapterTitle || siteTitle
   )}&tagline=${encodeURIComponent('এডুলিচার অনলাইন বই ও সাহিত্য সংকলন')}`;
@@ -595,29 +595,29 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
             )}
 
             {/* লেখক, অনুবাদক ও সম্পাদক তথ্য */}
-<div className="space-y-0.5 text-red-900 font-tarunima">
-  {book.author && (
-    <p className="text-lg font-medium">
-      {Array.isArray(book.author) ? book.author.join(', ') : book.author}
-    </p>
-  )}
-  {book.translator && (
-    <p className="text-base opacity-90">
-      অনুবাদ:{' '}
-      <span className="font-medium">
-        {Array.isArray(book.translator) ? book.translator.join(', ') : book.translator}
-      </span>
-    </p>
-  )}
-  {book.editor && (
-    <p className="text-base opacity-90">
-      সম্পাদনা:{' '}
-      <span className="font-medium">
-        {Array.isArray(book.editor) ? book.editor.join(', ') : book.editor}
-      </span>
-    </p>
-  )}
-</div>
+            <div className="space-y-0.5 text-red-900 font-tarunima">
+              {book.author && (
+                <p className="text-lg font-medium">
+                  {Array.isArray(book.author) ? book.author.join(', ') : book.author}
+                </p>
+              )}
+              {book.translator && (
+                <p className="text-base opacity-90">
+                  অনুবাদ:{' '}
+                  <span className="font-medium">
+                    {Array.isArray(book.translator) ? book.translator.join(', ') : book.translator}
+                  </span>
+                </p>
+              )}
+              {book.editor && (
+                <p className="text-base opacity-90">
+                  সম্পাদনা:{' '}
+                  <span className="font-medium">
+                    {Array.isArray(book.editor) ? book.editor.join(', ') : book.editor}
+                  </span>
+                </p>
+              )}
+            </div>
 
             <div className="w-48 h-0.5 bg-red-900/40 mx-auto mt-3"></div>
           </header>
@@ -662,7 +662,7 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
                   <h4 className="text-lg md:text-xl font-bold text-red-900 font-tarunima">টিকা ও মন্তব্য</h4>
                 </div>
 
-                <ol className="flex flex-wrap ml-0 text-sm text-gray-700 list-outside not-prose gap-x-2 gap-y-1 md:text-base">
+                <ol className="flex flex-wrap ml-0 text-sm text-gray-700 list-outside not-prose gap-x-1 gap-y-1 md:text-base">
                   {currentSubPageData.notes.map((note) => {
                     const noteHtmlContent = typeof note.text === 'string' ? note.text : JSON.stringify(note.text);
 
@@ -670,7 +670,7 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
                       <li
                         key={note.id}
                         id={`fn-${note.id}`}
-                        className="flex-auto min-w-62.5 p-2 bg-white/70 hover:bg-white not-prose rounded border border-orange-100 hover:border-orange-300 shadow-xs hover:shadow-md transition-all duration-200 text-sm md:text-base text-gray-800 flex items-start gap-1.5 font-tarunima"
+                        className="flex-auto min-w-25 p-1 bg-white/70 hover:bg-white not-prose rounded border border-orange-100 hover:border-orange-300 shadow-xs hover:shadow-md transition-all duration-200 text-sm md:text-base text-gray-800 flex items-start gap-1 font-tarunima"
                       >
                         <span className="shrink-0 px-1.5 py-0.5 text-sm font-semibold text-blue-900 bg-blue-50 border border-blue-200/60 rounded transition-colors">
                           {note.label}.

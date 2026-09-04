@@ -232,7 +232,7 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
   const subPageSubtitle = currentSubPage?.title;
 
   const pageDisplayTitle = getPageDisplayTitle(pageTitle, subPageSubtitle, currentPageNum);
-  
+
   const dynamicMetaTitle = buildTabTitle({
     metaTitle: item.meta_title,
     currentPageTitle: pageDisplayTitle || undefined,
@@ -321,7 +321,7 @@ export default async function SingleItemPage({ params, searchParams }: PageProps
   const currentType = getItemTypeName(item);
   const itemTypeDisplayName = getItemTypeDisplayName(item);
   const allItems = await getAllSortedItems();
-  
+
   const filteredList = allItems.filter((i) => getItemTypeName(i) === currentType);
   const currentIndex = filteredList.findIndex(
     (i) => resolveItemSlug(i, i.title) === effectiveSlug
@@ -410,7 +410,7 @@ export default async function SingleItemPage({ params, searchParams }: PageProps
             {itemTypeDisplayName}
           </Link>
           <span className="mx-2 text-white/50 shrink-0">/</span>
-          
+
           {(nextpageSubtitle || currentPageNum > 1) ? (
             <>
               <Link href={`/item/${effectiveSlug}`} className="transition-colors hover:text-red-100 shrink-0">
@@ -486,7 +486,7 @@ export default async function SingleItemPage({ params, searchParams }: PageProps
                     <h4 className="text-lg md:text-xl font-bold text-red-900 font-tarunima">টিকা ও মন্তব্য</h4>
                   </div>
 
-                  <ol className="flex flex-wrap ml-0 text-sm text-gray-700 list-outside not-prose gap-x-2 gap-y-1 md:text-base">
+                  <ol className="flex flex-wrap ml-0 text-sm text-gray-700 list-outside not-prose gap-x-1 gap-y-1 md:text-base">
                     {currentSubPageData.notes.map((note) => {
                       const noteHtmlContent = typeof note.text === 'string' ? note.text : JSON.stringify(note.text);
 
@@ -494,7 +494,7 @@ export default async function SingleItemPage({ params, searchParams }: PageProps
                         <li
                           key={note.id}
                           id={`fn-${note.id}`}
-                          className="flex-auto min-w-[250px] p-2 bg-white/70 hover:bg-white not-prose rounded border border-orange-100 hover:border-orange-300 shadow-xs hover:shadow-md transition-all duration-200 text-sm md:text-base text-gray-800 flex items-start gap-1.5 font-tarunima"
+                          className="flex-auto min-w-25 p-1 bg-white/70 hover:bg-white not-prose rounded border border-orange-100 hover:border-orange-300 shadow-xs hover:shadow-md transition-all duration-200 text-sm md:text-base text-gray-800 flex items-start gap-1 font-tarunima"
                         >
                           <span className="shrink-0 px-1.5 py-0.5 text-sm font-semibold text-blue-900 bg-blue-50 border border-blue-200/60 rounded transition-colors">
                             {note.label}.
