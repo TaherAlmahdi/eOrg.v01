@@ -35,6 +35,28 @@ const getAllContentFiles = (dirPath: string, arrayOfFiles: string[] = []): strin
 };
 
 /**
+ * বাংলা আদ্যক্ষর নির্ধারণ (ফলা ও যুক্তবর্ণ হ্যান্ডেল করার জন্য)
+ */
+const getBengaliInitial = (text: string = ''): string => {
+  const value = text.normalize('NFC').trim();
+
+  if (!value) return '';
+
+  const firstChar = value.charAt(0);
+  if (/^[a-zA-Z]$/.test(firstChar)) {
+    return firstChar.toUpperCase();
+  }
+
+  const match = value.match(/^([অআইঈউঊঋএঐওঔকখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহড়ঢ়য়])/);
+
+  if (match && match[1]) {
+    return match[1];
+  }
+
+  return firstChar;
+};
+
+/**
  * ফ্রন্টম্যাটার ডাটা থেকে স্ট্রিং বা অবজেক্ট থেকে আইটেমের নাম বের করার হেল্পার
  */
 const extractRawItemsFromFrontmatter = (frontmatter: Record<string, any>): string[] => {
@@ -51,7 +73,6 @@ const extractRawItemsFromFrontmatter = (frontmatter: Record<string, any>): strin
     }
   };
 
-  // সম্ভাব্য সকল ফিল্ড চেক করা
   const candidateFields = [
     frontmatter.item,
     frontmatter.items,
@@ -81,14 +102,13 @@ const getProcessedItems = cache(async (authorSlug?: string) => {
   }
 
   const allFilePaths = getAllContentFiles(contentDirectory);
-  const itemMap = new Map<string, { label: string; slug: string; count: number }>();
+  const itemMap = new Map<string, { label: string; slug: string; count: number; initial: string }>();
 
   allFilePaths.forEach((filePath) => {
     try {
       const fileContent = fs.readFileSync(filePath, "utf8");
       const { data: frontmatter } = matter(fileContent);
 
-      // লেখক ফিল্টারিং (library বা undefined না হলে)
       if (authorSlug && authorSlug !== "library") {
         const fileAuthor =
           frontmatter.authorSlug ||
@@ -99,7 +119,7 @@ const getProcessedItems = cache(async (authorSlug?: string) => {
           !fileAuthor ||
           String(fileAuthor).toLowerCase() !== String(authorSlug).toLowerCase()
         ) {
-          return; // অন্য লেখকের ফাইল হলে স্কিপ
+          return;
         }
       }
 
@@ -108,10 +128,10 @@ const getProcessedItems = cache(async (authorSlug?: string) => {
       rawItems.forEach((cleanItem) => {
         const slug = getItemSlug(cleanItem);
 
-        // রেজিস্ট্রি থেকে মেটাডাটা নেওয়া (যদি থাকে)
         const meta = ITEM_REGISTRY[slug] || ITEM_REGISTRY[cleanItem.toLowerCase()];
         const finalSlug = meta?.slug || slug || cleanItem.toLowerCase();
         const finalLabel = meta?.name || cleanItem;
+        const initial = getBengaliInitial(finalLabel);
 
         const existing = itemMap.get(finalSlug);
         if (existing) {
@@ -121,6 +141,7 @@ const getProcessedItems = cache(async (authorSlug?: string) => {
             label: finalLabel,
             slug: finalSlug,
             count: 1,
+            initial,
           });
         }
       });

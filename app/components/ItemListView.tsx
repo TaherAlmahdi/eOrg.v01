@@ -28,6 +28,32 @@ const normalizeBengaliText = (text: string): string => {
     .replace(/[\s\-_]+/g, "");
 };
 
+/**
+ * ============================================================
+ * বাংলা আদ্যক্ষর নির্ধারণ (ফলা ও যুক্তবর্ণ হ্যান্ডেল করার জন্য সংশোধিত)
+ * ============================================================
+ */
+const getBengaliInitial = (text: string = ''): string => {
+  const value = text.normalize('NFC').trim();
+
+  if (!value) return '';
+
+  // ইংরেজি অক্ষরের জন্য
+  const firstChar = value.charAt(0);
+  if (/^[a-zA-Z]$/.test(firstChar)) {
+    return firstChar.toUpperCase();
+  }
+
+  // বাংলা স্বরবর্ণ বা ব্যঞ্জনবর্ণের সঠিক আদ্যক্ষর তোলার জন্য ম্যাচিং
+  const match = value.match(/^([অআইঈউঊঋএঐওঔকখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহড়ঢ়য়])/);
+
+  if (match && match[1]) {
+    return match[1];
+  }
+
+  return firstChar;
+};
+
 // ১. Lucide icons mapping
 const GENRE_ICONS: Record<string, FC<{ className?: string }>> = {
   novel: ({ className }) => <BookMarked className={className} />,
@@ -124,10 +150,9 @@ export default function ItemListView({
     const lettersSet = new Set<string>();
 
     items.forEach((item) => {
-      const normalizedLabel = (item.label || "").normalize("NFC");
-      const firstChar = normalizedLabel.trim().charAt(0);
-      if (firstChar) {
-        lettersSet.add(firstChar);
+      const initial = getBengaliInitial(item.label || "");
+      if (initial) {
+        lettersSet.add(initial);
       }
     });
 
@@ -140,15 +165,12 @@ export default function ItemListView({
 
   // ৫. প্রসেসিং, সর্টিং, সার্চ ও ফিল্টারিং লজিক
   const processedItems = useMemo(() => {
-    // কপি তৈরি করে নেওয়া যাতে অরিজিনাল অ্যারে মিউটেট না হয়
     let result = [...items];
 
     if (isHomePage) {
-      // হোমপেজে সংখ্যা (count) অনুযায়ী বড় থেকে ছোট (Descending) সর্ট হবে এবং সর্বোচ্চ ১০টি নেওয়া হবে
       result.sort((a, b) => b.count - a.count);
       return result.slice(0, 10);
     } else {
-      // আইটেম পেজে বর্ণানুক্রমিক (Alphabetical) সর্ট হবে
       result.sort((a, b) =>
         (a.label || "").localeCompare(b.label || "", "bn", { sensitivity: "base" })
       );
@@ -159,8 +181,8 @@ export default function ItemListView({
         const normalizedLabel = normalizeBengaliText(item.label);
         const matchesSearch = !normalizedQuery || normalizedLabel.includes(normalizedQuery);
 
-        const firstChar = (item.label || "").normalize("NFC").trim().charAt(0);
-        const matchesLetter = selectedLetter === "সব" || firstChar === selectedLetter;
+        const initial = getBengaliInitial(item.label || "");
+        const matchesLetter = selectedLetter === "সব" || initial === selectedLetter;
 
         return matchesSearch && matchesLetter;
       });

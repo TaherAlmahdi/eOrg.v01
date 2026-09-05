@@ -37,32 +37,54 @@ const toBengaliNumber = (num: number | string): string =>
   num.toString().replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[parseInt(d, 10)]);
 
 /**
- * 🔹 যেকোনো ভাষার (বাংলা, ইংরেজি, আরবি ইত্যাদি) মূল আদ্যক্ষর বের করার সার্বজনীন ফাংশন
+ * 🔹 স্পেস, হ্রস্ব/দীর্ঘ স্বরবর্ণ ও ডায়াক্রিটিক্যাল মার্কস স্ট্যান্ডার্ডাইজ করার ফাংশন
+ */
+const normalizeText = (str: string): string => {
+  if (!str) return "";
+  return str
+    .normalize("NFC")
+    .toLowerCase()
+    // ই-ঈ, উ-ঊ এবং অনুরূপ স্বরবর্ণ বা কার-চিহ্নের ভিন্নতা মেলাতে চাইলে একীভূত করা যায়, 
+    // অথবা সাধারণ স্পেস ও অতিরিক্ত ডায়াক্রিটিকস দূর করা:
+    .replace(/[ঈী]/g, "ই")
+    .replace(/[ঊূ]/g, "উ")
+    .replace(/[ঋৠ]/g, "রি")
+    .replace(/[ঐৡ]/g, "ই")
+    .replace(/[ঔ]/g, "ও")
+    .replace(/[\s\-_]+/g, ""); // সব ধরনের স্পেস, হাইফেন ও আন্ডারস্কোর রিমুভ করে ফেলা
+};
+
+/**
+ * 🔹 বাংলা ও অন্যান্য ভাষার সঠিক আদ্যক্ষর বের করার ফাংশন
  */
 const getUniversalFirstLetter = (str: string): string => {
   if (!str) return "";
-  const cleaned = str.trim();
+  const cleaned = str.normalize("NFC").trim();
   if (!cleaned) return "";
 
-  // ১. Intl.Segmenter দিয়ে যেকোনো ভাষার সম্পূর্ণ প্রথম বর্ণ আলাদা করা
-  let firstGrapheme = cleaned;
+  // ইংরেজি অক্ষরের জন্য
+  const firstChar = cleaned.charAt(0);
+  if (/^[a-zA-Z]$/.test(firstChar)) {
+    return firstChar.toUpperCase();
+  }
+
+  // বাংলা স্বরবর্ণ বা ব্যঞ্জনবর্ণের সঠিক আদ্যক্ষর তোলার জন্য ম্যাচিং (ফলা বা কার-চিহ্ন ইগনোর করে)
+  const match = cleaned.match(/^([অআইঈউঊঋএঐওঔকখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহড়ঢ়য়])/);
+
+  if (match && match[1]) {
+    return match[1];
+  }
+
+  // অন্য কোনো ভাষা বা ফলব্যাকলেভেল
   if (typeof Intl !== "undefined" && Intl.Segmenter) {
     const segmenter = new Intl.Segmenter(undefined, { granularity: "grapheme" });
     const segments = Array.from(segmenter.segment(cleaned));
     if (segments.length > 0) {
-      firstGrapheme = segments[0].segment;
+      return segments[0].segment.toUpperCase();
     }
-  } else {
-    firstGrapheme = cleaned.charAt(0);
   }
 
-  // ২. কার-চিহ্ন, ডায়াক্রিটিক্যাল মার্কস ও স্বরচিহ্ন রিমুভ করা
-  const baseLetter = firstGrapheme
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f\u09be-\u09cd\u064b-\u065f]/g, "");
-
-  // ইংরেজি হলে uppercase করা যাতে 'a' এবং 'A' আলাদা বাটন না হয়
-  return baseLetter.toUpperCase();
+  return firstChar.toUpperCase();
 };
 
 export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => {
@@ -82,15 +104,23 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
       }
     });
 
-    return Array.from(lettersSet).sort((a, b) => a.localeCompare(b));
+    return Array.from(lettersSet).sort((a, b) =>
+      a.localeCompare(b, "bn", { sensitivity: "base" })
+    );
   }, [books]);
 
-  // 🔹 ২. সার্চ ও নির্বাচিত আদ্যক্ষর অনুযায়ী ফিল্টারিং
+  // 🔹 ২. সার্চ (স্পেস ও বানান নমনীয় করে) ও নির্বাচিত আদ্যক্ষর অনুযায়ী ফিল্টারিং
   const filteredBooks = useMemo(() => {
+    const normalizedQuery = normalizeText(searchQuery);
+
     return books.filter((book) => {
+      const normalizedTitle = normalizeText(book.title || "");
+      const normalizedAuthor = normalizeText(book.author || "");
+
       const matchesSearch =
-        book.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        book.author?.toLowerCase().includes(searchQuery.toLowerCase());
+        !normalizedQuery ||
+        normalizedTitle.includes(normalizedQuery) ||
+        normalizedAuthor.includes(normalizedQuery);
 
       const firstLetter = getUniversalFirstLetter(book.title || "");
       const matchesLetter = selectedLetter ? firstLetter === selectedLetter : true;

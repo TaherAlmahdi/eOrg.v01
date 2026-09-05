@@ -66,18 +66,23 @@ export const CONTENT_REGISTRY = {
     "sanjib-chandra-chattopadhyay": "সঞ্জীবচন্দ্র চট্টোপাধ্যায়",
     "sanjib-chatterjee": "সঞ্জীব চট্টোপাধ্যায়",
     "sushil-chaudhury": "সুশীল চৌধুরী",
-
+    "qazi-anwar-hussain": "কাজী আনোয়ার হোসেন",
+    
   } as Record<string, string>,
 
   // English Slug -> Bengali Value
   genres: {
     "adventure-fiction": "সাহসিক কাহিনী",
+    "adventure": "অভিযান",
     "autobiography": "আত্মজীবনী",
     "biography": "জীবনী",
     "children-fiction": "শিশু কাহিনী",
     "childrens-literature": "শিশুসাহিত্য",
     "classic": "ধ্রুপদী সাহিত্য",
     "detective-fiction": "গুপ্তচর কাহিনী",
+    "detective-novel": "গুপ্তচর উপন্যাস",
+    "detective-story": "গুপ্তচর গল্প",
+    "detective": "গোয়েন্দা",
     "mystery-novel": "রহস্য উপন্যাস",
     "drama": "নাটক",
     "drama-fiction": "নাট্য কাহিনী",
@@ -162,6 +167,7 @@ export const CONTENT_REGISTRY = {
     "misir-ali-omnibus": "মিসির আলি অমনিবাস",
     "zahir-raihan-rachanabali": "জহির রায়হান রচনাবলী",
     "sukanta-samagra": "সুকান্ত সমগ্র",
+    "masud-rana": "মাসুদ রানা",
   } as Record<string, string>,
 
   // English Slug -> Bengali Value
