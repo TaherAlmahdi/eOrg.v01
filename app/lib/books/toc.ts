@@ -107,7 +107,7 @@ export async function getBookHierarchy(slug: string): Promise<{
   const directChapters: ChapterItem[] = [];
 
   let bookTitle = slug;
-  let coverImage = '/default-cover.jpg';
+  let coverImage = '/cover/default-cover.webp';
 
   if (!bookDir || !existsSync(bookDir)) {
     return { nodes, bookTitle, coverImage, volumes, directChapters };

@@ -22,10 +22,10 @@ type Props = {
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const decodedSlug = slug.toLowerCase();
-  
+
   // রেজিস্ট্রি থেকেই সরাসরি টাইটেল ফেচিং (না পাওয়া গেলে স্লাগ ফলব্যাক)
   const bengaliTitle = getGenreTitle(decodedSlug) || slug;
-  
+
   return {
     title: `${bengaliTitle} | গ্রন্থাগার`,
   };
@@ -38,7 +38,7 @@ export default async function GenrePage({ params }: Props) {
   // মিডলওয়্যার থেকে সাবডোমেন রিসিভ করা
   const headerList = await headers();
   const subdomain = headerList.get('x-subdomain') || '';
-  
+
   // রেজিস্ট্রি থেকে বাংলা ঘরানার নাম বের করা
   const targetBengaliGenre = getGenreTitle(decodedSlug) || slug;
   const targetStr = String(targetBengaliGenre).trim().toLowerCase();
@@ -52,7 +52,7 @@ export default async function GenrePage({ params }: Props) {
     if (subdomain && subdomain !== 'library' && subdomain !== 'localhost:3000' && subdomain !== 'eduliture') {
       const bookAuthorSlug = (book as unknown as Record<string, unknown>).authorSlug || book.author;
       const isMatchingAuthor = String(bookAuthorSlug).trim().toLowerCase() === subdomain.trim().toLowerCase();
-      
+
       // যদি এই বইটির লেখক সাবডোমেনের লেখকের সাথে না মিলে, তবে বাদ যাবে
       if (!isMatchingAuthor) return false;
     }
@@ -106,8 +106,8 @@ export default async function GenrePage({ params }: Props) {
             ঘরানা : {targetBengaliGenre}
           </h2>
           <p className="text-gray-500 text-center mt-2 italic">
-            {filteredBooks.length > 0 
-              ? `এই ঘরানায় মোট ${toBengaliNumber(filteredBooks.length)}টি বই রয়েছে` 
+            {filteredBooks.length > 0
+              ? `এই ঘরানায় মোট ${toBengaliNumber(filteredBooks.length)}টি বই রয়েছে`
               : "এই ঘরানায় বর্তমানে কোনও বই নেই"}
           </p>
         </header>
@@ -115,22 +115,22 @@ export default async function GenrePage({ params }: Props) {
         {filteredBooks.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-6 gap-4">
             {filteredBooks.map((book) => (
-              <Link 
-                key={book.id || book.slug} 
-                href={`/book/${book.id || book.slug}`} 
+              <Link
+                key={book.id || book.slug}
+                href={`/book/${book.id || book.slug}`}
                 className="group flex flex-col h-full"
               >
                 <div className="relative aspect-2/3 overflow-hidden rounded shadow-sm bg-white border border-gray-100 transition-transform duration-300 group-hover:-translate-y-1.5 group-hover:shadow-md">
-                  <Image 
-                    src={book.cover || '/default-cover.jpg'} 
-                    alt={book.title || 'বইয়ের প্রচ্ছদ'} 
+                  <Image
+                    src={book.cover || '/cover/default-cover.webp'}
+                    alt={book.title || 'বইয়ের প্রচ্ছদ'}
                     fill
                     sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 16vw"
                     className="object-cover"
                   />
                   <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
-                
+
                 <div className="mt-2 text-center">
                   <h3 className="text-base font-bold text-gray-900 group-hover:text-emerald-700 transition-colors line-clamp-2 leading-snug">
                     {book.title}

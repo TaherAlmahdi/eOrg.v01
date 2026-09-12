@@ -8,6 +8,28 @@ import { Search, Book, X } from 'lucide-react';
 const toBengaliNumber = (num: number | string): string =>
   num.toString().replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[parseInt(d, 10)]);
 
+// 🔹 Cloudflare R2 Media Base URL ফরম্যাটিং হেল্পার
+const getCoverImageUrl = (coverPath?: string | null): string => {
+  if (!coverPath) return '';
+
+  let rawPath = coverPath.trim().replace(/\\/g, '/');
+
+  // 'public/' বা '/public/' রিমুভ করা
+  if (rawPath.startsWith('public/')) {
+    rawPath = rawPath.replace('public/', '');
+  } else if (rawPath.startsWith('/public/')) {
+    rawPath = rawPath.replace('/public/', '');
+  }
+
+  // শুরুর স্ল্যাশ বাদ দেওয়া
+  const cleanPath = rawPath.startsWith('/') ? rawPath.slice(1) : rawPath;
+
+  // ফুল URL থাকলে সেটাই রিটার্ন করবে, অন্যথায় Cloudflare R2 URL যুক্ত করবে
+  return cleanPath.startsWith('http://') || cleanPath.startsWith('https://')
+    ? cleanPath
+    : `https://media.eduliture.org/${cleanPath}`;
+};
+
 export interface BookItem {
   id?: string;
   title: string;
@@ -15,13 +37,13 @@ export interface BookItem {
   author?: string | string[];
   author_name?: string | string[];
   writer?: string | string[];
-  authors?: string | string[];        // 👈 এটি যোগ করুন
+  authors?: string | string[];
   translator?: string | string[];
   translator_name?: string | string[];
-  translators?: string | string[];     // 👈 এটি যোগ করুন
+  translators?: string | string[];
   editor?: string | string[];
   editor_name?: string | string[];
-  editors?: string | string[];         // 👈 এটি যোগ করুন
+  editors?: string | string[];
   coverImage?: string;
   cover?: string;
   cover_image?: string;
@@ -30,10 +52,9 @@ export interface BookItem {
 interface AuthorBookSearchGridProps {
   books?: BookItem[];
   siteName?: string;
-  personName: string; 
+  personName: string;
 }
 
-// 🔹 সিঙ্গেল বা মাল্টিপল (অ্যারে) কন্ট্রিবিউটরের নাম নির্ভুলভাবে মেলানোর ফাংশন
 const isFieldMatch = (field: unknown, targetName: string): boolean => {
   if (!field) return false;
   const target = targetName.trim().toLowerCase();
@@ -74,15 +95,15 @@ export default function AuthorBookSearchGrid({
       if (!book) return false;
 
       const matchesAuthor = isFieldMatch(
-        book.author || book.author_name || book.writer || book.authors, 
+        book.author || book.author_name || book.writer || book.authors,
         targetName
       );
       const matchesTranslator = isFieldMatch(
-        book.translator || book.translator_name || book.translators, 
+        book.translator || book.translator_name || book.translators,
         targetName
       );
       const matchesEditor = isFieldMatch(
-        book.editor || book.editor_name || book.editors, 
+        book.editor || book.editor_name || book.editors,
         targetName
       );
 
@@ -165,11 +186,10 @@ export default function AuthorBookSearchGrid({
                 <button
                   key={letter}
                   onClick={() => setSelectedLetter(letter)}
-                  className={`px-3 py-1 text-xs md:text-sm font-semibold rounded transition-all duration-200 ${
-                    isActive
+                  className={`px-3 py-1 text-xs md:text-sm font-semibold rounded transition-all duration-200 ${isActive
                       ? 'bg-[#008080] text-white shadow-xs scale-105'
                       : 'bg-teal-50/60 text-teal-900 hover:bg-teal-100/80 border border-teal-100'
-                  }`}
+                    }`}
                 >
                   {letter}
                 </button>
@@ -185,8 +205,8 @@ export default function AuthorBookSearchGrid({
             {searchQuery.trim() !== ''
               ? `${searchQuery} নামে কোন বই পাওয়া যায়নি।`
               : selectedLetter !== 'সব'
-              ? `${selectedLetter} অক্ষর দিয়ে কোন বই পাওয়া যায়নি।`
-              : `${personName}-এর কোন বই পাওয়া যায়নি।`}
+                ? `${selectedLetter} অক্ষর দিয়ে কোন বই পাওয়া যায়নি।`
+                : `${personName}-এর কোন বই পাওয়া যায়নি।`}
           </p>
           {(selectedLetter !== 'সব' || searchQuery.trim() !== '') && (
             <button
@@ -205,7 +225,8 @@ export default function AuthorBookSearchGrid({
           {filteredBooks.map((book) => {
             const bookSlug =
               book.slug || encodeURIComponent(book.title.toLowerCase());
-            const coverSrc = book.coverImage || book.cover || book.cover_image;
+            const rawCoverSrc = book.coverImage || book.cover || book.cover_image;
+            const coverSrc = getCoverImageUrl(rawCoverSrc);
 
             return (
               <Link

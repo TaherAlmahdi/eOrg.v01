@@ -5,23 +5,22 @@ import Link from "next/link";
 import Image from "next/image";
 import { Home, BookOpen, Search, X, Layers } from "lucide-react";
 
-// 🔹 মূল বইয়ের টাইপ (টাইপ-এরর সমাধানের জন্য আপডেট করা হয়েছে)
 export interface SeriesBook {
   id?: string;
   slug: string;
   title: string;
   author?: string;
   cover?: string;
-  Series?: string | string[] | any;
-  series?: string | string[] | any;
-  series_list?: any;
-  series_info?: any;
+  Series?: string | string[] | unknown;
+  series?: string | string[] | unknown;
+  series_list?: unknown;
+  series_info?: unknown;
   series_order?: string | number;
   series_index?: string | number;
   first_published?: number | string;
   published?: number | string;
   authorSlug?: string;
-  [key: string]: any; // ব্যাকএন্ডের অন্যান্য ডাইনামিক ফিল্ডের জন্য
+  [key: string]: unknown;
 }
 
 export type BookSeries = SeriesBook;
@@ -33,49 +32,56 @@ export interface SeriesViewProps {
   subdomain?: string;
 }
 
+// 🔹 Cloudflare R2 Media Base URL ফরম্যাটিং হেল্পার
+const getCoverImageUrl = (coverPath?: string | null): string => {
+  if (!coverPath) return "/default-cover.webp";
+
+  let rawPath = coverPath.trim().replace(/\\/g, "/");
+
+  if (rawPath.startsWith("public/")) {
+    rawPath = rawPath.replace("public/", "");
+  } else if (rawPath.startsWith("/public/")) {
+    rawPath = rawPath.replace("/public/", "");
+  }
+
+  const cleanPath = rawPath.startsWith("/") ? rawPath.slice(1) : rawPath;
+
+  return cleanPath.startsWith("http://") || cleanPath.startsWith("https://")
+    ? cleanPath
+    : `https://media.eduliture.org/${cleanPath}`;
+};
+
 const toBengaliNumber = (num: number | string): string =>
   num.toString().replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[parseInt(d, 10)]);
 
-/**
- * 🔹 স্পেস, হ্রস্ব/দীর্ঘ স্বরবর্ণ ও ডায়াক্রিটিক্যাল মার্কস স্ট্যান্ডার্ডাইজ করার ফাংশন
- */
 const normalizeText = (str: string): string => {
   if (!str) return "";
   return str
     .normalize("NFC")
     .toLowerCase()
-    // ই-ঈ, উ-ঊ এবং অনুরূপ স্বরবর্ণ বা কার-চিহ্নের ভিন্নতা মেলাতে চাইলে একীভূত করা যায়, 
-    // অথবা সাধারণ স্পেস ও অতিরিক্ত ডায়াক্রিটিকস দূর করা:
     .replace(/[ঈী]/g, "ই")
     .replace(/[ঊূ]/g, "উ")
     .replace(/[ঋৠ]/g, "রি")
     .replace(/[ঐৡ]/g, "ই")
     .replace(/[ঔ]/g, "ও")
-    .replace(/[\s\-_]+/g, ""); // সব ধরনের স্পেস, হাইফেন ও আন্ডারস্কোর রিমুভ করে ফেলা
+    .replace(/[\s\-_]+/g, "");
 };
 
-/**
- * 🔹 বাংলা ও অন্যান্য ভাষার সঠিক আদ্যক্ষর বের করার ফাংশন
- */
 const getUniversalFirstLetter = (str: string): string => {
   if (!str) return "";
   const cleaned = str.normalize("NFC").trim();
   if (!cleaned) return "";
 
-  // ইংরেজি অক্ষরের জন্য
   const firstChar = cleaned.charAt(0);
   if (/^[a-zA-Z]$/.test(firstChar)) {
     return firstChar.toUpperCase();
   }
 
-  // বাংলা স্বরবর্ণ বা ব্যঞ্জনবর্ণের সঠিক আদ্যক্ষর তোলার জন্য ম্যাচিং (ফলা বা কার-চিহ্ন ইগনোর করে)
-  const match = cleaned.match(/^([অআইঈউঊঋএঐওঔকখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহড়ঢ়য়])/);
-
+  const match = cleaned.match(/^([অআইঈউঊঋএঐওঔকখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহড়ঢ়য়])/);
   if (match && match[1]) {
     return match[1];
   }
 
-  // অন্য কোনো ভাষা বা ফলব্যাকলেভেল
   if (typeof Intl !== "undefined" && Intl.Segmenter) {
     const segmenter = new Intl.Segmenter(undefined, { granularity: "grapheme" });
     const segments = Array.from(segmenter.segment(cleaned));
@@ -91,7 +97,6 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLetter, setSelectedLetter] = useState<string | null>(null);
 
-  // 🔹 ১. যেকোনো ভাষার বইয়ের তালিকা থেকে স্বয়ংক্রিয়ভাবে আদ্যক্ষরের তালিকা তৈরি
   const availableLetters = useMemo(() => {
     const lettersSet = new Set<string>();
 
@@ -109,7 +114,6 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
     );
   }, [books]);
 
-  // 🔹 ২. সার্চ (স্পেস ও বানান নমনীয় করে) ও নির্বাচিত আদ্যক্ষর অনুযায়ী ফিল্টারিং
   const filteredBooks = useMemo(() => {
     const normalizedQuery = normalizeText(searchQuery);
 
@@ -131,13 +135,11 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
 
   return (
     <main className="bg-[#fdfcf8] min-h-screen font-tarunima">
-      {/* নেভিগেশন বার */}
       <nav className="w-full bg-[#7575a3] border-b border-gray-200 py-2 px-3 text-white overflow-x-auto no-scrollbar">
         <div className="flex items-center max-w-full mx-auto text-sm font-tarunima whitespace-nowrap">
           <Link href="/" className="transition-colors shrink-0 hover:text-orange-200">
             <Home size={16} />
           </Link>
-
           <span className="mx-2 text-white/50 shrink-0">/</span>
           <Link href="/books" className="transition-colors hover:text-orange-200">
             গ্রন্থাগার
@@ -146,7 +148,6 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
           <Link href="/series" className="transition-colors hover:text-orange-200 shrink-0">
             সিরিজ
           </Link>
-
           <span className="mx-2 text-white/50 shrink-0">/</span>
           <span className="flex items-center gap-2 font-medium">
             {seriesTitle}
@@ -154,12 +155,9 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
         </div>
       </nav>
 
-      {/* মূল কন্টেন্ট */}
       <div className="mx-auto max-w-full px-4 py-4">
         <header className="mb-3 space-y-3 bg-white/95 backdrop-blur-md shadow-xs">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-
-            {/* বামপাশে ডাইনামিক পেজ টাইটেল */}
             <div className="rounded bg-teal-50/90 text-[#008080] border border-teal-200 shadow-xs backdrop-blur-md self-start md:self-auto">
               <div className="p-2.5 inline-flex items-center gap-2">
                 <Layers size={22} className="shrink-0 animate-pulse text-[#008080]" />
@@ -176,7 +174,6 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
               </p>
             </div>
 
-            {/* ডানপাশে সার্চবার */}
             {books.length > 0 && (
               <div className="relative w-full md:w-80 shrink-0">
                 <Search className="absolute w-4 h-4 text-teal-600 -translate-y-1/2 left-3 top-1/2 pointer-events-none" />
@@ -190,17 +187,15 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery("")}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
                   >
                     <X size={16} />
                   </button>
                 )}
               </div>
             )}
-
           </div>
 
-          {/* নিচে: সেন্টারে আদ্যক্ষর ফিল্টার বার */}
           {books.length > 0 && availableLetters.length > 0 && (
             <div className="p-2 border border-teal-100 rounded bg-teal-50/90 backdrop-blur-md shadow-xs">
               <div className="flex flex-wrap items-center justify-center gap-1">
@@ -216,7 +211,6 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
 
                 {availableLetters.map((letter) => {
                   const isSelected = selectedLetter === letter;
-
                   return (
                     <button
                       key={letter}
@@ -242,12 +236,12 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
               return (
                 <Link
                   key={book.id || book.slug}
-                  href={`/book/${bookSlug}`}
+                  href={`/book/${encodeURIComponent(String(bookSlug))}`}
                   className="flex flex-col h-full group bg-teal-25 p-0 rounded border border-gray-200/80 shadow-xs transition-all duration-300 hover:-translate-y-1.5 hover:shadow-md hover:border-orange-200"
                 >
                   <div className="relative aspect-[2/3] overflow-hidden rounded-t border-b border-gray-200/50 bg-gray-50">
                     <Image
-                      src={book.cover || "/default-cover.jpg"}
+                      src={getCoverImageUrl(book.cover)}
                       alt={book.title || "বইয়ের প্রচ্ছদ"}
                       fill
                       sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 16vw"
@@ -282,7 +276,7 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
                   setSearchQuery("");
                   setSelectedLetter(null);
                 }}
-                className="inline-block mt-4 font-medium text-emerald-600 hover:underline"
+                className="inline-block mt-4 font-medium text-emerald-600 hover:underline cursor-pointer"
               >
                 ফিল্টার রিসেট করুন
               </button>

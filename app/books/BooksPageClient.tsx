@@ -5,6 +5,28 @@ import Link from 'next/link';
 import { Home, Search, BookOpen } from "lucide-react";
 import { buildTabTitle } from '@/app/lib/get-site-data';
 
+// 🔹 Cloudflare R2 Media Base URL ফরম্যাটিং হেল্পার
+const getCoverImageUrl = (coverPath?: string | null): string => {
+  if (!coverPath) return '/cover/default-cover.webp';
+
+  let rawPath = coverPath.trim().replace(/\\/g, '/');
+
+  // 'public/' বা '/public/' রিমুভ করা
+  if (rawPath.startsWith('public/')) {
+    rawPath = rawPath.replace('public/', '');
+  } else if (rawPath.startsWith('/public/')) {
+    rawPath = rawPath.replace('/public/', '');
+  }
+
+  // শুরুর স্ল্যাশ বাদ দেওয়া
+  const cleanPath = rawPath.startsWith('/') ? rawPath.slice(1) : rawPath;
+
+  // ফুল URL থাকলে সেটাই রিটার্ন করবে, অন্যথায় Cloudflare R2 URL যুক্ত করবে
+  return cleanPath.startsWith('http://') || cleanPath.startsWith('https://')
+    ? cleanPath
+    : `https://media.eduliture.org/${cleanPath}`;
+};
+
 // 🔹 ইংরেজি সংখ্যাকে বাংলায় রূপান্তর করার ফাংশন
 const toBengaliNumber = (num: number | string): string => {
   const englishToBengali: Record<string, string> = {
@@ -55,7 +77,7 @@ export default function BooksPageClient({
   const [selectedLetter, setSelectedLetter] = useState('সব');
   const [visibleCount, setVisibleCount] = useState(limit);
 
-  // স্ক্রিন সাইজ অনুযায়ী ইনিশিয়াল লিমিট নির্ধারণ (হাইড্রেশন মিসম্যাচ এড়াতে)
+  // স্ক্রিন সাইজ অনুযায়ী ইনিশিয়াল লিমিট নির্ধারণ (হাইড্রেশন মিসম্যাচ এড়াতে)
   useEffect(() => {
     if (window.innerWidth >= 1280) {
       setLimit(40);
@@ -110,7 +132,7 @@ export default function BooksPageClient({
             : Array.isArray(book.genre)
               ? book.genre
               : [];
-        
+
         const matchesGenre = bookGenres.some((g) =>
           normalizeBengali(g).includes(normalizedGenre)
         );
@@ -151,7 +173,7 @@ export default function BooksPageClient({
 
   const hasMore = visibleCount < filteredBooks.length;
 
-  // ৪. ডায়নামিক ব্রাউজার ট্যাবটাইটেল আপডেট (সেকেন্ডের মধ্যে বদলে যাওয়া রোধ করতে)
+  // ৪. ডায়নামিক ব্রাউজার ট্যাবটাইটেল আপডেট (সেকেন্ডের মধ্যে বদলে যাওয়া রোধ করতে)
   useEffect(() => {
     const baseTitle = genreTitle || 'গ্রন্থাগার';
     let currentPageTitle = baseTitle;
@@ -231,11 +253,10 @@ export default function BooksPageClient({
                 <button
                   key={letter}
                   onClick={() => setSelectedLetter(letter)}
-                  className={`px-2 py-0.5 rounded transition-all cursor-pointer ${
-                    selectedLetter === letter
-                      ? 'bg-[#996633] text-white font-bold shadow-xs'
-                      : 'bg-white text-gray-700 hover:bg-orange-100 border border-gray-100'
-                  }`}
+                  className={`px-2 py-0.5 rounded transition-all cursor-pointer ${selectedLetter === letter
+                    ? 'bg-[#996633] text-white font-bold shadow-xs'
+                    : 'bg-white text-gray-700 hover:bg-orange-100 border border-gray-100'
+                    }`}
                 >
                   {letter}
                 </button>
@@ -255,6 +276,9 @@ export default function BooksPageClient({
             <div className="grid grid-cols-2 md:grid-cols-6 xl:grid-cols-8 gap-2 pb-4 border-b border-red-100">
               {currentBooks.map((book) => {
                 const bookKey = book.slug || book.id || '';
+                const rawCoverSrc = (book.cover_image as string) || (book.cover as string);
+                const coverSrc = getCoverImageUrl(rawCoverSrc);
+
                 return (
                   <Link
                     key={bookKey}
@@ -264,7 +288,7 @@ export default function BooksPageClient({
                     {/* কভার ইমেজ কার্ড */}
                     <div className="relative aspect-2/3 overflow-hidden rounded shadow-lg bg-white border border-gray-100 transition-transform duration-300 group-hover:-translate-y-2 group-hover:shadow-2xl">
                       <img
-                        src={(book.cover_image as string) || (book.cover as string) || '/default-cover.jpg'}
+                        src={coverSrc}
                         alt={book.title}
                         className="w-full h-full object-cover"
                       />

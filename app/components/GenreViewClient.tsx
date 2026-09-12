@@ -14,6 +14,28 @@ const toBengaliNumber = (num: number | string) => {
   return num.toString().replace(/\d/g, (digit) => englishToBengali[digit] || digit);
 };
 
+// 🔹 Cloudflare R2 Media Base URL ফরম্যাটিং হেল্পার
+const getCoverImageUrl = (coverPath?: string | null): string => {
+  if (!coverPath) return '/cover/default-cover.webp';
+
+  let rawPath = coverPath.trim().replace(/\\/g, '/');
+
+  // 'public/' বা '/public/' রিমুভ করা
+  if (rawPath.startsWith('public/')) {
+    rawPath = rawPath.replace('public/', '');
+  } else if (rawPath.startsWith('/public/')) {
+    rawPath = rawPath.replace('/public/', '');
+  }
+
+  // শুরুর স্ল্যাশ বাদ দেওয়া
+  const cleanPath = rawPath.startsWith('/') ? rawPath.slice(1) : rawPath;
+
+  // ফুল URL থাকলে সেটাই রিটার্ন করবে, অন্যথায় Cloudflare R2 URL যুক্ত করবে
+  return cleanPath.startsWith('http://') || cleanPath.startsWith('https://')
+    ? cleanPath
+    : `https://media.eduliture.org/${cleanPath}`;
+};
+
 export interface BookItem {
   id?: string;
   slug?: string;
@@ -31,7 +53,7 @@ interface GenreViewClientProps {
 export default function GenreViewClient({ initialBooks, targetBengaliGenre }: GenreViewClientProps) {
   const [searchQuery, setSearchQuery] = useState('');
 
-  // সার্চ কুয়েরি অনুযায়ী বই ফিল্টারিং
+  // সার্চ কুয়েরি অনুযায়ী বই ফিল্টারিং
   const displayedBooks = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     if (!q) return initialBooks;
@@ -53,8 +75,8 @@ export default function GenreViewClient({ initialBooks, targetBengaliGenre }: Ge
           </h2>
           <p className="text-gray-500 mt-1 italic text-sm md:text-base">
             {displayedBooks.length > 0
-              ? `এই ঘরানায় মোট ${toBengaliNumber(displayedBooks.length)}টি বই রয়েছে`
-              : "কোনো বই পাওয়া যায়নি"}
+              ? `এই ঘরানায় মোট ${toBengaliNumber(displayedBooks.length)}টি বই রয়েছে`
+              : "কোনো বই পাওয়া যায়নি"}
           </p>
         </div>
 
@@ -65,14 +87,14 @@ export default function GenreViewClient({ initialBooks, targetBengaliGenre }: Ge
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="বই বা লেখকের নাম দিয়ে খুঁজুন..."
+              placeholder="বই বা লেখকের নাম দিয়ে খুঁজুন..."
               className="w-full pl-9 pr-4 py-2 text-sm bg-white border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 transition-all text-gray-800 placeholder-gray-400 shadow-xs"
             />
           </div>
         </div>
       </header>
 
-      {/* বইয়ের গ্রিড ডিসপ্লে */}
+      {/* বইয়ের গ্রিড ডিসপ্লে */}
       {displayedBooks.length > 0 ? (
         <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-6 xl:grid-cols-8 gap-2 pb-4 border-b border-red-100">
           {displayedBooks.map((book) => (
@@ -83,8 +105,8 @@ export default function GenreViewClient({ initialBooks, targetBengaliGenre }: Ge
             >
               <div className="relative aspect-2/3 overflow-hidden rounded shadow-sm bg-white border border-gray-100 transition-transform duration-300 group-hover:-translate-y-1.5 group-hover:shadow-md">
                 <Image
-                  src={book.cover || '/default-cover.jpg'}
-                  alt={book.title || 'বইয়ের প্রচ্ছদ'}
+                  src={getCoverImageUrl(book.cover)}
+                  alt={book.title || 'বইয়ের প্রচ্ছদ'}
                   fill
                   sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 16vw"
                   className="object-cover"
@@ -108,8 +130,8 @@ export default function GenreViewClient({ initialBooks, targetBengaliGenre }: Ge
           <BookOpen size={48} className="mx-auto text-orange-200 mb-4" />
           <p className="text-gray-400 text-lg italic">
             {searchQuery
-              ? `"${searchQuery}" এর সাথে মিলে এমন কোনো বই খুঁজে পাওয়া যায়নি।`
-              : "দুঃখিত, এই বিভাগে কোনো বই খুঁজে পাওয়া যায়নি।"}
+              ? `"${searchQuery}" এর সাথে মিলে এমন কোনো বই খুঁজে পাওয়া যায়নি।`
+              : "দুঃখিত, এই বিভাগে কোনো বই খুঁজে পাওয়া যায়নি।"}
           </p>
           {searchQuery ? (
             <button

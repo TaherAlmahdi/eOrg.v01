@@ -2,9 +2,9 @@ import { headers } from 'next/headers';
 import type { Metadata } from 'next';
 import { getSubdomainData, buildTabTitle } from '@/app/lib/get-site-data';
 import { getSeriesTitle } from '@/app/lib/content/core/registry';
-import { getLibraryBooks, sortSeriesBooks, slugify } from '@/app/lib/books';
+import { getLibraryBooks, sortSeriesBooks, slugify, type Book } from '@/app/lib/books';
 
-import SeriesView, { type BookSeries } from '@/app/components/SeriesView';
+import SeriesView, { type SeriesBook } from '@/app/components/SeriesView';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -52,7 +52,7 @@ export default async function SeriesPage({ params, searchParams }: PageProps) {
 
   const { latestBooks = [] } = await getLibraryBooks();
 
-  const filteredBooks = (latestBooks as BookSeries[]).filter((book) => {
+  const filteredBooks = (latestBooks as Book[]).filter((book) => {
     // ১. সাবডোমেইন / লেখক ফিল্টার
     if (subdomain && !['library', 'localhost:3000', 'eduliture'].includes(subdomain)) {
       const bookAuthor = book.authorSlug || book.author || '';
@@ -61,7 +61,7 @@ export default async function SeriesPage({ params, searchParams }: PageProps) {
       }
     }
 
-    // ২. সিরিজ ফিল্টারিং (স্ট্রিং ও অবজেক্ট উভয় স্ট্রাকচার সাপোর্ট সহ)
+    // ২. সিরিজ ফিল্টারিং (স্ট্রিং ও অবজেক্ট উভয় স্ট্রাকচার সাপোর্ট সহ)
     const rawSeries = book.Series || book.series || book.series_list || book.series_info;
     if (!rawSeries) return false;
 
@@ -75,9 +75,9 @@ export default async function SeriesPage({ params, searchParams }: PageProps) {
         sName = s.trim();
         sSlug = slugify(sName);
       } else if (typeof s === 'object' && s !== null) {
-        sName = String((s as Record<string, any>).name || '').trim();
-        sSlug = (s as Record<string, any>).slug
-          ? String((s as Record<string, any>).slug).trim()
+        sName = String((s as Record<string, unknown>).name || '').trim();
+        sSlug = (s as Record<string, unknown>).slug
+          ? String((s as Record<string, unknown>).slug).trim()
           : slugify(sName);
       }
 
@@ -93,16 +93,14 @@ export default async function SeriesPage({ params, searchParams }: PageProps) {
     });
   });
 
-  // ৩. টার্গেট সিরিজ উল্লেখ করে সর্টিং হেলপার কল
-  const sortedBooks = sortSeriesBooks(filteredBooks, targetBengaliSeries);
+  // ৩. টাইপ কাস্টিং সহ টার্গেট সিরিজ উল্লেখ করে সর্টিং হেলপার কল
+  const sortedBooks = sortSeriesBooks(filteredBooks, targetBengaliSeries) as unknown as SeriesBook[];
 
   return (
-    
     <SeriesView
       seriesTitle={String(targetBengaliSeries)}
       books={sortedBooks}
       subdomain={subdomain}
     />
-    
   );
 }

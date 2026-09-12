@@ -27,28 +27,28 @@ export default function LatestBooksGrid({ books, getAuthorSlug }: LatestBooksGri
         const bookSlug = String(book.slug || book.id || '');
         const authorSlug = getAuthorSlug(book);
 
-        const responsiveVisibilityClass = 
-          index >= 16 
-            ? "block sm:hidden xl:block"       
-            : index >= 8 
-              ? "block sm:hidden md:block"        
-              : "block";                        
+        const responsiveVisibilityClass =
+          index >= 16
+            ? "block sm:hidden xl:block"
+            : index >= 8
+              ? "block sm:hidden md:block"
+              : "block";
 
         return (
-          <div 
-            key={bookSlug || index} 
+          <div
+            key={bookSlug || index}
             className={`flex flex-col bg-white rounded border border-slate-200 shadow-sm transition-all hover:shadow-md group ${responsiveVisibilityClass}`}
           >
             <Link href={`/book/${encodeURIComponent(bookSlug)}`} className="relative block w-full overflow-hidden rounded-t aspect-2/3 bg-slate-100">
               <Image
-                src={book.cover || '/images/default-book-cover.png'}
+                src={book.cover || '/cover/default-cover.webp'}
                 alt={book.title || 'বইয়ের প্রচ্ছদ'}
                 fill
                 sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 16vw"
                 className="object-cover group-hover:scale-[1.03] transition-transform duration-300"
               />
             </Link>
-            
+
             <div className="flex flex-col justify-between p-3 grow">
               <div className="text-center">
                 <h3 className="text-base font-semibold leading-snug text-gray-900 transition-colors group-hover:text-emerald-700 line-clamp-2">
@@ -56,10 +56,10 @@ export default function LatestBooksGrid({ books, getAuthorSlug }: LatestBooksGri
                     {book.title || 'শিরোনামহীন'}
                   </Link>
                 </h3>
-                
+
                 <p className="mt-1 text-xs md:text-sm text-gray-500 font-tarunima">
                   {book.author ? (
-                    <Link 
+                    <Link
                       href={`/author/${encodeURIComponent(authorSlug)}`}
                       className="transition-colors hover:text-emerald-600 hover:underline"
                     >
