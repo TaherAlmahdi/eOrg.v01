@@ -1,29 +1,10 @@
 import type { FC } from "react";
-import { Users, Library, Layers, Tags } from "lucide-react";
+import { Users, Library, Layers, FileText, Tags } from "lucide-react";
+import { libraryStats } from "@/app/lib/generated/library-stats";
 
-const toBengaliNumber = (num: number | string): string => {
-  const parsedNum = Number(num);
-  const validNum = isNaN(parsedNum) ? 0 : parsedNum;
-  return validNum.toString().replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[parseInt(d, 10)]);
+const toBengaliNumber = (num: number): string => {
+  return (num || 0).toString().replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[parseInt(d, 10)]);
 };
-
-export interface LibraryStatsProps {
-  totalAuthors?: number;
-  totalBooks?: number;
-  totalSeries?: number;
-  totalGenres?: number;
-  authorsCount?: number;
-  booksCount?: number;
-  seriesCount?: number;
-  genresCount?: number;
-  totalEditors?: number;
-  editorsCount?: number;
-  editorCount?: number;
-  totalTranslators?: number;
-  translatorsCount?: number;
-  translatorCount?: number;
-  authorCount?: number;
-}
 
 interface StatItem {
   title: string;
@@ -37,23 +18,12 @@ interface StatItem {
   countColor: string;
 }
 
-export const LibraryStats: FC<LibraryStatsProps> = (props) => {
-  const authors = props.totalAuthors ?? props.authorsCount ?? props.authorCount ?? 0;
-  const editors = props.totalEditors ?? props.editorsCount ?? props.editorCount ?? 0;
-  const translators = props.totalTranslators ?? props.translatorsCount ?? props.translatorCount ?? 0;
-  
-  // লেখক, এডিটর এবং ট্রান্সলেটর একসাথে যোগ করা হলো
-  const combinedAuthors = authors + editors + translators;
-
-  const books = props.totalBooks ?? props.booksCount ?? 0;
-  const series = props.totalSeries ?? props.seriesCount ?? 0;
-  const genres = props.totalGenres ?? props.genresCount ?? 0;
-
+export const LibraryStats: FC = () => {
   const statsData: StatItem[] = [
     {
       title: "আমাদের পরিবারে",
-      subtitle: "সম্মানিত লেখক",
-      count: combinedAuthors,
+      subtitle: "লেখক",
+      count: libraryStats.totalAuthors,
       unit: "জন",
       icon: Users,
       bgColor: "bg-teal-50",
@@ -63,8 +33,8 @@ export const LibraryStats: FC<LibraryStatsProps> = (props) => {
     },
     {
       title: "এডুলিচার পাঠশালায়",
-      subtitle: "প্রকাশিত গ্রন্থ",
-      count: books,
+      subtitle: "পুস্তক",
+      count: libraryStats.totalBooks,
       unit: "টি",
       icon: Library,
       bgColor: "bg-amber-50",
@@ -74,8 +44,8 @@ export const LibraryStats: FC<LibraryStatsProps> = (props) => {
     },
     {
       title: "বিশেষ আয়োজন",
-      subtitle: "মোট সিরিজ",
-      count: series,
+      subtitle: "সিরিজ",
+      count: libraryStats.totalSeries,
       unit: "টি",
       icon: Layers,
       bgColor: "bg-indigo-50",
@@ -85,8 +55,8 @@ export const LibraryStats: FC<LibraryStatsProps> = (props) => {
     },
     {
       title: "বিষয় ও ভাবধারা",
-      subtitle: "মোট ঘরানা",
-      count: genres,
+      subtitle: "ঘরানা",
+      count: libraryStats.totalGenres,
       unit: "টি",
       icon: Tags,
       bgColor: "bg-rose-50",
@@ -94,10 +64,21 @@ export const LibraryStats: FC<LibraryStatsProps> = (props) => {
       borderColor: "border-rose-100/50",
       countColor: "text-[#e11d48]",
     },
+    {
+      title: "সাহিত্য রূপ",
+      subtitle: "প্রকরণ",
+      count: libraryStats.totalItems,
+      unit: "টি",
+      icon: FileText,
+      bgColor: "bg-purple-50",
+      textColor: "text-[#7c3aed]",
+      borderColor: "border-purple-100/50",
+      countColor: "text-[#7c3aed]",
+    },
   ];
 
   return (
-    <div className="grid w-full grid-cols-1 gap-2 p-0 mb-3 sm:grid-cols-2 md:grid-cols-4 font-tarunima">
+    <div className="grid w-full grid-cols-1 gap-2 p-0 mb-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 font-tarunima">
       {statsData.map((item, index) => {
         const IconComponent = item.icon;
         return (

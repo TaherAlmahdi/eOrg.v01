@@ -17,19 +17,19 @@ interface StoryItem {
 // MDX ফাইল থেকে ডাটা রিড করার ফাংশন
 async function getSuccessStories(): Promise<StoryItem[]> {
   const targetDir = path.join(process.cwd(), 'content', 'pages', 'success');
-  
+
   // যদি ফোল্ডারটি না থাকে তবে খালি অ্যারে রিটার্ন করবে
   if (!fs.existsSync(targetDir)) return [];
 
   const files = fs.readdirSync(targetDir);
-  
+
   const stories = files
     .filter((file) => file.endsWith('.md'))
     .map((file) => {
       const filePath = path.join(targetDir, file);
       const fileContent = fs.readFileSync(filePath, 'utf-8');
       const { data } = matter(fileContent); // frontmatter থেকে ডাটা রিড করবে
-      
+
       return {
         title: data.title || 'শিরোনামহীন',
         icon: data.icon || '/logo/elogo.png', // ব্যাকআপ আইকন
@@ -49,22 +49,22 @@ export default async function SuccessStories() {
   if (stories.length === 0) return null;
 
   return (
-    <section 
+    <section
       className="relative w-full h-auto bg-cover bg-center bg-no-repeat bg-fixed py-10 px-2 overflow-x-clip"
-      style={{ backgroundImage: "url('/bg03.png')" }} 
+      style={{ backgroundImage: "url('/bg03.png')" }}
     >
-      
+
       <div className="absolute inset-0 bg-[#ffcc66]/20 z-10 pointer-events-none backdrop-blur-[1px]" />
-      
+
       <div className="relative z-10 mx-auto w-full max-w-full overflow-hidden">
-        
+
         {/* প্রধান হেডার সেকশন */}
         <div className="flex justify-center pt-2 md:pt-2">
           <div className="inline-flex items-center justify-center gap-3 px-6 py-2 rounded bg-teal-50 text-[#008080] mb-4 animate-pulse border border-teal-100 shadow-sm text-center">
             {/* এসভিজির বদলে Lucide-React এর Trophy আইকন */}
-            <Trophy 
-              size={28} 
-              className="text-[#cc7a00] animate-bounce shrink-0" 
+            <Trophy
+              size={28}
+              className="text-[#cc7a00] animate-bounce shrink-0"
             />
             <h1 className="text-xl md:text-2xl font-tarunima p-2 font-black text-gray-900 leading-none tracking-tight">
               <span className="text-[#008080]">সাফল্য</span> <span className="text-[#cc7a00]">গাঁথা</span>
@@ -76,7 +76,7 @@ export default async function SuccessStories() {
         </p>
 
         {/* CARD কন্টেইনার: সঠিক পিক্সেল পারফেক্ট গ্রিডের জন্য ফ্লুয়িড ফ্লেক্স উইডথ */}
-        <div className="flex flex-wrap gap-3 justify-start items-stretch relative px-2 z-20 w-full">
+        <div className="flex flex-wrap gap-2 justify-start items-stretch relative px-2 z-20 w-full">
           {stories.map((story, index) => (
             <a
               key={index}
