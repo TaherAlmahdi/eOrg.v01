@@ -9,7 +9,7 @@ slug: "dhwangsha-paharh"
 first_published: 1966-05
 published: 2026-09-05
 
-series_list:
+series:
   - name: "মাসুদ রানা"
     order: 001
 

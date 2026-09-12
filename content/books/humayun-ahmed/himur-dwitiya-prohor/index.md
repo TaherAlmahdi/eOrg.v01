@@ -15,10 +15,7 @@ genre_links:
   - name: "উপন্যাস"
     link: "/genre/novel"
 
-series_list:
-  - name: "হুমায়ূন আহমেদ রচনাবলী"
-    order: 1997
-    link: "/series/humayun-ahmed-rachanabali"
+series:
   - name: "হিমু সমগ্র"
     order: 7
     link: "/series/himu-samagra"

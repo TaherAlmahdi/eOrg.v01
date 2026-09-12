@@ -15,9 +15,6 @@ genre:
 genre_links:
   - { name: "কাব্য", link: "/genre/poetry" }
 
-series: "সুকান্ত সমগ্র"
-series_link: "/series/sukanta-samagra"
-
 cover_image: "/cover/purbabhas.webp"
 
 meta_description: "সুকান্ত ভট্টাচার্যের ‘পূর্বাভাস’ ১৯৫০ সালে প্রকাশিত একটি কালজয়ী কাব্যগ্রন্থ। পরাধীন ভারত, ক্ষুধা, শোষিত মানুষের সংগ্রাম এবং আসন্ন সামাজিক ও রাজনৈতিক বিপ্লবের অমোঘ পূর্বাভাস এই গ্রন্থের কবিতাগুলোর প্রধান সুর।"

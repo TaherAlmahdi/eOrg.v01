@@ -17,9 +17,6 @@ genre_links:
   - { name: "উপন্যাস", link: "/genre/novel" }
   - { name: "রাজনৈতিক উপন্যাস", link: "/genre/political-novel" }
 
-series: "জহির রায়হান রচনাবলী"
-series_link: "/series/zahir-raihan-rachanabali"
-
 cover_image: "/cover/aarek-phalgun.webp"
 
 meta_description: "জহির রায়হানের ভাষা আন্দোলনভিত্তিক উপন্যাস ‘আরেক ফাল্গুন’-এর অনলাইন সংস্করণ। ১৯৫২ সালের রাষ্ট্রভাষা আন্দোলন, ছাত্রসমাজের সংগ্রাম, রাজনৈতিক চেতনা ও তৎকালীন পূর্ববাংলার উত্তাল সময়কে কেন্দ্র করে রচিত এই গুরুত্বপূর্ণ বাংলা উপন্যাসটি এডুলিচারে পড়ুন।"

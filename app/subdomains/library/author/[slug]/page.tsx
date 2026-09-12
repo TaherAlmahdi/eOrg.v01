@@ -12,7 +12,7 @@ interface PageProps {
   }>;
 }
 
-// 🔹 ইউনিকোড ও বানানগত ভিন্নতা (ই/ঈ, উ/ঊ, য়/য়, ড়/ড়) দূর করার নরমালাইজেশন ফাংশন
+// 🔹 ইউনিকোড ও বানানগত ভিন্নতা (ই/ঈ, উ/ঊ, য়/য়, ড়/ড়) দূর করার নরমালাইজেশন ফাংশন
 function normalizeBengaliSlug(text: string): string {
   if (!text) return '';
   return text
@@ -21,9 +21,9 @@ function normalizeBengaliSlug(text: string): string {
     // ই/ঈ, উ/ঊ এবং বর্ণগুলোর ভিন্ন রূপগুলো একীভূত করা যাতে বানান ভুল বা ভিন্নতা থাকলেও ম্যাচ করে
     .replace(/[ঈই]/g, 'ই')
     .replace(/[ঊউ]/g, 'উ')
-    .replace(/য়/g, 'য়')
-    .replace(/ড়/g, 'ড়')
-    .replace(/ঢ়/g, 'ঢ়')
+    .replace(/য়/g, 'য়')
+    .replace(/ড়/g, 'ড়')
+    .replace(/ঢ়/g, 'ঢ়')
     .replace(/\s+/g, '-')
     .replace(/[^\w\u0980-\u09FF-]+/g, '') // ইংরেজি, বাংলা ইউনিকোড এবং হাইফেন রাখা
     .replace(/--+/g, '-');
@@ -62,15 +62,15 @@ function resolveContributorRoles(fieldVal: unknown, slugVal: unknown): Array<{ n
     if (!slug && name) {
       slug = normalizeBengaliSlug(name);
     }
-    return { 
-      name, 
-      slug: slug.toLowerCase(), 
-      normalizedSlug: normalizeBengaliSlug(name) 
+    return {
+      name,
+      slug: slug.toLowerCase(),
+      normalizedSlug: normalizeBengaliSlug(name)
     };
   });
 }
 
-// 🔹 হেলপার ফাংশন: বাংলা/ইংরেজি উভয় স্লাগ, বানান ভুল বা ভিন্ন রূপ মিলিয়ে বই ফিল্টার করা
+// 🔹 হেলপার ফাংশন: বাংলা/ইংরেজি উভয় স্লাগ, বানান ভুল বা ভিন্ন রূপ মিলিয়ে বই ফিল্টার ও সর্ট করা
 async function getAuthorDataAndBooks(rawSlug: string) {
   const libraryData = await getLibraryBooks();
   const booksToFilter = (libraryData as any)?.allBooks || (libraryData as any)?.latestBooks || [];
@@ -89,7 +89,6 @@ async function getAuthorDataAndBooks(rawSlug: string) {
     let isMatchFound = false;
 
     const checkMatch = (person: { name: string; slug: string; normalizedSlug: string }) => {
-      const personNormName = normalizeBengaliSlug(person.name);
       return (
         normalizedRawSlug === person.normalizedSlug ||
         normalizedRawSlug === normalizeBengaliSlug(person.slug) ||
@@ -128,6 +127,13 @@ async function getAuthorDataAndBooks(rawSlug: string) {
     }
 
     return isMatchFound;
+  });
+
+  // 🔹 Frontmatter-এর order প্রপার্টি অনুযায়ী বইগুলোকে ক্রমানুসারে (Ascending) সাজানো
+  authorBooks.sort((a: any, b: any) => {
+    const orderA = a.order !== undefined && a.order !== null ? Number(a.order) : Infinity;
+    const orderB = b.order !== undefined && b.order !== null ? Number(b.order) : Infinity;
+    return orderA - orderB;
   });
 
   return {
@@ -199,13 +205,13 @@ export default async function SingleAuthorPage({ params }: PageProps) {
   };
 
   return (
-    <div className="w-full min-h-screen py-3 px-2 mx-auto font-tarunima">
+    <div className="w-full min-h-screen mx-auto font-tarunima">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }}
       />
-      <AuthorBookSearchGrid 
-        books={authorBooks as any} 
+      <AuthorBookSearchGrid
+        books={authorBooks as any}
         personName={displayAuthorName}
         siteName={siteData?.title || 'এডুলিচার পাঠশালা'}
       />

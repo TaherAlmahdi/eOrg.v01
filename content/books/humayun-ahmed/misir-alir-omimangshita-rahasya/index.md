@@ -18,10 +18,7 @@ genre_links:
   - name: "পরামনোবিজ্ঞান"
     link: "/genre/parapsychology"
 
-series_list:
-  - name: "হুমায়ূন আহমেদ রচনাবলী"
-    order: 1996
-    link: "/series/humayun-ahmed-rachanabali"
+series:
   - name: "মিসির আলি অমনিবাস"
     order: 9
     link: "/series/misir-ali-omnibus"

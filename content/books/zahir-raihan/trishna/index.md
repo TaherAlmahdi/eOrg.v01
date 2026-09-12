@@ -17,9 +17,6 @@ genre_links:
   - { name: "উপন্যাস", link: "/genre/novel" }
   - { name: "রোমান্টিক উপন্যাস", link: "/genre/romantic-novel" }
 
-series: "জহির রায়হান রচনাবলী"
-series_link: "/series/zahir-raihan-rachanabali"
-
 cover_image: "/cover/trishna.webp"
 
 meta_description: "জহির রায়হানের ‘তৃষ্ণা’ প্রেম, আকাঙ্ক্ষা, মানবিক সম্পর্ক, আবেগ ও জীবনের অন্তর্গত টানাপোড়েন নিয়ে রচিত একটি উল্লেখযোগ্য রোমান্টিক উপন্যাস।"

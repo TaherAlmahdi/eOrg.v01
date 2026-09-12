@@ -17,9 +17,6 @@ genre_links:
   - { name: "উপন্যাস", link: "/genre/novel" }
   - { name: "রোমান্টিক উপন্যাস", link: "/genre/romantic-novel" }
 
-series: "জহির রায়হান রচনাবলী"
-series_link: "/series/zahir-raihan-rachanabali"
-
 cover_image: "/cover/koyekti-mrityu.webp"
 
 meta_description: "জহির রায়হানের ‘কয়েকটি মৃত্যু’ প্রেম, মানবিক সম্পর্ক, আবেগ, বিচ্ছেদ ও মধ্যবিত্ত জীবনের টানাপোড়েন নিয়ে রচিত একটি উল্লেখযোগ্য উপন্যাস।"

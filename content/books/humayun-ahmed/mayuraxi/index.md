@@ -18,10 +18,7 @@ genre_links:
   - name: "পরামনোবিজ্ঞান"
     link: "/genre/parapsychology"
 
-series_list:
-  - name: "হুমায়ূন আহমেদ রচনাবলী"
-    order: 1990
-    link: "/series/humayun-ahmed-rachanabali"
+series:
   - name: "হিমু সমগ্র"
     order: 1
     link: "/series/himu-samagra"

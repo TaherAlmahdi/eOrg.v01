@@ -20,9 +20,6 @@ genre_links:
   - { name: "রাজনৈতিক উপন্যাস", link: "/genre/political-novel" }
   - { name: "ঐতিহাসিক উপন্যাস", link: "/genre/historical-novel" }
 
-series: "জহির রায়হান রচনাবলী"
-series_link: "/series/zahir-raihan-rachanabali"
-
 cover_image: "/cover/ekushe-february.webp"
 
 meta_description: "জহির রায়হানের ‘একুশে ফেব্রুয়ারি’ ভাষা আন্দোলনের পটভূমিতে রচিত একটি গুরুত্বপূর্ণ উপন্যাস। বাঙালির ভাষার অধিকার, আত্মপরিচয়, রাজনৈতিক সংগ্রাম, দেশপ্রেম ও আত্মত্যাগের চেতনাকে কেন্দ্র করে রচিত এই উপন্যাস বাংলা সাহিত্যে একুশের ইতিহাস ও চেতনার গুরুত্বপূর্ণ দলিল।"

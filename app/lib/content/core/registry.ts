@@ -67,7 +67,7 @@ export const CONTENT_REGISTRY = {
     "sanjib-chatterjee": "সঞ্জীব চট্টোপাধ্যায়",
     "sushil-chaudhury": "সুশীল চৌধুরী",
     "qazi-anwar-hussain": "কাজী আনোয়ার হোসেন",
-    
+
   } as Record<string, string>,
 
   // English Slug -> Bengali Value
@@ -159,8 +159,8 @@ export const CONTENT_REGISTRY = {
 
   // English Slug -> Bengali Value
   series: {
-    "feluda": "ফেলুদা সিরিজ",
-    "byomkesh": "ব্যোমকেশ সমগ্র",
+    "feluda-samagra": "ফেলুদা সমগ্র",
+    "byomkesh-samagra": "ব্যোমকেশ সমগ্র",
     "kakababu": "কাকাবাবু সিরিজ",
     "humayun-ahmed-rachanabali": "হুমায়ূন আহমেদ রচনাবলী",
     "himu-samagra": "হিমু সমগ্র",

@@ -2306,12 +2306,7 @@ export const libraryBooks = [
         "link": "/genre/parapsychology"
       }
     ],
-    "series_list": [
-      {
-        "name": "হুমায়ূন আহমেদ রচনাবলী",
-        "order": 1993,
-        "link": "/series/humayun-ahmed-rachanabali"
-      },
+    "series": [
       {
         "name": "মিসির আলি অমনিবাস",
         "order": 10,
@@ -2365,11 +2360,7 @@ export const libraryBooks = [
         "link": "/genre/parapsychology"
       }
     ],
-    "series_list": [
-      {
-        "name": "হুমায়ূন আহমেদ রচনাবলী",
-        "order": 2000
-      },
+    "series": [
       {
         "name": "মিসির আলি অমনিবাস",
         "order": 12
@@ -2433,11 +2424,7 @@ export const libraryBooks = [
         "link": "/genre/parapsychology"
       }
     ],
-    "series_list": [
-      {
-        "name": "হুমায়ূন আহমেদ রচনাবলী",
-        "order": 1987
-      },
+    "series": [
       {
         "name": "মিসির আলি অমনিবাস",
         "order": 4
@@ -2502,11 +2489,7 @@ export const libraryBooks = [
         "link": "/genre/parapsychology"
       }
     ],
-    "series_list": [
-      {
-        "name": "হুমায়ূন আহমেদ রচনাবলী",
-        "order": "1991-05"
-      },
+    "series": [
       {
         "name": "মিসির আলি অমনিবাস",
         "order": 6
@@ -2575,10 +2558,6 @@ export const libraryBooks = [
     ],
     "series": [
       {
-        "name": "হুমায়ূন আহমেদ রচনাবলী",
-        "order": "1991-06"
-      },
-      {
         "name": "মিসির আলি অমনিবাস",
         "order": 7
       }
@@ -2640,11 +2619,7 @@ export const libraryBooks = [
         "link": "/genre/parapsychology"
       }
     ],
-    "series_list": [
-      {
-        "name": "হুমায়ূন আহমেদ রচনাবলী",
-        "order": 1989
-      },
+    "series": [
       {
         "name": "মিসির আলি অমনিবাস",
         "order": 5
@@ -2708,12 +2683,7 @@ export const libraryBooks = [
         "link": "/genre/parapsychology"
       }
     ],
-    "series_list": [
-      {
-        "name": "হুমায়ূন আহমেদ রচনাবলী",
-        "order": 1992,
-        "link": "/series/humayun-ahmed-rachanabali"
-      },
+    "series": [
       {
         "name": "হিমু সমগ্র",
         "order": 2,
@@ -2767,11 +2737,7 @@ export const libraryBooks = [
         "link": "/genre/parapsychology"
       }
     ],
-    "series_list": [
-      {
-        "name": "হুমায়ূন আহমেদ রচনাবলী",
-        "order": 1985
-      },
+    "series": [
       {
         "name": "মিসির আলি অমনিবাস",
         "order": 1
@@ -2822,12 +2788,7 @@ export const libraryBooks = [
         "link": "/genre/novel"
       }
     ],
-    "series_list": [
-      {
-        "name": "হুমায়ূন আহমেদ রচনাবলী",
-        "order": 1997,
-        "link": "/series/humayun-ahmed-rachanabali"
-      },
+    "series": [
       {
         "name": "হিমু সমগ্র",
         "order": 7,
@@ -2862,6 +2823,46 @@ export const libraryBooks = [
     "bookFolder": "himur-dwitiya-prohor"
   },
   {
+    "id": "kuhurani",
+    "slug": "kuhurani",
+    "domain": "",
+    "title": "কুহুরানী",
+    "author": "হুমায়ূন আহমেদ",
+    "type": "book_index",
+    "subdomain": "library",
+    "first_published": 2006,
+    "published": "2026-09-10",
+    "order": 200602,
+    "genre": [
+      "উপন্যাস"
+    ],
+    "genre_links": [
+      {
+        "name": "উপন্যাস",
+        "link": "/genre/novel"
+      }
+    ],
+    "cover_image": "/cover/kuhurani.webp",
+    "meta_description": "হুমায়ূন আহমেদ রচিত ‘কুহুরানী’ একটি স্বতন্ত্র উপন্যাস। নয়াপাড়ার খায়রুন্নেসা আদর্শ বিদ্যালয়ের প্রধান শিক্ষক মোফাজ্জল করিমকে কেন্দ্র করে গড়ে ওঠা এই কাহিনিতে মানুষের ব্যক্তিগত বেদনা, পারিবারিক সম্পর্ক, জীবনসংগ্রাম ও মানবিক অনুভূতির নানা দিক উঠে এসেছে।",
+    "tags": [
+      "হুমায়ূন আহমেদ",
+      "কুহুরানী",
+      "উপন্যাস",
+      "বাংলা উপন্যাস",
+      "সমকালীন উপন্যাস",
+      "বাংলা সাহিত্য",
+      "হুমায়ূন আহমেদের উপন্যাস",
+      "হুমায়ূন আহমেদ রচনাবলী",
+      "এডুলিচার"
+    ],
+    "notice": "এই পাতাটি মূলগ্রন্থের অংশ নয়; এটি হুমায়ূন আহমেদ রচিত ‘কুহুরানী’ উপন্যাসের পরিচিতি, প্রকাশনা-ইতিহাস ও সাহিত্যিক মূল্যায়ন।",
+    "publisher": "মনিরুল হক, অনন্যা, ঢাকা",
+    "source_book": "অনন্যা প্রকাকিত ‘কুহুরানী’ উপন্যাসের ষষ্ঠ মুদ্রণ, ২০০৯ মুদ্রিত সংস্করণ।",
+    "extractedItems": [],
+    "authorFolder": "humayun-ahmed",
+    "bookFolder": "kuhurani"
+  },
+  {
     "id": "mayuraxi",
     "slug": "mayuraxi",
     "domain": "",
@@ -2885,12 +2886,7 @@ export const libraryBooks = [
         "link": "/genre/parapsychology"
       }
     ],
-    "series_list": [
-      {
-        "name": "হুমায়ূন আহমেদ রচনাবলী",
-        "order": 1990,
-        "link": "/series/humayun-ahmed-rachanabali"
-      },
+    "series": [
       {
         "name": "হিমু সমগ্র",
         "order": 1,
@@ -2944,12 +2940,7 @@ export const libraryBooks = [
         "link": "/genre/parapsychology"
       }
     ],
-    "series_list": [
-      {
-        "name": "হুমায়ূন আহমেদ রচনাবলী",
-        "order": 1996,
-        "link": "/series/humayun-ahmed-rachanabali"
-      },
+    "series": [
       {
         "name": "মিসির আলি অমনিবাস",
         "order": 9,
@@ -3003,18 +2994,6 @@ export const libraryBooks = [
         "link": "/genre/social-novel"
       }
     ],
-    "series_list": [
-      {
-        "name": "হুমায়ূন আহমেদ রচনাবলী",
-        "order": 1972
-      }
-    ],
-    "series_links": [
-      {
-        "name": "হুমায়ূন আহমেদ রচনাবলী",
-        "link": "/series/humayun-ahmed-rachanabali"
-      }
-    ],
     "cover_image": "/cover/nandita-naroke.webp",
     "meta_description": "হুমায়ূন আহমেদের প্রথম প্রকাশিত উপন্যাস ‘নন্দিত নরকে’। একটি মধ্যবিত্ত পরিবারের জীবন, পারিবারিক সম্পর্ক, ভালোবাসা, দুঃখ, অসহায়ত্ব ও মানবিক টানাপোড়েনের মধ্য দিয়ে রচিত এই উপন্যাসে বাংলাদেশের মধ্যবিত্ত সমাজজীবনের একটি অন্তরঙ্গ চিত্র ফুটে উঠেছে। ১৯৭২ সালে প্রকাশিত এই গ্রন্থের মধ্য দিয়েই বাংলা কথাসাহিত্যে হুমায়ূন আহমেদের স্বতন্ত্র সাহিত্যিক আত্মপ্রকাশ ঘটে।",
     "tags": [
@@ -3063,21 +3042,13 @@ export const libraryBooks = [
         "link": "/genre/parapsychology"
       }
     ],
-    "series_list": [
-      {
-        "name": "হুমায়ূন আহমেদ রচনাবলী",
-        "order": 1988
-      },
+    "series": [
       {
         "name": "মিসির আলি অমনিবাস",
         "order": 2
       }
     ],
     "series_links": [
-      {
-        "name": "হুমায়ূন আহমেদ রচনাবলী",
-        "link": "/series/humayun-ahmed-rachanabali"
-      },
       {
         "name": "মিসির আলি অমনিবাস",
         "link": "/series/misir-ali-omnibus"
@@ -3131,21 +3102,13 @@ export const libraryBooks = [
         "link": "/genre/parapsychology"
       }
     ],
-    "series_list": [
-      {
-        "name": "হুমায়ূন আহমেদ রচনাবলী",
-        "order": 1989
-      },
+    "series": [
       {
         "name": "মিসির আলি অমনিবাস",
         "order": 3
       }
     ],
     "series_links": [
-      {
-        "name": "হুমায়ূন আহমেদ রচনাবলী",
-        "link": "/series/humayun-ahmed-rachanabali"
-      },
       {
         "name": "মিসির আলি অমনিবাস",
         "link": "/series/misir-ali-omnibus"
@@ -3199,21 +3162,13 @@ export const libraryBooks = [
         "link": "/genre/parapsychology"
       }
     ],
-    "series_list": [
-      {
-        "name": "হুমায়ূন আহমেদ রচনাবলী",
-        "order": 1992
-      },
+    "series": [
       {
         "name": "মিসির আলি অমনিবাস",
         "order": 8
       }
     ],
     "series_links": [
-      {
-        "name": "হুমায়ূন আহমেদ রচনাবলী",
-        "link": "/series/humayun-ahmed-rachanabali"
-      },
       {
         "name": "মিসির আলি অমনিবাস",
         "link": "/series/misir-ali-omnibus"
@@ -3267,12 +3222,7 @@ export const libraryBooks = [
         "link": "/genre/parapsychology"
       }
     ],
-    "series_list": [
-      {
-        "name": "হুমায়ূন আহমেদ রচনাবলী",
-        "order": 2009,
-        "link": "/series/humayun-ahmed-rachanabali"
-      },
+    "series": [
       {
         "name": "মিসির আলি অমনিবাস",
         "order": 11,
@@ -3927,6 +3877,181 @@ export const libraryBooks = [
     "bookFolder": "ami-birangana-bolchi"
   },
   {
+    "id": "bharatnatyam",
+    "slug": "bharatnatyam",
+    "domain": "",
+    "title": "ভারতনাট্যম",
+    "author": "কাজী আনোয়ার হোসেন",
+    "pen_name": "বিদ্যুৎ মিত্র",
+    "subdomain": "library",
+    "type": "book_index",
+    "first_published": 1966,
+    "published": "2026-09-05T00:00:00.000Z",
+    "series": [
+      {
+        "name": "মাসুদ রানা",
+        "order": 2
+      }
+    ],
+    "series_links": [
+      {
+        "name": "মাসুদ রানা",
+        "link": "/series/masud-rana"
+      }
+    ],
+    "genre": [
+      "গোয়েন্দা",
+      "অভিযান"
+    ],
+    "genre_links": [
+      {
+        "name": "গোয়েন্দা",
+        "link": "/genre/detective"
+      },
+      {
+        "name": "অভিযান",
+        "link": "/genre/adventure"
+      }
+    ],
+    "cover_image": "/cover/bharatnatyam.webp",
+    "meta_description": "কাজী আনোয়ার হোসেনের ‘বিদ্যুৎ মিত্র’ ছদ্মনামে প্রকাশিত ‘ভারতনাট্যম’ মাসুদ রানা সিরিজের দ্বিতীয় গ্রন্থ। ১৯৬৬ সালে প্রকাশিত এই বাংলা মৌলিক গুপ্তচর-অভিযান কাহিনিতে রহস্য, রোমাঞ্চ, দুঃসাহসিকতা ও গুপ্তচরবৃত্তির সমন্বয় ঘটেছে।",
+    "tags": [
+      "কাজী আনোয়ার হোসেন",
+      "বিদ্যুৎ মিত্র",
+      "ভারতনাট্যম",
+      "মাসুদ রানা",
+      "মাসুদ রানা সিরিজ",
+      "গোয়েন্দা",
+      "গুপ্তচর কাহিনী",
+      "স্পাই থ্রিলার",
+      "অভিযান",
+      "অ্যাডভেঞ্চার",
+      "রহস্য-রোমাঞ্চ",
+      "বাংলা সাহিত্য"
+    ],
+    "notice": "এই পাতাটি মূলগ্রন্থের অংশ নয়; এটি কাজী আনোয়ার হোসেন রচিত ‘ভারতনাট্যম’ উপন্যাসের পরিচিতি, প্রকাশনা-ইতিহাস ও সাহিত্যিক মূল্যায়ন।",
+    "source_book": "সেবা প্রকাশনী থেকে প্রকাশিত ‘ভারতনাট্যম’—মাসুদ রানা সিরিজের দ্বিতীয় গ্রন্থ",
+    "extractedItems": [],
+    "authorFolder": "qazi-anwar-hussain",
+    "bookFolder": "bharatnatyam"
+  },
+  {
+    "id": "dhwangsha-paharh",
+    "slug": "dhwangsha-paharh",
+    "domain": "",
+    "title": "ধ্বংস পাহাড়",
+    "author": "কাজী আনোয়ার হোসেন",
+    "pen_name": "বিদ্যুৎ মিত্র",
+    "subdomain": "library",
+    "type": "book_index",
+    "first_published": "1966-05",
+    "published": "2026-09-05T00:00:00.000Z",
+    "series": [
+      {
+        "name": "মাসুদ রানা",
+        "order": 1
+      }
+    ],
+    "series_links": [
+      {
+        "name": "মাসুদ রানা",
+        "link": "/series/masud-rana"
+      }
+    ],
+    "genre": [
+      "গোয়েন্দা",
+      "অভিযান"
+    ],
+    "genre_links": [
+      {
+        "name": "গোয়েন্দা",
+        "link": "/genre/detective"
+      },
+      {
+        "name": "অভিযান",
+        "link": "/genre/adventure"
+      }
+    ],
+    "cover_image": "/cover/dhwansa-paharh.webp",
+    "meta_description": "কাজী আনোয়ার হোসেনের ‘বিদ্যুৎ মিত্র’ ছদ্মনামে প্রকাশিত ‘ধ্বংস পাহাড়’ মাসুদ রানা সিরিজের প্রথম গ্রন্থ। ১৯৬৬ সালের মে মাসে প্রকাশিত এই বাংলা মৌলিক স্পাই থ্রিলার উপন্যাসে রহস্য, রোমাঞ্চ, অ্যাডভেঞ্চার ও গুপ্তচরবৃত্তির সমন্বয় ঘটেছে।",
+    "tags": [
+      "কাজী আনোয়ার হোসেন",
+      "বিদ্যুৎ মিত্র",
+      "ধ্বংস পাহাড়",
+      "মাসুদ রানা",
+      "মাসুদ রানা সিরিজ",
+      "গুপ্তচর কাহিনী",
+      "স্পাই থ্রিলার",
+      "রহস্য-রোমাঞ্চ",
+      "অ্যাডভেঞ্চার",
+      "বাংলা সাহিত্য"
+    ],
+    "notice": "এই পাতাটি মূলগ্রন্থের অংশ নয়; এটি কাজী আনোয়ার হোসেন রচিত ‘ধ্বংস পাহাড়’ উপন্যাসের পরিচিতি, প্রকাশনা-ইতিহাস ও সাহিত্যিক মূল্যায়ন।",
+    "source_book": "সেবা প্রকাশনী থেকে প্রকাশিত ‘ধ্বংস পাহাড়’—মাসুদ রানা সিরিজের প্রথম গ্রন্থ",
+    "extractedItems": [],
+    "authorFolder": "qazi-anwar-hussain",
+    "bookFolder": "dhwangsha-paharh"
+  },
+  {
+    "id": "swarnamriga",
+    "slug": "swarnamriga",
+    "domain": "",
+    "title": "স্বর্ণমৃগ",
+    "author": "কাজী আনোয়ার হোসেন",
+    "pen_name": "বিদ্যুৎ মিত্র",
+    "subdomain": "library",
+    "type": "book_index",
+    "first_published": 1966,
+    "published": "2026-09-05T00:00:00.000Z",
+    "series": [
+      {
+        "name": "মাসুদ রানা",
+        "order": 3
+      }
+    ],
+    "series_links": [
+      {
+        "name": "মাসুদ রানা",
+        "link": "/series/masud-rana"
+      }
+    ],
+    "genre": [
+      "গোয়েন্দা",
+      "অভিযান"
+    ],
+    "genre_links": [
+      {
+        "name": "গোয়েন্দা",
+        "link": "/genre/detective"
+      },
+      {
+        "name": "অভিযান",
+        "link": "/genre/adventure"
+      }
+    ],
+    "cover_image": "/cover/swarnamriga.webp",
+    "meta_description": "কাজী আনোয়ার হোসেনের ‘বিদ্যুৎ মিত্র’ ছদ্মনামে প্রকাশিত ‘স্বর্ণমৃগ’ মাসুদ রানা সিরিজের তৃতীয় গ্রন্থ। ১৯৬৬ সালে প্রকাশিত এই বাংলা মৌলিক গুপ্তচর-অভিযান কাহিনিতে রহস্য, রোমাঞ্চ, দুঃসাহসিকতা ও গুপ্তচরবৃত্তির সমন্বয় ঘটেছে।",
+    "tags": [
+      "কাজী আনোয়ার হোসেন",
+      "বিদ্যুৎ মিত্র",
+      "স্বর্ণমৃগ",
+      "মাসুদ রানা",
+      "মাসুদ রানা সিরিজ",
+      "গোয়েন্দা",
+      "গুপ্তচর কাহিনী",
+      "স্পাই থ্রিলার",
+      "অভিযান",
+      "অ্যাডভেঞ্চার",
+      "রহস্য-রোমাঞ্চ",
+      "বাংলা সাহিত্য"
+    ],
+    "notice": "এই পাতাটি মূলগ্রন্থের অংশ নয়; এটি কাজী আনোয়ার হোসেন রচিত ‘স্বর্ণমৃগ’ উপন্যাসের পরিচিতি, প্রকাশনা-ইতিহাস ও সাহিত্যিক মূল্যায়ন।",
+    "source_book": "সেবা প্রকাশনী থেকে প্রকাশিত ‘স্বর্ণমৃগ’—মাসুদ রানা সিরিজের তৃতীয় গ্রন্থ",
+    "extractedItems": [],
+    "authorFolder": "qazi-anwar-hussain",
+    "bookFolder": "swarnamriga"
+  },
+  {
     "id": "ferrari",
     "slug": "ferrari",
     "domain": "",
@@ -4390,6 +4515,72 @@ export const libraryBooks = [
     "bookFolder": "polli-samaj"
   },
   {
+    "id": "feludar-goyendagiri",
+    "slug": "feludar-goyendagiri",
+    "domain": "",
+    "title": "ফেলুদার গোয়েন্দাগিরি",
+    "author": "সত্যজিৎ রায়",
+    "type": "book_index",
+    "subdomain": "library",
+    "first_published": 1965,
+    "published": "2026-09-11",
+    "order": 196500,
+    "pub_medium": "‘সন্দেশ’ পত্রিকায় ১৯৬৫ সালে প্রথম প্রকাশিত।",
+    "publisher": "সপ্তর্ষি প্রকাশন",
+    "cover_artist": "সৌরীশ মিত্র",
+    "editor": "অভীক চট্টোপাধ্যায়",
+    "genre": [
+      "গোয়েন্দা",
+      "রহস্য",
+      "অভিযান"
+    ],
+    "genre_links": [
+      {
+        "name": "গোয়েন্দা",
+        "link": "/genre/detective"
+      },
+      {
+        "name": "রহস্য",
+        "link": "/genre/mystery"
+      },
+      {
+        "name": "অভিযান",
+        "link": "/genre/adventure"
+      }
+    ],
+    "series": [
+      {
+        "name": "ফেলুদা সমগ্র",
+        "order": 2,
+        "link": "/series/feluda-samagra"
+      }
+    ],
+    "cover_image": "/cover/feludar-goyendagiri.webp",
+    "meta_description": "সত্যজিৎ রায়ের সৃষ্ট অমর গোয়েন্দা চরিত্র ফেলুদার প্রথম কাহিনি ‘ফেলুদার গোয়েন্দাগিরি’। ১৯৬৫ সালে ‘সন্দেশ’ পত্রিকায় প্রকাশিত এই কাহিনিতে প্রদোষ চন্দ্র মিত্র ওরফে ফেলুদার সঙ্গে পাঠকের প্রথম পরিচয় ঘটে। তোপসের বর্ণনায় দার্জিলিংকে পটভূমি করে এগিয়ে চলা এই রহস্যকাহিনি বাংলা গোয়েন্দাসাহিত্যে ফেলুদা-যাত্রার সূচনালগ্নের গুরুত্বপূর্ণ রচনা।",
+    "tags": [
+      "সত্যজিৎ রায়",
+      "ফেলুদা",
+      "ফেলুদার গোয়েন্দাগিরি",
+      "প্রদোষ চন্দ্র মিত্র",
+      "তোপসে",
+      "তপেশরঞ্জন মিত্র",
+      "গোয়েন্দা কাহিনি",
+      "রহস্য কাহিনি",
+      "অভিযান",
+      "বাংলা গোয়েন্দাসাহিত্য",
+      "বাংলা সাহিত্য",
+      "ফেলুদা সিরিজ",
+      "সত্যজিৎ রায়ের লেখা",
+      "ফেলুদা সমগ্র",
+      "এডুলিচার"
+    ],
+    "notice": "এই পাতাটি মূলগ্রন্থের অংশ নয়; এটি সত্যজিৎ রায় রচিত ‘ফেলুদার গোয়েন্দাগিরি’ কাহিনির পরিচিতি, প্রকাশনা-ইতিহাস ও সাহিত্যিক মূল্যায়ন।",
+    "source_book": "সত্যজিৎ রায়, ‘ফেলুদার গোয়েন্দাগিরি’; সম্পাদনা: অভীক চট্টোপাধ্যায়; সপ্তর্ষি প্রকাশন।",
+    "extractedItems": [],
+    "authorFolder": "satyajit-roy",
+    "bookFolder": "feludar-goyendagiri"
+  },
+  {
     "id": "prak-palashi-bangla",
     "slug": "prak-palashi-bangla",
     "domain": "",
@@ -4460,8 +4651,6 @@ export const libraryBooks = [
         "link": "/genre/poetry"
       }
     ],
-    "series": "সুকান্ত সমগ্র",
-    "series_link": "/series/sukanta-samagra",
     "cover_image": "/cover/charhpatra.webp",
     "meta_description": "সুকান্ত ভট্টাচার্যের বিখ্যাত কাব্যগ্রন্থ ‘ছাড়পত্র’ বাংলা প্রগতিশীল ও গণমুখী কবিতার এক গুরুত্বপূর্ণ সংকলন। দুর্ভিক্ষ, দারিদ্র্য, শোষণ, যুদ্ধ ও বৈষম্যের বাস্তবতার পাশাপাশি নতুন সমাজ ও মানবিক মুক্তির আকাঙ্ক্ষা এই গ্রন্থের কবিতাগুলোর প্রধান সুর। সহজ, তীব্র ও বাস্তবতাসম্পৃক্ত ভাষায় রচিত কবিতাগুলো বাংলা কবিতায় সুকান্তের স্বতন্ত্র কণ্ঠকে প্রতিষ্ঠিত করেছে।",
     "tags": [
@@ -4544,8 +4733,6 @@ export const libraryBooks = [
         "link": "/genre/poetry"
       }
     ],
-    "series": "সুকান্ত সমগ্র",
-    "series_link": "/series/sukanta-samagra",
     "cover_image": "/cover/geetiguchchha.webp",
     "meta_description": "সুকান্ত ভট্টাচার্যের ‘গীতিগুচ্ছ’ তাঁর কাব্যসৃষ্টির একটি স্বতন্ত্র সংকলন, যেখানে গীতিধর্মী কবিতার মধ্য দিয়ে প্রেম, প্রকৃতি, মানবজীবন, অনুভূতি ও সমকালীন বাস্তবতার নানা অনুষঙ্গ প্রকাশ পেয়েছে। সুকান্তের পরিচিত গণমুখী ও প্রতিবাদী কবিসত্তার পাশাপাশি তাঁর সংবেদনশীল ও গীতিময় শিল্পরূপের পরিচয়ও এই গ্রন্থে পাওয়া যায়।",
     "tags": [
@@ -4609,8 +4796,6 @@ export const libraryBooks = [
         "link": "/genre/poetry"
       }
     ],
-    "series": "সুকান্ত সমগ্র",
-    "series_link": "/series/sukanta-samagra",
     "cover_image": "/cover/ghum-nei.webp",
     "meta_description": "সুকান্ত ভট্টাচার্যের ‘ঘুম নেই’ একটি গুরুত্বপূর্ণ কাব্যগ্রন্থ, যা ১৯৫০ সালে প্রকাশিত হয়। দুর্ভিক্ষ, দারিদ্র্য, শোষণ, যুদ্ধ, সাম্রাজ্যবাদ, শ্রমজীবী মানুষের জীবন এবং সামাজিক পরিবর্তনের আকাঙ্ক্ষা এই গ্রন্থের কবিতাগুলোর প্রধান অনুষঙ্গ। তীব্র বাস্তববোধ, প্রতিবাদী চেতনা ও গণমানুষের প্রতি গভীর দায়বদ্ধতা ‘ঘুম নেই’-কে সুকান্তের কাব্যসত্তার একটি গুরুত্বপূর্ণ দলিল হিসেবে প্রতিষ্ঠিত করেছে।",
     "tags": [
@@ -4694,8 +4879,6 @@ export const libraryBooks = [
         "link": "/genre/stories"
       }
     ],
-    "series": "সুকান্ত সমগ্র",
-    "series_link": "/series/sukanta-samagra",
     "cover_image": "/cover/hortal.webp",
     "meta_description": "সুকান্ত ভট্টাচার্যের ‘হরতাল’ ১৯৬২ সালে মরণোত্তর প্রকাশিত একটি গুরুত্বপূর্ণ গদ্যসংকলন। শিরোনাম গল্প ‘হরতাল’-সহ ‘লেজের কাহিনী’, ‘ষাঁড়-গাধা-ছাগলের কথা’, ‘দেবতাদের ভয়’ ও ‘রাখাল ছেলে’ প্রভৃতি রচনায় ব্যঙ্গ, রূপক, রাজনৈতিক সচেতনতা, শোষণবিরোধী দৃষ্টিভঙ্গি এবং মানবিক সংবেদনশীলতার পরিচয় পাওয়া যায়। সহজ, তীক্ষ্ণ ও রসাত্মক ভাষায় সুকান্ত সমকালীন সমাজ ও মানুষের নানা অসংগতিকে তুলে ধরেছেন।",
     "tags": [
@@ -4750,8 +4933,6 @@ export const libraryBooks = [
         "link": "/genre/poetry"
       }
     ],
-    "series": "সুকান্ত সমগ্র",
-    "series_link": "/series/sukanta-samagra",
     "cover_image": "/cover/mithekorha.webp",
     "meta_description": "সুকান্ত ভট্টাচার্যের ‘মিঠেকড়া’ ১৯৫১ সালে প্রথম প্রকাশিত একটি ব্যঙ্গরসাত্মক কাব্যগ্রন্থ। ছড়া, হাস্যরস, তীক্ষ্ণ ব্যঙ্গ ও সামাজিক সচেতনতার সমন্বয়ে রচিত এই গ্রন্থে যুদ্ধ, দারিদ্র্য, শোষণ, বৈষম্য, ভণ্ডামি ও সমকালীন জীবনের নানা অসংগতিকে সহজ অথচ তীক্ষ্ণ ভাষায় তুলে ধরা হয়েছে। দেবব্রত মুখোপাধ্যায়ের চিত্রসমৃদ্ধ এই গ্রন্থ সুকান্তের সাহিত্যিক বহুমাত্রিকতার একটি গুরুত্বপূর্ণ নিদর্শন।",
     "tags": [
@@ -4777,21 +4958,21 @@ export const libraryBooks = [
     "notice": "এই পাতাটি মূলগ্রন্থের অংশ নয়; এটি সুকান্ত ভট্টাচার্য রচিত ‘মিঠেকড়া’ কাব্যগ্রন্থের পরিচিতি, প্রকাশনা-ইতিহাস ও সাহিত্যিক মূল্যায়ন।",
     "source_book": "সুকান্ত ভট্টাচার্যের ‘মিঠেকড়া’-এর প্রথম প্রকাশিত সংস্করণ; সারস্বত লাইব্রেরী, কলকাতা।",
     "extractedItems": [
-      "ছড়া",
-      "ছড়া",
-      "ছড়া",
-      "ছড়া",
-      "ছড়া",
-      "ছড়া",
-      "ছড়া",
-      "ছড়া",
-      "ছড়া",
-      "ছড়া",
-      "ছড়া",
-      "ছড়া",
-      "ছড়া",
-      "ছড়া",
-      "ছড়া"
+      "ছড়া",
+      "ছড়া",
+      "ছড়া",
+      "ছড়া",
+      "ছড়া",
+      "ছড়া",
+      "ছড়া",
+      "ছড়া",
+      "ছড়া",
+      "ছড়া",
+      "ছড়া",
+      "ছড়া",
+      "ছড়া",
+      "ছড়া",
+      "ছড়া"
     ],
     "authorFolder": "sukanta",
     "bookFolder": "mithekorha"
@@ -4821,8 +5002,6 @@ export const libraryBooks = [
         "link": "/genre/lyric-drama"
       }
     ],
-    "series": "সুকান্ত সমগ্র",
-    "series_link": "/series/sukanta-samagra",
     "cover_image": "/cover/obhiyan.webp",
     "meta_description": "সুকান্ত ভট্টাচার্যের ‘অভিযান’ ১৯৫৩ সালে প্রকাশিত একটি গুরুত্বপূর্ণ কাব্যগ্রন্থ। তাঁর প্রগতিশীল ও গণমুখী সাহিত্যচেতনার পরিচয়বাহী এই গ্রন্থে মানবজীবন, সমাজবাস্তবতা, সংগ্রাম, শোষণ-বঞ্চনা এবং পরিবর্তনের আকাঙ্ক্ষা বিভিন্ন কবিতা ও রচনার মধ্য দিয়ে প্রকাশ পেয়েছে। সুকান্তের স্বল্পায়ু সাহিত্যজীবনের গুরুত্বপূর্ণ সৃষ্টিগুলোর মধ্যে ‘অভিযান’ বিশেষভাবে উল্লেখযোগ্য।",
     "tags": [
@@ -4871,8 +5050,6 @@ export const libraryBooks = [
         "link": "/genre/poetry"
       }
     ],
-    "series": "সুকান্ত সমগ্র",
-    "series_link": "/series/sukanta-samagra",
     "cover_image": "/cover/purbabhas.webp",
     "meta_description": "সুকান্ত ভট্টাচার্যের ‘পূর্বাভাস’ ১৯৫০ সালে প্রকাশিত একটি কালজয়ী কাব্যগ্রন্থ। পরাধীন ভারত, ক্ষুধা, শোষিত মানুষের সংগ্রাম এবং আসন্ন সামাজিক ও রাজনৈতিক বিপ্লবের অমোঘ পূর্বাভাস এই গ্রন্থের কবিতাগুলোর প্রধান সুর।",
     "tags": [
@@ -4946,8 +5123,6 @@ export const libraryBooks = [
         "link": "/genre/miscellaneous"
       }
     ],
-    "series": "সুকান্ত সমগ্র",
-    "series_link": "/series/sukanta-samagra",
     "cover_image": "/cover/sukanter-aprachalita-rachana.webp",
     "meta_description": "সুকান্ত ভট্টাচার্যের ‘সুকান্তের অপ্রচলিত রচনা’ তাঁর বিভিন্ন সময়ে বিচ্ছিন্নভাবে রচিত, কম পরিচিত ও অগ্রন্থিত থেকে যাওয়া রচনাসমূহের একটি গুরুত্বপূর্ণ সংকলন। কবিতা, গদ্য ও অন্যান্য সাহিত্যকর্মের মাধ্যমে এই গ্রন্থে সুকান্তের বহুমাত্রিক সাহিত্যপ্রতিভা ও সৃষ্টিশীলতার নানা দিকের পরিচয় পাওয়া যায়।",
     "tags": [
@@ -4981,7 +5156,7 @@ export const libraryBooks = [
       "গীতি",
       "কবিতা",
       "কবিতা",
-      "ছড়া",
+      "ছড়া",
       "কবিতা",
       "কবিতা",
       "কবিতা",
@@ -5019,8 +5194,6 @@ export const libraryBooks = [
         "link": "/genre/letters"
       }
     ],
-    "series": "সুকান্ত সমগ্র",
-    "series_link": "/series/sukanta-samagra",
     "cover_image": "/cover/sukanter-patroguccha.webp",
     "meta_description": "সুকান্ত ভট্টাচার্যের ‘সুকান্তের পত্রগুচ্ছ’ তাঁর পত্রসাহিত্যের একটি গুরুত্বপূর্ণ সংকলন। বিভিন্ন ব্যক্তি ও প্রিয়জনকে লেখা চিঠির মধ্য দিয়ে কবির ব্যক্তিজীবন, মানসিকতা, সাহিত্যচিন্তা, সমকালীন সমাজ-রাজনীতি এবং তাঁর কবিসত্তার নানা দিকের পরিচয় পাওয়া যায়। ব্যক্তিগত অনুভূতি ও অন্তরঙ্গ কথনের পাশাপাশি এসব চিঠিতে সুকান্তের সময় ও সমাজ সম্পর্কে সচেতন দৃষ্টিভঙ্গিও প্রতিফলিত হয়েছে।",
     "tags": [
@@ -5092,9 +5265,7 @@ export const libraryBooks = [
     ],
     "notice": "এই পাতাটি মূলগ্রন্থের অংশ নয়; এটি সুশীল চৌধুরী রচিত ‘নবাবি আমলে মুর্শিদাবাদ’ গ্রন্থের পরিচিতি, প্রকাশনা-ইতিহাস ও সাহিত্যিক মূল্যায়ন।",
     "source_book": "সুশীল চৌধুরীর ‘নবাবি আমলে মুর্শিদাবাদ’ গ্রন্থের প্রামাণ্য মুদ্রিত সংস্করণ।",
-    "extractedItems": [
-      "প্রবন্ধ"
-    ],
+    "extractedItems": [],
     "authorFolder": "sushil-chaudhuri",
     "bookFolder": "nawabi-amole-murshidabad"
   },
@@ -5457,8 +5628,6 @@ export const libraryBooks = [
         "link": "/genre/anti-war-novel"
       }
     ],
-    "series": "জহির রায়হান রচনাবলী",
-    "series_link": "/series/zahir-raihan-rachanabali",
     "cover_image": "/cover/aar-koto-din.webp",
     "meta_description": "জহির রায়হানের উপন্যাস ‘আর কত দিন’ যুদ্ধ, সহিংসতা, নিপীড়িত মানুষের আর্তি এবং শান্তি ও মানবতার চিরন্তন আকাঙ্ক্ষাকে কেন্দ্র করে রচিত একটি গুরুত্বপূর্ণ বাংলা উপন্যাস। ধর্ম, বর্ণ ও জাতীয়তার নামে সংঘটিত হিংসা ও হত্যাযজ্ঞের বিরুদ্ধে এই উপন্যাস এক শক্তিশালী মানবিক প্রতিবাদ।",
     "tags": [
@@ -5513,8 +5682,6 @@ export const libraryBooks = [
         "link": "/genre/political-novel"
       }
     ],
-    "series": "জহির রায়হান রচনাবলী",
-    "series_link": "/series/zahir-raihan-rachanabali",
     "cover_image": "/cover/aarek-phalgun.webp",
     "meta_description": "জহির রায়হানের ভাষা আন্দোলনভিত্তিক উপন্যাস ‘আরেক ফাল্গুন’-এর অনলাইন সংস্করণ। ১৯৫২ সালের রাষ্ট্রভাষা আন্দোলন, ছাত্রসমাজের সংগ্রাম, রাজনৈতিক চেতনা ও তৎকালীন পূর্ববাংলার উত্তাল সময়কে কেন্দ্র করে রচিত এই গুরুত্বপূর্ণ বাংলা উপন্যাসটি এডুলিচারে পড়ুন।",
     "tags": [
@@ -5572,8 +5739,6 @@ export const libraryBooks = [
         "link": "/genre/political-novel"
       }
     ],
-    "series": "জহির রায়হান রচনাবলী",
-    "series_link": "/series/zahir-raihan-rachanabali",
     "cover_image": "/cover/borof-gola-nodi.webp",
     "meta_description": "জহির রায়হানের উপন্যাস ‘বরফ গলা নদী’-এর অনলাইন সংস্করণ। তৎকালীন পূর্ব পাকিস্তানের সামাজিক ও রাজনৈতিক বাস্তবতা, মধ্যবিত্ত জীবনের সংকট, ব্যক্তিমানুষের সম্পর্ক এবং পরিবর্তনশীল সময়ের টানাপোড়েনকে কেন্দ্র করে রচিত এই গুরুত্বপূর্ণ বাংলা উপন্যাসটি এডুলিচারে পড়ুন।",
     "tags": [
@@ -5629,8 +5794,6 @@ export const libraryBooks = [
         "link": "/genre/historical-novel"
       }
     ],
-    "series": "জহির রায়হান রচনাবলী",
-    "series_link": "/series/zahir-raihan-rachanabali",
     "cover_image": "/cover/ekushe-february.webp",
     "meta_description": "জহির রায়হানের ‘একুশে ফেব্রুয়ারি’ ভাষা আন্দোলনের পটভূমিতে রচিত একটি গুরুত্বপূর্ণ উপন্যাস। বাঙালির ভাষার অধিকার, আত্মপরিচয়, রাজনৈতিক সংগ্রাম, দেশপ্রেম ও আত্মত্যাগের চেতনাকে কেন্দ্র করে রচিত এই উপন্যাস বাংলা সাহিত্যে একুশের ইতিহাস ও চেতনার গুরুত্বপূর্ণ দলিল।",
     "tags": [
@@ -5677,8 +5840,6 @@ export const libraryBooks = [
         "link": "/genre/social-novel"
       }
     ],
-    "series": "জহির রায়হান রচনাবলী",
-    "series_link": "/series/zahir-raihan-rachanabali",
     "cover_image": "/cover/hazar-bochor-dhore.webp",
     "meta_description": "জহির রায়হানের কালজয়ী সামাজিক উপন্যাস 'হাজার বছর ধরে' গ্রামীণ বাংলার সমাজব্যবস্থা, কুসংস্কার, নারীর অবস্থান, প্রেম, মানবিক সম্পর্ক এবং চিরন্তন জীবনপ্রবাহের এক অসাধারণ শিল্পরূপ।",
     "tags": [
@@ -5726,8 +5887,6 @@ export const libraryBooks = [
         "link": "/genre/romantic-novel"
       }
     ],
-    "series": "জহির রায়হান রচনাবলী",
-    "series_link": "/series/zahir-raihan-rachanabali",
     "cover_image": "/cover/koyekti-mrityu.webp",
     "meta_description": "জহির রায়হানের ‘কয়েকটি মৃত্যু’ প্রেম, মানবিক সম্পর্ক, আবেগ, বিচ্ছেদ ও মধ্যবিত্ত জীবনের টানাপোড়েন নিয়ে রচিত একটি উল্লেখযোগ্য উপন্যাস।",
     "tags": [
@@ -5773,8 +5932,6 @@ export const libraryBooks = [
         "link": "/genre/romantic-novel"
       }
     ],
-    "series": "জহির রায়হান রচনাবলী",
-    "series_link": "/series/zahir-raihan-rachanabali",
     "cover_image": "/cover/the-girl-of-the-evening-light.webp",
     "meta_description": "জহির রায়হানের ‘শেষ বিকেলের মেয়ে’ প্রেম, মানবিক সম্পর্ক, স্বপ্ন, আবেগ ও মধ্যবিত্ত জীবনের টানাপোড়েন নিয়ে রচিত তাঁর অন্যতম জনপ্রিয় রোমান্টিক উপন্যাস।",
     "tags": [
@@ -5819,8 +5976,6 @@ export const libraryBooks = [
         "link": "/genre/romantic-novel"
       }
     ],
-    "series": "জহির রায়হান রচনাবলী",
-    "series_link": "/series/zahir-raihan-rachanabali",
     "cover_image": "/cover/trishna.webp",
     "meta_description": "জহির রায়হানের ‘তৃষ্ণা’ প্রেম, আকাঙ্ক্ষা, মানবিক সম্পর্ক, আবেগ ও জীবনের অন্তর্গত টানাপোড়েন নিয়ে রচিত একটি উল্লেখযোগ্য রোমান্টিক উপন্যাস।",
     "tags": [
@@ -5863,8 +6018,6 @@ export const libraryBooks = [
         "link": "/genre/stories"
       }
     ],
-    "series": "জহির রায়হান রচনাবলী",
-    "series_link": "/series/zahir-raihan-rachanabali",
     "cover_image": "/cover/zahir-raihan-galpo-samagra.webp",
     "meta_description": "জহির রায়হানের বিভিন্ন সময়ে লেখা গল্প নিয়ে সংকলিত ‘জহির রায়হান গল্পসমগ্র’ বাংলা সাহিত্যের একটি গুরুত্বপূর্ণ গল্পসংকলন। ভাষা আন্দোলন, মুক্তিযুদ্ধ, মধ্যবিত্ত জীবন, প্রেম, দারিদ্র্য, সামাজিক বৈষম্য, মানবিকতা ও প্রতিবাদ তাঁর গল্পগুলোর প্রধান বিষয়।",
     "tags": [

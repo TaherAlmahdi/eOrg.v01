@@ -16,9 +16,6 @@ genre_links:
   - { name: "উপন্যাস", link: "/genre/novel" }
   - { name: "সামাজিক উপন্যাস", link: "/genre/social-novel" }
 
-series: "জহির রায়হান রচনাবলী"
-series_link: "/series/zahir-raihan-rachanabali"
-
 cover_image: "/cover/hazar-bochor-dhore.webp"
 
 meta_description: "জহির রায়হানের কালজয়ী সামাজিক উপন্যাস 'হাজার বছর ধরে' গ্রামীণ বাংলার সমাজব্যবস্থা, কুসংস্কার, নারীর অবস্থান, প্রেম, মানবিক সম্পর্ক এবং চিরন্তন জীবনপ্রবাহের এক অসাধারণ শিল্পরূপ।"

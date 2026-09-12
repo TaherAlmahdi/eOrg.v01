@@ -15,9 +15,6 @@ genre:
 genre_links:
   - { name: "গল্পগ্রন্থ", link: "/genre/stories" }
 
-series: "জহির রায়হান রচনাবলী"
-series_link: "/series/zahir-raihan-rachanabali"
-
 cover_image: "/cover/zahir-raihan-galpo-samagra.webp"
 
 meta_description: "জহির রায়হানের বিভিন্ন সময়ে লেখা গল্প নিয়ে সংকলিত ‘জহির রায়হান গল্পসমগ্র’ বাংলা সাহিত্যের একটি গুরুত্বপূর্ণ গল্পসংকলন। ভাষা আন্দোলন, মুক্তিযুদ্ধ, মধ্যবিত্ত জীবন, প্রেম, দারিদ্র্য, সামাজিক বৈষম্য, মানবিকতা ও প্রতিবাদ তাঁর গল্পগুলোর প্রধান বিষয়।"

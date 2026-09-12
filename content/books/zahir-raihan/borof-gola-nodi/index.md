@@ -21,9 +21,6 @@ genre_links:
   - { name: "সামাজিক উপন্যাস", link: "/genre/social-novel" }
   - { name: "রাজনৈতিক উপন্যাস", link: "/genre/political-novel" }
 
-series: "জহির রায়হান রচনাবলী"
-series_link: "/series/zahir-raihan-rachanabali"
-
 cover_image: "/cover/borof-gola-nodi.webp"
 
 meta_description: "জহির রায়হানের উপন্যাস ‘বরফ গলা নদী’-এর অনলাইন সংস্করণ। তৎকালীন পূর্ব পাকিস্তানের সামাজিক ও রাজনৈতিক বাস্তবতা, মধ্যবিত্ত জীবনের সংকট, ব্যক্তিমানুষের সম্পর্ক এবং পরিবর্তনশীল সময়ের টানাপোড়েনকে কেন্দ্র করে রচিত এই গুরুত্বপূর্ণ বাংলা উপন্যাসটি এডুলিচারে পড়ুন।"

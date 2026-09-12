@@ -17,9 +17,7 @@ genre_links:
   - { name: "গল্পগ্রন্থ", link: "/genre/stories" }
   - { name: "পরামনোবিজ্ঞান", link: "/genre/parapsychology" }
 
-series_list:
-  - name: "হুমায়ূন আহমেদ রচনাবলী"
-    order: "1991-05"
+series:
   - name: "মিসির আলি অমনিবাস"
     order: 6
 

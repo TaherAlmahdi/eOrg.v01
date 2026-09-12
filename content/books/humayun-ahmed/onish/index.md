@@ -16,14 +16,11 @@ genre_links:
   - { name: "উপন্যাস", link: "/genre/novel" }
   - { name: "পরামনোবিজ্ঞান", link: "/genre/parapsychology" }
 
-series_list:
-  - name: "হুমায়ূন আহমেদ রচনাবলী"
-    order: 1992
+series:
   - name: "মিসির আলি অমনিবাস"
     order: 8
 
 series_links:
-  - { name: "হুমায়ূন আহমেদ রচনাবলী", link: "/series/humayun-ahmed-rachanabali" }
   - { name: "মিসির আলি অমনিবাস", link: "/series/misir-ali-omnibus" }
 
 cover_image: "/cover/onish.webp"
