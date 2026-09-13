@@ -580,7 +580,7 @@ export const libraryBooks = [
     "type": "book_index",
     "subdomain": "library",
     "first_published": 1991,
-    "published": "2026-09-11-02",
+    "published": "2026-09-11",
     "pub_medium": "‘পাখির খাতা’র লেখাগুলি ১৯৭৭–১৯৭৯ সালের মধ্যে ‘যুগান্তর’-এর ‘ছোটদের পাততাড়ি’তে প্রথম প্রকাশিত হয়। পরে ১৯৯১ সালে গ্রন্থাকারে প্রকাশিত হয়।",
     "genre": [
       "গল্পগ্রন্থ",
@@ -612,7 +612,20 @@ export const libraryBooks = [
     ],
     "notice": "এই পাতাটি মূলগ্রন্থের অংশ নয়; এটি অমরেন্দ্র চক্রবর্তীর রচিত ‘পাখির খাতা’ গ্রন্থের পরিচিতি, প্রকাশনা-ইতিহাস ও সাহিত্যিক মূল্যায়ন।",
     "source_book": "‘পাখির খাতা’র মুদ্রিত সংস্করণ।",
-    "extractedItems": [],
+    "extractedItems": [
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প"
+    ],
     "authorFolder": "amarendra-chakraborty",
     "bookFolder": "pakhir-khata"
   },
@@ -3961,6 +3974,63 @@ export const libraryBooks = [
     "extractedItems": [],
     "authorFolder": "neelima-ibrahim",
     "bookFolder": "ami-birangana-bolchi"
+  },
+  {
+    "id": "kiriteer-aribhab",
+    "slug": "kiriteer-aribhab",
+    "domain": "",
+    "title": "কিরীটির আবির্ভাব",
+    "author": "নীহাররঞ্জন গুপ্ত",
+    "subdomain": "library",
+    "type": "book_index",
+    "subtitle": "কিরীটী-তত্ত্ব",
+    "first_published": "1933",
+    "published": "2026-09-12T00:00:00.000Z",
+    "series": [
+      {
+        "name": "কিরীটি অমনিবাস",
+        "order": 1,
+        "link": "/series/kiriti-omnibus"
+      }
+    ],
+    "genre": [
+      "গোয়েন্দা",
+      "রহস্য",
+      "উপন্যাস"
+    ],
+    "genre_links": [
+      {
+        "name": "গোয়েন্দা",
+        "link": "/genre/detective"
+      },
+      {
+        "name": "রহস্য",
+        "link": "/genre/mystery"
+      },
+      {
+        "name": "উপন্যাস",
+        "link": "/genre/novel"
+      }
+    ],
+    "cover_image": "/cover/kiriteer-aribhab.webp",
+    "meta_description": "নীহাররঞ্জন গুপ্তের কিরীটি রায় সিরিজের প্রথম কাহিনি ‘কিরীটির আবির্ভাব’। রহস্য, অপরাধ অনুসন্ধান, যুক্তি ও কিরীটি রায়ের তীক্ষ্ণ পর্যবেক্ষণশক্তিকে কেন্দ্র করে রচিত এই গোয়েন্দা কাহিনিতে বাংলা সাহিত্যের অন্যতম জনপ্রিয় গোয়েন্দা চরিত্রের স্বাতন্ত্র্যপূর্ণ পরিচয় পাওয়া যায়।",
+    "tags": [
+      "নীহাররঞ্জন গুপ্ত",
+      "কিরীটির আবির্ভাব",
+      "কিরীটি রায়",
+      "কিরীটি",
+      "কিরীটি সিরিজ",
+      "কিরীটি অমনিবাস",
+      "গোয়েন্দা কাহিনী",
+      "রহস্য কাহিনী",
+      "বাংলা গোয়েন্দা সাহিত্য",
+      "বাংলা সাহিত্য"
+    ],
+    "notice": "এই পাতাটি মূলগ্রন্থের অংশ নয়; এটি প্রমথনাথ বিশী রচিত ভূমিকা—‘কিরীটী-তত্ত্ব’ যা ‘কিরীটি অমনিবাসে’র পরিচিতি ও সাহিত্যিক মূল্যায়ন।",
+    "source_book": "‘কিরীটি অমনিবাস’, প্রথম খণ্ড",
+    "extractedItems": [],
+    "authorFolder": "nihar-ranjan-gupta",
+    "bookFolder": "kiriteer-aribhab"
   },
   {
     "id": "bharatnatyam",
