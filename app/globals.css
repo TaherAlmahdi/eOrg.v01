@@ -1418,7 +1418,7 @@ span.right {
   content: " ❀ ";
   text-align: center;
   color: green;
-  opacity: 0.6;
+  opacity: 0.2;
   /* 0.1 খুব বেশি হালকা, তাই 0.5-0.7 ব্যবহার করা ভালো */
   line-height: 1.5;
   display: block;
