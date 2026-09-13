@@ -67,6 +67,8 @@ export const CONTENT_REGISTRY = {
     "sanjib-chatterjee": "সঞ্জীব চট্টোপাধ্যায়",
     "sushil-chaudhury": "সুশীল চৌধুরী",
     "qazi-anwar-hussain": "কাজী আনোয়ার হোসেন",
+    "amarendra-chakraborty": "অমরেন্দ্র চক্রবর্তী",
+    
 
   } as Record<string, string>,
 
@@ -161,13 +163,15 @@ export const CONTENT_REGISTRY = {
   series: {
     "feluda-samagra": "ফেলুদা সমগ্র",
     "byomkesh-samagra": "ব্যোমকেশ সমগ্র",
-    "kakababu": "কাকাবাবু সিরিজ",
-    "humayun-ahmed-rachanabali": "হুমায়ূন আহমেদ রচনাবলী",
+    "kakababu-series": "কাকাবাবু সিরিজ",
+    "kiriti-omnibus": "কিরীটি অমনিবাস",
     "himu-samagra": "হিমু সমগ্র",
     "misir-ali-omnibus": "মিসির আলি অমনিবাস",
     "zahir-raihan-rachanabali": "জহির রায়হান রচনাবলী",
     "sukanta-samagra": "সুকান্ত সমগ্র",
     "masud-rana": "মাসুদ রানা",
+
+
   } as Record<string, string>,
 
   // English Slug -> Bengali Value
