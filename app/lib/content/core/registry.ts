@@ -68,6 +68,7 @@ export const CONTENT_REGISTRY = {
     "sushil-chaudhury": "সুশীল চৌধুরী",
     "qazi-anwar-hussain": "কাজী আনোয়ার হোসেন",
     "amarendra-chakraborty": "অমরেন্দ্র চক্রবর্তী",
+    "nihar-ranjan-gupta": "নীহাররঞ্জন গুপ্ত",
     
 
   } as Record<string, string>,
