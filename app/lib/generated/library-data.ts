@@ -3976,8 +3976,8 @@ export const libraryBooks = [
     "bookFolder": "ami-birangana-bolchi"
   },
   {
-    "id": "kiriteer-aribhab",
-    "slug": "kiriteer-aribhab",
+    "id": "kiriteer-abirbhab",
+    "slug": "kiriteer-abirbhab",
     "domain": "",
     "title": "কিরীটির আবির্ভাব",
     "author": "নীহাররঞ্জন গুপ্ত",
@@ -4012,7 +4012,7 @@ export const libraryBooks = [
         "link": "/genre/novel"
       }
     ],
-    "cover_image": "/cover/kiriteer-aribhab.webp",
+    "cover_image": "/cover/kiriteer-abirbhab.webp",
     "meta_description": "নীহাররঞ্জন গুপ্তের কিরীটি রায় সিরিজের প্রথম কাহিনি ‘কিরীটির আবির্ভাব’। রহস্য, অপরাধ অনুসন্ধান, যুক্তি ও কিরীটি রায়ের তীক্ষ্ণ পর্যবেক্ষণশক্তিকে কেন্দ্র করে রচিত এই গোয়েন্দা কাহিনিতে বাংলা সাহিত্যের অন্যতম জনপ্রিয় গোয়েন্দা চরিত্রের স্বাতন্ত্র্যপূর্ণ পরিচয় পাওয়া যায়।",
     "tags": [
       "নীহাররঞ্জন গুপ্ত",
@@ -4030,7 +4030,67 @@ export const libraryBooks = [
     "source_book": "‘কিরীটি অমনিবাস’, প্রথম খণ্ড",
     "extractedItems": [],
     "authorFolder": "nihar-ranjan-gupta",
-    "bookFolder": "kiriteer-aribhab"
+    "bookFolder": "kiriteer-abirbhab"
+  },
+  {
+    "id": "rahasyabhedi",
+    "slug": "rahasyabhedi",
+    "domain": "",
+    "title": "রহস্যভেদী",
+    "subtitle": "এক",
+    "author": "নীহাররঞ্জন গুপ্ত",
+    "subdomain": "library",
+    "type": "book_index",
+    "first_published": null,
+    "published": "2026-09-13",
+    "booksOrder": "202609121201",
+    "series": [
+      {
+        "name": "কিরীটি অমনিবাস",
+        "order": 2,
+        "link": "/series/kiriti-omnibus"
+      }
+    ],
+    "genre": [
+      "গোয়েন্দা",
+      "রহস্য"
+    ],
+    "genre_links": [
+      {
+        "name": "গোয়েন্দা",
+        "link": "/genre/detective"
+      },
+      {
+        "name": "রহস্য",
+        "link": "/genre/mystery"
+      }
+    ],
+    "item": [
+      {
+        "name": "গল্প",
+        "link": "/items/story"
+      }
+    ],
+    "cover_image": "/cover/rahasyabhedi.webp",
+    "meta_description": "নীহাররঞ্জন গুপ্তের কিরীটি রায় সিরিজের অন্যতম প্রারম্ভিক কাহিনি ‘রহস্যভেদী’। কিরীটি রায়ের তীক্ষ্ণ পর্যবেক্ষণ, যুক্তিবোধ, মানবিকতা ও রহস্যভেদের দক্ষতাকে কেন্দ্র করে রচিত এই গোয়েন্দা কাহিনিতে অপরাধের অনুসন্ধানের পাশাপাশি মানুষের মন ও নৈতিকতার একটি সংবেদনশীল দিকও উন্মোচিত হয়েছে।",
+    "tags": [
+      "নীহাররঞ্জন গুপ্ত",
+      "রহস্যভেদী",
+      "কিরীটি রায়",
+      "কিরীটি",
+      "কিরীটি সিরিজ",
+      "কিরীটি অমনিবাস",
+      "গোয়েন্দা কাহিনী",
+      "রহস্য কাহিনী",
+      "বাংলা গোয়েন্দা সাহিত্য",
+      "বাংলা সাহিত্য"
+    ],
+    "source_book": "‘কিরীটি অমনিবাস’, প্রথম খণ্ড",
+    "extractedItems": [
+      "গল্প"
+    ],
+    "authorFolder": "nihar-ranjan-gupta",
+    "bookFolder": "rahasyabhedi"
   },
   {
     "id": "bharatnatyam",

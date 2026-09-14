@@ -3,7 +3,7 @@ title: "কিরীটির আবির্ভাব"
 author: "নীহাররঞ্জন গুপ্ত"
 subdomain: "library"
 type: "book_index"
-slug: "kiriteer-aribhab"
+slug: "kiriteer-abirbhab"
 subtitle: "কিরীটী-তত্ত্ব"
 
 first_published: "1933"
@@ -24,7 +24,7 @@ genre_links:
   - { name: "রহস্য", link: "/genre/mystery" }
   - { name: "উপন্যাস", link: "/genre/novel" }
 
-cover_image: "/cover/kiriteer-aribhab.webp"
+cover_image: "/cover/kiriteer-abirbhab.webp"
 
 meta_description: "নীহাররঞ্জন গুপ্তের কিরীটি রায় সিরিজের প্রথম কাহিনি ‘কিরীটির আবির্ভাব’। রহস্য, অপরাধ অনুসন্ধান, যুক্তি ও কিরীটি রায়ের তীক্ষ্ণ পর্যবেক্ষণশক্তিকে কেন্দ্র করে রচিত এই গোয়েন্দা কাহিনিতে বাংলা সাহিত্যের অন্যতম জনপ্রিয় গোয়েন্দা চরিত্রের স্বাতন্ত্র্যপূর্ণ পরিচয় পাওয়া যায়।"
 
