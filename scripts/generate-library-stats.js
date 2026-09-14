@@ -120,7 +120,6 @@ function addValuesToSet(targetSet, rawValue) {
   if (!rawValue) return;
 
   const processSingleString = (str) => {
-    // কমা (,), সেমিকোলন (;), বা পাইপ (|) দিয়ে স্প্লিট করা
     const parts = String(str).split(/[,;|]/);
     parts.forEach((p) => {
       const cleaned = normalizeText(p);
@@ -171,7 +170,7 @@ function generateLibraryFiles() {
     addValuesToSet(authorsSet, book.editor_name);
   });
 
-  // ৩. মোট সিরিজ কাউন্ট (series এবং series_list উভয়ই পার্স করা হচ্ছে)
+  // ৩. মোট সিরিজ কাউন্ট
   const seriesSet = new Set();
   books.forEach((book) => {
     addValuesToSet(seriesSet, book.series);
@@ -246,4 +245,49 @@ export default {
   console.log(`📄 Data File: ${DATA_OUTPUT_FILE}`);
 }
 
-generateLibraryFiles();
+// 🔹 নির্দিষ্টভাবে index.md ফিল্টার করে ফাইল ওয়াচার ফাংশন
+function watchLibraryFiles() {
+  if (!fs.existsSync(BOOKS_DIR)) {
+    console.warn(`⚠️ Books directory not found: ${BOOKS_DIR}`);
+    return;
+  }
+
+  console.log(`👀 Watching for 'index.md' changes in: ${BOOKS_DIR}`);
+
+  // প্রথমবার একবার জেনারেট করে নেওয়া
+  generateLibraryFiles();
+
+  let debounceTimer = null;
+
+  // recursive: true দিয়ে পুরো বুকস ফোল্ডার ট্র্যাক করা
+  fs.watch(BOOKS_DIR, { recursive: true }, (_, filename) => {
+    if (!filename) return;
+
+    // পাথ নরমালাইজ করে চেক করা যে পরিবর্তন হওয়া ফাইলটি আসলেই কোনো 'index.md' কিনা
+    const normalizedFilename = filename.replace(/\\/g, '/');
+    if (!normalizedFilename.endsWith('index.md')) {
+      return; // index.md ছাড়া অন্য কোনো ফাইলে পরিবর্তন হলে স্কিপ করবে
+    }
+
+    // অতিরিক্ত ফ্রিকুয়েন্ট ট্রিগার এড়াতে ডাবাউন্স (Debounce) ব্যবহার করা
+    if (debounceTimer) clearTimeout(debounceTimer);
+
+    debounceTimer = setTimeout(() => {
+      console.log(`\n🔄 index.md change detected (${filename}). Regenerating library data...`);
+      try {
+        generateLibraryFiles();
+      } catch (error) {
+        console.error(`❌ Error during auto-regeneration:`, error);
+      }
+    }, 500);
+  });
+}
+
+// স্ক্রিপ্টটি টার্মিনাল থেকে সরাসরি রান করলে অথবা ওয়াচ মোডে চালাতে চাইলে
+const isWatchMode = process.argv.includes('--watch') || process.argv.includes('-w');
+
+if (isWatchMode) {
+  watchLibraryFiles();
+} else {
+  generateLibraryFiles();
+}

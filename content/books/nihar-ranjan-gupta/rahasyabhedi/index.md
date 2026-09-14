@@ -8,7 +8,6 @@ slug: "rahasyabhedi"
 
 first_published:
 published: "2026-09-13"
-booksOrder: "202609121201"
 
 series:
   - name: "কিরীটি অমনিবাস"

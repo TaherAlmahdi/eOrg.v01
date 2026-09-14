@@ -3976,6 +3976,62 @@ export const libraryBooks = [
     "bookFolder": "ami-birangana-bolchi"
   },
   {
+    "id": "chakri",
+    "slug": "chakri",
+    "domain": "",
+    "title": "চক্রী",
+    "author": "নীহাররঞ্জন গুপ্ত",
+    "subdomain": "library",
+    "type": "book_index",
+    "first_published": null,
+    "published": "2026-09-13",
+    "series": [
+      {
+        "name": "কিরীটি অমনিবাস",
+        "order": 3,
+        "link": "/series/kiriti-omnibus"
+      }
+    ],
+    "genre": [
+      "গোয়েন্দা",
+      "রহস্য",
+      "উপন্যাস"
+    ],
+    "genre_links": [
+      {
+        "name": "গোয়েন্দা",
+        "link": "/genre/detective"
+      },
+      {
+        "name": "রহস্য",
+        "link": "/genre/mystery"
+      },
+      {
+        "name": "উপন্যাস",
+        "link": "/genre/novel"
+      }
+    ],
+    "cover_image": "/cover/chakri.webp",
+    "meta_description": "নীহাররঞ্জন গুপ্তের কিরীটি রায় সিরিজের অন্যতম পরিচিত গোয়েন্দা কাহিনি ‘চক্রী’। সমুদ্রতীরবর্তী একটি হোটেলকে কেন্দ্র করে রহস্য, অপরাধ, সন্দেহ ও অনুসন্ধানের জটিল আবহে কিরীটি রায়ের তীক্ষ্ণ পর্যবেক্ষণ ও রহস্যভেদের দক্ষতা কাহিনিটিকে এগিয়ে নিয়ে যায়।",
+    "tags": [
+      "নীহাররঞ্জন গুপ্ত",
+      "চক্রী",
+      "কিরীটি রায়",
+      "কিরীটি",
+      "কিরীটি সিরিজ",
+      "কিরীটি অমনিবাস",
+      "গোয়েন্দা কাহিনী",
+      "রহস্য কাহিনী",
+      "বাংলা গোয়েন্দা সাহিত্য",
+      "বাংলা সাহিত্য"
+    ],
+    "notice": "এই পাতাটি মূলগ্রন্থের অংশ নয়; এটি নীহাররঞ্জন গুপ্তের রচিত ‘চক্রী’ কাহিনির পরিচিতি, প্রকাশনা-ইতিহাস ও সাহিত্যিক মূল্যায়ন।",
+    "source_book": "‘কিরীটি অমনিবাস’, প্রথম খণ্ড",
+    "extractedItems": [],
+    "authorFolder": "nihar-ranjan-gupta",
+    "bookFolder": "chakri"
+  },
+  {
     "id": "kiriteer-abirbhab",
     "slug": "kiriteer-abirbhab",
     "domain": "",
@@ -4043,7 +4099,6 @@ export const libraryBooks = [
     "type": "book_index",
     "first_published": null,
     "published": "2026-09-13",
-    "booksOrder": "202609121201",
     "series": [
       {
         "name": "কিরীটি অমনিবাস",

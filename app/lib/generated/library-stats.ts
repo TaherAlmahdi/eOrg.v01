@@ -4,7 +4,7 @@
 
 export const libraryStats = {
   "totalAuthors": 39,
-  "totalBooks": 121,
+  "totalBooks": 122,
   "totalSeries": 5,
   "totalGenres": 60,
   "totalItems": 16
