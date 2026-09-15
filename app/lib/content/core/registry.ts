@@ -70,7 +70,8 @@ export const CONTENT_REGISTRY = {
     "amarendra-chakraborty": "অমরেন্দ্র চক্রবর্তী",
     "nihar-ranjan-gupta": "নীহাররঞ্জন গুপ্ত",
     "prabhat-mohan-bandyopadhyay": "প্রভাতমোহন বন্দ্যোপাধ্যায়",
-    "muhammad-abdur-rahim": "মুহম্মদ আবদুর রহীম",
+    "muhammad-abdur-rahim": "মুহাম্মদ আবদুর রহীম",
+    "sayed-abdul-agfar": "সৈয়দ আবদুল আগফর",
 
 
   } as Record<string, string>,

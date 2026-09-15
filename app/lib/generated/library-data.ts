@@ -1823,7 +1823,8 @@ export const libraryBooks = [
     "source_book": "পর্ষদ সংস্করণ, সংশোধিত ঊনবিংশ মুদ্রণ, মাঘ ১৪০৭",
     "genre": [
       "সামাজিক উপন্যাস",
-      "উপন্যাস"
+      "উপন্যাস",
+      "উপকথা"
     ],
     "genre_links": [
       {
@@ -1833,6 +1834,10 @@ export const libraryBooks = [
       {
         "name": "উপন্যাস",
         "link": "/genre/novel"
+      },
+      {
+        "name": "উপকথা",
+        "link": "/genre/novella"
       }
     ],
     "cover_image": "/cover/radharani.webp",
@@ -2380,6 +2385,64 @@ export const libraryBooks = [
     "extractedItems": [],
     "authorFolder": "bhuban-chandra",
     "bookFolder": "haridaser-guptakotha"
+  },
+  {
+    "id": "ananda-not",
+    "slug": "ananda-not",
+    "domain": "",
+    "title": "আনন্দ-নট",
+    "author": "বিভূতিভূষণ মুখোপাধ্যায়",
+    "type": "book_index",
+    "subdomain": "library",
+    "first_published": 1958,
+    "published": "2026-09-15",
+    "order": 195802,
+    "pub_medium": "প্রথম প্রকাশ ফাল্গুন ১৩৬৪ বঙ্গাব্দ।",
+    "genre": [
+      "গল্পগ্রন্থ"
+    ],
+    "genre_links": [
+      {
+        "name": "গল্পগ্রন্থ",
+        "link": "/genre/stories"
+      }
+    ],
+    "cover_image": "/cover/ananda-not.webp",
+    "meta_description": "বিভূতিভূষণ মুখোপাধ্যায়ের ‘আনন্দ-নট’ একটি গল্পগ্রন্থ। তাঁর স্বভাবসিদ্ধ মানবিক দৃষ্টিভঙ্গি, সূক্ষ্ম জীবনবোধ, হাস্যরস ও সাধারণ মানুষের বিচিত্র জীবন-অভিজ্ঞতার শিল্পিত প্রকাশে রচিত এই গ্রন্থ বাংলা কথাসাহিত্যে তাঁর স্বতন্ত্র সাহিত্যিক পরিচয়ের একটি উল্লেখযোগ্য নিদর্শন।",
+    "tags": [
+      "আনন্দ-নট",
+      "বিভূতিভূষণ মুখোপাধ্যায়",
+      "বিভূতিভূষণ মুখোপাধ্যায়",
+      "গল্পগ্রন্থ",
+      "গল্প",
+      "বাংলা গল্প",
+      "বাংলা সাহিত্য",
+      "বাংলা কথাসাহিত্য",
+      "বিভূতিভূষণ মুখোপাধ্যায়ের গল্প",
+      "পুরোনো বাংলা সাহিত্য",
+      "এডুলিচার"
+    ],
+    "publisher": "শ্রীভুবনমোহন মজুমদার, বি. এস্-সি, শ্রীগুরু লাইব্রেরী, ২০৪ কর্ণওয়ালিশ স্ট্রীট, কলিকাতা ৬",
+    "source_book": "বিভূতিভূষণ মুখোপাধ্যায়, ‘আনন্দ-নট’; প্রথম সংস্করণ, ফাল্গুন ১৩৬৪ বঙ্গাব্দ।",
+    "extractedItems": [
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প"
+    ],
+    "authorFolder": "bibhutibhushan-mukhopadhyay",
+    "bookFolder": "ananda-not"
   },
   {
     "id": "ami-ebong-amra",
@@ -3698,7 +3761,8 @@ export const libraryBooks = [
     "publisher": "বাংলা একাডেমী",
     "genre": [
       "ইসলাম",
-      "ইতিহাস"
+      "ইতিহাস",
+      "ধর্মতত্ত্ব"
     ],
     "genre_links": [
       {
@@ -3708,6 +3772,10 @@ export const libraryBooks = [
       {
         "name": "ইতিহাস",
         "link": "/genre/history"
+      },
+      {
+        "name": "ধর্মতত্ত্ব",
+        "link": "/genre/theology"
       }
     ],
     "cover_image": "/cover/hadith-samkalaner-itihas.webp",
@@ -4965,7 +5033,7 @@ export const libraryBooks = [
     "publisher": "মুন্‌শী আজিজুদ্দীন আহমদ।",
     "genre": [
       "ইসলাম",
-      "ইতিহাস"
+      "ধর্মতত্ত্ব"
     ],
     "genre_links": [
       {
@@ -4973,8 +5041,8 @@ export const libraryBooks = [
         "link": "/genre/islam"
       },
       {
-        "name": "ইতিহাস",
-        "link": "/genre/history"
+        "name": "ধর্মতত্ত্ব",
+        "link": "/genre/theology"
       }
     ],
     "cover_image": "/cover/islam-darpon.webp",
@@ -5598,11 +5666,11 @@ export const libraryBooks = [
     "published": "2026-08-30",
     "order": 19670,
     "genre": [
-      "পত্রসাহিত্য"
+      "পত্রাবলী"
     ],
     "genre_links": [
       {
-        "name": "পত্রসাহিত্য",
+        "name": "পত্রাবলী",
         "link": "/genre/letters"
       }
     ],
