@@ -69,7 +69,9 @@ export const CONTENT_REGISTRY = {
     "qazi-anwar-hussain": "কাজী আনোয়ার হোসেন",
     "amarendra-chakraborty": "অমরেন্দ্র চক্রবর্তী",
     "nihar-ranjan-gupta": "নীহাররঞ্জন গুপ্ত",
-    
+    "prabhat-mohan-bandyopadhyay": "প্রভাতমোহন বন্দ্যোপাধ্যায়",
+    "muhammad-abdur-rahim": "মুহম্মদ আবদুর রহীম",
+
 
   } as Record<string, string>,
 
@@ -157,6 +159,7 @@ export const CONTENT_REGISTRY = {
     "screenplay": "চিত্রনাট্য",
     "research": "গবেষণা",
     "political-novel": "রাজনৈতিক উপন্যাস",
+    "mythological-novel": "পৌরাণিক উপন্যাস",
 
   } as Record<string, string>,
 

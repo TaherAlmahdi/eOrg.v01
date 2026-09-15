@@ -3,10 +3,10 @@
 // Do not edit manually.
 
 export const libraryStats = {
-  "totalAuthors": 39,
-  "totalBooks": 122,
+  "totalAuthors": 41,
+  "totalBooks": 124,
   "totalSeries": 5,
-  "totalGenres": 60,
+  "totalGenres": 62,
   "totalItems": 16
 } as const;
 
