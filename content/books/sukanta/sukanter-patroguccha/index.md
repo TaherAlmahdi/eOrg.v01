@@ -10,10 +10,10 @@ published: "2026-08-30"
 order: 19670
 
 genre:
-  - "পত্রসাহিত্য"
+  - "পত্রাবলী"
 
 genre_links:
-  - { name: "পত্রসাহিত্য", link: "/genre/letters" }
+  - { name: "পত্রাবলী", link: "/genre/letters" }
 
 cover_image: "/cover/sukanter-patroguccha.webp"
 

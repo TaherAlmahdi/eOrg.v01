@@ -3,7 +3,7 @@ title: "চক্রী"
 author: "নীহাররঞ্জন গুপ্ত"
 subdomain: "library"
 type: "book_index"
-slug: "chakri"
+slug: "chokri"
 
 first_published:
 published: "2026-09-13"

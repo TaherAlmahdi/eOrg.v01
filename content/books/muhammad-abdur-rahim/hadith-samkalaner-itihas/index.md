@@ -17,10 +17,12 @@ publisher: "বাংলা একাডেমী"
 genre:
   - "ইসলাম"
   - "ইতিহাস"
+  - "ধর্মতত্ত্ব"
 
 genre_links:
   - { name: "ইসলাম", link: "/genre/islam" }
   - { name: "ইতিহাস", link: "/genre/history" }
+  - { name: "ধর্মতত্ত্ব", link: "/genre/theology"}
 
 cover_image: "/cover/hadith-samkalaner-itihas.webp"
 

@@ -39,7 +39,7 @@ export const ITEM_REGISTRY: Record<string, ItemMeta> = {
     slug: "novel",
   },
   "novella": {
-    name: "উপন্যাসিকা",
+    name: "উপকথা",
     slug: "novella",
   },
   "fable": {

@@ -11,11 +11,11 @@ published: "2026-09-11"
 pub_medium: "অমরেন্দ্র চক্রবর্তীর ‘চাঁদের তাঁবু’ উপন্যাসটি মূলত ২০১৫ সালের ‘ছেলেবেলা’ পত্রিকার ছুটির সংখ্যায় প্রথম প্রকাশিত হয়েছিল এবং এর গ্রন্থগত প্রকাশ ঘটেছিল ২০১৯ সালে।"
 
 genre:
-  - "উপন্যাসিকা"
+  - "উপকথা"
   - "শিশুসাহিত্য"
 
 genre_links:
-  - { name: "উপন্যাসিকা", link: "/genre/novella" }
+  - { name: "উপকথা", link: "/genre/novella" }
   - { name: "শিশুসাহিত্য", link: "/genre/childrens-literature" }
 
 cover_image: "/cover/chander-tanbu.webp"

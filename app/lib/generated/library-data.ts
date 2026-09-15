@@ -542,12 +542,12 @@ export const libraryBooks = [
     "published": "2026-09-11",
     "pub_medium": "অমরেন্দ্র চক্রবর্তীর ‘চাঁদের তাঁবু’ উপন্যাসটি মূলত ২০১৫ সালের ‘ছেলেবেলা’ পত্রিকার ছুটির সংখ্যায় প্রথম প্রকাশিত হয়েছিল এবং এর গ্রন্থগত প্রকাশ ঘটেছিল ২০১৯ সালে।",
     "genre": [
-      "উপন্যাসিকা",
+      "উপকথা",
       "শিশুসাহিত্য"
     ],
     "genre_links": [
       {
-        "name": "উপন্যাসিকা",
+        "name": "উপকথা",
         "link": "/genre/novella"
       },
       {
@@ -1409,7 +1409,7 @@ export const libraryBooks = [
     "genre": [
       "সামাজিক উপন্যাস",
       "উপন্যাস",
-      "উপন্যাসিকা"
+      "উপকথা"
     ],
     "genre_links": [
       {
@@ -1421,7 +1421,7 @@ export const libraryBooks = [
         "link": "/genre/novel"
       },
       {
-        "name": "উপন্যাসিকা",
+        "name": "উপকথা",
         "link": "novella"
       }
     ],
@@ -2309,7 +2309,7 @@ export const libraryBooks = [
     "genre": [
       "ঐতিহাসিক উপন্যাস",
       "উপন্যাস",
-      "উপন্যাসিকা"
+      "উপকথা"
     ],
     "genre_links": [
       {
@@ -2321,7 +2321,7 @@ export const libraryBooks = [
         "link": "/genre/novel"
       },
       {
-        "name": "উপন্যাসিকা",
+        "name": "উপকথা",
         "link": "/genre/novella"
       }
     ],
@@ -4028,8 +4028,8 @@ export const libraryBooks = [
     "bookFolder": "ami-birangana-bolchi"
   },
   {
-    "id": "chakri",
-    "slug": "chakri",
+    "id": "chokri",
+    "slug": "chokri",
     "domain": "",
     "title": "চক্রী",
     "author": "নীহাররঞ্জন গুপ্ত",
@@ -4081,7 +4081,7 @@ export const libraryBooks = [
     "source_book": "‘কিরীটি অমনিবাস’, প্রথম খণ্ড",
     "extractedItems": [],
     "authorFolder": "nihar-ranjan-gupta",
-    "bookFolder": "chakri"
+    "bookFolder": "chokri"
   },
   {
     "id": "kiriteer-abirbhab",
@@ -4949,6 +4949,48 @@ export const libraryBooks = [
     "extractedItems": [],
     "authorFolder": "satyajit-roy",
     "bookFolder": "feludar-goyendagiri"
+  },
+  {
+    "id": "islam-darpon",
+    "slug": "islam-darpon",
+    "domain": "",
+    "title": "ইসলাম দর্পণ",
+    "author": "সৈয়দ আবদুল আগফর",
+    "type": "book_index",
+    "subdomain": "library",
+    "first_published": "June 1903",
+    "order": 190301,
+    "published": "2026-09-14T00:00:00.000Z",
+    "pub_medium": "১৯৬৫ সালে বাংলা একাডেমীর আনুকূল্যে প্রথম গ্রন্থাকারে প্রকাশিত। গ্রন্থটির রচনার পূর্বে লেখক প্রায় চার বছর ধরে হাদীসের সংকলন, সংরক্ষণ ও হাদীসশাস্ত্রের ইতিহাস নিয়ে ব্যাপক অধ্যয়ন ও গবেষণা করেন।",
+    "publisher": "মুন্‌শী আজিজুদ্দীন আহমদ।",
+    "genre": [
+      "ইসলাম",
+      "ইতিহাস"
+    ],
+    "genre_links": [
+      {
+        "name": "ইসলাম",
+        "link": "/genre/islam"
+      },
+      {
+        "name": "ইতিহাস",
+        "link": "/genre/history"
+      }
+    ],
+    "cover_image": "/cover/islam-darpon.webp",
+    "meta_description": "সৈয়দ আবদুল আগফরের ‘ইসলাম দর্পণ’ ইসলাম ও ইসলামী ইতিহাস বিষয়ক একটি গুরুত্বপূর্ণ গ্রন্থ। এতে ইসলামের বিভিন্ন দিক, ইতিহাস ও ঐতিহ্য সুন্দরভাবে তুলে ধরা হয়েছে।",
+    "tags": [
+      "ইসলাম দর্পণ",
+      "সৈয়দ আবদুল আগফর",
+      "ইসলামী ইতিহাস",
+      "ইসলামী সাহিত্য",
+      "ইসলাম",
+      "বাংলা ইসলামী সাহিত্য"
+    ],
+    "source_book": "সৈয়দ আবদুল আগফর, ‘ইসলাম দর্পণ’; প্রথম সংস্করণ।",
+    "extractedItems": [],
+    "authorFolder": "sayed-abdul-agfar",
+    "bookFolder": "islam-darpon"
   },
   {
     "id": "prak-palashi-bangla",

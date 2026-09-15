@@ -117,7 +117,7 @@ export const CONTENT_REGISTRY = {
     "miscellaneous": "বিবিধ",
     "mythology": "পুরাণ",
     "novel": "উপন্যাস",
-    "novella": "উপন্যাসিকা",
+    "novella": "উপকথা",
     "philosophical-criticism": "দর্শন সমালোচনা",
     "philosophical-essay": "দর্শন প্রবন্ধ",
     "philosophical-translation": "দর্শন অনুবাদ",
