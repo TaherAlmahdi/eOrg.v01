@@ -13,6 +13,7 @@ genre:
   - "লোকগাথা"
   - "অনুবাদ"
   - "অলৌকিক গল্প"
+  - "ভৌতিক কাহিনী"
   - "পাঠ্যপুস্তক"  
 genre_links:
   - { name: "গল্পগ্রন্থ", link: "/genre/stories" }
@@ -20,6 +21,11 @@ genre_links:
   - { name: "অনুবাদ", link: "/genre/translation" }
   - { name: "অলৌকিক গল্প", link: "/genre/supernatural-fiction" }
   - { name: "পাঠ্যপুস্তক", link: "/genre/textbook" }  
+
+series:
+  - name: "ভৌতিক সমগ্র"
+    link: "/series/horror-samagra"
+
 cover_image: "/cover/vetal-panchavimshati.webp"
 meta_description: "ঈশ্বরচন্দ্র বিদ্যাসাগর রচিত 'বেতাল-পঞ্চবিংশতি' ভারতীয় বিক্রম-বেতাল উপাখ্যান অবলম্বনে রচিত বাংলা গদ্যের অন্যতম পথিকৃৎ গ্রন্থ। যুক্তিবোধ, নৈতিক শিক্ষা ও সাহিত্যিক সৌকর্যের অনন্য সমন্বয়ে এটি বাংলা সাহিত্যের এক কালজয়ী সৃষ্টি।"
 tags:

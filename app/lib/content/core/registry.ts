@@ -36,7 +36,7 @@ export const CONTENT_REGISTRY = {
     "satyajit-ray": "সত্যজিৎ রায়",
     "shamsur-rahman": "শামসুর রহমান",
     "sufia-kamal": "সুফিয়া কামাল",
-    "syed-mujtaba-ali": "সৈয়দ মুজতবা আলী",
+    "syed-mujtaba-ali": "সৈয়দ মুজতবা আলী",
     "syed-shamsul-haque": "সৈয়দ শামসুল হক",
     "syed-waliullah": "সৈয়দ ওয়ালীউল্লাহ",
     "abanindranath-tagore": "অবনীন্দ্রনাথ ঠাকুর",
@@ -74,6 +74,8 @@ export const CONTENT_REGISTRY = {
     "sayed-abdul-agfar": "সৈয়দ আবদুল আগফর",
     "prochet-gupta": "প্রচেত গুপ্ত",
     "hemendra-kumar-roy": "হেমেন্দ্রকুমার রায়",
+    "manilal-gangopadhyay": "মণিলাল গঙ্গোপাধ্যায়",
+    "tarapranab-brahmachari": "তারাপ্রণব ব্রহ্মচারী",
 
 
   } as Record<string, string>,
@@ -105,7 +107,8 @@ export const CONTENT_REGISTRY = {
     "historical-novel": "ঐতিহাসিক উপন্যাস",
     "historical-translation": "ঐতিহাসিক অনুবাদ",
     "history": "ইতিহাস",
-    "horror-fiction": "ভয়ঙ্কর কাহিনী",
+    "horror": "ভৌতিক",
+    "horror-fiction": "ভৌতিক কাহিনী",
     "humor": "রম্য সাহিত্য",
     "islam": "ইসলাম",
     "language-learning": "ভাষা শিক্ষা",
