@@ -2445,6 +2445,46 @@ export const libraryBooks = [
     "bookFolder": "ananda-not"
   },
   {
+    "id": "sahityik-sarat-chandra",
+    "slug": "sahityik-sarat-chandra",
+    "domain": "",
+    "title": "সাহিত্যিক শরৎচন্দ্র",
+    "author": "হেমেন্দ্রকুমার রায়",
+    "pen_name": "প্রসাদদাস রায়",
+    "type": "book_index",
+    "subdomain": "library",
+    "first_published": 1937,
+    "published": "2026-09-16",
+    "genre": [
+      "জীবনী"
+    ],
+    "genre_links": [
+      {
+        "name": "জীবনী",
+        "link": "/genre/biography"
+      }
+    ],
+    "cover_image": "/cover/sahityik-sarat-chandra.webp",
+    "meta_description": "হেমেন্দ্রকুমার রায় রচিত ‘সাহিত্যিক শরৎচন্দ্র’ শরৎচন্দ্র চট্টোপাধ্যায়ের জীবন ও সাহিত্যিক বিকাশ নিয়ে রচিত একটি জীবনীগ্রন্থ। শরৎচন্দ্রের শৈশব, বাল্যজীবন ও প্রথম যৌবন, মধ্যকাল এবং প্রকাশ্য ও গৌরবময় সাহিত্যজীবনসহ তাঁর সাহিত্যিক সত্তার নানা দিক এই গ্রন্থে আলোচিত হয়েছে।",
+    "tags": [
+      "সাহিত্যিক শরৎচন্দ্র",
+      "হেমেন্দ্রকুমার রায়",
+      "শরৎচন্দ্র চট্টোপাধ্যায়",
+      "জীবনী",
+      "শরৎচন্দ্রের জীবনী",
+      "বাংলা জীবনী",
+      "বাংলা সাহিত্য",
+      "জীবনীগ্রন্থ",
+      "এডুলিচার"
+    ],
+    "notice": "এই পাতাটি মূলগ্রন্থের অংশ নয়; এটি হেমেন্দ্রকুমার রায় রচিত ‘সাহিত্যিক শরৎচন্দ্র’ গ্রন্থের পরিচিতি, প্রকাশনা-ইতিহাস ও সাহিত্যিক মূল্যায়ন।",
+    "publisher": "এম. সি. সরকার এণ্ড সন্স লিমিটেড",
+    "source_book": "প্রথম প্রকাশ, ১৯৩৭; এম. সি. সরকার এণ্ড সন্স লিমিটেড, কলকাতা।",
+    "extractedItems": [],
+    "authorFolder": "hemendra-kumar-roy",
+    "bookFolder": "sahityik-sarat-chandra"
+  },
+  {
     "id": "ami-ebong-amra",
     "slug": "ami-ebong-amra",
     "domain": "",
@@ -4313,6 +4353,65 @@ export const libraryBooks = [
     "extractedItems": [],
     "authorFolder": "prabhat-mohan-bandyopadhyay",
     "bookFolder": "mantharaharan"
+  },
+  {
+    "id": "ashcharya-pukur",
+    "slug": "ashcharya-pukur",
+    "domain": "",
+    "title": "আশ্চর্য পুকুর",
+    "author": "প্রচেত গুপ্ত",
+    "type": "book_index",
+    "pub_medium": "মিত্র ও ঘোষ পাবলিশার্স থেকে প্রকাশিত কিশোর উপযোগী গল্পগ্রন্থ।",
+    "first_published": "2009",
+    "published": "2026-09-15",
+    "publisher": "মিত্র এণ্ড ঘোষ প্রা. লি.",
+    "source_book": "তৃতীয় মুদ্রণ, আশ্বিন ১৪১৮",
+    "genre": [
+      "গল্পগ্রন্থ"
+    ],
+    "genre_links": [
+      {
+        "name": "গল্পগ্রন্থ",
+        "link": "/genre/stories"
+      }
+    ],
+    "cover_image": "/cover/ashcharya-pukur.webp",
+    "meta_description": "প্রচেত গুপ্তের লেখা কিশোর গল্পগ্রন্থ ‘আশ্চর্য পুকুর’। ভুবনপুরের পুবদিকের বোসদের বাগান ও আশ্চর্য পুকুরকে কেন্দ্র করে গড়ে ওঠা একচত্র কিশোর মনস্তত্ত্ব, রোমাঞ্চ এবং গ্রামীণ পটভূমির চমৎকার সব গল্পের সংকলন।",
+    "tags": [
+      "আশ্চর্য পুকুর",
+      "প্রচেত গুপ্ত",
+      "কিশোর গল্প",
+      "গল্পগ্রন্থ",
+      "বাংলা গল্প",
+      "বাংলা সাহিত্য",
+      "মিত্র ও ঘোষ",
+      "এডুলিচার"
+    ],
+    "extractedItems": [
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প",
+      "গল্প"
+    ],
+    "authorFolder": "prochet-gupta",
+    "bookFolder": "ashcharya-pukur"
   },
   {
     "id": "bharatnatyam",

@@ -72,6 +72,8 @@ export const CONTENT_REGISTRY = {
     "prabhat-mohan-bandyopadhyay": "প্রভাতমোহন বন্দ্যোপাধ্যায়",
     "muhammad-abdur-rahim": "মুহাম্মদ আবদুর রহীম",
     "sayed-abdul-agfar": "সৈয়দ আবদুল আগফর",
+    "prochet-gupta": "প্রচেত গুপ্ত",
+    "hemendra-kumar-roy": "হেমেন্দ্রকুমার রায়",
 
 
   } as Record<string, string>,
