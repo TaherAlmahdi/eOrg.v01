@@ -8,6 +8,51 @@ export { libraryStats };
 
 export const libraryBooks = [
   {
+    "id": "khirer-putul",
+    "slug": "khirer-putul",
+    "domain": "",
+    "title": "ক্ষীরের পুতুল",
+    "author": "অবনীন্দ্রনাথ ঠাকুর",
+    "subdomain": "library",
+    "type": "book_index",
+    "first_published": 1896,
+    "published": "2026-08-05T00:00:00.000Z",
+    "genre": [
+      "শিশুসাহিত্য",
+      "রূপকথা"
+    ],
+    "genre_links": [
+      {
+        "name": "শিশুসাহিত্য",
+        "link": "/genre/children-literature"
+      },
+      {
+        "name": "রূপকথা",
+        "link": "/genre/fairy-tale"
+      }
+    ],
+    "cover_image": "/cover/khirer-putul.webp",
+    "meta_description": "অবনীন্দ্রনাথ ঠাকুরের 'ক্ষীরের পুতুল' বাংলা শিশুসাহিত্যের একটি কালজয়ী রূপকথা। রাজা, দুই রানি, বাঁদর এবং ক্ষীরের তৈরি পুতুলকে ঘিরে নির্মিত এই কাহিনি কল্পনা, মানবিকতা ও নৈতিক শিক্ষার অপূর্ব সমন্বয়।",
+    "tags": [
+      "অবনীন্দ্রনাথ ঠাকুর",
+      "ক্ষীরের পুতুল",
+      "শিশুসাহিত্য",
+      "রূপকথা",
+      "বাংলা রূপকথা",
+      "শিশুতোষ সাহিত্য",
+      "রাজা",
+      "সুয়োরানি",
+      "দুয়োরানি",
+      "বাংলা ক্লাসিক",
+      "অবনীন্দ্রনাথ রচনাবলী"
+    ],
+    "notice": "এই পাতাটি মূলগ্রন্থের অংশ নয়; এটি অবনীন্দ্রনাথ ঠাকুর রচিত 'ক্ষীরের পুতুল' গ্রন্থের পরিচিতি, প্রকাশনা-ইতিহাস ও সাহিত্যিক মূল্যায়ন।",
+    "source_book": "অবনীন্দ্রনাথ ঠাকুর রচনাবলী এবং 'ক্ষীরের পুতুল'-এর প্রামাণ্য সংস্করণ",
+    "extractedItems": [],
+    "authorFolder": "aban-tagore",
+    "bookFolder": "khirer-putul"
+  },
+  {
     "id": "rajkahini",
     "slug": "rajkahini",
     "domain": "",
@@ -51,51 +96,6 @@ export const libraryBooks = [
     "extractedItems": [],
     "authorFolder": "aban-tagore",
     "bookFolder": "rajkahini"
-  },
-  {
-    "id": "surya-deeghal-barhi",
-    "slug": "khirer-putul",
-    "domain": "",
-    "title": "ক্ষীরের পুতুল",
-    "author": "অবনীন্দ্রনাথ ঠাকুর",
-    "subdomain": "library",
-    "type": "book_index",
-    "first_published": 1896,
-    "published": "2026-08-05T00:00:00.000Z",
-    "genre": [
-      "শিশুসাহিত্য",
-      "রূপকথা"
-    ],
-    "genre_links": [
-      {
-        "name": "শিশুসাহিত্য",
-        "link": "/genre/children-literature"
-      },
-      {
-        "name": "রূপকথা",
-        "link": "/genre/fairy-tale"
-      }
-    ],
-    "cover_image": "/cover/khirer-putul.webp",
-    "meta_description": "অবনীন্দ্রনাথ ঠাকুরের 'ক্ষীরের পুতুল' বাংলা শিশুসাহিত্যের একটি কালজয়ী রূপকথা। রাজা, দুই রানি, বাঁদর এবং ক্ষীরের তৈরি পুতুলকে ঘিরে নির্মিত এই কাহিনি কল্পনা, মানবিকতা ও নৈতিক শিক্ষার অপূর্ব সমন্বয়।",
-    "tags": [
-      "অবনীন্দ্রনাথ ঠাকুর",
-      "ক্ষীরের পুতুল",
-      "শিশুসাহিত্য",
-      "রূপকথা",
-      "বাংলা রূপকথা",
-      "শিশুতোষ সাহিত্য",
-      "রাজা",
-      "সুয়োরানি",
-      "দুয়োরানি",
-      "বাংলা ক্লাসিক",
-      "অবনীন্দ্রনাথ রচনাবলী"
-    ],
-    "notice": "এই পাতাটি মূলগ্রন্থের অংশ নয়; এটি অবনীন্দ্রনাথ ঠাকুর রচিত 'ক্ষীরের পুতুল' গ্রন্থের পরিচিতি, প্রকাশনা-ইতিহাস ও সাহিত্যিক মূল্যায়ন।",
-    "source_book": "অবনীন্দ্রনাথ ঠাকুর রচনাবলী এবং 'ক্ষীরের পুতুল'-এর প্রামাণ্য সংস্করণ",
-    "extractedItems": [],
-    "authorFolder": "aban-tagore",
-    "bookFolder": "surya-deeghal-barhi"
   },
   {
     "id": "padmar-palidweep",
@@ -2088,6 +2088,7 @@ export const libraryBooks = [
       "সমালোচনা",
       "সমালোচনা",
       "নিবন্ধ",
+      "সমালোচনা",
       "সমালোচনা",
       "সমালোচনা",
       "সমালোচনা",
