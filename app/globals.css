@@ -123,13 +123,13 @@
   .chorus_left,
   .rc,
   .chorus_right {
-    font-size: clamp(1rem, 1.2vw + 0.2rem, 1.2rem) !important;
+    font-size: clamp(1rem, 1.2vw + 0.2rem, 1.3rem) !important;
     line-height: 1.55;
     color: var(--text-main);
   }
 
   .right {
-    font-size: clamp(1rem, 1.2vw + 0.2rem, 1.2rem) !important;
+    font-size: clamp(1rem, 1.2vw + 0.2rem, 1.3rem) !important;
     line-height: 1.15;
     color: var(--text-main);
   }
