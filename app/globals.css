@@ -334,8 +334,8 @@
   .poem .right {
     display: inline-block;
     width: 100%;
-    text-align: right;
-    margin-right: -50px !important;
+    text-align: right !important;
+    margin-right: -150px !important;
   }
 
   /* ----------------------------------
