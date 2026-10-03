@@ -4471,6 +4471,54 @@ export const libraryBooks = [
     "bookFolder": "ashcharya-pukur"
   },
   {
+    "id": "rabindranather-upanyas",
+    "slug": "rabindranather-upanyas",
+    "domain": "",
+    "title": "রবীন্দ্রনাথের উপন্যাস",
+    "author": "পুলকেশ দে সরকার",
+    "subdomain": "library",
+    "type": "book_index",
+    "first_published": 1961,
+    "published": "2026-10-01T00:00:00.000Z",
+    "sort": 196101,
+    "publisher": "সাহিত্য, কলকাতা",
+    "genre": [
+      "প্রবন্ধগ্রন্থ",
+      "সাহিত্য সমালোচনা"
+    ],
+    "genre_links": [
+      {
+        "name": "প্রবন্ধগ্রন্থ",
+        "link": "/genre/essays"
+      },
+      {
+        "name": "সাহিত্য সমালোচনা",
+        "link": "/genre/literary-criticism"
+      }
+    ],
+    "cover_image": "/cover/rabindranather-upanyas.webp",
+    "meta_description": "পুলকেশ দে সরকারের ‘রবীন্দ্রনাথের উপন্যাস’ রবীন্দ্রনাথ ঠাকুরের উপন্যাসসমূহ নিয়ে রচিত একটি সাহিত্যসমালোচনামূলক গ্রন্থ। রবীন্দ্র-উপন্যাসের বিষয়, চরিত্র, আঙ্গিক, সমাজভাবনা ও সাহিত্যিক বৈশিষ্ট্য বিশ্লেষণের মধ্য দিয়ে গ্রন্থটি কথাশিল্পী রবীন্দ্রনাথের উপন্যাস-সৃষ্টির একটি সংক্ষিপ্ত ও তাৎপর্যপূর্ণ পাঠ উপস্থাপন করে।",
+    "tags": [
+      "রবীন্দ্রনাথের উপন্যাস",
+      "Rabindranather Upanyas",
+      "পুলকেশ দে সরকার",
+      "Pulkesh Dey Sarkar",
+      "রবীন্দ্রনাথ ঠাকুর",
+      "রবীন্দ্রনাথ",
+      "রবীন্দ্র-উপন্যাস",
+      "রবীন্দ্রসাহিত্য",
+      "বাংলা উপন্যাস",
+      "সাহিত্য সমালোচনা",
+      "বাংলা সাহিত্য",
+      "রবীন্দ্রচর্চা",
+      "এডুলিচার"
+    ],
+    "source_book": "পুলকেশ দে সরকার, ‘রবীন্দ্রনাথের উপন্যাস’; সাহিত্য, কলকাতা, প্রথম প্রকাশ বৈশাখ ১৩৬৮।",
+    "extractedItems": [],
+    "authorFolder": "pulakesh-dey-sarkar",
+    "bookFolder": "rabindranather-upanyas"
+  },
+  {
     "id": "bharatnatyam",
     "slug": "bharatnatyam",
     "domain": "",

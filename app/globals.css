@@ -132,6 +132,7 @@
     font-size: clamp(1rem, 1.2vw + 0.2rem, 1.3rem) !important;
     line-height: 1.15;
     color: var(--text-main);
+    text-align: right !important;
   }
 
   .quote {

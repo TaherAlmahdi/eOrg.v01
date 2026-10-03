@@ -76,6 +76,7 @@ export const CONTENT_REGISTRY = {
     "hemendra-kumar-roy": "হেমেন্দ্রকুমার রায়",
     "manilal-gangopadhyay": "মণিলাল গঙ্গোপাধ্যায়",
     "tarapranab-brahmachari": "তারাপ্রণব ব্রহ্মচারী",
+    "pulakesh-dey-sarkar": "পুলকেশ দে সরকার",
 
 
   } as Record<string, string>,
