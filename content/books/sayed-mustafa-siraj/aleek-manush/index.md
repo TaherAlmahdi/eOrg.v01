@@ -1,6 +1,6 @@
 ---
 title: "অলীক মানুষ"
-author: "সৈয়দ মুস্তাফা সিরাজ"
+author: "সৈয়দ মুস্তাফা সিরাজ"
 type: "book_index"
 slug: "aleek-manush"
 subdomain: "library"

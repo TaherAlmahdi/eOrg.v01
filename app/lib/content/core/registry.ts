@@ -9,7 +9,7 @@ export const CONTENT_REGISTRY = {
     genre: "ঘরানা",
     tags: "শ্রেণী",
     volume: "গ্রন্থখণ্ড",
-    chapter: "অধ্যায় বা পরিচ্ছেদ",
+    chapter: "অধ্যায় বা পরিচ্ছেদ",
     series: "সিরিজ",
     books: "বই",
   } as Record<string, string>,
@@ -17,14 +17,14 @@ export const CONTENT_REGISTRY = {
   // English Slug -> Bengali Value
   authors: {
     "abu-ishaque": "আবু ইসহাক",
-    "achintyarup-roy": "অচিন্ত্যরূপ রায়",
+    "achintyarup-roy": "অচিন্ত্যরূপ রায়",
     "adwaita-mallabarman": "অদ্বৈত মল্লবর্মণ",
     "jasim-uddin": "জসীম উদ্‌দীন",
-    "ajit-gangopadhyay": "অজিত গঙ্গোপাধ্যায়",
-    "bankim-chandra-chatterjee": "বঙ্কিমচন্দ্র চট্টোপাধ্যায়",
-    "bibhutibhushan-bandyopadhyay": "বিভূতিভূষণ বন্দ্যোপাধ্যায়",
-    "bibhutibhushan-mukhopadhyay": "বিভূতিভূষণ মুখোপাধ্যায়",
-    "humayun-ahmed": "হুমায়ূন আহমেদ",
+    "ajit-gangopadhyay": "অজিত গঙ্গোপাধ্যায়",
+    "bankim-chandra-chatterjee": "বঙ্কিমচন্দ্র চট্টোপাধ্যায়",
+    "bibhutibhushan-bandyopadhyay": "বিভূতিভূষণ বন্দ্যোপাধ্যায়",
+    "bibhutibhushan-mukhopadhyay": "বিভূতিভূষণ মুখোপাধ্যায়",
+    "humayun-ahmed": "হুমায়ূন আহমেদ",
     "jibananda-dash": "জীবনানন্দ দাশ",
     "kazi-nazrul-islam": "কাজী নজরুল ইসলাম",
     "muhammad-lutfar-rahman": "মুহম্মদ লুৎফর রহমান",
@@ -32,51 +32,52 @@ export const CONTENT_REGISTRY = {
     "muhammad-zafar-iqbal": "মুহম্মদ জাফর ইকবাল",
     "al-mahmud": "আল মাহমুদ",
     "rabindranath-tagore": "রবীন্দ্রনাথ ঠাকুর",
-    "sarat-chandra-chattopadhyay": "শরৎচন্দ্র চট্টোপাধ্যায়",
-    "satyajit-ray": "সত্যজিৎ রায়",
+    "sarat-chandra-chattopadhyay": "শরৎচন্দ্র চট্টোপাধ্যায়",
+    "satyajit-ray": "সত্যজিৎ রায়",
     "shamsur-rahman": "শামসুর রহমান",
-    "sufia-kamal": "সুফিয়া কামাল",
+    "sufia-kamal": "সুফিয়া কামাল",
     "syed-mujtaba-ali": "সৈয়দ মুজতবা আলী",
-    "syed-shamsul-haque": "সৈয়দ শামসুল হক",
-    "syed-waliullah": "সৈয়দ ওয়ালীউল্লাহ",
+    "syed-shamsul-haque": "সৈয়দ শামসুল হক",
+    "syed-waliullah": "সৈয়দ ওয়ালীউল্লাহ",
     "abanindranath-tagore": "অবনীন্দ্রনাথ ঠাকুর",
-    "zahir-raihan": "জহির রায়হান",
+    "zahir-raihan": "জহির রায়হান",
     "ishwar-chandra-vidyasagar": "ঈশ্বরচন্দ্র বিদ্যাসাগর",
-    "anowar-pasha": "আনোয়ার পাশা",
-    "uttam-kumar-chatterjee": "উত্তমকুমার চট্টোপাধ্যায়",
+    "anowar-pasha": "আনোয়ার পাশা",
+    "uttam-kumar-chatterjee": "উত্তমকুমার চট্টোপাধ্যায়",
     "kasem-bin-abu-bakar": "কাসেম বিন আবু বাকার",
     "charu-chandra-chakraborty": "জরাসন্ধ (চারুচন্দ্র চক্রবর্তী)",
     "jahiruddin-babar": "জহির উদ্দীন বাবর",
     "muhammad-jalaluddin-biswas": "মুহম্মদ জালালউদ্দীন বিশ্বাস",
-    "abhik-chatterjee": "অভীক চট্টোপাধ্যায়",
+    "abhik-chatterjee": "অভীক চট্টোপাধ্যায়",
     "neelima-ibrahim": "নীলিমা ইব্রাহীম",
-    "bhuban-chandra-mukhopadhyay": "ভুবনচন্দ্র মুখোপাধ্যায়",
+    "bhuban-chandra-mukhopadhyay": "ভুবনচন্দ্র মুখোপাধ্যায়",
     "mahbub-siddiki": "মাহবুব সিদ্দিকী",
     "johan-august-strindberg": "অগাস্ট স্ট্রিন্ডবার্গ",
     "mohammad-najibar-rahman": "মোহাম্মদ নজিবর রহমান",
     "samaresh-majumdar": "সমরেশ মজুমদার",
     "subodh-kumar-mukhopadhyay": "সুবোধকুমার মুখোপাধ্যায়",
     "akbar-ali-khan": "আকবর আলি খান",
-    "akshayakshay-kumar-sarkar": "অক্ষয়কুমার সরকার",
+    "akshayakshay-kumar-sarkar": "অক্ষয়কুমার সরকার",
     "satyen-chakraborty": "সত্যেন চক্রবর্তী",
-    "akshay-kumar-maitreya": "অক্ষয়কুমার মৈত্রেয়",
+    "akshay-kumar-maitreya": "অক্ষয়কুমার মৈত্রেয়",
     "henrik-ibsen": "হেনরিক ইবসেন",
     "amitav-ghosh": "অমিতাভ ঘোষ",
     "sukanta-bhattacharya": "সুকান্ত ভট্টাচার্য",
-    "sanjib-chandra-chattopadhyay": "সঞ্জীবচন্দ্র চট্টোপাধ্যায়",
-    "sanjib-chatterjee": "সঞ্জীব চট্টোপাধ্যায়",
+    "sanjib-chandra-chattopadhyay": "সঞ্জীবচন্দ্র চট্টোপাধ্যায়",
+    "sanjib-chatterjee": "সঞ্জীব চট্টোপাধ্যায়",
     "sushil-chaudhury": "সুশীল চৌধুরী",
-    "qazi-anwar-hussain": "কাজী আনোয়ার হোসেন",
+    "qazi-anwar-hussain": "কাজী আনোয়ার হোসেন",
     "amarendra-chakraborty": "অমরেন্দ্র চক্রবর্তী",
     "nihar-ranjan-gupta": "নীহাররঞ্জন গুপ্ত",
     "prabhat-mohan-bandyopadhyay": "প্রভাতমোহন বন্দ্যোপাধ্যায়",
     "muhammad-abdur-rahim": "মুহাম্মদ আবদুর রহীম",
-    "sayed-abdul-agfar": "সৈয়দ আবদুল আগফর",
+    "sayed-abdul-agfar": "সৈয়দ আবদুল আগফর",
     "prochet-gupta": "প্রচেত গুপ্ত",
     "hemendra-kumar-roy": "হেমেন্দ্রকুমার রায়",
     "manilal-gangopadhyay": "মণিলাল গঙ্গোপাধ্যায়",
     "tarapranab-brahmachari": "তারাপ্রণব ব্রহ্মচারী",
     "pulakesh-dey-sarkar": "পুলকেশ দে সরকার",
+    "sayed-mustafa-siraj": "সৈয়দ মুস্তাফা সিরাজ",
 
 
   } as Record<string, string>,
@@ -136,9 +137,9 @@ export const CONTENT_REGISTRY = {
     "poetry-collection": "কবিতা সঙ্কলন",
     "psychological-novel": "মনস্তাত্ত্বিক উপন্যাস",
     "religious": "ধর্মীয় সাহিত্য",
-    "religious-criticism": "ধর্মীয় সমালোচনা",
-    "religious-essay": "ধর্মীয় প্রবন্ধ",
-    "religious-translation": "ধর্মীয় অনুবাদ",
+    "religious-criticism": "ধর্মীয় সমালোচনা",
+    "religious-essay": "ধর্মীয় প্রবন্ধ",
+    "religious-translation": "ধর্মীয় অনুবাদ",
     "romance-fiction": "রোমান্টিক কাহিনী",
     "romantic-novel": "রোমান্টিক উপন্যাস",
     "satire": "ব্যঙ্গ",
@@ -178,7 +179,7 @@ export const CONTENT_REGISTRY = {
     "kiriti-omnibus": "কিরীটি অমনিবাস",
     "himu-samagra": "হিমু সমগ্র",
     "misir-ali-omnibus": "মিসির আলি অমনিবাস",
-    "zahir-raihan-rachanabali": "জহির রায়হান রচনাবলী",
+    "zahir-raihan-rachanabali": "জহির রায়হান রচনাবলী",
     "sukanta-samagra": "সুকান্ত সমগ্র",
     "masud-rana": "মাসুদ রানা",
 
@@ -192,7 +193,7 @@ export const CONTENT_REGISTRY = {
     "romantic": "রোমান্টিক",
   } as Record<string, string>,
 
-  // English Slug -> Bengali Value (প্রয়োজনে কাস্টম বইয়ের স্লাগ ও বাংলা নাম এখানে যোগ করা যাবে)
+  // English Slug -> Bengali Value (প্রয়োজনে কাস্টম বইয়ের স্লাগ ও বাংলা নাম এখানে যোগ করা যাবে)
   books: {} as Record<string, string>,
 };
 
@@ -200,7 +201,7 @@ export type RegistryCategory = "authors" | "genres" | "tags" | "series" | "books
 
 /**
  * বাংলা স্ট্রিংকে সংগত ও নরম্যালাইজড ডিকম্পোজিশনে রূপান্তর করার হেল্পার।
- * এটি 'ড+নুক্তা' ফরম্যাটকে সরাসরি একক বর্ণে (যেমন: ড়, ঢ়, য়) রূপান্তর করে।
+ * এটি 'ড+নুক্তা' ফরম্যাটকে সরাসরি একক বর্ণে (যেমন: ড়, ঢ়, য়) রূপান্তর করে।
  */
 export function normalizeBanglaText(text: string): string {
   if (!text) return "";
@@ -208,12 +209,12 @@ export function normalizeBanglaText(text: string): string {
     .normalize("NFC") // ইউনিকোড কম্পোজিশন ঠিক করা (ড + ় => ড়)
     .replace(/\u09A1\u09BC/g, "ড়") // ড + নুক্তা = ড়
     .replace(/\u09A2\u09BC/g, "ঢ়") // ঢ + নুক্তা = ঢ়
-    .replace(/\u09AF\u09BC/g, "য়") // য + নুক্তা = য়
-    .replace(/\u09B0/g, "র");      // অসমীয়া/বাংলা র-এর সঠিক ম্যাপিং
+    .replace(/\u09AF\u09BC/g, "য়") // য + নুক্তা = য়
+    .replace(/\u09B0/g, "র");      // অসমীয়া/বাংলা র-এর সঠিক ম্যাপিং
 }
 
 /**
- * যেকোনো স্ট্রিংকে স্লাগে রূপান্তর করার হেল্পার (বাংলা ড়, ঢ়, য়, ্য, ্র সহ অন্যান্য চিহ্নের জন্য নিরাপদ)
+ * যেকোনো স্ট্রিংকে স্লাগে রূপান্তর করার হেল্পার (বাংলা ড়, ঢ়, য়, ্য, ্র সহ অন্যান্য চিহ্নের জন্য নিরাপদ)
  */
 export function slugify(text: string): string {
   if (!text) return "";
@@ -222,8 +223,8 @@ export function slugify(text: string): string {
 
   return normalized
     .trim()
-    .replace(/\s+/g, "-") // স্পেসের জায়গায় হাইফেন
-    // \u0980-\u09FF পুরো বাংলা ব্লককে কাভার করে (যার মধ্যে ড় \u09DC, ঢ় \u09DD, য় \u09DF সহ সকল নুক্তা ও যুক্তবর্ণ রয়েছে)
+    .replace(/\s+/g, "-") // স্পেসের জায়গায় হাইফেন
+    // \u0980-\u09FF পুরো বাংলা ব্লককে কাভার করে (যার মধ্যে ড় \u09DC, ঢ় \u09DD, য় \u09DF সহ সকল নুক্তা ও যুক্তবর্ণ রয়েছে)
     .replace(/[^\w\u0980-\u09FF\-]/g, "")
     .replace(/-+/g, "-") // একাধিক হাইফেন পাশাপাশি থাকলে একটিতে রূপান্তর
     .toLowerCase();
@@ -281,7 +282,7 @@ export function getAuthorTitle(slug: string): string {
 }
 
 /**
- * রুল ৫: ইউআরএল-এর ইংরেজি বা বাংলা স্লাগ থেকে বইয়ের বাংলা নাম উদ্ধার করার ফাংশন।
+ * রুল ৫: ইউআরএল-এর ইংরেজি বা বাংলা স্লাগ থেকে বইয়ের বাংলা নাম উদ্ধার করার ফাংশন।
  */
 export function getBookTitle(slug: string): string {
   if (!slug) return "";
