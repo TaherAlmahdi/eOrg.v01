@@ -1,5 +1,4 @@
 import { EventEmitter } from 'events';
-import type { NextConfig } from "next";
 import withPWAInit from "@ducanh2912/next-pwa";
 
 // ইভেন্ট লিসেনার লিমিট বাড়িয়ে MaxListenersExceededWarning দূর করা হলো
@@ -14,7 +13,8 @@ const withPWA = withPWAInit({
   },
 });
 
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   // 🔹 থার্ড-পার্টি আইকন ও PWA প্যাকেজের মডিউল রেজোলিউশন ঠিক রাখতে
   transpilePackages: ['lucide-react', '@ducanh2912/next-pwa'],
 
