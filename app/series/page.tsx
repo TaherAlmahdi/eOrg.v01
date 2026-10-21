@@ -1,5 +1,4 @@
-import Link from 'next/link';
-import { Home, Layers } from 'lucide-react';
+import Breadcrumb from '@/app/components/Breadcrumb';
 import { headers } from 'next/headers';
 import type { Metadata } from 'next';
 import SeriesList from '@/app/components/SeriesList';
@@ -34,19 +33,7 @@ export default async function SeriesPage() {
   return (
     <main className="bg-[#fdfcf8] min-h-screen">
       {/* নেভিগেশন বার (ব্রেডকাম) */}
-      <nav className="w-full bg-[#7575a3] border-b border-gray-200 py-2 px-3 text-white overflow-x-auto no-scrollbar">
-        <div className="flex items-center max-w-full mx-auto text-sm font-tarunima whitespace-nowrap">
-          <Link href="/" className="transition-colors shrink-0 hover:text-orange-200">
-            <Home size={16} />
-          </Link>
-          <span className="mx-2 text-white/50 shrink-0">/</span>
-          <Link href="/series" className="transition-colors hover:text-orange-200 shrink-0">
-            সিরিজ
-          </Link>
-          <span className="mx-2 text-white/50 shrink-0">/</span>
-          <span className="font-medium">সকল সিরিজ</span>
-        </div>
-      </nav>
+      <Breadcrumb items={[{ label: 'সিরিজ', href: '/series' }, { label: 'সকল সিরিজ' }]} />
 
 
       {/* সিরিজ লিস্ট সেকশন */}

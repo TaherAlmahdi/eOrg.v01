@@ -1,8 +1,10 @@
 'use client';
 
+import Breadcrumb from '@/app/components/Breadcrumb';
+import type { FrontmatterValue } from '@/app/lib/frontmatter';
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
-import { Search, Home, Layers } from "lucide-react";
+import { Search, Layers } from "lucide-react";
 
 /**
  * বাংলা টেক্সট সার্চের জন্য Normalize
@@ -47,7 +49,7 @@ const slugify = (text: string = ''): string => {
  * বিভিন্ন ধরনের field থেকে text বের করা
  */
 const extractFieldText = (
-  field: any,
+  field: FrontmatterValue,
   fallback: string = "—"
 ): string => {
   if (!field) return fallback;
@@ -100,7 +102,7 @@ const getBengaliInitial = (text: string = ''): string => {
 
 
 interface ItemViewClientProps {
-  initialItems?: any[];
+  initialItems?: FrontmatterValue[];
   displayTitle?: string;
   itemSlug?: string;
   slugsArray?: string[];
@@ -170,7 +172,7 @@ export default function ItemViewClient({
       return [];
     }
 
-    return [...initialItems].sort((a: any, b: any) => {
+    return [...initialItems].sort((a: FrontmatterValue, b: FrontmatterValue) => {
 
       const titleA = extractFieldText(a.title, "")
         .normalize('NFC');
@@ -197,7 +199,7 @@ export default function ItemViewClient({
 
     const lettersSet = new Set<string>();
 
-    sortedItems.forEach((entry: any) => {
+    sortedItems.forEach((entry: FrontmatterValue) => {
 
       const title = extractFieldText(
         entry.title,
@@ -244,7 +246,7 @@ export default function ItemViewClient({
       normalizeBengaliText(search);
 
 
-    return sortedItems.filter((entry: any) => {
+    return sortedItems.filter((entry: FrontmatterValue) => {
 
       const rawTitle = extractFieldText(
         entry.title,
@@ -314,13 +316,12 @@ export default function ItemViewClient({
    * Search অথবা letter পরিবর্তন হলে
    * pagination প্রথম থেকে শুরু
    */
-  useEffect(() => {
+  const visibleResetKey = `${search}|${selectedLetter}|${itemsPerPage}`;
+  const [prevVisibleResetKey, setPrevVisibleResetKey] = useState(visibleResetKey);
+  if (prevVisibleResetKey !== visibleResetKey) {
+    setPrevVisibleResetKey(visibleResetKey);
     setVisibleCount(itemsPerPage);
-  }, [
-    search,
-    selectedLetter,
-    itemsPerPage
-  ]);
+  }
 
 
   /**
@@ -345,44 +346,7 @@ export default function ItemViewClient({
 
       {/* ব্রেডক্রাম্ব */}
 
-      <nav className="w-full bg-[#7575a3] border-b border-gray-200 py-2 px-3 text-white overflow-x-auto no-scrollbar shadow-xs rounded-t">
-
-        <div className="max-w-full mx-auto text-sm flex items-center whitespace-nowrap">
-
-          <Link
-            href="/"
-            className="shrink-0 hover:text-teal-200 transition-colors"
-          >
-            <Home size={16} />
-          </Link>
-
-          <span className="mx-2 text-white/50 shrink-0">
-            /
-          </span>
-
-          <Link
-            href="/items"
-            className="hover:text-teal-200 transition-colors shrink-0"
-          >
-            প্রকরণ
-          </Link>
-
-          {displayTitle &&
-            displayTitle !== 'সকল আইটেম' && (
-              <>
-                <span className="mx-2 text-white/50 shrink-0">
-                  /
-                </span>
-
-                <span className="text-teal-100 shrink-0">
-                  {displayTitle}
-                </span>
-              </>
-            )}
-
-        </div>
-
-      </nav>
+      <Breadcrumb items={displayTitle && displayTitle !== 'সকল আইটেম' ? [{ label: 'প্রকরণ', href: '/items' }, { label: displayTitle }] : [{ label: 'প্রকরণ' }]} />
 
 
       {/* পেজ টাইটেল, কাউন্টার ও সার্চবার */}
@@ -513,7 +477,7 @@ export default function ItemViewClient({
           <div className="grid grid-cols-1 md:grid-cols-3 2xl:grid-cols-4 gap-2">
 
             {currentItems.map(
-              (item: any, idx: number) => {
+              (item: FrontmatterValue, idx: number) => {
 
                 const itemTitle =
                   extractFieldText(

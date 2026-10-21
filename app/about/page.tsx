@@ -1,5 +1,4 @@
-import fs from 'fs';
-import path from 'path';
+// app/about/page.tsx
 import { headers } from 'next/headers';
 import matter from 'gray-matter';
 import ReactMarkdown from 'react-markdown';
@@ -8,6 +7,7 @@ import rehypeRaw from 'rehype-raw';
 import rehypeSlug from 'rehype-slug';
 import { Metadata } from 'next';
 import { getSubdomainData, buildTabTitle } from '@/app/lib/get-site-data';
+import { readTextFromR2 } from '@/app/lib/books/r2';
 import TOCAbout, { TocItem } from '@/app/components/TOCAbout';
 
 interface AboutFrontmatter {
@@ -40,23 +40,25 @@ async function getOnlySubdomain(): Promise<string> {
   return 'www';
 }
 
-function getAboutData(subdomain: string): AboutData {
-  const dirPath = path.join(process.cwd(), 'content', 'pages', 'about');
-  const primaryPath = path.join(dirPath, `${subdomain.toLowerCase()}.md`);
-  const fallbackPath = path.join(dirPath, 'www.md');
-
-  const filePath = fs.existsSync(primaryPath) ? primaryPath : fallbackPath;
+// 🔹 R2 থেকে (content/pages/about/{subdomain}.md → pages/about/{subdomain}.md) ডাটা রিড করার ফাংশন
+async function getAboutData(subdomain: string): Promise<AboutData> {
+  const primaryKey = `pages/about/${subdomain.toLowerCase()}.md`;
+  const fallbackKey = 'pages/about/www.md';
 
   try {
-    if (!fs.existsSync(filePath)) {
+    let raw = await readTextFromR2(primaryKey);
+    if (raw === null) {
+      raw = await readTextFromR2(fallbackKey);
+    }
+
+    if (raw === null) {
       return {
         frontmatter: { title: 'আমাদের সম্পর্কে' },
         content: 'আমাদের সম্পর্কে কোনো তথ্য পাওয়া যায়নি।',
       };
     }
 
-    const fileContents = fs.readFileSync(filePath, 'utf8');
-    const { data, content } = matter(fileContents);
+    const { data, content } = matter(raw);
 
     return {
       frontmatter: data as AboutFrontmatter,
@@ -128,7 +130,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const siteData = getSubdomainData(host);
   const subdomain = await getOnlySubdomain();
 
-  const { frontmatter } = getAboutData(subdomain);
+  const { frontmatter } = await getAboutData(subdomain);
 
   const currentPageTitle = frontmatter.title || 'আমাদের সম্পর্কে';
 
@@ -163,7 +165,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function AboutPage() {
   const subdomain = await getOnlySubdomain();
-  const aboutData = getAboutData(subdomain);
+  const aboutData = await getAboutData(subdomain);
   const tocItems = extractToc(aboutData.content);
 
   return (

@@ -1,5 +1,6 @@
 'use client';
 
+import { COVER_BASE } from '@/app/lib/cover-base';
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 
@@ -8,26 +9,37 @@ interface BookCoverProps {
   title: string;
 }
 
-// 🔹 Cloudflare R2 Media Base URL ফরম্যাটিং হেল্পার
+// 🔹 Cloudflare R2 Media Base URL ফরম্যাটিং হেল্পার (আপডেটেড)
 const getCoverImageUrl = (coverPath?: string | null): string => {
   if (!coverPath) return '';
 
-  let rawPath = coverPath.trim().replace(/\\/g, '/');
-
-  // 'public/' বা '/public/' রিমুভ করা
-  if (rawPath.startsWith('public/')) {
-    rawPath = rawPath.replace('public/', '');
-  } else if (rawPath.startsWith('/public/')) {
-    rawPath = rawPath.replace('/public/', '');
+  // ১. যদি ইতোমধ্যে সম্পূর্ণ URL (http/https) হয়ে থাকে
+  if (coverPath.startsWith('http://') || coverPath.startsWith('https://')) {
+    return coverPath;
   }
 
-  // শুরুর স্ল্যাশ বাদ দেওয়া
-  const cleanPath = rawPath.startsWith('/') ? rawPath.slice(1) : rawPath;
+  // ২. স্ল্যাশ ও স্পেস পরিচ্ছন্ন করা
+  let cleanPath = coverPath.trim().replace(/\\/g, '/');
 
-  // ফুল URL থাকলে সেটাই রিটার্ন করবে, অন্যথায় Cloudflare R2 URL যুক্ত করবে
-  return cleanPath.startsWith('http://') || cleanPath.startsWith('https://')
-    ? cleanPath
-    : `https://media.eduliture.org/${cleanPath}`;
+  // 'public/' বা '/public/' রিমুভ করা
+  if (cleanPath.startsWith('public/')) {
+    cleanPath = cleanPath.replace('public/', '');
+  } else if (cleanPath.startsWith('/public/')) {
+    cleanPath = cleanPath.replace('/public/', '');
+  }
+
+  cleanPath = cleanPath.startsWith('/') ? cleanPath.slice(1) : cleanPath;
+
+  // ৩. ডাবল এক্সটেনশন সমস্যা দূর করা (যেমন: .webp.webp বা .jpg.webp)
+  cleanPath = cleanPath.replace(/\.(webp|jpg|png)\.(webp|jpg|png)$/i, '.$1');
+
+  // ৪. যদি পাথে ইতিমধ্যে 'cover/' ফোল্ডার যুক্ত থাকে
+  if (cleanPath.startsWith('cover/')) {
+    return `${COVER_BASE}/${cleanPath}`;
+  }
+
+  // ৫. অন্যথায় সামনে 'cover/' ফোল্ডার যুক্ত করা
+  return `${COVER_BASE}/cover/${cleanPath}`;
 };
 
 export default function BookCover({ coverImage, title }: BookCoverProps) {

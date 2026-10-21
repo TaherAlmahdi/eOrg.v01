@@ -1,33 +1,34 @@
+import type { FrontmatterValue } from '@/app/lib/frontmatter';
 import type { FC } from "react";
 import { getAllBooks } from "@/app/lib/books"; 
-import { CONTENT_REGISTRY, getSlug } from "@/app/lib/content/core/registry";
+import { findName, getSlug } from "@/app/lib/content/core/registry";
 import { GenreListView } from "./GenreListView";
 
-const parseGenreField = (item: any): string[] => {
+const parseGenreField = (item: FrontmatterValue): string[] => {
   const result: string[] = [];
   if (!item) return result;
   if (typeof item.genre === 'string' && item.genre.trim()) result.push(item.genre.trim());
-  else if (Array.isArray(item.genre)) item.genre.forEach((g: any) => typeof g === 'string' && g.trim() && result.push(g.trim()));
+  else if (Array.isArray(item.genre)) item.genre.forEach((g: FrontmatterValue) => typeof g === 'string' && g.trim() && result.push(g.trim()));
   if (typeof item.genres === 'string' && item.genres.trim()) result.push(item.genres.trim());
-  else if (Array.isArray(item.genres)) item.genres.forEach((g: any) => typeof g === 'string' && g.trim() && result.push(g.trim()));
+  else if (Array.isArray(item.genres)) item.genres.forEach((g: FrontmatterValue) => typeof g === 'string' && g.trim() && result.push(g.trim()));
   return result;
 };
 
-const collectAllGenresFromBook = (book: any): string[] => {
+const collectAllGenresFromBook = (book: FrontmatterValue): string[] => {
   const genreSet = new Set<string>();
   parseGenreField(book).forEach((g) => genreSet.add(g));
 
   const nestedArrays = [book.directChapters, book.chapters, book.stories, book.items, book.articles, book.contents];
   nestedArrays.forEach((arr) => {
-    if (Array.isArray(arr)) arr.forEach((subItem: any) => parseGenreField(subItem).forEach((g) => genreSet.add(g)));
+    if (Array.isArray(arr)) arr.forEach((subItem: FrontmatterValue) => parseGenreField(subItem).forEach((g) => genreSet.add(g)));
   });
 
   if (Array.isArray(book.volumes)) {
-    book.volumes.forEach((vol: any) => {
+    book.volumes.forEach((vol: FrontmatterValue) => {
       parseGenreField(vol).forEach((g) => genreSet.add(g));
       const volSubArrays = [vol.chapters, vol.stories, vol.items, vol.directChapters];
       volSubArrays.forEach((arr) => {
-        if (Array.isArray(arr)) arr.forEach((subItem: any) => parseGenreField(subItem).forEach((g) => genreSet.add(g)));
+        if (Array.isArray(arr)) arr.forEach((subItem: FrontmatterValue) => parseGenreField(subItem).forEach((g) => genreSet.add(g)));
       });
     });
   }
@@ -47,7 +48,7 @@ const GenreList: FC<GenreListProps> = async ({ sortBy, limit }) => {
   const seriesSet = new Set<string>();
   const genreMap = new Map<string, { label: string; slug: string; rawGenre: string; count: number }>();
 
-  allBooks.forEach((book: any) => {
+  allBooks.forEach((book: FrontmatterValue) => {
     // 🔹 লেখক, অনুবাদক ও সম্পাদকদের ইউনিকভাবে যুক্ত করা হচ্ছে
     if (typeof book.author === 'string' && book.author.trim()) {
       contributorSet.add(book.author.trim());
@@ -83,7 +84,7 @@ const GenreList: FC<GenreListProps> = async ({ sortBy, limit }) => {
         const current = genreMap.get(genreSlug)!;
         genreMap.set(genreSlug, { ...current, count: current.count + 1 });
       } else {
-        const label = CONTENT_REGISTRY.genres[genreSlug] || cleanGenre;
+        const label = findName("genres", genreSlug) || cleanGenre;
         genreMap.set(genreSlug, { label, slug: genreSlug, rawGenre: cleanGenre, count: 1 });
       }
     });

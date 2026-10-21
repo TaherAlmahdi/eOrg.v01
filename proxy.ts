@@ -27,6 +27,13 @@ export default function proxy(request: NextRequest) {
     if (parts.length > 1 && parts[0] !== 'localhost') {
       subdomain = parts[0];
     }
+  } else if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(hostWithoutPort)) {
+    // 🔹 IP address (যেমন 127.0.0.1, Wrangler-এর লোকাল প্রিভিউ) — কোনো subdomain নেই
+    subdomain = null;
+  } else if (hostWithoutPort.endsWith('.workers.dev')) {
+    // 🔹 Cloudflare Workers প্রিভিউ URL — এখানে কোনো author subdomain নেই,
+    // মেইন সাইট হিসেবেই সার্ভ হবে
+    subdomain = null;
   } else if (hostWithoutPort.endsWith('.vercel.app') || hostWithoutPort.endsWith('.pages.dev')) {
     if (parts.length > 3 && !hostWithoutPort.includes('-projects')) {
       subdomain = parts[0];
@@ -48,7 +55,8 @@ export default function proxy(request: NextRequest) {
     pathname === '/favicon.ico' ||
     pathname === '/manifest.webmanifest' ||
     pathname === '/sw.js' ||
-    pathname.startsWith('/icons/')
+    pathname.startsWith('/icons/') ||
+    pathname.startsWith('/cover/')
   ) {
     return NextResponse.next();
   }
@@ -85,10 +93,10 @@ export default function proxy(request: NextRequest) {
 
   // গ্লোবাল বাইপাস রুটসমূহ
   const globalBypassRoutes = [
-    '/about', 
-    '/biography', 
-    '-genres', 
-    '/books', 
+    '/about',
+    '/biography',
+    '/genres',
+    '/books',
     '/book',
     '/items',
     '/item'

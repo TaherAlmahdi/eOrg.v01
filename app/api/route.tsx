@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
 
     // আপনার মূল ডেটা সোর্স বা ফাইল থেকে বইয়ের ডাটা এখানে আনবেন।
     // আপাতত ফিক্সড বা খালি অ্যারে দিয়ে এপিআই সচল রাখা হলো:
-    const allBooksData: any[] = []; 
+    const allBooksData: unknown[] = []; 
 
     return NextResponse.json({
       books: allBooksData.slice((page - 1) * limit, page * limit),

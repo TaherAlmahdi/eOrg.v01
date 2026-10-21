@@ -1,5 +1,6 @@
 'use client';
 
+import type { FrontmatterValue } from '@/app/lib/frontmatter';
 import Link from 'next/link';
 import BookCover from '@/app/components/BookCover';
 
@@ -20,11 +21,11 @@ const renderValue = (val: unknown): string => {
   }
 
   if (typeof val === 'object' && val !== null) {
-    if ('name' in val && typeof (val as any).name === 'string') {
-      return String((val as any).name);
+    if ('name' in val && typeof (val as FrontmatterValue).name === 'string') {
+      return String((val as FrontmatterValue).name);
     }
-    if ('title' in val && typeof (val as any).title === 'string') {
-      return String((val as any).title);
+    if ('title' in val && typeof (val as FrontmatterValue).title === 'string') {
+      return String((val as FrontmatterValue).title);
     }
   }
   return '';
@@ -51,21 +52,27 @@ export interface ItemDetailsProps {
     first_published?: string | number;
     publisher?: string;
     source_book?: string | number;
-    items?: any;
+    items?: FrontmatterValue;
     items_name?: string | string[];
     items_link?: string;
     items_links?: CustomLink[];
     itemsOrder?: string | number;
     part?: string | number;
     volume?: string | number;
-    genre?: string | string[] | any;
+    genre?: string | string[] | FrontmatterValue;
     genre_links?: CustomLink[];
     [key: string]: unknown;
   }; 
-  items?: any; 
+  items?: FrontmatterValue;
+  /** Link target for the item-type name in the first row. */
+  itemHref?: string;
+  /** Link target for the book name. */
+  bookHref?: string;
+  /** Person name (author/translator/editor) -> profile URL; names without an entry stay plain text. */
+  personLinks?: Record<string, string>;
 }
 
-export default function BookDetails({ book, items: explicititems }: ItemDetailsProps) {
+export default function BookDetails({ book, items: explicititems, itemHref, bookHref, personLinks }: ItemDetailsProps) {
   if (!book) return null;
 
   const bookName = renderValue(book.book || book.title); 
@@ -73,6 +80,22 @@ export default function BookDetails({ book, items: explicititems }: ItemDetailsP
   const currentTitle = renderValue(book.current_title || book.page_title || book.title); 
 
   const itemsData = book.items || book.items_name || explicititems;
+
+  const renderPeople = (val: unknown) => {
+    const names = (Array.isArray(val) ? val : [val]).map((v) => renderValue(v)).filter(Boolean);
+    return names.map((name, index) => (
+      <span key={index}>
+        {personLinks?.[name] ? (
+          <Link href={personLinks[name]} className="text-blue-600 hover:underline transition-colors">
+            {name}
+          </Link>
+        ) : (
+          name
+        )}
+        {index < names.length - 1 && ', '}
+      </span>
+    ));
+  };
 
   const getItemsLink = (itemsName: string): string => {
     const matchedLink = book.items_links?.find(
@@ -94,7 +117,13 @@ export default function BookDetails({ book, items: explicititems }: ItemDetailsP
           
           {itemName && currentTitle && (
             <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
-              <span className="font-bold">{itemName}</span>
+              {itemHref ? (
+                <Link href={itemHref} className="font-bold text-blue-600 hover:underline transition-colors">
+                  {itemName}
+                </Link>
+              ) : (
+                <span className="font-bold">{itemName}</span>
+              )}
               <span className="text-gray-400">:</span>
               <span>{currentTitle}</span>
             </div>
@@ -104,7 +133,7 @@ export default function BookDetails({ book, items: explicititems }: ItemDetailsP
             <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
               <span className="font-bold">বই</span>
               <span className="text-gray-400">:</span>
-              <span>{bookName}</span>
+              <span>{bookHref ? <Link href={bookHref} className="text-blue-600 hover:underline transition-colors">{bookName}</Link> : bookName}</span>
             </div>
           )}
 
@@ -113,7 +142,7 @@ export default function BookDetails({ book, items: explicititems }: ItemDetailsP
             <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
               <span className="font-bold">লেখক</span>
               <span className="text-gray-400">:</span>
-              <span>{renderValue(book.author)}</span>
+              <span>{renderPeople(book.author)}</span>
             </div>
           )}
 
@@ -122,7 +151,7 @@ export default function BookDetails({ book, items: explicititems }: ItemDetailsP
             <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
               <span className="font-bold">অনুবাদক</span>
               <span className="text-gray-400">:</span>
-              <span>{renderValue(book.translator)}</span>
+              <span>{renderPeople(book.translator)}</span>
             </div>
           )}
 
@@ -131,7 +160,7 @@ export default function BookDetails({ book, items: explicititems }: ItemDetailsP
             <div className="grid grid-cols-[60px_10px_1fr] items-baseline">
               <span className="font-bold">সম্পাদক</span>
               <span className="text-gray-400">:</span>
-              <span>{renderValue(book.editor)}</span>
+              <span>{renderPeople(book.editor)}</span>
             </div>
           )}
 
@@ -232,9 +261,9 @@ export default function BookDetails({ book, items: explicititems }: ItemDetailsP
                     const isLast = index === (book.genre as unknown[]).length - 1;
                     return (
                       <span key={index}>
-                        {linkObj && typeof linkObj === 'object' && 'link' in linkObj && (linkObj as any).link ? (
+                        {linkObj && typeof linkObj === 'object' && 'link' in linkObj && (linkObj as FrontmatterValue).link ? (
                           <Link
-                            href={String((linkObj as any).link)}
+                            href={String((linkObj as FrontmatterValue).link)}
                             className="text-blue-600 hover:underline"
                           >
                             {toBengaliNumber(gName)}

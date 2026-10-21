@@ -1,17 +1,18 @@
-import fs from 'fs/promises';
-import { existsSync } from 'fs';
-import path from 'path';
+// app/lib/books/fetchers.ts
+import type { FrontmatterData, FrontmatterValue } from '@/app/lib/frontmatter';
 import matter from 'gray-matter';
 import { Book, BookDetail } from './types';
 import {
-  booksDirectory,
   parseSubdomains,
   extractGenresFromData,
   extractSeriesFromData,
   generateGenreLinks,
   extractItemsFromData,
+  slugify,
 } from './utils';
 import { getBookHierarchy } from './hierarchy';
+import { getManifest, readTextFromR2, getCoverUrl } from './r2';
+import { getSlug } from '@/app/lib/content/core/registry';
 
 // ==========================================
 // Helper Functions
@@ -23,49 +24,45 @@ import { getBookHierarchy } from './hierarchy';
 function isSubdomainAllowed(bookSubdomains: string[], currentSubdomain?: string): boolean {
   if (!currentSubdomain) return true;
   const normalizedSubdomain = currentSubdomain.toLowerCase();
-  if (['main', 'www'].includes(normalizedSubdomain)) return true;
+  // main site and the library show every book, whatever the frontmatter `subdomain` says
+  if (['main', 'www', 'library'].includes(normalizedSubdomain)) return true;
   return bookSubdomains.includes(normalizedSubdomain);
 }
 
 /**
- * সমস্ত লেখক ও বইয়ের ডিরেক্টরি পাথ একত্রে রিটার্ন করে
+ * registry-ভিত্তিক কাস্টম স্লাগ (থাকলে) অগ্রাধিকার দিয়ে বইয়ের চূড়ান্ত slug বের করে,
+ * না থাকলে frontmatter-এর slug, তাও না থাকলে title থেকে slugify, শেষে ফোল্ডার-নাম fallback
  */
-async function getAllBookFolders(): Promise<Array<{ authorFolder: string; bookFolder: string; bookPath: string }>> {
-  if (!existsSync(booksDirectory)) return [];
+function resolveBookSlug(data: FrontmatterData, bookFolderName: string): string {
+  return bookFolderName ? bookFolderName.trim() : (data.slug ? String(data.slug).trim() : slugify(data.title));
+}
 
-  const bookFolders: Array<{ authorFolder: string; bookFolder: string; bookPath: string }> = [];
-  const authorItems = await fs.readdir(booksDirectory, { withFileTypes: true });
-
-  for (const authorItem of authorItems) {
-    if (!authorItem.isDirectory()) continue;
-
-    const authorFolderPath = path.join(booksDirectory, authorItem.name);
-    const bookItems = await fs.readdir(authorFolderPath, { withFileTypes: true });
-
-    for (const bookItem of bookItems) {
-      if (!bookItem.isDirectory()) continue;
-
-      bookFolders.push({
-        authorFolder: authorItem.name,
-        bookFolder: bookItem.name,
-        bookPath: path.join(authorFolderPath, bookItem.name),
-      });
-    }
-  }
-
-  return bookFolders;
+/**
+ * manifest থেকে প্রতিটা বইয়ের entry রিটার্ন করে
+ * (আগে fs.readdir দিয়ে ডিরেক্টরি স্ক্যান হতো, এখন R2-তে রাখা একটা প্রি-বিল্ট manifest পড়া হয়)
+ */
+async function getAllBookEntries(): Promise<
+  Array<{ authorFolder: string; bookFolder: string; bookPrefix: string; data: FrontmatterData }>
+> {
+  const manifest = await getManifest();
+  return manifest.map((entry: FrontmatterValue) => ({
+    authorFolder: entry.authorFolder,
+    bookFolder: entry.bookFolder,
+    bookPrefix: entry.bookPrefix, // যেমন: "books/bankim/durgeshnandini/"
+    data: entry.data,
+  }));
 }
 
 /**
  * ফ্রন্টম্যাটার ডাটা থেকে বেসিক Book অবজেক্ট তৈরি করার রিইউজেবল হেল্পার
  */
 function mapBookData(
-  data: Record<string, any>,
+  data: FrontmatterData,
   authorFolderName: string,
   bookFolderName: string,
-  extractedItems: any
+  extractedItems: FrontmatterValue
 ): Book {
-  const bookSlug = data.slug ? String(data.slug).trim() : bookFolderName;
+  const bookSlug = resolveBookSlug(data, bookFolderName);
   const bookSubdomains = parseSubdomains(data.subdomain, authorFolderName);
   const bookGenres = extractGenresFromData(data);
   if (bookGenres.length === 0) bookGenres.push('অন্যান্য');
@@ -74,6 +71,9 @@ function mapBookData(
   const seriesNames = extractedSeriesList.map((s) => s.name);
   const primarySeries = extractedSeriesList[0];
   const genreLinksVal = generateGenreLinks(data.genre_links, bookGenres);
+
+  // 🔹 cover/cover_image এখন getCoverUrl() দিয়ে পূর্ণ URL-এ রূপান্তর করা হচ্ছে
+  const resolvedCover = getCoverUrl(data.cover || data.cover_image || '');
 
   return {
     id: bookSlug,
@@ -108,8 +108,8 @@ function mapBookData(
     published: data.published ? String(data.published) : '',
     first_published: data.first_published || '',
     publisher: data.publisher ? String(data.publisher) : '',
-    cover: data.cover || data.cover_image || '',
-    cover_image: data.cover_image || data.cover || '',
+    cover: resolvedCover,
+    cover_image: resolvedCover,
     source_book: data.source_book || '',
     pub_medium: data.pub_medium ? String(data.pub_medium) : '',
     notice: data.notice ? String(data.notice) : '',
@@ -126,7 +126,7 @@ function mapBookData(
  * হাইরার্কি নোড থেকে নির্দিষ্ট চ্যাপ্টার/ভলিউম মিলানোর হেল্পার
  */
 function findTargetNodeIndex(
-  nodes: any[],
+  nodes: FrontmatterValue[],
   volumeOrChapterSlug?: string,
   chapterSlug?: string
 ): number {
@@ -165,50 +165,39 @@ export async function getLibraryBooks(currentSubdomain?: string): Promise<{
   const allBooks: Book[] = [];
 
   try {
-    const bookFolders = await getAllBookFolders();
+    const bookEntries = await getAllBookEntries();
 
-    for (const { authorFolder, bookFolder, bookPath } of bookFolders) {
-      const indexMdPath = path.join(bookPath, 'index.md');
-      if (!existsSync(indexMdPath)) continue;
-
+    for (const { authorFolder, bookFolder, data } of bookEntries) {
       try {
-        const fileContents = await fs.readFile(indexMdPath, 'utf8');
-        const { data } = matter(fileContents);
-
         const bookSubdomains = parseSubdomains(data.subdomain, authorFolder);
         if (!isSubdomainAllowed(bookSubdomains, currentSubdomain)) continue;
 
-        // 🟢 ভারী ও ধীরগতির collectChapterItemsDeep স্ক্যানিং বাদ দেওয়া হলো (ফ্রন্টম্যাটার থেকে ডাটা নেওয়া হবে)
         const extractedItems = extractItemsFromData(data);
 
         const book = mapBookData(data, authorFolder, bookFolder, extractedItems);
-        (book as any).rawFrontmatter = data;
+        (book as FrontmatterValue).rawFrontmatter = data;
 
         allBooks.push(book);
       } catch (err) {
-        console.error(`Error reading ${indexMdPath}:`, err);
+        console.error(`বই প্রসেস করতে ব্যর্থ ${authorFolder}/${bookFolder}:`, err);
       }
     }
 
-    // প্রকাশনার তারিখ অনুযায়ী সর্টিং
     const sortedBooks = allBooks.sort((a, b) =>
       (b.publishDate || '').localeCompare(a.publishDate || '')
     );
 
-    // জেনার, সিরিজ ও আইটেম অনুযায়ী গ্রুপিং
     const booksByGenre: Record<string, Book[]> = {};
     const booksBySeries: Record<string, Book[]> = {};
     const booksByItem: Record<string, Book[]> = {};
     const globalItemSet = new Set<string>();
 
     for (const book of sortedBooks) {
-      // জেনার গ্রুপিং
       for (const gName of book.genres) {
         if (!booksByGenre[gName]) booksByGenre[gName] = [];
         booksByGenre[gName].push(book);
       }
 
-      // সিরিজ গ্রুপিং
       if (book.seriesList && book.seriesList.length > 0) {
         for (const sItem of book.seriesList) {
           const sName = sItem.name;
@@ -221,12 +210,11 @@ export async function getLibraryBooks(currentSubdomain?: string): Promise<{
         booksBySeries[sName].push(book);
       }
 
-      // আইটেম (প্রকরণ) গ্রুপিং
       const rawItemSources = [
         book.items,
-        (book as any).item,
-        (book as any).rawFrontmatter?.item,
-        (book as any).rawFrontmatter?.items,
+        (book as FrontmatterValue).item,
+        (book as FrontmatterValue).rawFrontmatter?.item,
+        (book as FrontmatterValue).rawFrontmatter?.items,
       ];
 
       const itemNamesSet = new Set<string>();
@@ -258,7 +246,6 @@ export async function getLibraryBooks(currentSubdomain?: string): Promise<{
       });
     }
 
-    // সিরিজের ক্রম অনুসারে বই সর্টিং
     for (const sName in booksBySeries) {
       booksBySeries[sName].sort((a, b) => {
         const getOrder = (bObj: Book) => {
@@ -272,7 +259,6 @@ export async function getLibraryBooks(currentSubdomain?: string): Promise<{
       });
     }
 
-    // ইউনিক প্রকরণের সঠিক সংখ্যা
     const totalItems = globalItemSet.size > 0 ? globalItemSet.size : Object.keys(booksByItem).length;
 
     return { latestBooks: sortedBooks, booksByGenre, booksBySeries, booksByItem, totalItems };
@@ -294,32 +280,38 @@ export async function getBookBySlug(
   chapterSlug?: string
 ): Promise<BookDetail | null> {
   try {
-    const bookFolders = await getAllBookFolders();
+    const bookEntries = await getAllBookEntries();
+    const normalizedInputSlug = decodeURIComponent(bookSlug).toLowerCase().trim();
 
-    for (const { authorFolder, bookFolder, bookPath } of bookFolders) {
-      const indexMdPath = path.join(bookPath, 'index.md');
-      if (!existsSync(indexMdPath)) continue;
-
+    for (const { authorFolder, bookFolder, bookPrefix, data: mainData } of bookEntries) {
       try {
-        const mainIndexContents = await fs.readFile(indexMdPath, 'utf8');
-        const { data: mainData } = matter(mainIndexContents);
+        const fileSlug = resolveBookSlug(mainData, bookFolder);
+        const normalizedFileSlug = fileSlug.toLowerCase().trim();
 
-        const fileSlug = mainData.slug ? String(mainData.slug).trim() : bookFolder;
-        if (fileSlug.toLowerCase() !== bookSlug.toLowerCase()) continue;
+        // ফ্লেক্সিবল স্লাগ চেক (হুবহু মিল অথবা শেষ অংশ মিললে)
+        const isSlugMatch = 
+          normalizedFileSlug === normalizedInputSlug ||
+          normalizedFileSlug.endsWith(`/${normalizedInputSlug}`) ||
+          bookFolder.toLowerCase() === normalizedInputSlug;
+
+        if (!isSlugMatch) continue;
 
         const bookSubdomains = parseSubdomains(mainData.subdomain, authorFolder);
         if (!isSubdomainAllowed(bookSubdomains, currentSubdomain)) continue;
 
-        const { nodes, volumes, directChapters } = await getBookHierarchy(fileSlug);
+        const { nodes, volumes, directChapters } = await getBookHierarchy(bookPrefix, fileSlug);
         const targetNodeIndex = findTargetNodeIndex(nodes, volumeOrChapterSlug, chapterSlug);
 
-        let targetFilePath = indexMdPath;
+        const indexMdKey = `${bookPrefix}index.md`;
+        let targetFileKey = indexMdKey;
         let currentVolTitle = '';
         let currentChapTitle = '';
 
         if (targetNodeIndex !== -1) {
           const matchedNode = nodes[targetNodeIndex];
-          targetFilePath = matchedNode.filePath;
+          if (matchedNode?.filePath) {
+            targetFileKey = matchedNode.filePath;
+          }
 
           if (matchedNode.type === 'volume') {
             currentVolTitle = matchedNode.title;
@@ -330,17 +322,22 @@ export async function getBookBySlug(
           }
         }
 
-        if (!existsSync(targetFilePath)) {
-          targetFilePath = indexMdPath;
+        let fileContents = await readTextFromR2(targetFileKey);
+        
+        // যদি নির্দিষ্ট নোডের ফাইল না পাওয়া যায়, তবে রুট index.md এ ফলব্যাক করবে
+        if (fileContents === null && targetFileKey !== indexMdKey) {
+          targetFileKey = indexMdKey;
+          fileContents = await readTextFromR2(targetFileKey);
         }
 
-        const fileContents = await fs.readFile(targetFilePath, 'utf8');
+        if (fileContents === null) {
+          continue;
+        }
+
         const { data: pageData, content } = matter(fileContents);
 
         let pageItems = extractItemsFromData(pageData);
-        if (pageItems.length === 0 && targetFilePath !== indexMdPath) {
-          pageItems = extractItemsFromData(pageData);
-        } else if (targetFilePath === indexMdPath) {
+        if (pageItems.length === 0 && targetFileKey === indexMdKey) {
           pageItems = extractItemsFromData(mainData);
         }
 
@@ -369,35 +366,18 @@ export async function getBookBySlug(
           }
         }
 
-        const baseBook = mapBookData(
-          mainData,
-          authorFolder,
-          bookFolder,
-          pageItems
-        );
-
-        const resolvedSubtitle = pageData.subtitle
-          ? String(pageData.subtitle)
-          : targetNodeIndex === -1 && mainData.subtitle
-            ? String(mainData.subtitle)
-            : '';
-
-        const resolvedNotice = pageData.notice
-          ? String(pageData.notice)
-          : targetNodeIndex === -1 && mainData.notice
-            ? String(mainData.notice)
-            : '';
+        const baseBook = mapBookData(mainData, authorFolder, bookFolder, pageItems);
 
         return {
           ...baseBook,
-          subtitle: resolvedSubtitle,
+          subtitle: pageData.subtitle ? String(pageData.subtitle) : mainData.subtitle ? String(mainData.subtitle) : '',
           meta_title: pageData.meta_title || mainData.meta_title || '',
           meta_description: pageData.meta_description || mainData.meta_description || '',
           items: pageItems,
           item: pageData.item || pageItems,
           volumes: volumes.length > 0 ? volumes : mainData.volumes || [],
           directChapters: directChapters.length > 0 ? directChapters : mainData.directChapters || [],
-          notice: resolvedNotice,
+          notice: pageData.notice ? String(pageData.notice) : mainData.notice ? String(mainData.notice) : '',
           og_image: pageData.og_image || mainData.og_image || '',
           footnotes: pageData.footnotes || mainData.footnotes || [],
           chapter_title: pageData.chapter_title || currentChapTitle || '',
@@ -411,7 +391,8 @@ export async function getBookBySlug(
           content,
           rawFrontmatter: pageData,
         };
-      } catch {
+      } catch (innerErr) {
+        console.error(`Error processing book entry:`, innerErr);
         continue;
       }
     }

@@ -1,10 +1,13 @@
+import { loadSlugManifest } from '@/app/lib/books/r2';
+import Breadcrumb from '@/app/components/Breadcrumb';
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { headers } from 'next/headers';
-import { Home, BookOpen } from "lucide-react";
+import { BookOpen } from "lucide-react";
 import { getLibraryBooks } from '@/app/lib/books';
 import { getGenreTitle } from '@/app/lib/content/core/registry';
+import { getSubdomainData } from '@/app/lib/get-site-data';
 
 // ইংরেজি সংখ্যাকে বাংলায় রূপান্তর করার ফাংশন
 const toBengaliNumber = (num: number | string) => {
@@ -21,18 +24,23 @@ type Props = {
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
+  await loadSlugManifest();
   const decodedSlug = slug.toLowerCase();
 
   // রেজিস্ট্রি থেকেই সরাসরি টাইটেল ফেচিং (না পাওয়া গেলে স্লাগ ফলব্যাক)
   const bengaliTitle = getGenreTitle(decodedSlug) || slug;
 
+  const headersList = await headers();
+  const siteName = getSubdomainData(headersList.get('host'))?.title || 'এডুলিচার';
+
   return {
-    title: `${bengaliTitle} | গ্রন্থাগার`,
+    title: `${bengaliTitle} ❀ ${siteName}`,
   };
 }
 
 export default async function GenrePage({ params }: Props) {
   const { slug } = await params;
+  await loadSlugManifest();
   const decodedSlug = slug.toLowerCase();
 
   // মিডলওয়্যার থেকে সাবডোমেন রিসিভ করা
@@ -87,20 +95,10 @@ export default async function GenrePage({ params }: Props) {
   return (
     <main className="bg-[#fdfcf8] min-h-screen font-tarunima">
       {/* নেভিগেশন বার */}
-      <nav className="w-full bg-[#7575a3] border-b border-gray-200 py-2 px-3 text-white overflow-x-auto no-scrollbar">
-        <div className="max-w-full mx-auto text-sm font-tarunima flex items-center whitespace-nowrap">
-          <Link href="/" className="shrink-0"><Home size={16} /></Link>
-          <span className="mx-2 text-white/50 shrink-0">/</span>
-          <Link href="/books" className="hover:text-orange-200">গ্রন্থাগার</Link>
-          <span className="mx-2 text-white/50 shrink-0">/</span>
-          <span className="flex items-center gap-2 font-medium">
-            {targetBengaliGenre}
-          </span>
-        </div>
-      </nav>
+      <Breadcrumb items={[{ label: 'গ্রন্থাগার', href: '/books' }, { label: targetBengaliGenre }]} />
 
       {/* মূল কন্টেন্ট ডোমেন */}
-      <div className="max-w-8xl mx-auto py-4 px-3">
+      <div className="max-w-full mx-auto py-4 px-3">
         <header className="mb-6 border-b border-orange-200 pb-3">
           <h2 className="text-2xl text-center md:text-3xl font-bold font-sabrina text-gray-800">
             ঘরানা : {targetBengaliGenre}
@@ -113,7 +111,7 @@ export default async function GenrePage({ params }: Props) {
         </header>
 
         {filteredBooks.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 xl:grid-cols-8 gap-4">
             {filteredBooks.map((book) => (
               <Link
                 key={book.id || book.slug}

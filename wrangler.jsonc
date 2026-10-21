@@ -1,0 +1,40 @@
+{
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"name": "eorg",
+	"main": ".open-next/worker.js",
+	"compatibility_date": "2026-09-19",
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
+	"assets": {
+		"directory": ".open-next/assets",
+		"binding": "ASSETS"
+	},
+	"r2_buckets": [
+		{
+			"binding": "ASSETS_BUCKET",
+			"bucket_name": "eduliture-assets",
+			"remote": true
+		}
+	],
+	"routes": [
+		{
+			"pattern": "eduliture.org/*",
+			"zone_name": "eduliture.org"
+		},
+		{
+			"pattern": "*.eduliture.org/*",
+			"zone_name": "eduliture.org"
+		}
+	],
+	"observability": {
+		"enabled": true
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "eorg-db",
+			"database_id": "224d6af6-d827-403e-8ab8-9bdc739c77b2"
+		}
+	]
+}

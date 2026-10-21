@@ -1,3 +1,4 @@
+import type { FrontmatterValue } from '@/app/lib/frontmatter';
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -9,6 +10,7 @@ import SeriesList from '@/app/components/SeriesList';
 import ItemList from '@/app/components/ItemList';
 import { LibraryStats } from '@/app/components/LibraryStats';
 import LatestBooks from '@/app/components/LatestBooks';
+import PopularBooks from '@/app/components/PopularBooks';
 import { BookCopy, Calendar, ChevronRight, Layers, Users } from 'lucide-react';
 import { getLibraryBooks } from '../../lib/books';
 import { getSlug, getAuthorSlugFromTitle } from '../../lib/content/core/registry';
@@ -82,12 +84,13 @@ export default async function LibraryHomePage() {
   const subdomain = siteData.subdomain || 'library';
   const currentConfig = headerConfig[subdomain] || headerConfig.library || headerConfig.main;
 
-  // ক্লাউডফ্লেয়ার ফ্রেন্ডলি ডেটা ফেচিং (try-catch দিয়ে নিরাপদ রাখা হয়েছে)
+  // 🔹 R2 manifest থেকে লাইব্রেরি ডেটা লোড করা (getLibraryBooks ইতিমধ্যেই
+  // subdomain-filter এবং genre/series/item গ্রুপিং করে সঠিক শেপে রিটার্ন করে)
   let libraryData: LibraryData = {};
   try {
-    libraryData = (await getLibraryBooks()) as LibraryData;
+    libraryData = await getLibraryBooks(subdomain);
   } catch (error) {
-    console.error("Failed to load library books on Cloudflare Edge:", error);
+    console.error('Error loading library data:', error);
   }
 
   const {
@@ -207,7 +210,7 @@ export default async function LibraryHomePage() {
   return (
     <div
       className="relative w-full min-h-screen px-2 py-4 bg-fixed bg-center bg-no-repeat bg-cover sm:px-4"
-      style={{ backgroundImage: "url('/bg01.png')" }}
+      style={{ backgroundImage: "url('/bg01.webp')" }}
     >
       <script
         type="application/ld+json"
@@ -224,7 +227,7 @@ export default async function LibraryHomePage() {
             <div className="relative z-20 w-full mx-auto max-w-none">
               {(() => {
                 const combinedPeople = new Set<string>();
-                allBooksList.forEach((b: any) => {
+                allBooksList.forEach((b: FrontmatterValue) => {
                   if (b.author) {
                     String(b.author).split(',').forEach(name => {
                       const cleanName = name.trim();
@@ -257,6 +260,9 @@ export default async function LibraryHomePage() {
         <section aria-labelledby="latest-books-heading">
           <LatestBooks books={sortedLatestBooks} limit={16} />
         </section>
+
+        {/* পাঠকপ্রিয় বই (D1-এ ভিউ জমলে দেখা যাবে) */}
+        <PopularBooks books={allBooksList} />
 
         {/* ৩. ঘরানা নির্ঘণ্ট সেকশন */}
         <section data-aos="fade-up" className="relative">

@@ -1,8 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
-import fs from 'fs';
-import path from 'path';
 import matter from 'gray-matter';
+import { listKeysUnderPrefix, readTextFromR2 } from './lib/books/r2';
 import { headers } from 'next/headers'; // 🟢 ডোমেন সনাক্ত করার জন্য
 import { headerConfig, DomainConfig } from './lib/headerConfig';
 
@@ -17,29 +16,29 @@ interface StoryItem {
 
 // MDX ফোল্ডার থেকে ডাটা ফেচ করার ফাংশন
 async function getSubdomainsData(): Promise<StoryItem[]> {
-  const targetDir = path.join(process.cwd(), 'content', 'pages', 'success');
+  // Same source as the SuccessStories section: pages/success/ in R2 (no fs on Workers)
+  try {
+    const keys = (await listKeysUnderPrefix('pages/success/')).filter((k) => k.endsWith('.md'));
+    const stories: StoryItem[] = [];
 
-  if (!fs.existsSync(targetDir)) return [];
-
-  const files = fs.readdirSync(targetDir);
-
-  const stories = files
-    .filter((file) => file.endsWith('.md'))
-    .map((file) => {
-      const filePath = path.join(targetDir, file);
-      const fileContent = fs.readFileSync(filePath, 'utf-8');
-      const { data } = matter(fileContent);
-
-      return {
+    for (const key of keys) {
+      const raw = await readTextFromR2(key);
+      if (!raw) continue;
+      const { data } = matter(raw);
+      stories.push({
         title: data.title || 'শিরোনামহীন',
         icon: data.icon || '/logo/elogo.png',
         externalLink: data.externalLink || '#',
         excerpt: data.excerpt || '',
         order: typeof data.order === 'number' ? data.order : Infinity,
-      };
-    });
+      });
+    }
 
-  return stories.sort((a, b) => a.order - b.order);
+    return stories.sort((a, b) => a.order - b.order);
+  } catch (err) {
+    console.error('not-found: failed to read success stories from R2', err);
+    return [];
+  }
 }
 
 export default async function NotFound() {
@@ -79,7 +78,7 @@ export default async function NotFound() {
   {/* 🟢 404 GIF Image Container */}
   <div className="relative w-full mx-auto mb-2 overflow-hidden max-w-70 sm:max-w-120 md:max-w-120 aspect-509/337">
     <Image
-      src="/404.gif" // আপনার জিফ ফাইলের সঠিক পাথ (public/images/404.gif বা public/404.gif অনুযায়ী দিন)
+      src="/404.webp" // আপনার জিফ ফাইলের সঠিক পাথ (public/images/404.gif বা public/404.gif অনুযায়ী দিন)
       alt="404 Page Not Found"
       fill
       className="object-contain"

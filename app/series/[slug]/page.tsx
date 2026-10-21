@@ -1,3 +1,4 @@
+import { loadSlugManifest } from '@/app/lib/books/r2';
 import { headers } from 'next/headers';
 import type { Metadata } from 'next';
 import { getSubdomainData, buildTabTitle } from '@/app/lib/get-site-data';
@@ -13,6 +14,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
+  await loadSlugManifest();
   const decodedSlug = decodeURIComponent(slug).trim();
 
   const targetBengaliSeries = getSeriesTitle(decodedSlug) || decodedSlug;
@@ -23,7 +25,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const siteName = siteData?.title || 'এডুলিচার';
 
   const pageTitle = buildTabTitle({
-    currentPageTitle: `${targetBengaliSeries} ❀ গ্রন্থাগার`,
+    currentPageTitle: targetBengaliSeries,
     siteName,
   });
 
@@ -36,6 +38,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function SeriesPage({ params, searchParams }: PageProps) {
   const { slug } = await params;
+  await loadSlugManifest();
   const resolvedSearchParams = searchParams ? await searchParams : {};
   const author = resolvedSearchParams.author;
 

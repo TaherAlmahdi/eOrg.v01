@@ -12,7 +12,18 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // OpenNext/Cloudflare build output and generated files
+    ".open-next/**",
+    ".wrangler/**",
+    "public/sw.js",
+    "public/workbox-*.js",
+    "cloudflare-env.d.ts",
   ]),
+  // CommonJS config/utility scripts legitimately use require()
+  {
+    files: ["*.js", "scripts/**/*.js"],
+    rules: { "@typescript-eslint/no-require-imports": "off" },
+  },
 ]);
 
 export default eslintConfig;

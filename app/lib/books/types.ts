@@ -1,3 +1,4 @@
+import type { FrontmatterValue } from '@/app/lib/frontmatter';
 // ==========================================
 // 1. Common / Shared Base Types
 // ==========================================
@@ -139,7 +140,7 @@ export interface Book extends SeriesBaseProperties, TaxonomyProperties {
   prevLabel?: string;
   nextLink?: string;
   nextLabel?: string;
-  [key: string]: any;
+  [key: string]: FrontmatterValue;
 }
 
 export interface BookDetail extends Book {

@@ -1,6 +1,6 @@
 import type { FC } from "react";
 import { getAllBooks, type Book } from "@/app/lib/books"; 
-import { CONTENT_REGISTRY, getSlug, getAuthorSlugFromTitle } from "@/app/lib/content/core/registry";
+import { getSlug, getAuthorSlugFromTitle, findName } from "@/app/lib/content/core/registry";
 import { AuthorListView } from "./AuthorListView";
 
 interface AuthorListProps {
@@ -40,7 +40,7 @@ const AuthorList: FC<AuthorListProps> = async ({ sortBy, limit }) => {
     // ৩. প্রতিটি ব্যক্তির জন্য কাউন্ট ও ডেটা আপডেট করা
     uniqueContributors.forEach((rawAuthor) => {
       const authorSlug = getAuthorSlugFromTitle(rawAuthor) || getSlug("authors", rawAuthor);
-      const displayName = CONTENT_REGISTRY.authors[authorSlug] || rawAuthor;
+      const displayName = findName("authors", authorSlug) || rawAuthor;
 
       if (authorMap.has(authorSlug)) {
         const current = authorMap.get(authorSlug)!;

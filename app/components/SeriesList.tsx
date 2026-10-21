@@ -1,6 +1,7 @@
+import type { FrontmatterValue } from '@/app/lib/frontmatter';
 import type { FC } from "react";
 import { getAllBooks } from "@/app/lib/books"; 
-import { CONTENT_REGISTRY, getSlug } from "@/app/lib/content/core/registry";
+import { findName, getSlug } from "@/app/lib/content/core/registry";
 import { SeriesListView, type SeriesItem } from "./SeriesListView";
 import { Users, Library } from "lucide-react";
 
@@ -8,7 +9,7 @@ const toBengaliNumber = (num: number | string): string =>
   num.toString().replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[parseInt(d, 10)]);
 
 // ১. কোনো আইটেম থেকে সিরিজের নামগুলো নিরাপদভাবে বের করার হেলপার
-const parseSeriesField = (item: any): string[] => {
+const parseSeriesField = (item: FrontmatterValue): string[] => {
   if (!item) return [];
   const fields = [item.Series, item.Seriess, item.series];
   return fields
@@ -18,16 +19,16 @@ const parseSeriesField = (item: any): string[] => {
 };
 
 // ২. বই ও বইয়ের চাইল্ড আইটেমসমূহ থেকে সব সিরিজ সংগ্রহ করার হেলপার
-const collectAllSeriesFromBook = (book: any): string[] => {
+const collectAllSeriesFromBook = (book: FrontmatterValue): string[] => {
   const seriesSet = new Set<string>();
 
-  const processItem = (item: any) => {
+  const processItem = (item: FrontmatterValue) => {
     parseSeriesField(item).forEach((s) => seriesSet.add(s));
   };
 
   processItem(book);
 
-  const processSubArray = (arr?: any[]) => {
+  const processSubArray = (arr?: FrontmatterValue[]) => {
     if (Array.isArray(arr)) arr.forEach(processItem);
   };
 
@@ -42,7 +43,7 @@ const collectAllSeriesFromBook = (book: any): string[] => {
   nestedArrays.forEach(processSubArray);
 
   if (Array.isArray(book.volumes)) {
-    book.volumes.forEach((vol: any) => {
+    book.volumes.forEach((vol: FrontmatterValue) => {
       processItem(vol);
       const volSubArrays = [vol.chapters, vol.stories, vol.items, vol.directChapters];
       volSubArrays.forEach(processSubArray);
@@ -63,7 +64,7 @@ const SeriesList: FC<SeriesListProps> = async ({ sortBy, limit }) => {
   const contributorSet = new Set<string>();
   const seriesMap = new Map<string, SeriesItem>();
 
-  allBooks.forEach((book: any) => {
+  allBooks.forEach((book: FrontmatterValue) => {
     // 🔹 লেখক, অনুবাদক ও সম্পাদকদের সংগ্রহ করা
     ["author", "translator", "editor"].forEach((role) => {
       if (typeof book[role] === "string" && book[role].trim()) {
@@ -80,13 +81,12 @@ const SeriesList: FC<SeriesListProps> = async ({ sortBy, limit }) => {
 
       // 🔹 টাইপ-সেফ প্যারামিটার ব্যবহার করা হয়েছে ("series")
       const seriesSlug = getSlug("series", cleanSeries);
-      const registry = (CONTENT_REGISTRY as Record<string, Record<string, string>>).series || {};
 
       if (seriesMap.has(seriesSlug)) {
         const current = seriesMap.get(seriesSlug)!;
         seriesMap.set(seriesSlug, { ...current, count: current.count + 1 });
       } else {
-        const label = registry[seriesSlug] || cleanSeries;
+        const label = findName("series", seriesSlug) || cleanSeries;
         seriesMap.set(seriesSlug, {
           label,
           slug: seriesSlug,

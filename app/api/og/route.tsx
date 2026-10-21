@@ -1,6 +1,4 @@
 import { ImageResponse } from 'next/og';
-import { readFile } from 'node:fs/promises';
-import { join } from 'node:path';
 
 export const runtime = 'nodejs';
 
@@ -13,12 +11,16 @@ export async function GET(request: Request) {
     const subtitle = searchParams.get('subtitle') || 'অনলাইন বই ও সাহিত্য সংকলন';
     const tagline = searchParams.get('tagline') || 'সহজ ভাষায় সকল বই ও অনুচ্ছেদ পড়ুন';
 
-    // ২. Tarunima ফন্ট লোড করা এবং ArrayBuffer-এ রূপান্তর
+    // ২. Tarunima ফন্ট লোড করা — fs.readFile()-এর বদলে fetch() দিয়ে,
+    // কারণ Cloudflare Workers-এ public/ ফোল্ডারের ফাইল ডিস্কে থাকে না,
+    // ASSETS binding-এর মাধ্যমে URL দিয়ে সার্ভ হয়
     let fontData: ArrayBuffer | null = null;
     try {
-      const fontPath = join(process.cwd(), 'public/fonts/tarunima.ttf');
-      const buffer = await readFile(fontPath);
-      fontData = buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
+      const fontUrl = new URL('/fonts/tarunima.ttf', request.url).toString();
+      const fontRes = await fetch(fontUrl);
+      if (fontRes.ok) {
+        fontData = await fontRes.arrayBuffer();
+      }
     } catch (err) {
       console.error('Font load error:', err);
     }

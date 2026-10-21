@@ -1,6 +1,7 @@
+import type { FrontmatterValue } from '@/app/lib/frontmatter';
 import { cache } from 'react';
 import Link from 'next/link';
-import { Home } from 'lucide-react';
+import Breadcrumb from '@/app/components/Breadcrumb';
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
@@ -13,6 +14,7 @@ import { getSubdomainData, buildTabTitle } from '@/app/lib/get-site-data';
 import { getBookBySlug, getItemsByItemType } from '@/app/lib/books/singleItemExtract';
 import { parseNoteShortcodes } from '@/app/lib/parse-shortcodes';
 import { getItemSlug, getItemMeta } from '@/app/lib/content/core/registry/items';
+import { getSlug } from '@/app/lib/content/core/registry';
 
 // ==========================================
 // 📐 Interfaces
@@ -56,8 +58,8 @@ export interface ItemDetail {
   meta_description?: string;
   og_image?: string;
   cover_image?: string;
-  item?: string | any;
-  type?: string | any;
+  item?: FrontmatterValue;
+  type?: FrontmatterValue;
   rawFrontmatter?: { notice?: string; slug?: string; title?: string };
   [key: string]: unknown;
 }
@@ -127,13 +129,17 @@ const getAllSortedItems = cache(async () => {
   );
 });
 
-const getItemTypeName = (itemObj: any): string => {
+// Several authors/translators/editors are shown separated by " | " in the page header.
+const joinValues = (val?: string | string[]): string =>
+  (Array.isArray(val) ? val : [val]).map((v) => (v ?? '').toString().trim()).filter(Boolean).join(' | ');
+
+const getItemTypeName = (itemObj: FrontmatterValue): string => {
   const rawItem = itemObj?.item || itemObj?.type;
   if (!rawItem) return '';
   return getItemSlug(rawItem);
 };
 
-const getItemTypeDisplayName = (itemObj: any): string => {
+const getItemTypeDisplayName = (itemObj: FrontmatterValue): string => {
   const rawItem = itemObj?.item || itemObj?.type;
   if (!rawItem) return '';
   const meta = getItemMeta(rawItem);
@@ -233,10 +239,11 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
 
   const pageDisplayTitle = getPageDisplayTitle(pageTitle, subPageSubtitle, currentPageNum);
 
+  // Tab title: page name ❀ item type name ❀ site name (an explicit meta_title in the frontmatter wins)
   const dynamicMetaTitle = buildTabTitle({
-    metaTitle: item.meta_title,
+    metaTitle: (item.rawFrontmatter?.meta_title as string | undefined) || undefined,
     currentPageTitle: pageDisplayTitle || undefined,
-    bookTitle: item.title,
+    volumePageTitle: getItemTypeDisplayName(item) || undefined,
     siteName: siteName,
   });
 
@@ -372,9 +379,19 @@ export default async function SingleItemPage({ params, searchParams }: PageProps
     activeSubtitle || siteTitle
   )}&tagline=${encodeURIComponent('এডুলিচার অনলাইন সাহিত্য সংকলন')}`;
 
-  const authorName = Array.isArray(item.author) ? item.author.join(', ') : item.author || 'অজানা লেখক';
-  const translatorName = Array.isArray(item.translator) ? item.translator.join(', ') : item.translator;
-  const editorName = Array.isArray(item.editor) ? item.editor.join(', ') : item.editor;
+  const authorName = joinValues(item.author) || 'অজানা লেখক';
+  const translatorName = joinValues(item.translator);
+  const editorName = joinValues(item.editor);
+  const bookTitleStr = typeof item.bookTitle === 'string' ? item.bookTitle.trim() : '';
+
+  // Author/translator/editor names -> profile links (slug from the registry, else slugified name).
+  const personLinks: Record<string, string> = {};
+  for (const val of [item.author, item.translator, item.editor]) {
+    for (const name of Array.isArray(val) ? val : [val]) {
+      const clean = typeof name === 'string' ? name.trim() : '';
+      if (clean) personLinks[clean] = `/author/${getSlug('authors', clean)}`;
+    }
+  }
 
   const jsonLdData = {
     '@context': 'https://schema.org',
@@ -396,44 +413,18 @@ export default async function SingleItemPage({ params, searchParams }: PageProps
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }} />
 
       {/* Breadcrumb Navigation */}
-      <nav className="w-full bg-[#7575a3] border-b border-gray-200 py-2 px-3 text-white overflow-x-auto no-scrollbar">
-        <div className="flex items-center max-w-full mx-auto text-sm font-tarunima whitespace-nowrap">
-          <Link href="/" className="transition-colors shrink-0 hover:text-red-100" title="হোম">
-            <Home size={16} />
-          </Link>
-          <span className="mx-2 text-white/50 shrink-0">/</span>
-          <Link href="/items" className="transition-colors hover:text-red-100 shrink-0">
-            প্রকরণ
-          </Link>
-          <span className="mx-2 text-white/50 shrink-0">/</span>
-          <Link href={`/items/${currentType}`} className="transition-colors hover:text-red-100 shrink-0">
-            {itemTypeDisplayName}
-          </Link>
-          <span className="mx-2 text-white/50 shrink-0">/</span>
-
-          {(nextpageSubtitle || currentPageNum > 1) ? (
-            <>
-              <Link href={`/item/${effectiveSlug}`} className="transition-colors hover:text-red-100 shrink-0">
-                {pageTitle}
-              </Link>
-              {nextpageSubtitle && (
-                <>
-                  <span className="mx-2 text-white/50 shrink-0">/</span>
-                  <span className="font-medium text-white whitespace-nowrap">{nextpageSubtitle}</span>
-                </>
-              )}
-              {!nextpageSubtitle && currentPageNum > 1 && (
-                <>
-                  <span className="mx-2 text-white/50 shrink-0">/</span>
-                  <span className="font-medium text-white shrink-0">পাতা {toBengaliNumber(currentPageNum)}</span>
-                </>
-              )}
-            </>
-          ) : (
-            <span className="font-medium text-white shrink-0">{pageTitle}</span>
-          )}
-        </div>
-      </nav>
+      <Breadcrumb
+        items={[
+          { label: 'প্রকরণ', href: '/items' },
+          { label: itemTypeDisplayName, href: `/items/${currentType}` },
+          ...(nextpageSubtitle || currentPageNum > 1
+            ? [
+                { label: pageTitle, href: `/item/${effectiveSlug}` },
+                { label: nextpageSubtitle || `পাতা ${toBengaliNumber(currentPageNum)}` },
+              ]
+            : [{ label: pageTitle }]),
+        ]}
+      />
 
       {/* Main Container */}
       <div className="grid max-w-full grid-cols-1 gap-0 mx-auto lg:grid-cols-12">
@@ -452,6 +443,7 @@ export default async function SingleItemPage({ params, searchParams }: PageProps
               )}
 
               <div className="space-y-0.5 text-red-900 font-tarunima">
+                {bookTitleStr && <p className="text-base opacity-90">{bookTitleStr}</p>}
                 {item.author && <p className="text-lg font-medium">{authorName}</p>}
                 {translatorName && (
                   <p className="text-base opacity-90">
@@ -552,7 +544,12 @@ export default async function SingleItemPage({ params, searchParams }: PageProps
         {/* Sidebar */}
         <aside className="order-2 col-span-1 px-3 py-4 space-y-4 lg:order-1 lg:col-span-3">
           <div className="space-y-4 lg:sticky lg:top-6">
-            <ItemDetails book={item} />
+            <ItemDetails
+              book={{ ...item, book: bookTitleStr || item.title, item: itemTypeDisplayName }}
+              itemHref={`/items/${currentType}`}
+              bookHref={item.bookSlug ? `/book/${item.bookSlug}` : undefined}
+              personLinks={personLinks}
+            />
 
             <TOCItem
               structure={{ title: 'সূচী' }}

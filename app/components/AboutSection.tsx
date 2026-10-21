@@ -2,14 +2,14 @@
 
 import Link from 'next/link';
 import Image from 'next/image'; // Image ইম্পোর্ট যুক্ত করা হলো
-import lightedCandle from '../../public/btree.png'; 
+import lightedCandle from '../../public/btree.webp'; 
 
 const AboutSection = () => {
   return (
     <div
       className="relative w-full overflow-hidden h-auto"
       style={{
-        backgroundImage: "url('/bg01.png')",
+        backgroundImage: "url('/bg01.webp')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",

@@ -1,30 +1,46 @@
 'use client';
 
+import Breadcrumb from '@/app/components/Breadcrumb';
+import { COVER_BASE } from '@/app/lib/cover-base';
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Home, Search, Book, X, User } from 'lucide-react';
+import { Search, Book, X, User } from 'lucide-react';
 
 const toBengaliNumber = (num: number | string): string =>
   num.toString().replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[parseInt(d, 10)]);
 
-// 🔹 Cloudflare R2 Media Base URL ফরম্যাটিং হেল্পার
+// 🔹 Cloudflare R2 Media Base URL ফরম্যাটিং হেল্পার (আপডেটেড)
 const getCoverImageUrl = (coverPath?: string | null): string => {
-  if (!coverPath) return '';
+  if (!coverPath) return `${COVER_BASE}/cover/default-cover.webp`;
 
-  let rawPath = coverPath.trim().replace(/\\/g, '/');
-
-  if (rawPath.startsWith('public/')) {
-    rawPath = rawPath.replace('public/', '');
-  } else if (rawPath.startsWith('/public/')) {
-    rawPath = rawPath.replace('/public/', '');
+  // ১. যদি ইতোমধ্যে সম্পূর্ণ URL (http/https) হয়ে থাকে
+  if (coverPath.startsWith('http://') || coverPath.startsWith('https://')) {
+    return coverPath;
   }
 
-  const cleanPath = rawPath.startsWith('/') ? rawPath.slice(1) : rawPath;
+  // ২. স্ল্যাশ ও স্পেস পরিচ্ছন্ন করা
+  let cleanPath = coverPath.trim().replace(/\\/g, '/');
 
-  return cleanPath.startsWith('http://') || cleanPath.startsWith('https://')
-    ? cleanPath
-    : `https://media.eduliture.org/${cleanPath}`;
+  // 'public/' বা '/public/' রিমুভ করা
+  if (cleanPath.startsWith('public/')) {
+    cleanPath = cleanPath.replace('public/', '');
+  } else if (cleanPath.startsWith('/public/')) {
+    cleanPath = cleanPath.replace('/public/', '');
+  }
+
+  cleanPath = cleanPath.startsWith('/') ? cleanPath.slice(1) : cleanPath;
+
+  // ৩. ডাবল এক্সটেনশন সমস্যা দূর করা (যেমন: .webp.webp বা .jpg.webp)
+  cleanPath = cleanPath.replace(/\.(webp|jpg|png)\.(webp|jpg|png)$/i, '.$1');
+
+  // ৪. যদি পাথে ইতিমধ্যে 'cover/' ফোল্ডার যুক্ত থাকে
+  if (cleanPath.startsWith('cover/')) {
+    return `${COVER_BASE}/${cleanPath}`;
+  }
+
+  // ৫. অন্যথায় সামনে 'cover/' ফোল্ডার যুক্ত করা
+  return `${COVER_BASE}/cover/${cleanPath}`;
 };
 
 export interface BookItem {
@@ -155,25 +171,7 @@ export default function AuthorBookSearchGrid({
 
   return (
     <main className="bg-[#fdfcf8] min-h-screen font-tarunima">
-      <nav className="w-full bg-[#7575a3] border-b border-gray-200 py-2 px-3 text-white overflow-x-auto no-scrollbar">
-        <div className="flex items-center max-w-full mx-auto text-sm font-tarunima whitespace-nowrap">
-          <Link href="/" className="transition-colors shrink-0 hover:text-orange-200">
-            <Home size={16} />
-          </Link>
-          <span className="mx-2 text-white/50 shrink-0">/</span>
-          <Link href="/books" className="transition-colors hover:text-orange-200">
-            গ্রন্থাগার
-          </Link>
-          <span className="mx-2 text-white/50 shrink-0">/</span>
-          <Link href="/authors" className="transition-colors hover:text-orange-200">
-            লেখক নির্ঘণ্ট
-          </Link>
-          <span className="mx-2 text-white/50 shrink-0">/</span>
-          <span className="flex items-center gap-2 font-medium">
-            {personName}
-          </span>
-        </div>
-      </nav>
+      <Breadcrumb items={[{ label: 'গ্রন্থাগার', href: '/books' }, { label: 'লেখক নির্ঘণ্ট', href: '/authors' }, { label: personName }]} />
 
       <div className="mx-auto max-w-full px-2 py-4">
         {/* 🔹 হেডার সেকশন: টাইটেল, সার্চবার এবং বর্ণমালা ফিল্টার */}
@@ -196,7 +194,7 @@ export default function AuthorBookSearchGrid({
               </p>
             </div>
 
-            {/* ডানপাশে সার্চবার (মোবাইলে নিচে ফুল-ওয়াইড) */}
+            {/* ডানপাশে সার্চবার (মোবাইলে নিচে ফুল-ওয়াইড) */}
             {personBooks.length > 0 && (
               <div className="relative w-full md:w-80 shrink-0">
                 <Search className="absolute w-4 h-4 text-teal-600 -translate-y-1/2 left-3 top-1/2 pointer-events-none" />
@@ -219,7 +217,7 @@ export default function AuthorBookSearchGrid({
             )}
           </div>
 
-          {/* ফুল-ওয়াইড ও সেন্টারাইজড আদ্যক্ষর ফিল্টারিং */}
+          {/* ফুল-ওয়াইড ও সেন্টারাইজড আদ্যক্ষর ফিল্টারিং */}
           {personBooks.length > 0 && dynamicLetters.length > 1 && (
             <div className="p-2 border border-teal-100 rounded bg-teal-50/90 backdrop-blur-md shadow-xs">
               <div className="flex flex-wrap items-center justify-center gap-1">

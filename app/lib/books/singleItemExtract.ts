@@ -1,14 +1,9 @@
 // app/lib/books/singleItemExtract.ts
-import fs from 'fs';
-import path from 'path';
-import matter from 'gray-matter';
-import { getAllLibraryItems, LibraryItemEntry } from './items';
+import type { FrontmatterData, FrontmatterValue } from '@/app/lib/frontmatter';
+import matter from 'gray-matter'; // 🌟 ১. gray-matter ইমপোর্ট করা হলো
+import { getAllLibraryItems } from './items';
+import { readTextFromR2 } from './r2';
 
-const BOOKS_DIRECTORY = path.join(process.cwd(), 'content/books');
-
-/**
- * ১. সিঙ্গেল আইটেমের জন্য সুনির্দিষ্ট টাইপ ডেফিনিশন (TypeScript Interface)
- */
 export interface SingleBookItem {
   slug: string;
   title: string;
@@ -26,32 +21,24 @@ export interface SingleBookItem {
   meta_description?: string;
   og_image?: string;
   cover_image?: string;
-  rawFrontmatter?: Record<string, any>;
+  rawFrontmatter?: FrontmatterData;
   content: string;
-  [key: string]: any;
-}
-
-// সাব-ফোল্ডারসহ সব .md ফাইল খুঁজে বের করার রিকার্সিভ ফাংশন (সিঙ্ক্রোনাস)
-function getAllMarkdownFiles(dirPath: string, arrayOfFiles: string[] = []): string[] {
-  if (!fs.existsSync(dirPath)) return arrayOfFiles;
-
-  const files = fs.readdirSync(dirPath);
-
-  files.forEach((file) => {
-    const fullPath = path.join(dirPath, file);
-    if (fs.statSync(fullPath).isDirectory()) {
-      arrayOfFiles = getAllMarkdownFiles(fullPath, arrayOfFiles);
-    } else if (file.endsWith('.md')) {
-      arrayOfFiles.push(fullPath);
-    }
-  });
-
-  return arrayOfFiles;
+  [key: string]: FrontmatterValue;
 }
 
 /**
- * ২. ফ্রন্টমেটার বা আইটেম টাইপ অনুযায়ী আইটেম খুঁজে বের করার ফাংশন
+ * 🛠️ হেল্পার: ফ্রন্টম্যাটারের item বা type ফিল্ড স্ট্রিং বা অবজেক্ট যাই হোক না কেন তা থেকে সঠিক নাম বা স্লাগ বের করা
  */
+const resolveItemTypeString = (rawItem: FrontmatterValue): string => {
+  if (!rawItem) return '';
+  if (typeof rawItem === 'string') return rawItem.trim().toLowerCase();
+  if (typeof rawItem === 'object' && rawItem !== null) {
+    const val = rawItem.name || rawItem.title || rawItem.item || rawItem.type || '';
+    return typeof val === 'string' ? val.trim().toLowerCase() : '';
+  }
+  return '';
+};
+
 export async function getItemsByItemType(targetItemType?: string) {
   const allLibraryItems = await getAllLibraryItems();
 
@@ -61,7 +48,6 @@ export async function getItemsByItemType(targetItemType?: string) {
       title: item.title,
       author: item.author,
       bookTitle: item.bookTitle,
-      content: item.content,
       ...item.frontmatter,
     }));
   }
@@ -69,9 +55,10 @@ export async function getItemsByItemType(targetItemType?: string) {
   const cleanTargetType = targetItemType.trim().toLowerCase();
 
   const filtered = allLibraryItems.filter((item) => {
-    const type = item.itemType ? item.itemType.toLowerCase() : '';
-    const typeSlug = item.itemTypeSlug ? item.itemTypeSlug.toLowerCase() : '';
-    return type === cleanTargetType || typeSlug === cleanTargetType;
+    const type = resolveItemTypeString(item.itemType || item.frontmatter?.item);
+    const typeSlug = resolveItemTypeString(item.itemTypeSlug || item.frontmatter?.itemSlug);
+
+    return type === cleanTargetType || typeSlug === cleanTargetType || type.includes(cleanTargetType);
   });
 
   return filtered.map((item) => ({
@@ -79,108 +66,75 @@ export async function getItemsByItemType(targetItemType?: string) {
     title: item.title,
     author: item.author,
     bookTitle: item.bookTitle,
-    content: item.content,
     ...item.frontmatter,
   }));
 }
 
 /**
- * ৩. যেকোনো স্লাগ দিয়ে সিঙ্গেল আইটেম খোঁজার অল-ইন-ওয়ান সমাধান
+ * যেকোনো স্লাগ দিয়ে সিঙ্গেল আইটেম খোঁজা
  */
 export async function getBookBySlug(slug: string | string[]): Promise<SingleBookItem | null> {
   const rawSlug = Array.isArray(slug) ? slug.join('/') : slug;
   const decodedSlug = decodeURIComponent(rawSlug).trim();
-  const lowerDecodedSlug = decodedSlug.toLowerCase();
+  const lowerDecodedSlug = decodedSlug.toLowerCase().replace(/^\/+|\/+$/g, '');
 
-  // স্লাগের শেষ অংশ আলাদা করা
   const slugSegments = decodedSlug.split('/').filter(Boolean);
-  const lastSegment = slugSegments[slugSegments.length - 1] || decodedSlug;
-  const lowerLastSegment = lastSegment.toLowerCase();
-
-  // ১. মেথড: items.ts-এর পার্স করা ডাটা থেকে খোঁজা (সবচেয়ে নির্ভরযোগ্য)
   const allItems = await getAllLibraryItems();
 
-  const matchedItem = allItems.find((entry) => {
-    const tSlug = entry.titleSlug ? entry.titleSlug.trim() : '';
-    const fileSlug = entry.frontmatter.slug ? String(entry.frontmatter.slug).trim() : '';
-    const href = entry.href ? entry.href.toLowerCase() : '';
+  // প্রথমে সম্পূর্ণ পাথ দিয়ে নিখুঁত (Exact) ম্যাচ খোঁজা
+  let matchedItem = allItems.find((entry) => {
+    const href = entry.href ? entry.href.toLowerCase().replace(/^\/+|\/+$/g, '') : '';
+    const cleanHref = href.replace(/^book\//, '');
 
-    return (
-      tSlug === decodedSlug ||
-      tSlug.toLowerCase() === lowerDecodedSlug ||
-      tSlug.toLowerCase() === lowerLastSegment ||
-      fileSlug === decodedSlug ||
-      fileSlug.toLowerCase() === lowerDecodedSlug ||
-      fileSlug.toLowerCase() === lowerLastSegment ||
-      href.endsWith(`/${lowerLastSegment}`) ||
-      href.includes(lowerDecodedSlug)
-    );
+    return cleanHref === lowerDecodedSlug || cleanHref.endsWith(`/${lowerDecodedSlug}`);
   });
 
-  if (matchedItem) {
-    return {
-      slug: matchedItem.titleSlug,
-      title: matchedItem.title,
-      subtitle: matchedItem.frontmatter.subtitle || '',
-      author: matchedItem.author || matchedItem.frontmatter.author || '',
-      authorSlug: matchedItem.authorSlug,
-      bookTitle: matchedItem.bookTitle,
-      bookSlug: matchedItem.bookSlug,
-      itemType: matchedItem.itemType,
-      itemTypeSlug: matchedItem.itemTypeSlug,
-      href: matchedItem.href,
-      translator: matchedItem.frontmatter.translator || '',
-      editor: matchedItem.frontmatter.editor || '',
-      meta_title: matchedItem.frontmatter.meta_title || matchedItem.title,
-      meta_description: matchedItem.frontmatter.meta_description || '',
-      og_image: matchedItem.frontmatter.og_image || '',
-      cover_image: matchedItem.frontmatter.cover_image || '',
-      rawFrontmatter: matchedItem.frontmatter,
-      content: matchedItem.content,
-      ...matchedItem.frontmatter,
-    };
+  // যদি নিখুঁত পাথ ম্যাচ না মেলে এবং এটি একটিমাত্র সেগমেন্ট হয়, তবে সাধারণ স্লাগ বা ফাইল স্লাগ দিয়ে খুঁজি
+  if (!matchedItem && slugSegments.length === 1) {
+    const singleSlug = slugSegments[0].toLowerCase();
+    matchedItem = allItems.find((entry) => {
+      const tSlug = entry.titleSlug ? entry.titleSlug.trim().toLowerCase() : '';
+      const fileSlug = entry.frontmatter?.slug ? String(entry.frontmatter.slug).trim().toLowerCase() : '';
+      return tSlug === singleSlug || fileSlug === singleSlug;
+    });
   }
 
-  // ২. ফলব্যাক মেথড: ফাইল পাথ দিয়ে খোঁজা (বাধ্যতামূলক slug চেকসহ)
-  const targetPath = path.join(BOOKS_DIRECTORY, `${lastSegment}.md`);
-  if (fs.existsSync(targetPath)) {
-    const fileContent = fs.readFileSync(targetPath, 'utf8');
-    const { data: frontmatter, content } = matter(fileContent);
-
-    if (!frontmatter.slug) {
-      throw new Error(`❌ ত্রুটি: ${targetPath} ফাইলে বাধ্যতামূলক 'slug' অনুপস্থিত!`);
-    }
-
-    return {
-      slug: String(frontmatter.slug).trim(),
-      title: frontmatter.title || lastSegment,
-      content,
-      rawFrontmatter: frontmatter,
-      ...frontmatter,
-    };
+  // যদি তখনও না মেলে, তবে শেষের অংশ দিয়ে ফ্লেক্সিবল ম্যাচ
+  if (!matchedItem && slugSegments.length > 1) {
+    const lastSegment = slugSegments[slugSegments.length - 1].toLowerCase();
+    matchedItem = allItems.find((entry) => {
+      const href = entry.href ? entry.href.toLowerCase() : '';
+      return href.endsWith(`/${lastSegment}`);
+    });
   }
 
-  // ৩. ফলব্যাক মেথড: পুরো ডিরেক্টরি রিকার্সিভলি চেক করা (বাধ্যতামূলক slug চেকসহ)
-  const allFiles = getAllMarkdownFiles(BOOKS_DIRECTORY);
-  for (const filePath of allFiles) {
-    const fileName = path.basename(filePath, '.md');
-    if (fileName.toLowerCase() === lowerLastSegment) {
-      const fileContent = fs.readFileSync(filePath, 'utf8');
-      const { data: frontmatter, content } = matter(fileContent);
+  if (!matchedItem) return null;
 
-      if (!frontmatter.slug) {
-        throw new Error(`❌ ত্রুটি: ${filePath} ফাইলে বাধ্যতামূলক 'slug' অনুপস্থিত!`);
-      }
+  const raw = await readTextFromR2(matchedItem.r2Key);
 
-      return {
-        slug: String(frontmatter.slug).trim(),
-        title: frontmatter.title || fileName,
-        content,
-        rawFrontmatter: frontmatter,
-        ...frontmatter,
-      };
-    }
-  }
+  // 🌟 ২. gray-matter দিয়ে ফ্রন্টম্যাটার এবং বডি আলাদা করা হলো
+  const parsed = matter(raw || '');
+  const content = parsed.content; // এটি শুধু মূল লেখার অংশটুকু দেবে, ফ্রন্টম্যাটার নয়!
 
-  return null;
+  return {
+    slug: matchedItem.titleSlug,
+    title: matchedItem.title,
+    subtitle: matchedItem.frontmatter?.subtitle || '',
+    author: matchedItem.author || matchedItem.frontmatter?.author || '',
+    authorSlug: matchedItem.authorSlug,
+    bookTitle: matchedItem.bookTitle,
+    bookSlug: matchedItem.bookSlug,
+    itemType: resolveItemTypeString(matchedItem.itemType || matchedItem.frontmatter?.item),
+    itemTypeSlug: matchedItem.itemTypeSlug,
+    href: matchedItem.href,
+    translator: matchedItem.frontmatter?.translator || '',
+    editor: matchedItem.frontmatter?.editor || '',
+    meta_title: matchedItem.frontmatter?.meta_title || matchedItem.title,
+    meta_description: matchedItem.frontmatter?.meta_description || '',
+    og_image: matchedItem.frontmatter?.og_image || '',
+    cover_image: matchedItem.frontmatter?.cover_image || '',
+    rawFrontmatter: matchedItem.frontmatter,
+    content, // ফ্রন্টম্যাটার বাদ দেওয়া পরিষ্কার বডি কন্টেন্ট
+    ...matchedItem.frontmatter,
+  };
 }

@@ -1,9 +1,11 @@
 "use client";
 
+import Breadcrumb from '@/app/components/Breadcrumb';
+import { COVER_BASE } from '@/app/lib/cover-base';
 import { useState, useMemo, FC } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Home, BookOpen, Search, X, Layers } from "lucide-react";
+import { BookOpen, Search, X, Layers } from "lucide-react";
 
 export interface SeriesBook {
   id?: string;
@@ -34,21 +36,35 @@ export interface SeriesViewProps {
 
 // 🔹 Cloudflare R2 Media Base URL ফরম্যাটিং হেল্পার
 const getCoverImageUrl = (coverPath?: string | null): string => {
-  if (!coverPath) return "/default-cover.webp";
+  if (!coverPath) return `${COVER_BASE}/cover/default-cover.webp`;
 
-  let rawPath = coverPath.trim().replace(/\\/g, "/");
-
-  if (rawPath.startsWith("public/")) {
-    rawPath = rawPath.replace("public/", "");
-  } else if (rawPath.startsWith("/public/")) {
-    rawPath = rawPath.replace("/public/", "");
+  // ১. যদি ইতোমধ্যে সম্পূর্ণ URL (http/https) হয়ে থাকে
+  if (coverPath.startsWith("http://") || coverPath.startsWith("https://")) {
+    return coverPath;
   }
 
-  const cleanPath = rawPath.startsWith("/") ? rawPath.slice(1) : rawPath;
+  // ২. স্ল্যাশ ও স্পেস পরিচ্ছন্ন করা
+  let cleanPath = coverPath.trim().replace(/\\/g, "/");
 
-  return cleanPath.startsWith("http://") || cleanPath.startsWith("https://")
-    ? cleanPath
-    : `https://media.eduliture.org/${cleanPath}`;
+  // 'public/' বা প্রিসিডিং স্ল্যাশ রিমুভ করা
+  if (cleanPath.startsWith("public/")) {
+    cleanPath = cleanPath.replace("public/", "");
+  } else if (cleanPath.startsWith("/public/")) {
+    cleanPath = cleanPath.replace("/public/", "");
+  }
+
+  cleanPath = cleanPath.startsWith("/") ? cleanPath.slice(1) : cleanPath;
+
+  // ৩. ডাবল এক্সটেনশন সমস্যা দূর করা (যেমন: .webp.webp)
+  cleanPath = cleanPath.replace(/\.(webp|jpg|png)\.(webp|jpg|png)$/i, ".$1");
+
+  // ৪. যদি পাথে ইতিমধ্যে 'cover/' ফোল্ডারটি যুক্ত থাকে
+  if (cleanPath.startsWith("cover/")) {
+    return `${COVER_BASE}/${cleanPath}`;
+  }
+
+  // ৫. অন্যথায় সামনে 'cover/' ফোল্ডার যুক্ত করা
+  return `${COVER_BASE}/cover/${cleanPath}`;
 };
 
 const toBengaliNumber = (num: number | string): string =>
@@ -135,25 +151,7 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
 
   return (
     <main className="bg-[#fdfcf8] min-h-screen font-tarunima">
-      <nav className="w-full bg-[#7575a3] border-b border-gray-200 py-2 px-3 text-white overflow-x-auto no-scrollbar">
-        <div className="flex items-center max-w-full mx-auto text-sm font-tarunima whitespace-nowrap">
-          <Link href="/" className="transition-colors shrink-0 hover:text-orange-200">
-            <Home size={16} />
-          </Link>
-          <span className="mx-2 text-white/50 shrink-0">/</span>
-          <Link href="/books" className="transition-colors hover:text-orange-200">
-            গ্রন্থাগার
-          </Link>
-          <span className="mx-2 text-white/50 shrink-0">/</span>
-          <Link href="/series" className="transition-colors hover:text-orange-200 shrink-0">
-            সিরিজ
-          </Link>
-          <span className="mx-2 text-white/50 shrink-0">/</span>
-          <span className="flex items-center gap-2 font-medium">
-            {seriesTitle}
-          </span>
-        </div>
-      </nav>
+      <Breadcrumb items={[{ label: 'গ্রন্থাগার', href: '/books' }, { label: 'সিরিজ', href: '/series' }, { label: seriesTitle }]} />
 
       <div className="mx-auto max-w-full px-4 py-4">
         <header className="mb-3 space-y-3 bg-white/95 backdrop-blur-md shadow-xs">

@@ -1,6 +1,4 @@
 import React from 'react';
-import fs from 'fs';
-import path from 'path';
 import matter from 'gray-matter';
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
@@ -10,6 +8,7 @@ import rehypeRaw from 'rehype-raw';
 import { Metadata } from 'next';
 import BioSidebar, { InfoField } from '@/app/components/BioSidebar';
 import { getSubdomainData, buildTabTitle } from '@/app/lib/get-site-data';
+import { readTextFromR2 } from '@/app/lib/books/r2'; // R2 থেকে ফাইল পড়ার ফাংশন
 
 interface BioFrontmatter {
   title?: string;
@@ -57,17 +56,17 @@ async function getOnlySubdomain(): Promise<string | null> {
   return null;
 }
 
-// ২. লোকাল ফাইল থেকে বায়োগ্রাফি ডাটা লোড করা
-function getBioData(subdomain: string | null) {
+// ২. R2 থেকে বায়োগ্রাফি ডাটা লোড করা (Async)
+async function getBioData(subdomain: string | null) {
   if (!subdomain) return null;
 
-  const targetDir = path.join(process.cwd(), 'content', 'pages', 'bio');
-  const filePath = path.join(targetDir, `${subdomain.toLowerCase()}.md`);
+  // R2-তে আপনার ফাইলটি যদি 'pages/bio/' ফোল্ডারে থাকে
+  const r2Key = `pages/bio/${subdomain.toLowerCase()}.md`;
 
   try {
-    if (!fs.existsSync(filePath)) return null;
+    const fileContents = await readTextFromR2(r2Key);
+    if (!fileContents) return null;
 
-    const fileContents = fs.readFileSync(filePath, 'utf-8');
     const { data, content } = matter(fileContents);
 
     return {
@@ -86,7 +85,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const siteData = getSubdomainData(host);
 
   const subdomain = await getOnlySubdomain();
-  const bioData = getBioData(subdomain);
+  const bioData = await getBioData(subdomain); // await যুক্ত করা হয়েছে
 
   if (!bioData) {
     return {
@@ -208,7 +207,7 @@ export default async function BiographyPage() {
     notFound();
   }
 
-  const bioData = getBioData(subdomain);
+  const bioData = await getBioData(subdomain); // await যুক্ত করা হয়েছে
 
   if (!bioData) {
     notFound();

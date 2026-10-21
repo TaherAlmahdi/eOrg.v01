@@ -3,14 +3,14 @@
 import Hero from './Hero';
 import WelcomeBadge from './Welcome';
 import Image from 'next/image';
-import lightedCandle from '../../public/lighted-candle.gif';
+import lightedCandle from '../../public/lighted-candle.webp';
 
 const WelcomeSection = () => {
   return (
     <div
       className="relative w-full h-auto overflow-hidden min-h-auto flex flex-col justify-center p-3 md:p-4"
       style={{
-        backgroundImage: "url('/bg01.png')",
+        backgroundImage: "url('/bg01.webp')",
         backgroundSize: "cover",
         backgroundPosition: "top center",
         backgroundRepeat: "no-repeat",

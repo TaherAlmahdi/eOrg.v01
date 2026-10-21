@@ -1,30 +1,44 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import Breadcrumb from '@/app/components/Breadcrumb';
+import { COVER_BASE } from '@/app/lib/cover-base';
+import React, { useState, useMemo, useEffect, useSyncExternalStore } from 'react';
 import Link from 'next/link';
-import { Home, Search, BookOpen } from "lucide-react";
+import Image from 'next/image';
+import { Search, BookOpen } from "lucide-react";
 import { buildTabTitle } from '@/app/lib/get-site-data';
 
-// 🔹 Cloudflare R2 Media Base URL ফরম্যাটিং হেল্পার
+// 🔹 Cloudflare R2 Media Base URL ফরম্যাটিং হেল্পার (আপডেটেড)
 const getCoverImageUrl = (coverPath?: string | null): string => {
-  if (!coverPath) return '/cover/default-cover.webp';
+  if (!coverPath) return `${COVER_BASE}/cover/default-cover.webp`;
 
-  let rawPath = coverPath.trim().replace(/\\/g, '/');
-
-  // 'public/' বা '/public/' রিমুভ করা
-  if (rawPath.startsWith('public/')) {
-    rawPath = rawPath.replace('public/', '');
-  } else if (rawPath.startsWith('/public/')) {
-    rawPath = rawPath.replace('/public/', '');
+  // ১. যদি ইতোমধ্যে সম্পূর্ণ URL (http/https) হয়ে থাকে
+  if (coverPath.startsWith('http://') || coverPath.startsWith('https://')) {
+    return coverPath;
   }
 
-  // শুরুর স্ল্যাশ বাদ দেওয়া
-  const cleanPath = rawPath.startsWith('/') ? rawPath.slice(1) : rawPath;
+  // ২. স্ল্যাশ ও স্পেস পরিচ্ছন্ন করা
+  let cleanPath = coverPath.trim().replace(/\\/g, '/');
 
-  // ফুল URL থাকলে সেটাই রিটার্ন করবে, অন্যথায় Cloudflare R2 URL যুক্ত করবে
-  return cleanPath.startsWith('http://') || cleanPath.startsWith('https://')
-    ? cleanPath
-    : `https://media.eduliture.org/${cleanPath}`;
+  // 'public/' বা '/public/' রিমুভ করা
+  if (cleanPath.startsWith('public/')) {
+    cleanPath = cleanPath.replace('public/', '');
+  } else if (cleanPath.startsWith('/public/')) {
+    cleanPath = cleanPath.replace('/public/', '');
+  }
+
+  cleanPath = cleanPath.startsWith('/') ? cleanPath.slice(1) : cleanPath;
+
+  // ৩. ডাবল এক্সটেনশন সমস্যা দূর করা (যেমন: .webp.webp বা .jpg.webp)
+  cleanPath = cleanPath.replace(/\.(webp|jpg|png)\.(webp|jpg|png)$/i, '.$1');
+
+  // ৪. যদি পাথে ইতিমধ্যে 'cover/' ফোল্ডার যুক্ত থাকে
+  if (cleanPath.startsWith('cover/')) {
+    return `${COVER_BASE}/${cleanPath}`;
+  }
+
+  // ৫. অন্যথায় সামনে 'cover/' ফোল্ডার যুক্ত করা
+  return `${COVER_BASE}/cover/${cleanPath}`;
 };
 
 // 🔹 ইংরেজি সংখ্যাকে বাংলায় রূপান্তর করার ফাংশন
@@ -67,26 +81,31 @@ interface BooksPageClientProps {
   genreTitle?: string;
 }
 
+const WIDE_SCREEN_QUERY = '(min-width: 1280px)';
+
+function subscribeWideScreen(onChange: () => void) {
+  const mql = window.matchMedia(WIDE_SCREEN_QUERY);
+  mql.addEventListener('change', onChange);
+  return () => mql.removeEventListener('change', onChange);
+}
+
+function getWideScreen() {
+  return window.matchMedia(WIDE_SCREEN_QUERY).matches;
+}
+
 export default function BooksPageClient({
   initialBooks = [],
   siteTitle,
   genreTitle
 }: BooksPageClientProps) {
-  const [limit, setLimit] = useState(30);
+  // Wide screens show 40 books, others 30 (server snapshot is false, so hydration matches)
+  const isWide = useSyncExternalStore(subscribeWideScreen, getWideScreen, () => false);
+  const limit = isWide ? 40 : 30;
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLetter, setSelectedLetter] = useState('সব');
   const [visibleCount, setVisibleCount] = useState(limit);
 
   // স্ক্রিন সাইজ অনুযায়ী ইনিশিয়াল লিমিট নির্ধারণ (হাইড্রেশন মিসম্যাচ এড়াতে)
-  useEffect(() => {
-    if (window.innerWidth >= 1280) {
-      setLimit(40);
-    }
-  }, []);
-
-  useEffect(() => {
-    setVisibleCount(limit);
-  }, [limit]);
 
   // ১. প্রাথমিক বইগুলো সর্ট করা
   const sortedBooks = useMemo(() => {
@@ -162,9 +181,12 @@ export default function BooksPageClient({
   }, [sortedBooks, searchQuery, selectedLetter, genreTitle]);
 
   // সার্চ বা লেটার পরিবর্তন করলে দৃশ্যমান কাউন্ট রিসেট করা
-  useEffect(() => {
+  const visibleResetKey = `${searchQuery}|${selectedLetter}|${limit}`;
+  const [prevVisibleResetKey, setPrevVisibleResetKey] = useState(visibleResetKey);
+  if (prevVisibleResetKey !== visibleResetKey) {
+    setPrevVisibleResetKey(visibleResetKey);
     setVisibleCount(limit);
-  }, [searchQuery, selectedLetter, limit]);
+  }
 
   // বর্তমান দৃশ্যমান বইগুলো
   const currentBooks = useMemo(() => {
@@ -193,19 +215,7 @@ export default function BooksPageClient({
   return (
     <main className="bg-[#fdfcf8] min-h-screen font-tarunima">
       {/* নেভিগেশন বার */}
-      <nav className="w-full bg-[#7575a3] border-b border-gray-200 py-2 px-3 text-white overflow-x-auto no-scrollbar">
-        <div className="max-w-full mx-auto text-sm font-tarunima flex items-center whitespace-nowrap">
-          <Link href="/" className="shrink-0"><Home size={16} /></Link>
-          <span className="mx-2 text-white/50 shrink-0">/</span>
-          <Link href="/books" className="hover:text-red-100 shrink-0">গ্রন্থাগার</Link>
-          {genreTitle && (
-            <>
-              <span className="mx-2 text-white/50 shrink-0">/</span>
-              <span className="font-medium text-white">{genreTitle}</span>
-            </>
-          )}
-        </div>
-      </nav>
+      <Breadcrumb items={genreTitle ? [{ label: 'গ্রন্থাগার', href: '/books' }, { label: genreTitle }] : [{ label: 'গ্রন্থাগার' }]} />
 
       {/* বইয়ের গ্রিড ও ফিল্টার হেডার */}
       <div className="max-w-full mx-auto py-4 px-4">
@@ -283,24 +293,26 @@ export default function BooksPageClient({
                   <Link
                     key={bookKey}
                     href={`/book/${bookKey}`}
-                    className="group font-tarunima flex flex-col h-full"
+                    className="group font-tarunima flex flex-col h-full bg-white rounded border border-gray-100 p-2 shadow-xs hover:shadow-md transition-all duration-300"
                   >
-                    {/* কভার ইমেজ কার্ড */}
-                    <div className="relative aspect-2/3 overflow-hidden rounded shadow-lg bg-white border border-gray-100 transition-transform duration-300 group-hover:-translate-y-2 group-hover:shadow-2xl">
-                      <img
+                    {/* প্রচ্ছদ ইমেজ কার্ড (Next.js Image কম্পোনেন্ট ব্যবহার করা হয়েছে) */}
+                    <div className="relative aspect-2/3 overflow-hidden rounded bg-amber-50/50">
+                      <Image
                         src={coverSrc}
                         alt={book.title}
-                        className="w-full h-full object-cover"
+                        fill
+                        sizes="(max-width: 640px) 50vw, (max-width: 1280px) 16.6vw, 12.5vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
                     </div>
 
                     {/* বইয়ের তথ্য */}
-                    <div className="mt-1 flex flex-col grow font-tarunima">
-                      <h3 className="text-base md:text-lg text-center font-bold text-gray-900 group-hover:text-red-900 transition-colors line-clamp-2">
+                    <div className="mt-2 flex flex-col grow font-tarunima">
+                      <h3 className="text-xs md:text-sm text-center font-bold text-gray-900 group-hover:text-[#996633] transition-colors line-clamp-2">
                         {book.title}
                       </h3>
-                      <p className="text-sm text-center text-gray-500 mt-1 uppercase tracking-tight">
+                      <p className="text-xs text-center text-gray-500 mt-1 uppercase tracking-tight line-clamp-1">
                         {(book.author as string) || 'অজানা লেখক'}
                       </p>
                     </div>

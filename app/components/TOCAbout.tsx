@@ -51,7 +51,7 @@ export default function TOCAbout({ items }: TOCAboutProps) {
     }
   };
 
-  const TocList = () => (
+  const tocList = (
     <nav className="space-y-2 font-tarunima p-0 m-0">
       <p className="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3 border-b pb-1 whitespace-nowrap">
         সূচিপত্র
@@ -93,7 +93,7 @@ export default function TOCAbout({ items }: TOCAboutProps) {
       {/* 🖥️ ডেস্কটপ ভার্সন */}
       <aside className="hidden lg:block shrink-0 w-fit max-w-md sticky top-20 h-auto">
         <div className="p-4 rounded border border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 backdrop-blur-sm">
-          <TocList />
+          {tocList}
         </div>
       </aside>
 
@@ -121,7 +121,7 @@ export default function TOCAbout({ items }: TOCAboutProps) {
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <TocList />
+            {tocList}
           </div>
         </div>
       )}

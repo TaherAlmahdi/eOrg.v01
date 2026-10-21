@@ -1,8 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import fs from 'fs';
-import path from 'path';
 import matter from 'gray-matter';
 import { Metadata } from 'next';
 import { headers } from 'next/headers';
@@ -11,6 +9,7 @@ import { getLibraryBooks } from '../../../lib/books';
 import { getSlug } from '../../../lib/content/core/registry';
 import { getSubdomainData, buildTabTitle } from '@/app/lib/get-site-data';
 import { headerConfig } from '../../../lib/headerConfig';
+import { readTextFromR2 } from '../../../lib/books/r2';
 
 interface AuthorHomePageProps {
   params: Promise<{
@@ -25,45 +24,33 @@ export async function generateMetadata({ params }: AuthorHomePageProps): Promise
   const headersList = await headers();
   const host = headersList.get('host') || '';
 
-  // সাবডোমেন ডাটা ও হেডার কনফিগারেশন এক্সট্র্যাক্ট করা
   const siteData = getSubdomainData(host);
   const subdomain = siteData.subdomain || 'library';
   const currentConfig = headerConfig[subdomain] || headerConfig.library || headerConfig.main;
 
-  // লেখক পরিচিতি ফাইল থেকে Title বের করা
-  // 📌 নোট: sucsess এর বানান ফোল্ডারের প্রকৃত নাম অনুযায়ী মিলিয়ে নিন (উদাহরণ: success)
-  const mdFilePath = path.join(
-    process.cwd(),
-    'content',
-    'pages',
-    'success',
-    `${author}.md`
-  );
-
+  const r2Key = `pages/success/${author}.md`;
   let pageTitle = '';
-  if (fs.existsSync(mdFilePath)) {
-    try {
-      const fileSource = fs.readFileSync(mdFilePath, 'utf8');
+
+  try {
+    const fileSource = await readTextFromR2(r2Key);
+    if (fileSource) {
       const { data } = matter(fileSource);
       if (data?.title) {
         pageTitle = data.title;
       }
-    } catch (err) {
-      console.error('Metadata MD parsing error:', err);
     }
+  } catch (err) {
+    console.error('Metadata R2 MD parsing error:', err);
   }
 
   const fullTitle = pageTitle || (author ? author.charAt(0).toUpperCase() + author.slice(1) : '');
 
-  // 🔹 ট্যাব টাইটেল: সাবডোমেন টাইটেল ❀ সাবডোমেন ট্যাগলাইন
   const dynamicMetaTitle = buildTabTitle({
     siteName: currentConfig.siteName,
     tagline: currentConfig.tagline,
   });
 
   const description = `${fullTitle}-এর জীবন, সাহিত্য ও সমস্ত রচনার ডিজিটাল নির্ঘণ্ট দেখুন এডুলিচার পাঠশালায়।`;
-
-  // 🖼️ ডাইনামিক OG Image API Call (সাবডোমেন ও অথর ভিত্তিক)
   const ogImageUrl = `https://eduliture.org/api/og?title=${encodeURIComponent(fullTitle)}&tagline=${encodeURIComponent('লেখক ও সাহিত্যিক সংকলন')}`;
 
   return {
@@ -93,57 +80,40 @@ export async function generateMetadata({ params }: AuthorHomePageProps): Promise
 export default async function AuthorHomePage({ params }: AuthorHomePageProps) {
   const { author } = await params;
 
-  // ১. লেখক পরিচিতির জন্য মার্কডাউন ফাইল পড়া
-  const mdFilePath = path.join(
-    process.cwd(),
-    'content',
-    'pages',
-    'success',
-    `${author}.md`
-  );
-
+  const r2Key = `pages/success/${author}.md`;
   let mdHtmlContent = '';
   let pageTitle = '';
 
-  if (fs.existsSync(mdFilePath)) {
-    try {
-      const fileSource = fs.readFileSync(mdFilePath, 'utf8');
+  try {
+    const fileSource = await readTextFromR2(r2Key);
+    if (fileSource) {
       const { content, data } = matter(fileSource);
-      
       mdHtmlContent = content;
       if (data?.title) {
         pageTitle = data.title;
       }
-    } catch (err) {
-      console.error('MD parsing error:', err);
-      mdHtmlContent = '<div class="text-sm text-red-500">পরিচিতি কন্টেন্ট লোড করার সময় সমস্যা হয়েছে।</div>';
+    } else {
+      mdHtmlContent = `<div class="text-sm text-slate-500 italic py-4">${author} সংক্রান্ত কোনো কন্টেন্ট ফাইল পাওয়া যায়নি।</div>`;
     }
-  } else {
-    mdHtmlContent = `<div class="text-sm text-slate-500 italic py-4">${author} সংক্রান্ত কোনো কন্টেন্ট ফাইল পাওয়া যায়নি।</div>`;
+  } catch (err) {
+    console.error('R2 MD parsing error:', err);
+    mdHtmlContent = '<div class="text-sm text-red-500">পরিচিতি কন্টেন্ট লোড করার সময় সমস্যা হয়েছে।</div>';
   }
 
-  // 🖼️ ইমেজের অস্তিত্ব পরীক্ষা করা (404 এরর রোধে)
-  const imageRelativePath = `/authors/${author}.webp`;
-  const absoluteImagePath = path.join(process.cwd(), 'public', 'authors', `${author}.webp`);
-  
-  const authorImageSrc = fs.existsSync(absoluteImagePath) 
-    ? imageRelativePath 
-    : '/authors/default.webp';
+  // ইমেজের পাথ (fs ছাড়া সরাসরি পাবলিক পাথ ব্যবহার)
+  const authorImageSrc = `/authors/${author}.webp`;
 
-  // ২. লাইব্রেরি থেকে বইয়ের ডাটা আনা
   const { latestBooks } = await getLibraryBooks();
 
   const fullTitle = pageTitle || (author ? author.charAt(0).toUpperCase() + author.slice(1) : '');
   const authorFirstName = fullTitle.split(' ')[0] || fullTitle;
 
-  // ঐ লেখকের সব বই ফিল্টার করা
   const authorBooks = latestBooks.filter((book) => {
     if (!book.author) return false;
     const formattedBookAuthor = book.author.toLowerCase().replace(/\s+/g, '-');
     return formattedBookAuthor === author.toLowerCase() || book.author.includes(authorFirstName);
   });
 
-  // ৩. ঘরানাভিত্তিক বইয়ের সংখ্যা হিসাব করে ক্রমানুসারে সর্ট করা
   const genreCounts: Record<string, number> = {};
 
   authorBooks.forEach((book) => {
@@ -164,12 +134,7 @@ export default async function AuthorHomePage({ params }: AuthorHomePageProps) {
 
   return (
     <div className="max-w-full mx-auto px-3 py-2 font-tarunima">
-      
-      {/* 🌟 ১. পরিচিতি সেকশন */}
-      <section
-        aria-labelledby="welcome-heading"
-        className="bg-white p-0 sm:p-0 overflow-hidden"
-      >
+      <section aria-labelledby="welcome-heading" className="bg-white p-0 sm:p-0 overflow-hidden">
         <div className="flex justify-center pt-2 md:pt-6">
           <div className="inline-flex items-center justify-center gap-4 px-5 py-2 rounded bg-teal-50 text-[#008080] mb-8 animate-pulse border border-teal-100 shadow-sm text-center">
             <Sparkles size={28} className="shrink-0" />
@@ -180,7 +145,6 @@ export default async function AuthorHomePage({ params }: AuthorHomePageProps) {
         </div>
 
         <div className="w-full text-slate-800 leading-relaxed">
-          {/* 📌 কাস্টম aspect ratio সংশোধন করা হয়েছে: aspect-[2/3] */}
           <div className="w-full aspect-[2/3] mb-3 md:float-left md:mr-3 md:mb-2 md:w-64 md:h-96 relative bg-slate-100 rounded border border-slate-200 overflow-hidden shadow-sm p-0 flex items-center justify-center">
             <Image
               src={authorImageSrc}
@@ -192,7 +156,6 @@ export default async function AuthorHomePage({ params }: AuthorHomePageProps) {
             />
           </div>
 
-          {/* ⚡ কন্টেন্ট রেন্ডারিং কাস্টম টাইপোগ্রাফি ডাইনামিক স্টাইলিং */}
           <div 
             className="space-y-4 leading-relaxed [&_h1]:text-3xl [&_h1]:md:text-4xl [&_h1]:font-black [&_h1]:mb-4 [&_h1]:mt-6 [&_h1]:text-slate-900 [&_h2]:text-2xl [&_h2]:md:text-3xl [&_h2]:font-bold [&_h2]:mb-3 [&_h2]:mt-5 [&_h2]:text-slate-900 [&_ul]:list-disc [&_ul]:list-inside [&_ul]:mb-4 [&_ul]:space-y-1 [&_ul]:text-xl [&_ul]:md:text-2xl [&_ol]:list-decimal [&_ol]:list-inside [&_ol]:mb-4 [&_ol]:space-y-1 [&_ol]:text-xl [&_ol]:md:text-2xl"
             dangerouslySetInnerHTML={{ __html: mdHtmlContent }}
@@ -200,10 +163,8 @@ export default async function AuthorHomePage({ params }: AuthorHomePageProps) {
         </div>
       </section>
 
-      {/* 📚 ২. ঘরানা নির্ঘণ্ট সেকশন */}
       <section aria-labelledby="genre-index-heading" className="mt-8">
         <div className="max-w-full mx-auto">
-          {/* হেডিং */}
           <div className="flex justify-center">
             <div className="inline-flex items-center justify-center gap-4 px-5 py-2 rounded bg-teal-50 text-[#008080] mb-8 animate-pulse border border-teal-100 shadow-sm text-center">
               <Sparkles size={28} className="shrink-0" />
@@ -237,7 +198,6 @@ export default async function AuthorHomePage({ params }: AuthorHomePageProps) {
           )}
         </div>
       </section>
-
     </div>
   );
 }

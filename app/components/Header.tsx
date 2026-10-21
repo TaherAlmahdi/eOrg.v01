@@ -55,7 +55,7 @@ const createDynamicUrl = (targetUrl: string): string => {
 
 // স্ট্রিং নাম থেকে ডাইনামিক লুসিড আইকন জেনারেট করার জন্য
 const DynamicIcon = ({ name, size = 22 }: { name: string; size?: number }) => {
-  const IconComponent = (Icons as any)[name];
+  const IconComponent = (Icons as unknown as Record<string, React.ComponentType<{ size?: number }>>)[name];
   if (!IconComponent) return <Icons.BookOpen size={size} />; 
   return <IconComponent size={size} />;
 };

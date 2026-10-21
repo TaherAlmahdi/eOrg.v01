@@ -1,10 +1,6 @@
-import path from 'path';
-import { existsSync, readdirSync, readFileSync } from 'fs';
-import matter from 'gray-matter';
+import type { FrontmatterData } from '@/app/lib/frontmatter';
 import { getSlug } from '@/app/lib/content/core/registry';
 import { SeriesItem, Book } from './types';
-
-export const booksDirectory = path.resolve(process.cwd(), 'content', 'books');
 
 /**
  * বাংলা ইউনিকোড এনকোডিং নরম্যালাইজার (য়, ড়, ঢ়, ব় এনকোডিং ফিক্স সহ)
@@ -207,58 +203,10 @@ export function extractItemsFromData(data: Record<string, unknown> | null | unde
   return Array.from(itemsSet);
 }
 
-export function collectChapterItemsDeep(bookFolderPath: string): string[] {
-  const itemsSet = new Set<string>();
-
-  if (!bookFolderPath || !existsSync(bookFolderPath)) {
-    return [];
-  }
-
-  try {
-    // ১. সবার আগে মূল বইয়ের নিজস্ব index.md ফাইলের ফ্রন্টম্যাটার থেকে আইটেমগুলো যুক্ত করা হলো
-    const mainIndexPath = path.join(bookFolderPath, 'index.md');
-    if (existsSync(mainIndexPath)) {
-      try {
-        const mainContent = readFileSync(mainIndexPath, 'utf8');
-        const { data: mainData } = matter(mainContent);
-        extractItemsFromData(mainData).forEach((i) => itemsSet.add(i));
-      } catch {
-        // Read error ignored
-      }
-    }
-
-    // ২. এরপর সাব-ফোল্ডার বা সাব-ফাইলগুলো স্ক্যান করা হবে
-    const scanDir = (dirPath: string) => {
-      const entries = readdirSync(dirPath, { withFileTypes: true });
-      for (const entry of entries) {
-        const fullPath = path.join(dirPath, entry.name);
-        if (entry.isDirectory()) {
-          scanDir(fullPath);
-        } else if (entry.isFile() && entry.name.endsWith('.md')) {
-          if (entry.name.toLowerCase() === 'index.md') continue;
-
-          try {
-            const fileContent = readFileSync(fullPath, 'utf8');
-            const { data: fileData } = matter(fileContent);
-            extractItemsFromData(fileData).forEach((i) => itemsSet.add(i));
-          } catch {
-            // Read error ignored
-          }
-        }
-      }
-    };
-    scanDir(bookFolderPath);
-  } catch {
-    // Directory traversal error ignored
-  }
-
-  return Array.from(itemsSet);
-}
-
 /**
  * টার্গেট সিরিজের সাপেক্ষে একটি বইয়ের অর্ডার খোঁজার হেলপার
  */
-function getTargetSeriesOrder(book: Record<string, any>, targetSeries?: string): string | null {
+function getTargetSeriesOrder(book: FrontmatterData, targetSeries?: string): string | null {
   if (targetSeries) {
     const targetSlug = slugify(targetSeries);
     const rawSeriesList = book.series_list || book.series_info || book.series;
@@ -291,7 +239,7 @@ function getTargetSeriesOrder(book: Record<string, any>, targetSeries?: string):
 /**
  * সিরিজের বইগুলোর জন্য রিফ্যাক্টর্ড সর্টিং হেলপার
  */
-export function sortSeriesBooks<T extends Partial<Book> & Record<string, any>>(
+export function sortSeriesBooks<T extends Partial<Book> & FrontmatterData>(
   books: T[],
   targetSeries?: string
 ): T[] {

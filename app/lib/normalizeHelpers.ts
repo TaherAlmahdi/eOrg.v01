@@ -1,3 +1,4 @@
+import type { FrontmatterValue } from '@/app/lib/frontmatter';
 // app/lib/normalizeHelpers.ts
 
 // ১. বাংলা ও ইংরেজি টেক্সট নরম্যালাইজেশন (স্পেস, চিহ্ন, নুকতা, স্বরচিহ্ন ও কেস ক্লিন করা)
@@ -20,11 +21,11 @@ export const normalizeKey = (text: string): string => {
 };
 
 // ২. অবজেক্ট বা নেস্টেড অ্যারে থেকে আইটেম ও সিরিজের নাম এক্সট্র্যাক্ট করার সেফ ফাংশন
-export const extractCleanNames = (rawInput: any): string[] => {
+export const extractCleanNames = (rawInput: FrontmatterValue): string[] => {
     if (!rawInput) return [];
     const namesSet = new Set<string>();
 
-    const process = (val: any) => {
+    const process = (val: FrontmatterValue) => {
         if (!val) return;
         if (typeof val === "string" && val.trim()) {
             namesSet.add(val.trim());

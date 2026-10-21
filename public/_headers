@@ -1,0 +1,33 @@
+# Cloudflare static-asset headers (picked up from the OpenNext assets folder at deploy time)
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/fonts/*
+  Cache-Control: public, max-age=2592000
+
+/logo/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+/favicon/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+/icons/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+/bg01.webp
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+/bg02.png
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+/bg03.png
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+/btree.webp
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+/lighted-candle.webp
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+/404.webp
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400

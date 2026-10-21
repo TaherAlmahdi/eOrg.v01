@@ -1,12 +1,7 @@
-import fs from 'fs';
-import path from 'path';
 import { headers } from 'next/headers';
 import Script from 'next/script';
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
-import { Analytics } from '@vercel/analytics/next';
-import { SpeedInsights } from '@vercel/speed-insights/next';
-
 import Header from './components/Header';
 import Footer from './components/Footer';
 import AOSProvider from './components/AOSProvider';
@@ -55,18 +50,21 @@ function parseDomainContext(host: string) {
   return { hostname, subdomain, domainKey };
 }
 
+// Icon files in public/favicon/ (no fs on Cloudflare Workers, so the list is static).
+// Key = subdomain, value = icon file name without extension.
+const SUBDOMAIN_FAVICONS: Record<string, string> = {
+  library: 'library',
+  vidyasagar: 'vidyasagar',
+  bankim: 'bankim',
+  rabindra: 'rabindra',
+  nazrul: 'nazrul',
+  sarat: 'sarat',
+  jibananda: 'jibanananda',
+};
+
 function getSubdomainFavicon(subdomain: string | null): string {
-  if (!subdomain) return '/favicon.ico';
-
-  const targetIconName = `${subdomain}.ico`;
-  const localFilePath = path.join(process.cwd(), 'public', 'favicon', targetIconName);
-
-  if (fs.existsSync(localFilePath)) {
-    return `/favicon/${targetIconName}`;
-  }
-
-  const defaultSubPath = path.join(process.cwd(), 'public', 'favicon', 'default.ico');
-  return fs.existsSync(defaultSubPath) ? '/favicon/default.ico' : '/favicon.ico';
+  const iconName = subdomain ? SUBDOMAIN_FAVICONS[subdomain] : undefined;
+  return iconName ? `/favicon/${iconName}.ico` : '/favicon.ico';
 }
 
 // ==========================================
@@ -169,7 +167,7 @@ export default async function RootLayout({
           crossOrigin="anonymous"
         />
       </head>
-      <body className="min-h-full flex flex-col bg-[#fdfdf7] text-gray-900 font-tarunima">
+      <body className="min-h-screen w-full bg-[#fdfdf7] text-gray-900 font-tarunima bg-[url('/bg01.webp')] bg-cover bg-center bg-no-repeat bg-fixed">
         <AOSProvider />
 
         <Header domainKey={domainKey} />
@@ -177,9 +175,6 @@ export default async function RootLayout({
         <main className="grow">{children}</main>
 
         <Footer />
-
-        <Analytics />
-        <SpeedInsights />
 
         {/* Google Analytics Script via Next.js Script Strategy */}
         <Script

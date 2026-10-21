@@ -1,6 +1,6 @@
 import type { FC } from "react";
 import { Users, Library, Layers, FileText, Tags } from "lucide-react";
-import { libraryStats } from "@/app/lib/generated/library-stats";
+import { getLibraryStatsData } from "@/lib/catalog";
 
 const toBengaliNumber = (num: number): string => {
   return (num || 0).toString().replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[parseInt(d, 10)]);
@@ -18,7 +18,14 @@ interface StatItem {
   countColor: string;
 }
 
-export const LibraryStats: FC = () => {
+interface LibraryStatsProps {
+  subdomain?: string;
+}
+
+// Totals are computed from the R2 manifests (no generated file, no Supabase)
+export const LibraryStats: FC<LibraryStatsProps> = async ({ subdomain }) => {
+  const libraryStats = await getLibraryStatsData(subdomain);
+
   const statsData: StatItem[] = [
     {
       title: "আমাদের পরিবারে",

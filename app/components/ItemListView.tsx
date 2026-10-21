@@ -8,54 +8,10 @@ import {
   FileText, Languages, Laugh, BookText, Compass, History, GraduationCap,
   Music, Flame, MoonStar, Cross, Sun, Flower2
 } from "lucide-react";
+import { normalizeKey } from "@/app/lib/normalizeHelpers";
 
-// 🔹 বাংলা বর্ণ ও স্পেস নরমালাইজ করার হেল্পার ফাংশন
-const normalizeBengaliText = (text: string): string => {
-  if (!text) return "";
-  return text
-    .normalize("NFC")
-    .toLowerCase()
-    .replace(/\u09af\u09bc/g, "য়")
-    .replace(/\u09a1\u09bc/g, "ড়")
-    .replace(/\u09a2\u09bc/g, "ঢ়")
-    .replace(/\u09b0\u09bc/g, "র")
-    .replace(/য়/g, "য")
-    .replace(/ড়/g, "র")
-    .replace(/ঢ়/g, "র")
-    .replace(/ব়/g, "র")
-    .replace(/়/g, "")
-    .replace(/[\u200B-\u200D\uFEFF]/g, "")
-    .replace(/[\s\-_]+/g, "");
-};
-
-/**
- * ============================================================
- * বাংলা আদ্যক্ষর নির্ধারণ (ফলা ও যুক্তবর্ণ হ্যান্ডেল করার জন্য সংশোধিত)
- * ============================================================
- */
-const getBengaliInitial = (text: string = ''): string => {
-  const value = text.normalize('NFC').trim();
-
-  if (!value) return '';
-
-  // ইংরেজি অক্ষরের জন্য
-  const firstChar = value.charAt(0);
-  if (/^[a-zA-Z]$/.test(firstChar)) {
-    return firstChar.toUpperCase();
-  }
-
-  // বাংলা স্বরবর্ণ বা ব্যঞ্জনবর্ণের সঠিক আদ্যক্ষর তোলার জন্য ম্যাচিং
-  const match = value.match(/^([অআইঈউঊঋএঐওঔকখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহড়ঢ়য়])/);
-
-  if (match && match[1]) {
-    return match[1];
-  }
-
-  return firstChar;
-};
-
-// ১. Lucide icons mapping
-const GENRE_ICONS: Record<string, FC<{ className?: string }>> = {
+// 🔹 Lucide icons mapping
+const ITEM_ICONS: Record<string, FC<{ className?: string }>> = {
   novel: ({ className }) => <BookMarked className={className} />,
   novella: ({ className }) => <Bookmark className={className} />,
   poetry: ({ className }) => <Feather className={className} />,
@@ -79,80 +35,79 @@ const GENRE_ICONS: Record<string, FC<{ className?: string }>> = {
   christianity: ({ className }) => <Cross className={className} />,
 };
 
-// ২. স্মার্ট আইকন ডিটেক্টর
-const getItemIcon = (slug: string, rawText: string): FC<{ className?: string }> => {
-  const cleanSlug = normalizeBengaliText(slug);
-  const cleanText = normalizeBengaliText(rawText);
+const getItemIcon = (slug: string = "", rawText: string = ""): FC<{ className?: string }> => {
+  const cleanSlug = slug.toLowerCase().trim();
+  const cleanText = rawText.toLowerCase().trim();
 
-  if (GENRE_ICONS[cleanSlug]) return GENRE_ICONS[cleanSlug];
-  if (GENRE_ICONS[cleanText]) return GENRE_ICONS[cleanText];
+  if (ITEM_ICONS[cleanSlug]) return ITEM_ICONS[cleanSlug];
+  if (ITEM_ICONS[cleanText]) return ITEM_ICONS[cleanText];
 
-  if (cleanSlug.includes("islam") || cleanText.includes("ইসলাম")) return GENRE_ICONS.islam;
-  if (cleanSlug.includes("hindu") || cleanText.includes("হিন্দু")) return GENRE_ICONS.hinduism;
-  if (cleanSlug.includes("buddh") || cleanText.includes("বৌদ্ধ")) return GENRE_ICONS.buddhism;
-  if (cleanSlug.includes("christ") || cleanText.includes("খ্রিষ্ট")) return GENRE_ICONS.christianity;
-  if (cleanSlug.includes("religi") || cleanText.includes("ধর্ম")) return GENRE_ICONS.religious;
+  if (cleanSlug.includes("islam") || cleanText.includes("ইসলাম")) return ITEM_ICONS.islam;
+  if (cleanSlug.includes("hindu") || cleanText.includes("হিন্দু")) return ITEM_ICONS.hinduism;
+  if (cleanSlug.includes("buddh") || cleanText.includes("বৌদ্ধ")) return ITEM_ICONS.buddhism;
+  if (cleanSlug.includes("christ") || cleanText.includes("খ্রিষ্ট")) return ITEM_ICONS.christianity;
+  if (cleanSlug.includes("religi") || cleanText.includes("ধর্ম")) return ITEM_ICONS.religious;
 
-  if (cleanSlug.includes("novel") || cleanText.includes("উপন্যাস")) return GENRE_ICONS.novel;
-  if (cleanSlug.includes("poem") || cleanText.includes("কবিতা")) return GENRE_ICONS.poetry;
-  if (cleanSlug.includes("essay") || cleanText.includes("প্রবন্ধ")) return GENRE_ICONS.essay;
-  if (cleanSlug.includes("story") || cleanText.includes("গল্প")) return GENRE_ICONS.story;
+  if (cleanSlug.includes("novel") || cleanText.includes("উপন্যাস")) return ITEM_ICONS.novel;
+  if (cleanSlug.includes("poem") || cleanText.includes("কবিতা")) return ITEM_ICONS.poetry;
+  if (cleanSlug.includes("essay") || cleanText.includes("প্রবন্ধ")) return ITEM_ICONS.essay;
+  if (cleanSlug.includes("story") || cleanText.includes("গল্প")) return ITEM_ICONS.story;
 
-  return ({ className }) => <BookText className={className} />;
-};
-
-// ৩. বাংলা ও ইংরেজি অক্ষরের জন্য ক্লিন স্লাগ হেল্পার
-const generateSlugFallback = (slug: string, label: string): string => {
-  if (slug && slug.trim() !== "") {
-    return slug.trim();
-  }
-  return label
-    .toLowerCase()
-    .trim()
-    .replace(/[\u200B-\u200D\uFEFF]/g, '')
-    .replace(/\s+/g, "-")
-    .replace(/[^a-z0-9\u0980-\u09FF\-]/g, "")
-    .replace(/-+/g, "-")
-    .replace(/^-+|-+$/g, "");
+  const FallbackIcon = ({ className }: { className?: string }) => <BookText className={className} />;
+  return FallbackIcon;
 };
 
 const toBengaliNumber = (num: number | string): string =>
-  num.toString().replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[parseInt(d, 10)]);
+  num ? num.toString().replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[parseInt(d, 10)]) : "০";
 
 export interface ItemData {
   slug: string;
   label: string;
   rawGenre?: string;
   count: number;
+  initial?: string;
 }
 
 interface ItemListViewProps {
-  items: ItemData[];
+  items?: ItemData[];
   isHomePage?: boolean;
   limit?: number;
-  totalItemsCount?: number;
-  slug?: string;
-  slugsArray?: string[];
 }
 
 export default function ItemListView({
-  items = [],
+  items: initialItems = [],
   isHomePage = false,
-  totalItemsCount,
+  limit,
 }: ItemListViewProps) {
+  const items = initialItems;
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLetter, setSelectedLetter] = useState("সব");
 
-  // ৪. বর্ণ তালিকা তৈরি (আইটেম পেজের জন্য)
+  const validItemsList = useMemo(() => {
+    const filtered = (items || []).filter((item) => {
+      if (!item || !item.label || !item.slug) return false;
+      return item.label.trim() !== "" && item.slug.trim() !== "";
+    });
+
+    if (isHomePage) {
+      const sortedByCount = [...filtered].sort((a, b) => (b.count || 0) - (a.count || 0));
+      return limit ? sortedByCount.slice(0, limit) : sortedByCount.slice(0, 20);
+    } else {
+      return [...filtered].sort((a, b) =>
+        a.label.trim().localeCompare(b.label.trim(), "bn", { sensitivity: "base" })
+      );
+    }
+  }, [items, isHomePage, limit]);
+
   const availableLetters = useMemo(() => {
     if (isHomePage) return [];
 
     const lettersSet = new Set<string>();
-
-    items.forEach((item) => {
-      const initial = getBengaliInitial(item.label || "");
-      if (initial) {
-        lettersSet.add(initial);
+    validItemsList.forEach((item) => {
+      const cleanLabel = item.label.trim().replace(/^[\s\-_–—\.,'\/\(\)]+/, "");
+      const firstChar = cleanLabel.charAt(0).normalize("NFC");
+      if (firstChar) {
+        lettersSet.add(firstChar);
       }
     });
 
@@ -161,65 +116,51 @@ export default function ItemListView({
     );
 
     return ["সব", ...sortedLetters];
-  }, [items, isHomePage]);
+  }, [validItemsList, isHomePage]);
 
-  // ৫. প্রসেসিং, সর্টিং, সার্চ ও ফিল্টারিং লজিক
-  const processedItems = useMemo(() => {
-    let result = [...items];
+  const filteredItems = useMemo(() => {
+    if (isHomePage) return validItemsList;
 
-    if (isHomePage) {
-      result.sort((a, b) => b.count - a.count);
-      return result.slice(0, 10);
-    } else {
-      result.sort((a, b) =>
-        (a.label || "").localeCompare(b.label || "", "bn", { sensitivity: "base" })
-      );
+    const normalizedQuery = normalizeKey(searchQuery);
 
-      const normalizedQuery = normalizeBengaliText(searchQuery);
+    return validItemsList.filter((item) => {
+      const normalizedLabel = normalizeKey(item.label);
+      const matchesSearch = normalizedLabel.includes(normalizedQuery);
 
-      return result.filter((item) => {
-        const normalizedLabel = normalizeBengaliText(item.label);
-        const matchesSearch = !normalizedQuery || normalizedLabel.includes(normalizedQuery);
+      const cleanLabel = item.label.trim().replace(/^[\s\-_–—\.,'\/\(\)]+/, "");
+      const firstChar = cleanLabel.charAt(0).normalize("NFC");
+      const matchesLetter = selectedLetter === "সব" || firstChar === selectedLetter;
 
-        const initial = getBengaliInitial(item.label || "");
-        const matchesLetter = selectedLetter === "সব" || initial === selectedLetter;
-
-        return matchesSearch && matchesLetter;
-      });
-    }
-  }, [items, searchQuery, selectedLetter, isHomePage]);
-
-  const displayTotalCount = totalItemsCount ?? items.length;
+      return matchesSearch && matchesLetter;
+    });
+  }, [validItemsList, searchQuery, selectedLetter, isHomePage]);
 
   return (
-    <div className="w-full font-tarunima bg-teal-25">
-      {/* শিরোনাম, কাউন্ট, সার্চবার ও বর্ণ ফিল্টার শুধু আইটেম পেজে দেখাবে */}
+    <div className="w-full font-tarunima">
       {!isHomePage && (
-        <div className="mb-3 space-y-3 backdrop-blur-md shadow-xs">
+        <div className="mb-3 space-y-3 bg-white/95 backdrop-blur-md shadow-xs">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-            {/* বামপাশে ডাইনামিক পেজ টাইটেল */}
-           <div className="w-full md:w-auto rounded bg-teal-50/90 text-[#008080] text-center border border-teal-200 shadow-xs backdrop-blur-md overflow-hidden">
+            <div className="rounded bg-teal-50/90 text-[#008080] border border-teal-200 shadow-xs backdrop-blur-md self-start md:self-auto">
               <div className="p-2.5 inline-flex items-center gap-2">
                 <Layers size={22} className="shrink-0 animate-pulse text-[#008080]" />
                 <h1 className="text-xl md:text-2xl font-bold text-gray-950 leading-none">
-                  <span className="text-[#008080]">প্রকরণ</span> <span className="text-[#008080]">সম্ভার</span>
+                  <span className="text-[#008080]">প্রকরণ</span> <span className="text-[#cc7a00]">সম্ভার</span>
                 </h1>
               </div>
               <p className="text-xs md:text-sm text-gray-500 mt-1">
-                {displayTotalCount > 0 && (
+                {validItemsList.length > 0 && (
                   <span className="w-full text-xs md:text-sm font-normal text-teal-700 bg-teal-100/70 px-2 py-1 border-t border-teal-200 inline-block">
-                    প্রকরণ সংখ্যা সর্বমোট {toBengaliNumber(displayTotalCount)}টি
+                    প্রকরণ সংখ্যা সর্বমোট {toBengaliNumber(validItemsList.length)} টি
                   </span>
                 )}
               </p>
             </div>
 
-            {/* ডানপাশে সার্চবার */}
-            <div className="relative w-full md:w-80 shrink-0">
+            <div className="relative w-full md:w-80 shrink-0 px-2">
               <Search className="absolute w-4 h-4 text-teal-600 -translate-y-1/2 left-3 top-1/2 pointer-events-none" />
               <input
                 type="text"
-                placeholder="প্রকরণ খুঁজুন..."
+                placeholder="প্রকরণের নাম দিয়ে খুঁজুন..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-9 pr-4 py-2 border border-teal-200 rounded focus:outline-none focus:ring-1 focus:ring-[#008080] text-sm bg-teal-50/30 text-gray-800 shadow-xs placeholder-gray-400"
@@ -227,7 +168,6 @@ export default function ItemListView({
             </div>
           </div>
 
-          {/* আদ্যক্ষর ফিল্টার বার */}
           {availableLetters.length > 1 && (
             <div className="p-2 border border-teal-100 rounded bg-teal-50/90 backdrop-blur-md shadow-xs">
               <div className="flex flex-wrap items-center justify-center gap-1">
@@ -236,11 +176,10 @@ export default function ItemListView({
                     key={letter}
                     type="button"
                     onClick={() => setSelectedLetter(letter)}
-                    className={`px-2 py-1 text-xs md:text-sm font-semibold rounded transition-colors cursor-pointer ${
-                      selectedLetter === letter
+                    className={`px-2 py-1 text-xs md:text-sm font-semibold rounded transition-colors cursor-pointer ${selectedLetter === letter
                         ? "bg-[#008080] text-white shadow-xs"
                         : "bg-gray-100 hover:bg-teal-50 text-gray-700 hover:text-[#008080] border border-transparent hover:border-teal-200"
-                    }`}
+                      }`}
                   >
                     {letter}
                   </button>
@@ -251,21 +190,19 @@ export default function ItemListView({
         </div>
       )}
 
-      {/* আইটেম কার্ড গ্রিড */}
-      {processedItems.length === 0 ? (
+      {filteredItems.length === 0 ? (
         <div className="p-8 text-center text-gray-500 rounded bg-white border border-dashed border-gray-300">
-          কোন প্রকরণ পাওয়া যায়নি।
+          কোনো প্রকরণের তথ্য পাওয়া যায়নি।
         </div>
       ) : (
-        <div className="flex flex-wrap gap-2">
-          {processedItems.map(({ slug, label, rawGenre, count }) => {
+        <div className="flex flex-wrap gap-1.5">
+          {filteredItems.map(({ slug, label, rawGenre, count }, index) => {
             const IconComponent = getItemIcon(slug, rawGenre || label);
-            const resolvedSlug = generateSlugFallback(slug, label);
 
             return (
               <Link
-                key={resolvedSlug}
-                href={`/items/${resolvedSlug}`}
+                key={`${slug}-${index}`}
+                href={`/items/${slug}`}
                 className="flex items-center justify-between gap-2 px-2.5 py-2 rounded bg-white text-[#008080] border border-teal-100 shadow-xs transition-all duration-200 hover:bg-teal-50/50 hover:shadow-md hover:border-teal-300 shrink-0 grow basis-full sm:basis-[calc(50%-0.35rem)] lg:basis-[calc(33.333%-0.45rem)] xl:basis-[calc(25%-0.5rem)] 2xl:basis-[calc(20%-0.5rem)] max-w-full group cursor-pointer"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
@@ -279,7 +216,7 @@ export default function ItemListView({
 
                 <div className="text-right shrink-0 flex items-center gap-1.5 bg-teal-50 text-[#008080] border border-teal-100 px-2 py-0.5 rounded text-xs font-semibold">
                   <BookOpen size={14} className="shrink-0" />
-                  <span>{toBengaliNumber(count)} টি</span>
+                  <span>{toBengaliNumber(count || 0)} টি</span>
                 </div>
               </Link>
             );

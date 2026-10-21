@@ -1,9 +1,8 @@
 import React from 'react';
 import Image from 'next/image';
-import fs from 'fs';
-import path from 'path';
-import matter from 'gray-matter'; // MDX frontmatter পার্স করার জন্য
-import { Trophy } from 'lucide-react'; // এসভিজির পরিবর্তে Trophy আইকন ইম্পোর্ট করা হলো
+import matter from 'gray-matter';
+import { Trophy } from 'lucide-react';
+import { listKeysUnderPrefix, readTextFromR2 } from '@/app/lib/books/r2';
 
 // ডাটা টাইপ ইন্টারফেস
 interface StoryItem {
@@ -14,37 +13,43 @@ interface StoryItem {
   order: number;
 }
 
-// MDX ফাইল থেকে ডাটা রিড করার ফাংশন
+// R2 থেকে (content/pages/success/ → pages/success/) ডাটা রিড করার ফাংশন
 async function getSuccessStories(): Promise<StoryItem[]> {
-  const targetDir = path.join(process.cwd(), 'content', 'pages', 'success');
+  const prefix = 'pages/success/';
+  const keys = await listKeysUnderPrefix(prefix);
+  const mdKeys = keys.filter((k) => k.endsWith('.md'));
 
-  // যদি ফোল্ডারটি না থাকে তবে খালি অ্যারে রিটার্ন করবে
-  if (!fs.existsSync(targetDir)) return [];
+  if (mdKeys.length === 0) return [];
 
-  const files = fs.readdirSync(targetDir);
+  const stories: StoryItem[] = [];
 
-  const stories = files
-    .filter((file) => file.endsWith('.md'))
-    .map((file) => {
-      const filePath = path.join(targetDir, file);
-      const fileContent = fs.readFileSync(filePath, 'utf-8');
-      const { data } = matter(fileContent); // frontmatter থেকে ডাটা রিড করবে
+  for (const key of mdKeys) {
+    const raw = await readTextFromR2(key);
+    if (!raw) continue;
 
-      return {
-        title: data.title || 'শিরোনামহীন',
-        icon: data.icon || '/logo/elogo.png', // ব্যাকআপ আইকন
-        externalLink: data.externalLink || '#', // ব্যাকআপ লিংক
-        excerpt: data.excerpt || '', // ফ্রন্টম্যাটার থেকে excerpt রিড করা হলো
-        order: typeof data.order === 'number' ? data.order : Infinity, // অর্ডার না থাকলে শেষে যাবে
-      };
+    const { data } = matter(raw); // frontmatter থেকে ডাটা রিড করবে
+
+    stories.push({
+      title: data.title || 'শিরোনামহীন',
+      icon: data.icon || '/logo/elogo.png', // ব্যাকআপ আইকন
+      externalLink: data.externalLink || '#', // ব্যাকআপ লিংক
+      excerpt: data.excerpt || '', // ফ্রন্টম্যাটার থেকে excerpt রিড করা হলো
+      order: typeof data.order === 'number' ? data.order : Infinity, // অর্ডার না থাকলে শেষে যাবে
     });
+  }
 
   // order নাম্বার অনুযায়ী ছোট থেকে বড় ক্রমানুসারে (Sorting) সাজানো হলো
   return stories.sort((a, b) => a.order - b.order);
 }
 
 export default async function SuccessStories() {
-  const stories = await getSuccessStories();
+  let stories: StoryItem[] = [];
+  try {
+    stories = await getSuccessStories();
+  } catch (err) {
+    // R2 unreachable: hide this section instead of breaking the whole page
+    console.error('SuccessStories: failed to read from R2', err);
+  }
 
   if (stories.length === 0) return null;
 
@@ -72,7 +77,7 @@ export default async function SuccessStories() {
           </div>
         </div>
 
-        <p className="max-w-full px-2 md:px-2 pb-2 text-justify text-lg md:text-xl leading-relaxed text-gray-800 font-medium">বাস্তবায়িত প্রতিটি প্রকল্পই আমাদের সাফল্যগাঁথার অংশ। এখানে রয়েছে আমাদের সম্পন্ন হওয়া ও বাস্তবায়নাধীন প্রকল্পসমূহের একটি তালিকা। এই প্রকল্পগুলোর সফল বাস্তবায়ন আমাদের কাজের পরিধি এবং গুণগত মানকে প্রকাশ করে। এডুলিচারের প্রথম সাফল্য ছিল ১৯৯৮ সালের ভাষা শহীদ দিবস উপলক্ষ্যে একটি সাহিত্য সঙ্কলন প্রকাশ। এরপর একই সালে বিদ্রোহী কবি ও বাংলাদেশের জাতীয় কবি কাজী নজরুল ইসলামের জন্মশতবার্ষিকী উপলক্ষ্যে নানান আয়োজন…
+        <p className="max-w-full px-2 md:px-2 pb-2 text-justify text-lg md:text-xl leading-relaxed text-gray-800 font-medium">বাস্তবায়িত প্রতিটি প্রকল্পই আমাদের সাফল্যগাঁথার অংশ। এখানে রয়েছে আমাদের সম্পন্ন হওয়া ও বাস্তবায়নাধীন প্রকল্পসমূহের একটি তালিকা। এই প্রকল্পগুলোর সফল বাস্তবায়ন আমাদের কাজের পরিধি এবং গুণগত মানকে প্রকাশ করে। এডুলিচারের প্রথম সাফল্য ছিল ১৯৯৮ সালের ভাষা শহীদ দিবস উপলক্ষ্যে একটি সাহিত্য সঙ্কলন প্রকাশ। এরপর একই সালে বিদ্রোহী কবি ও বাংলাদেশের জাতীয় কবি কাজী নজরুল ইসলামের জন্মশতবার্ষিকী উপলক্ষ্যে নানান আয়োজন…
         </p>
 
         {/* CARD কন্টেইনার: সঠিক পিক্সেল পারফেক্ট গ্রিডের জন্য ফ্লুয়িড ফ্লেক্স উইডথ */}

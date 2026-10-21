@@ -22,3 +22,25 @@ export const generateRawSlug = (text: string): string => {
       .replace(/^-+|-+$/g, "")
   );
 };
+
+/**
+ * Normalises Bengali text: composes nukta letters (ড়, ঢ়, য়) so equal names compare equal.
+ */
+export function normalizeBanglaText(text: string): string {
+  if (!text) return "";
+  return String(text)
+    .normalize("NFC")
+    .replace(/ড়/g, "ড়")
+    .replace(/ঢ়/g, "ঢ়")
+    .replace(/য়/g, "য়")
+    .replace(/র/g, "র");
+}
+
+/**
+ * Turns any name or hand-written slug ("Kazi Nazrul Islam", "kazi_nazrul-islam", a Bengali name)
+ * into a lower-case URL-friendly slug.
+ */
+export function toUrlSlug(text: string): string {
+  if (!text) return "";
+  return generateRawSlug(normalizeBanglaText(text));
+}

@@ -1,3 +1,4 @@
+import { loadSlugManifest } from '@/app/lib/books/r2';
 // app/genre/[slug]/page.tsx
 
 import React from 'react';
@@ -14,6 +15,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
+  await loadSlugManifest();
   const decodedSlug = decodeURIComponent(slug).toLowerCase();
   const targetBengaliGenre = getGenreTitle(decodedSlug) || slug;
 
@@ -36,6 +38,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function GenrePage({ params }: Props) {
   const { slug } = await params;
+  await loadSlugManifest();
   const decodedSlug = slug.toLowerCase();
 
   const headerList = await headers();
@@ -51,7 +54,7 @@ export default async function GenrePage({ params }: Props) {
 
   // ফিল্টারিং লজিক (১. লেখক সাবডোমেন এবং ২. ঘরানা)
   const filteredBooks = latestBooks.filter((book) => {
-    if (subdomain && subdomain !== 'library' && subdomain !== 'localhost:3000' && subdomain !== 'eduliture') {
+    if (subdomain && subdomain !== 'library' && subdomain !== 'localhost:8787' && subdomain !== 'eduliture') {
       const bookAuthorSlug = (book as unknown as Record<string, unknown>).authorSlug || book.author;
       const isMatchingAuthor = String(bookAuthorSlug).trim().toLowerCase() === subdomain.trim().toLowerCase();
       if (!isMatchingAuthor) return false;

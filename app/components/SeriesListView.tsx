@@ -54,7 +54,8 @@ const getSeriesIcon = (slug: string, rawText: string): FC<{ className?: string }
   if (cleanSlug.includes("essay") || cleanText.includes("প্রবন্ধ")) return SERIES_ICONS.essay;
   if (cleanSlug.includes("story") || cleanText.includes("গল্প")) return SERIES_ICONS.story;
 
-  return ({ className }) => <BookText className={className} />;
+  const FallbackIcon = ({ className }: { className?: string }) => <BookText className={className} />;
+  return FallbackIcon;
 };
 
 const toBengaliNumber = (num: number | string): string =>

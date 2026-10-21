@@ -1,5 +1,7 @@
 import React from 'react';
 import { Metadata } from 'next';
+import { headers } from 'next/headers';
+import { getSubdomainData } from '@/app/lib/get-site-data';
 import { getAuthorSlugFromTitle, getSlug } from '@/app/lib/content/core/registry';
 
 interface Props {
@@ -16,7 +18,10 @@ export async function generateMetadata({ params }: { params: Promise<Record<stri
   const decodedAuthor = decodeURIComponent(authorParam).replace(/-/g, ' ');
   const authorName = decodedAuthor ? decodedAuthor.charAt(0).toUpperCase() + decodedAuthor.slice(1) : 'লেখক';
 
-  const title = `${authorName} ❀ এডুলিচার`;
+  const headersList = await headers();
+  const siteName = getSubdomainData(headersList.get('host'))?.title || 'এডুলিচার';
+
+  const title = `${authorName} ❀ ${siteName}`;
   const description = `${authorName}-এর জীবনী, সাহিত্যকর্ম, প্রকাশিত বই ও রচনা সংগ্রহ পড়ুন এডুলিচারে।`;
   const ogImageUrl = `https://eduliture.org/api/og?title=${encodeURIComponent(authorName)}&tagline=${encodeURIComponent('লেখক পরিচিতি ও সাহিত্যকর্ম')}`;
 

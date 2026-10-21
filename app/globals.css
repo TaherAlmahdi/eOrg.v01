@@ -132,7 +132,6 @@
     font-size: clamp(1rem, 1.2vw + 0.2rem, 1.3rem) !important;
     line-height: 1.15;
     color: var(--text-main);
-    text-align: right !important;
   }
 
   .quote {
@@ -335,7 +334,7 @@
   .poem .right {
     display: inline-block;
     width: 100%;
-    text-align: right;
+    text-align: right !important;
     margin-right: -50px !important;
   }
 
@@ -1478,7 +1477,7 @@ span.right {
   content: " ❀ ";
   text-align: center;
   color: green;
-  opacity: 0.2;
+  opacity: 0;
   /* 0.1 খুব বেশি হালকা, তাই 0.5-0.7 ব্যবহার করা ভালো */
   line-height: 1.5;
   display: block;

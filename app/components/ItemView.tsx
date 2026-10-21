@@ -1,6 +1,7 @@
 import React from "react";
 import { getAllLibraryItems, type LibraryItemEntry } from "@/app/lib/books";
-import { ITEM_REGISTRY, getItemSlug } from "@/app/lib/content/core/registry/items";
+import { getItemMeta, getItemSlug } from "@/app/lib/content/core/registry/items";
+import { loadSlugManifest } from "@/app/lib/books/r2";
 import ItemViewClient from "./ItemViewClient";
 
 export type LibraryItem = LibraryItemEntry & {
@@ -115,6 +116,8 @@ export default async function ItemView({
   authorSlug = "",
   slugsArray = [],
 }: ItemViewProps) {
+  await loadSlugManifest();
+
   // কার্যকর স্লাগ নির্ধারণ
   const effectiveRawSlug = decodeURIComponent(
     slug || (slugsArray.length > 0 ? slugsArray[0] : "")
@@ -127,10 +130,8 @@ export default async function ItemView({
   // ডিসপ্লে টাইটেল নির্ধারণ
   let displayTitle = "সকল আইটেম";
   if (targetKey) {
-    displayTitle =
-      ITEM_REGISTRY[targetKey]?.name ||
-      ITEM_REGISTRY[effectiveRawSlug]?.name ||
-      effectiveRawSlug;
+    const metaName = getItemMeta(targetKey).name;
+    displayTitle = metaName && metaName !== targetKey ? metaName : effectiveRawSlug;
   }
 
   // টাইপস্ক্রিপ্ট সেফ ডাটা ফেচিং

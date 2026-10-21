@@ -1,0 +1,5 @@
+# Copy to .dev.vars (never commit). Used by `npm run preview` (wrangler).
+CONTENT_SOURCE=remote
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+REVALIDATE_SECRET=

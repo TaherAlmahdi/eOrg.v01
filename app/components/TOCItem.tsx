@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, memo } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import Link from 'next/link';
 import { ChevronRight, ChevronDown, FileText, List, X } from 'lucide-react';
 
@@ -81,16 +81,49 @@ export default function TOCItem({
   currentPageNum = 1,
   allItemsList = [],
 }: TOCItemProps) {
-  const [openStates, setOpenStates] = useState<Record<string, boolean>>({});
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  // slug formatting helper
+  const slugify = (text: string) =>
+    text
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w\u0980-\u09FF\-]/g, '');
 
-  if (!allItemsList || allItemsList.length === 0) return null;
-
-  // ১. বর্তমান আইটেমটি খুঁজে বের করা
-  const currentItem = allItemsList.find(
+  const currentItem = allItemsList?.find(
     (item) => item.slug === currentChapter || item.slug === slug
   );
 
+  const activeItemSlug = currentItem ? currentItem.slug || slugify(currentItem.title) : '';
+
+  // Hooks must run before any early return (rules of hooks)
+  const [openStates, setOpenStates] = useState<Record<string, boolean>>(() =>
+    activeItemSlug ? { [activeItemSlug]: true } : {}
+  );
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [prevActiveItemSlug, setPrevActiveItemSlug] = useState(activeItemSlug);
+
+  // Keep the current item open when it changes (adjusting state during render, not in an effect)
+  if (prevActiveItemSlug !== activeItemSlug) {
+    setPrevActiveItemSlug(activeItemSlug);
+    if (activeItemSlug) {
+      setOpenStates((prev) => ({ ...prev, [activeItemSlug]: true }));
+    }
+  }
+
+  const toggleAccordion = useCallback((itemSlug: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setOpenStates((prev) => ({
+      ...prev,
+      [itemSlug]: !prev[itemSlug],
+    }));
+  }, []);
+
+  const handleCloseMobile = useCallback(() => {
+    setIsMobileOpen(false);
+  }, []);
+
+  if (!allItemsList || allItemsList.length === 0) return null;
   if (!currentItem) return null;
 
   // ২. বর্তমান আইটেমের ধরন (Item Type) নির্ধারণ করা
@@ -119,14 +152,6 @@ export default function TOCItem({
   const startIndex = Math.max(0, currentIndex - 10);
   const endIndex = Math.min(filteredList.length, currentIndex + 11);
   const slicedList = filteredList.slice(startIndex, endIndex);
-
-  // স্লাগ ফরম্যাট করার হেল্পার
-  const slugify = (text: string) =>
-    text
-      .trim()
-      .toLowerCase()
-      .replace(/\s+/g, '-')
-      .replace(/[^\w\u0980-\u09FF\-]/g, '');
 
   // ৬. কন্টেন্ট থেকে nextpage এবং মূল আইটেমের সাবটাইটেল পার্স করার ফাংশন
   const parseSubPages = (item: typeof currentItem): SubPageInfo[] => {
@@ -166,29 +191,6 @@ export default function TOCItem({
 
     return subPages;
   };
-
-  const activeItemSlug = currentItem.slug || slugify(currentItem.title);
-
-  // কারেন্ট আইটেম অটো-ওপেন রাখার জন্য ইফেক্ট
-  useEffect(() => {
-    setOpenStates((prev) => ({
-      ...prev,
-      [activeItemSlug]: true,
-    }));
-  }, [activeItemSlug]);
-
-  const toggleAccordion = useCallback((itemSlug: string, e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setOpenStates((prev) => ({
-      ...prev,
-      [itemSlug]: !prev[itemSlug],
-    }));
-  }, []);
-
-  const handleCloseMobile = useCallback(() => {
-    setIsMobileOpen(false);
-  }, []);
 
   const displayTitle = `${currentType} ${structure?.title || 'সূচী'}`;
 

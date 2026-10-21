@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, memo } from 'react';
+import { useState, useCallback, memo } from 'react';
 import Link from 'next/link';
 import { ChevronDown, ChevronRight, FileText, Folder, List, X } from 'lucide-react';
 
@@ -106,23 +106,21 @@ export default function TableOfContents({
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   // কারেন্ট ভলিউম বা চ্যাপ্টার অটো-ওপেন রাখার লজিক
-  useEffect(() => {
+  const currentVolume = structure?.currentVolume;
+  const openKey = `${currentVolume ?? ''}|${currentChapter ?? ''}`;
+  const [prevOpenKey, setPrevOpenKey] = useState<string | null>(null);
+  if (prevOpenKey !== openKey) {
+    setPrevOpenKey(openKey);
     const initialOpenState: Record<string, boolean> = {};
-
-    if (structure?.currentVolume) {
-      initialOpenState[structure.currentVolume] = true;
+    if (currentVolume) {
+      initialOpenState[currentVolume] = true;
     }
-
     if (currentChapter) {
       initialOpenState[`chap-${currentChapter}`] = true;
       initialOpenState[currentChapter] = true;
     }
-
-    setOpenSections((prev) => ({
-      ...prev,
-      ...initialOpenState,
-    }));
-  }, [structure?.currentVolume, currentChapter]);
+    setOpenSections((prev) => ({ ...prev, ...initialOpenState }));
+  }
 
   const toggleSection = useCallback((id: string) => {
     setOpenSections((prev) => ({ ...prev, [id]: !prev[id] }));

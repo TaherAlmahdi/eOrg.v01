@@ -1,3 +1,5 @@
+import { loadSlugManifest } from '@/app/lib/books/r2';
+import type { FrontmatterValue } from '@/app/lib/frontmatter';
 import React from 'react';
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
@@ -38,7 +40,7 @@ function resolveContributorRoles(fieldVal: unknown, slugVal: unknown): Array<{ n
     fieldVal.forEach((v) => {
       if (typeof v === 'string') rawNames.push(v.trim());
       else if (v && typeof v === 'object') {
-        const n = (v as any).name || (v as any).title || (v as any).label;
+        const n = (v as FrontmatterValue).name || (v as FrontmatterValue).title || (v as FrontmatterValue).label;
         if (n) rawNames.push(String(n).trim());
       }
     });
@@ -72,14 +74,15 @@ function resolveContributorRoles(fieldVal: unknown, slugVal: unknown): Array<{ n
 
 // 🔹 হেলপার ফাংশন: বাংলা/ইংরেজি উভয় স্লাগ, বানান ভুল বা ভিন্ন রূপ মিলিয়ে বই ফিল্টার ও সর্ট করা
 async function getAuthorDataAndBooks(rawSlug: string) {
+  await loadSlugManifest();
   const libraryData = await getLibraryBooks();
-  const booksToFilter = (libraryData as any)?.allBooks || (libraryData as any)?.latestBooks || [];
+  const booksToFilter = (libraryData as FrontmatterValue)?.allBooks || (libraryData as FrontmatterValue)?.latestBooks || [];
 
   let matchedPersonName: string | null = null;
   const decodedRawSlug = decodeURIComponent(rawSlug).trim();
   const normalizedRawSlug = normalizeBengaliSlug(decodedRawSlug);
 
-  const authorBooks = booksToFilter.filter((book: any) => {
+  const authorBooks = booksToFilter.filter((book: FrontmatterValue) => {
     const item = book as Record<string, unknown>;
 
     const authors = resolveContributorRoles(item.author || item.authors || item.writer, item.authorSlug || item.authorsSlug);
@@ -130,7 +133,7 @@ async function getAuthorDataAndBooks(rawSlug: string) {
   });
 
   // 🔹 Frontmatter-এর order প্রপার্টি অনুযায়ী বইগুলোকে ক্রমানুসারে (Ascending) সাজানো
-  authorBooks.sort((a: any, b: any) => {
+  authorBooks.sort((a: FrontmatterValue, b: FrontmatterValue) => {
     const orderA = a.order !== undefined && a.order !== null ? Number(a.order) : Infinity;
     const orderB = b.order !== undefined && b.order !== null ? Number(b.order) : Infinity;
     return orderA - orderB;
@@ -195,7 +198,7 @@ export default async function SingleAuthorPage({ params }: PageProps) {
       'name': displayAuthorName,
       'url': currentFullUrl,
       'jobTitle': 'Author / Contributor',
-      'workExample': authorBooks.map((book: any) => ({
+      'workExample': authorBooks.map((book: FrontmatterValue) => ({
         '@type': 'Book',
         'name': book.title || 'শিরোনামহীন বই',
         'url': book.slug ? `https://${siteData.subdomain ? `${siteData.subdomain}.` : ''}eduliture.org/book/${book.slug}` : undefined,
@@ -211,7 +214,7 @@ export default async function SingleAuthorPage({ params }: PageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }}
       />
       <AuthorBookSearchGrid
-        books={authorBooks as any}
+        books={authorBooks as FrontmatterValue}
         personName={displayAuthorName}
         siteName={siteData?.title || 'এডুলিচার পাঠশালা'}
       />

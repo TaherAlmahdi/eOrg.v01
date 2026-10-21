@@ -1,5 +1,6 @@
 'use client';
 
+import type { FrontmatterValue } from '@/app/lib/frontmatter';
 import Link from 'next/link';
 import BookCover from '@/app/components/BookCover';
 
@@ -15,8 +16,8 @@ interface CustomLink {
 }
 
 export interface BookDetailsProps {
-  book: any;
-  series?: any; // অভিভাবক ফাইল থেকে এক্সপ্লিসিটলি পাস করলেও যেন যেন TypeScript এরর না দেয়
+  book: FrontmatterValue;
+  series?: FrontmatterValue; // অভিভাবক ফাইল থেকে এক্সপ্লিসিটলি পাস করলেও যেন যেন TypeScript এরর না দেয়
 }
 
 export default function BookDetails({ book, series: explicitSeries }: BookDetailsProps) {
@@ -261,11 +262,11 @@ export default function BookDetails({ book, series: explicitSeries }: BookDetail
               <span className="text-gray-400">:</span>
               <span className="flex flex-wrap gap-x-1">
                 {Array.isArray(book.item) ? (
-                  book.item.map((itemVal: any, index: number) => {
+                  book.item.map((itemVal: FrontmatterValue, index: number) => {
                     const itemName = typeof itemVal === 'object' && itemVal !== null ? itemVal.name : itemVal;
                     const itemLink = typeof itemVal === 'object' && itemVal !== null ? itemVal.link : book.item_links?.find((l: CustomLink) => l.name === itemName)?.link;
                     
-                    const isLast = index === (book.item as any[]).length - 1;
+                    const isLast = index === (book.item as FrontmatterValue[]).length - 1;
 
                     return (
                       <span key={index}>

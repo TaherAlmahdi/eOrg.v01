@@ -1,5 +1,5 @@
+import Breadcrumb, { type Crumb } from '@/app/components/Breadcrumb';
 import Link from 'next/link';
-import { Home } from 'lucide-react';
 import { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
@@ -9,6 +9,7 @@ import TableOfContents from '@/app/components/TableOfContents';
 import BookDetails from '@/app/components/BookDetails';
 
 import { getBookBySlug, BookDetail } from '@/app/lib/books';
+import ViewTracker from '@/app/components/ViewTracker';
 import { getSubdomainData, buildTabTitle } from '@/app/lib/get-site-data';
 import { parseNoteShortcodes } from '@/app/lib/parse-shortcodes';
 
@@ -99,20 +100,29 @@ function parseBookSubPages(fullContent: string): SplitPage[] {
 
 // স্লাগ পাথ থেকে স্লাগ টিউন ও বর্তমান পেজ নম্বর বিশ্লেষণ
 function resolveRouteSegments(rawSegments: string[]) {
-  let bookSlug = rawSegments[0] || '';
-  let volumeOrChapterSlug = rawSegments[1] || '';
-  let chapterSlug = rawSegments[2] || '';
-  let pageNumFromPath: number | null = null;
   let cleanSegments = [...rawSegments];
+  let pageNumFromPath: number | null = null;
 
   const lastSegment = rawSegments[rawSegments.length - 1];
 
+  // যদি শেষ সেগমেন্টটি সংখ্যা হয়, তবে সেটি পেজ নম্বর হিসেবে আলাদা হবে
   if (/^\d+$/.test(lastSegment) && rawSegments.length > 1) {
     pageNumFromPath = parseInt(lastSegment, 10);
     cleanSegments = rawSegments.slice(0, -1);
-    bookSlug = cleanSegments[0] || '';
-    volumeOrChapterSlug = cleanSegments[1] || '';
-    chapterSlug = cleanSegments[2] || '';
+  }
+
+  const bookSlug = cleanSegments[0] || '';
+  let volumeOrChapterSlug = '';
+  let chapterSlug = '';
+
+  // সেগমেন্টের দৈর্ঘ্য অনুযায়ী ভলিউম এবং চ্যাপ্টার নির্ধারণ
+  if (cleanSegments.length === 2) {
+    // যেমন: /book/durgeshnandini/vol-1 অথবা /book/durgeshnandini/intro
+    volumeOrChapterSlug = cleanSegments[1];
+  } else if (cleanSegments.length >= 3) {
+    // যেমন: /book/durgeshnandini/vol-1/chapter-1
+    volumeOrChapterSlug = cleanSegments[1];
+    chapterSlug = cleanSegments[2];
   }
 
   return {
@@ -151,7 +161,7 @@ export async function generateMetadata({ params, searchParams }: UnifiedPageProp
   const resolvedSearchParams = await searchParams;
   const rawSegments = resolvedParams.slug || [];
 
-  if (rawSegments.length === 0) return { title: 'বই পাওয়া যায়নি | এডুলিচার' };
+  if (rawSegments.length === 0) return { title: 'বই পাওয়া যায়নি ❀ এডুলিচার' };
 
   const { bookSlug, volumeOrChapterSlug, chapterSlug, pageNumFromPath } = resolveRouteSegments(rawSegments);
 
@@ -166,7 +176,7 @@ export async function generateMetadata({ params, searchParams }: UnifiedPageProp
     chapterSlug
   );
 
-  if (!book) return { title: 'বই পাওয়া যায়নি | এডুলিচার' };
+  if (!book) return { title: `বই পাওয়া যায়নি ❀ ${siteData?.title || 'এডুলিচার'}` };
 
   const splitPages = parseBookSubPages(book.content || '');
   const activePageIndex = resolveActivePageIndex(splitPages, pageNumFromPath, resolvedSearchParams.page);
@@ -518,60 +528,50 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
     },
   };
 
+  // Breadcrumb trail: home / library / book / volume-or-chapter / chapter / sub-page.
+  // While a later step is shown, every earlier step is a link (the post name links back when it has sub-pages).
+  const hasActiveSubPage = totalSubPages > 1 && currentPageNum > 1;
+  const volumeStepLabel =
+    displayVolumeTitle ||
+    displayChapterTitle ||
+    (isMetaFile ? metaFiles[currentMetaIndex]?.title : volumeOrChapterSlug);
+
+  const bookCrumbs: Crumb[] = [{ label: 'গ্রন্থাগার', href: '/books' }];
+  bookCrumbs.push(
+    volumeOrChapterSlug
+      ? { label: book.title, href: `/book/${bookSlug}` }
+      : { label: book.title }
+  );
+  if (volumeOrChapterSlug) {
+    if (chapterSlug) {
+      bookCrumbs.push({
+        label: displayVolumeTitle || volumeOrChapterSlug,
+        href: `/book/${bookSlug}/${volumeOrChapterSlug}`,
+      });
+      bookCrumbs.push(
+        hasActiveSubPage
+          ? { label: displayChapterTitle || chapterSlug, href: `/book/${bookSlug}/${volumeOrChapterSlug}/${chapterSlug}` }
+          : { label: displayChapterTitle || chapterSlug }
+      );
+    } else {
+      bookCrumbs.push(
+        hasActiveSubPage
+          ? { label: volumeStepLabel, href: `/book/${bookSlug}/${volumeOrChapterSlug}` }
+          : { label: volumeStepLabel }
+      );
+    }
+  }
+  if (hasActiveSubPage) {
+    bookCrumbs.push({ label: getSubPageLabel(currentSubPageData) });
+  }
+
   return (
     <main className="bg-[#fdfcf8] min-h-screen">
+      <ViewTracker slug={book.slug} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }} />
 
       {/* ব্রেডক্রাম্ব নেভিগেশন */}
-      <nav className="w-full bg-[#7575a3] border-b border-gray-200 py-2 px-3 text-white overflow-x-auto no-scrollbar">
-        <div className="flex items-center max-w-full mx-auto text-sm font-tarunima whitespace-nowrap">
-          <Link href="/" className="transition-colors shrink-0 hover:text-red-100">
-            <Home size={16} />
-          </Link>
-          <span className="mx-2 text-white/50 shrink-0">/</span>
-          <Link href="/books" className="transition-colors hover:text-red-100 shrink-0">
-            গ্রন্থাগার
-          </Link>
-          <span className="mx-2 text-white/50 shrink-0">/</span>
-
-          {volumeOrChapterSlug ? (
-            <Link href={`/book/${bookSlug}`} className="transition-colors hover:text-red-100 shrink-0">
-              {book.title}
-            </Link>
-          ) : (
-            <span className="font-medium text-white whitespace-nowrap">{book.title}</span>
-          )}
-
-          {volumeOrChapterSlug && (
-            <>
-              <span className="mx-2 text-white/50 shrink-0">/</span>
-              {chapterSlug ? (
-                <Link href={`/book/${bookSlug}/${volumeOrChapterSlug}`} className="transition-colors hover:text-red-100 shrink-0">
-                  {displayVolumeTitle || volumeOrChapterSlug}
-                </Link>
-              ) : (
-                <span className="font-medium text-white whitespace-nowrap">
-                  {displayVolumeTitle || displayChapterTitle || (isMetaFile ? metaFiles[currentMetaIndex]?.title : volumeOrChapterSlug)}
-                </span>
-              )}
-            </>
-          )}
-
-          {chapterSlug && (
-            <>
-              <span className="mx-2 text-white/50 shrink-0">/</span>
-              <span className="font-medium text-white whitespace-nowrap">{displayChapterTitle || chapterSlug}</span>
-            </>
-          )}
-
-          {totalSubPages > 1 && currentPageNum > 1 && (
-            <>
-              <span className="mx-2 text-white/50 shrink-0">/</span>
-              <span className="font-medium text-white shrink-0">{getSubPageLabel(currentSubPageData)}</span>
-            </>
-          )}
-        </div>
-      </nav>
+      <Breadcrumb items={bookCrumbs} />
 
       {/* কন্টেন্ট ও সাইডবার লেআউট */}
       <div className="grid max-w-full grid-cols-1 gap-0 mx-auto lg:grid-cols-12">

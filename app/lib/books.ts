@@ -4,10 +4,9 @@ export * from './books/utils';
 export * from './books/hierarchy';
 export * from './books/fetchers';
 export * from './books/items';
+export * from './books/r2';   // 🔹 নতুন যোগ করুন
 
-// নতুন নাম অনুযায়ী রিফ্যাক্টর করা এক্সপোর্ট
+// নতুন নাম অনুযায়ী রিফ্যাক্টর করা এক্সপোর্ট
 export { getItemsByItemType } from './books/singleItemExtract';
 
 // Toc বা অন্যান্য রিকানেকশন (যদি থেকে থাকে)
-export { getBookDirectoryBySlug as getBookDirectoryBySlugFromToc } from './books/toc';
-

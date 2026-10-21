@@ -1,5 +1,4 @@
-import Link from 'next/link';
-import { Home, Layers } from "lucide-react";
+import Breadcrumb from '@/app/components/Breadcrumb';
 import { headers } from 'next/headers';
 import type { Metadata } from 'next';
 import GenreList from "@/app/components/GenreList"; // আপনার প্রজেক্টের সঠিক পাথ অনুযায়ী ইমপোর্ট করুন
@@ -14,7 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const siteName = siteData?.title || 'এডুলিচার পাঠশালা';
 
   // ট্যাব টাইটেল ফরম্যাট: ঘরানা ❀ {সাবডোমেন সাইট-টাইটেল}
-  const dynamicMetaTitle = `ঘরানা ❀ ${siteName} ❀ এডুলিচার`;
+  const dynamicMetaTitle = `ঘরানা ❀ ${siteName}`;
 
   return {
     title: dynamicMetaTitle,
@@ -27,13 +26,7 @@ export default async function GenresPage() {
   return (
     <main className="bg-[#fdfcf8] min-h-screen">
       {/* নেভিগেশন বার */}
-      <nav className="w-full bg-[#7575a3] border-b border-gray-200 py-2 px-3 text-white overflow-x-auto no-scrollbar">
-        <div className="max-w-full mx-auto text-sm font-tarunima flex items-center whitespace-nowrap">
-          <Link href="/" className="shrink-0"><Home size={16} /></Link>
-          <span className="mx-2 text-white/50 shrink-0">/</span>
-          <Link href="/genres" className="hover:text-red-100 shrink-0">ঘরানা</Link>
-        </div>
-      </nav>
+      <Breadcrumb items={[{ label: 'ঘরানা' }]} />
 
       <header>
 
