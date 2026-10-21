@@ -32,6 +32,8 @@ const BUCKET = 'eduliture-assets';
 const DRY_RUN = process.argv.includes('--dry-run');
 const ASSUME_YES = process.argv.includes('--yes');
 const TRASH_PREFIX = '_trash/';
+// stories/ go to Supabase (eStory, `npm run sync-stories`), not to the bucket
+const NOT_FOR_BUCKET_PREFIXES = ['stories/'];
 const TRASH_CONFIRM_THRESHOLD = 20;
 const BOOKS_MANIFEST_KEY = '_manifest/books-index.json';
 const ITEMS_MANIFEST_KEY = '_manifest/items-index.json';
@@ -121,7 +123,10 @@ async function main() {
   console.log(`R2 currently has ${remoteObjects.size} keys.`);
 
   console.log('🔍 Scanning local content/ and public/cover/ directories...');
-  const contentFiles = await walk(CONTENT_ROOT);
+  const contentFiles = (await walk(CONTENT_ROOT)).filter((file) => {
+    const key = path.relative(CONTENT_ROOT, file).replace(/\\/g, '/');
+    return !NOT_FOR_BUCKET_PREFIXES.some((prefix) => key.startsWith(prefix));
+  });
   const coverFiles = await walk(COVER_ROOT);
   console.log(`Found ${contentFiles.length} files in content/, ${coverFiles.length} files in public/cover/.`);
 
@@ -186,6 +191,7 @@ async function main() {
   for (const remoteKey of remoteObjects.keys()) {
     if (remoteKey === BOOKS_MANIFEST_KEY || remoteKey === ITEMS_MANIFEST_KEY || remoteKey === SLUGS_MANIFEST_KEY) continue;
     if (remoteKey.startsWith(TRASH_PREFIX)) continue;
+    if (NOT_FOR_BUCKET_PREFIXES.some((prefix) => remoteKey.startsWith(prefix))) continue; // left as it is
     if (!localKeys.has(remoteKey)) keysToTrash.push(remoteKey);
   }
 
