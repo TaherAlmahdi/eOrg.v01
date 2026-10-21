@@ -3,6 +3,7 @@ title: "বড়দিদি"
 subtitle: "গ্রন্থপরিচয়"
 author: "শরৎচন্দ্র চট্টোপাধ্যায়"
 type: "book_index"
+subdomain: "library, sarat"
 slug: "barhadidi"
 
 pub_medium: "১৩১৪ সালের বৈশাখ থেকে আষাঢ় সংখ্যা পর্যন্ত সরলা দেবী সম্পাদিত ‘ভারতী’ পত্রিকায় ধারাবাহিকভাবে প্রকাশিত"

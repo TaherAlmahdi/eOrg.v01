@@ -2,6 +2,7 @@
 title: "যুগলাঙ্গুরীয়"
 author: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়"
 type: "book_index"
+subdomain: "library, bankim"
 slug: "yugalanguriya"
 first_published: 1874
 sn: 07

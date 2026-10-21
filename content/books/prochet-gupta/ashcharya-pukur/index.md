@@ -2,6 +2,7 @@
 title: "আশ্চর্য পুকুর"
 author: "প্রচেত গুপ্ত"
 type: "book_index"
+subdomain: "library"
 slug: "ashcharya-pukur"
 
 pub_medium: "মিত্র ও ঘোষ পাবলিশার্স থেকে প্রকাশিত কিশোর উপযোগী গল্পগ্রন্থ।"

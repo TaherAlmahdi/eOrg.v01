@@ -2,6 +2,7 @@
 title: "বাল্যরচনা"
 author: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়"
 type: "book_index"
+subdomain: "library, bankim"
 slug: "balyarachana"
 
 first_published: 1875

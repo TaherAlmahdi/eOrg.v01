@@ -3,6 +3,7 @@ title: "অগ্নিবীণা"
 subtitle: "গ্রন্থপরিচয়"
 author: "কাজী নজরুল ইসলাম"
 type: "book_index"
+subdomain: "library, nazrul"
 genre:
   - "কাব্য"
 
