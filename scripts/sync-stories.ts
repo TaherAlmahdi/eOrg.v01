@@ -200,7 +200,10 @@ async function main() {
   // file as its source_path. Its old slug is kept in legacy_slug so old links still work.
   const personKey = (names: string[] | null | undefined) => (names || []).map((n) => normalizeBengali(n).trim()).join('|');
   const storyKey = (title: string, authors: string[] | null | undefined) => `${normalizeBengali(title).trim()}#${personKey(authors)}`;
-  const unclaimed = existing.filter((e) => !e.source_path);
+  // A file that was renamed (018-story.md -> adab.md) is the same story: its row still points to the old,
+  // now missing file, so it is taken over the same way.
+  const fileNames = new Set(files.map((f) => f.sourcePath));
+  const unclaimed = existing.filter((e) => !e.source_path || !fileNames.has(e.source_path));
   const adoptedBy = new Map<string, (typeof existing)[number]>(); // source_path -> old row
   const claimed = new Set<string>();
   for (const f of files) {
@@ -243,10 +246,9 @@ async function main() {
   const toUpdate = files.filter((f) => {
     const e = currentRow(f);
     // a story hidden by hand in the dashboard stays hidden until its file changes
-    return e && (e.content_hash !== f.hash || !e.source_path);
+    return e && (e.content_hash !== f.hash || e.source_path !== f.sourcePath);
   });
-  const fileNames = new Set(files.map((f) => f.sourcePath));
-  const toUnpublish = existing.filter((e) => e.source_path && e.published && !fileNames.has(e.source_path));
+  const toUnpublish = existing.filter((e) => e.source_path && e.published && !fileNames.has(e.source_path) && !claimed.has(e.id));
 
   const slugChanges = toUpdate.filter((f) => currentRow(f)?.slug !== f.slug);
   console.log(
@@ -257,7 +259,10 @@ async function main() {
   for (const f of toUpdate) {
     const row = currentRow(f);
     const old = row?.slug;
-    const adopted = row && !row.source_path ? ' (existing story, now tied to this file)' : '';
+    const adopted =
+      row && row.source_path !== f.sourcePath
+        ? ` (existing story${row.source_path ? `, renamed from ${row.source_path}` : ''}, now tied to this file)`
+        : '';
     console.log(`   ~ ${f.sourcePath} -> ${f.slug}${old && old !== f.slug ? ` (was ${old})` : ''}${adopted}`);
   }
   for (const e of toUnpublish) console.log(`   - ${e.source_path} (file gone, will be hidden)`);
