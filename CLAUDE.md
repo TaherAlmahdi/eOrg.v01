@@ -10,6 +10,7 @@
 - এই রিপোর সাথে Cloudflare Worker/ডিপ্লয়ের কোনো যোগ নেই। এখানে বই লোকালে লেখা হয়, `npm run dev` লোকাল ফাইল থেকে বই দেখে (`CONTENT_ROOT`, `COVER_ROOT`, `NEXT_PUBLIC_COVER_BASE=/local-media`), যাতে v02 (লাইভ)-এ কেমন দেখাবে ও কোনো error আসবে কিনা আগেই দেখা যায়।
 - R2-তে বই, কভার, ম্যানিফেস্ট ও স্লাগ (`_manifest/slugs.json`) পাঠানোর পথ: `npm run sync-assets` (লোকালে, আগে `npm run sync-assets:dry`), এবং পরিকল্পিত GitHub Actions (push করলে স্বয়ংক্রিয়)।
 - স্লাগ লেখা হয় `app/lib/content/core/registry/slug-data.ts`-এ (`"বাংলা নাম": "english slug"`)। বদলাতে হলে v02-তে বদলে এখানে কপি।
+- গল্প (`content/stories/*.md`) Supabase-এ যায় `npm run sync-stories` (আগে `:dry`) দিয়ে — স্ক্রিপ্ট `scripts/sync-stories.ts`, শুধু এই রিপোতে; `.env.local`-এ `NEXT_PUBLIC_SUPABASE_URL` ও `SUPABASE_SERVICE_ROLE_KEY` লাগে। বই/কভার/স্লাগ যায় `npm run sync-assets` দিয়ে। v02 থেকে কপির সময় `scripts/sync-stories.ts`, `scripts/stories-slug-map.ts`, `.github/` ও package.json-এর sync-stories স্ক্রিপ্ট/`@supabase/supabase-js` মুছে না ফেলতে সাবধান।
 - `npm run deploy`, `wrangler ...` এখানে চালাবে না।
 
 ## স্থাপত্য (বিস্তারিত: docs/PLAN.md)
