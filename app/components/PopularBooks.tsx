@@ -21,7 +21,7 @@ interface PopularBooksProps {
 
 const getCoverImageUrl = (coverPath?: string | null): string => {
   if (!coverPath) return `${COVER_BASE}/cover/default-cover.webp`;
-  if (coverPath.startsWith('http://') || coverPath.startsWith('https://')) return coverPath;
+  if (coverPath.startsWith('http://') || coverPath.startsWith('https://') || coverPath.startsWith(`${COVER_BASE}/`)) return coverPath;
 
   let cleanPath = coverPath.trim().replace(/\\/g, '/');
   if (cleanPath.startsWith('public/')) cleanPath = cleanPath.replace('public/', '');

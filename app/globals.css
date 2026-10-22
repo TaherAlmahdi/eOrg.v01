@@ -45,7 +45,7 @@
   table,
   .first,
   .dcap,
-  .normal,
+  .normal, .story,
   .natok,
   .n-normal,
   .shabda,
@@ -225,7 +225,7 @@
 
   .first,
   .dcap,
-  .normal {
+  .normal, .story {
     margin-bottom: 0.5rem !important;
     text-align: justify;
   }
@@ -235,7 +235,7 @@
     margin-bottom: 0.1rem !important;
   }
 
-  .normal {
+  .normal, .story {
     text-indent: 30px;
   }
 
@@ -395,13 +395,13 @@
   /* ----------------------------------
      চ. লিংক, উদ্ধৃতি ও ইউটিলিটি ক্লাস
      ---------------------------------- */
-  .normal a,
+  .normal a, .story a,
   .first a,
   .dcap a {
     color: #cc0044;
   }
 
-  .normal a:hover,
+  .normal a:hover, .story a:hover,
   .first a:hover,
   .dcap a:hover {
     color: #80002a;

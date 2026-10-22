@@ -15,7 +15,7 @@ const getCoverImageUrl = (coverPath?: string | null): string => {
   if (!coverPath) return `${COVER_BASE}/cover/default-cover.webp`;
 
   // ১. যদি ইতোমধ্যে সম্পূর্ণ URL (http/https) হয়ে থাকে
-  if (coverPath.startsWith('http://') || coverPath.startsWith('https://')) {
+  if (coverPath.startsWith('http://') || coverPath.startsWith('https://') || coverPath.startsWith(`${COVER_BASE}/`)) {
     return coverPath;
   }
 

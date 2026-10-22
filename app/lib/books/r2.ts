@@ -131,7 +131,7 @@ export function getCoverUrl(coverName?: string | null): string {
   if (!coverName) return `${COVER_BASE}/cover/default-cover.webp`;
 
   // ১. যদি ইতোমধ্যে সম্পূর্ণ URL (http/https) হয়ে থাকে
-  if (coverName.startsWith('http://') || coverName.startsWith('https://')) {
+  if (coverName.startsWith('http://') || coverName.startsWith('https://') || coverName.startsWith(`${COVER_BASE}/`)) {
     return coverName;
   }
 

@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events';
+import path from 'path';
 import type { NextConfig } from "next";
 import withPWAInit from "@ducanh2912/next-pwa";
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
@@ -6,8 +7,20 @@ import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 // ইভেন্ট লিসেনার লিমিট বাড়িয়ে MaxListenersExceededWarning দূর করা হলো
 EventEmitter.defaultMaxListeners = 25;
 
-// লোকাল dev সার্ভারে Cloudflare bindings (R2 ইত্যাদি) অ্যাক্সেস করার জন্য
-initOpenNextCloudflareForDev();
+// লোকাল dev সার্ভারে Cloudflare bindings (R2 ইত্যাদি) অ্যাক্সেস করার জন্য।
+// eOrg.v01-এ dev সম্পূর্ণ লোকাল (নিচে CONTENT_ROOT), তাই সেখানে R2/D1 binding-এ সংযোগ করা হয় না।
+if (process.env.NODE_ENV !== "development") {
+  initOpenNextCloudflareForDev();
+}
+
+// eOrg.v01 is the local writing room: in `next dev` the books come from ./content, the covers from
+// ./public/cover and the slugs from app/lib/content/core/registry/slug-data.ts (R2 is not touched).
+// A value already set in .env.local wins.
+if (process.env.NODE_ENV === "development") {
+  process.env.CONTENT_ROOT ||= path.resolve("content");
+  process.env.COVER_ROOT ||= path.resolve("public", "cover");
+  process.env.NEXT_PUBLIC_COVER_BASE ||= "/local-media";
+}
 
 const withPWA = withPWAInit({
   dest: "public",

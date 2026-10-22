@@ -176,6 +176,7 @@ export const SLUG_DATA: Record<SlugCategory, Record<string, string>> = {
     "মিসির আলি অমনিবাস": "misir-ali-omnibus",
     "সুকান্ত সমগ্র": "sukanta-samagra",
     "হিমু সমগ্র": "himu-samagra",
+    "অদ্ভূতুড়ে সিরিজ": "adbhuturhe-series",
   },
 
   tags: {
