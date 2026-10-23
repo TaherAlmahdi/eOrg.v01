@@ -2,7 +2,9 @@
 // One place that turns book .md files into the two catalog manifests.
 // Used by scripts/sync-assets-to-r2.ts (uploads them to R2) and by the local provider
 // (serves them from disk in `next dev`), so what you see locally is what goes live.
+import { createHash } from 'node:crypto';
 import matter from 'gray-matter';
+import { computeBookHierarchy, tocManifestKey } from '../../app/lib/books/hierarchy-core';
 import type { FrontmatterData } from '../../app/lib/frontmatter';
 import { getItemSlug } from '../../app/lib/content/core/registry/items';
 import { buildSlugManifest, fallbackSlug, registryTable, type SlugCategory, type SlugTable } from '../../app/lib/content/core/registry/slug-store';
@@ -15,6 +17,8 @@ export interface BookManifestEntry {
   bookFolder: string;
   bookPrefix: string;
   data: FrontmatterData;
+  /** Hash of the book's prebuilt toc (see buildTocManifests); changes when a chapter is added, renamed or removed. */
+  tocHash?: string;
 }
 
 export interface ItemManifestEntry {
@@ -224,4 +228,35 @@ export function buildCatalogFromFiles(files: CatalogFile[]): {
   const { warnings: nameWarnings, newSlugs } = findUnlistedNames(found, sources);
   const { manifest: slugsManifest, warnings: slugWarnings } = buildSlugManifest(found, newSlugs);
   return { booksManifest, itemsManifest, slugsManifest, slugWarnings, nameWarnings, newSlugs };
+}
+
+/**
+ * Builds the prebuilt table of contents of every book (R2 key -> JSON text) from the same .md files,
+ * so a chapter page reads one small file instead of every chapter of the book.
+ * Also stamps each books-manifest entry with `tocHash`: the books manifest changes whenever a toc does,
+ * which is what makes the page cache (worker/page-cache.ts) drop pages that show the old table of contents.
+ * Upload the returned files BEFORE the books manifest.
+ */
+export async function buildTocManifests(
+  files: CatalogFile[],
+  booksManifest: BookManifestEntry[]
+): Promise<Map<string, string>> {
+  const bodies = new Map<string, string>();
+  for (const file of files) {
+    if (file.key.startsWith('books/') && file.key.endsWith('.md')) bodies.set(file.key, file.body);
+  }
+  const allKeys = Array.from(bodies.keys());
+  const tocs = new Map<string, string>();
+
+  for (const entry of booksManifest) {
+    const bookKeys = allKeys.filter((key) => key.startsWith(entry.bookPrefix));
+    const hierarchy = await computeBookHierarchy(entry.bookPrefix, entry.bookFolder, bookKeys, async (key) => {
+      const body = bodies.get(key);
+      return body === undefined ? null : normalizeBn(body);
+    });
+    const json = JSON.stringify({ bookSlug: entry.bookFolder, ...hierarchy });
+    tocs.set(tocManifestKey(entry.bookPrefix), json);
+    entry.tocHash = createHash('md5').update(json).digest('hex').slice(0, 12);
+  }
+  return tocs;
 }

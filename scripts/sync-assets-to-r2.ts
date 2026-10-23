@@ -6,7 +6,7 @@ import { config } from 'dotenv';
 config({ path: '.env.local' });
 import mime from 'mime-types';
 import readline from 'readline/promises';
-import { buildCatalogFromFiles, type CatalogFile } from '../lib/catalog/build';
+import { buildCatalogFromFiles, buildTocManifests, type CatalogFile } from '../lib/catalog/build';
 import {
   S3Client,
   ListObjectsV2Command,
@@ -42,6 +42,7 @@ const TRASH_CONFIRM_THRESHOLD = 20;
 const BOOKS_MANIFEST_KEY = '_manifest/books-index.json';
 const ITEMS_MANIFEST_KEY = '_manifest/items-index.json';
 const SLUGS_MANIFEST_KEY = '_manifest/slugs.json';
+const TOC_MANIFEST_PREFIX = '_manifest/toc/';
 
 const s3 = new S3Client({
   region: 'auto',
@@ -209,6 +210,7 @@ async function main() {
   for (const warning of slugWarnings) console.warn(`⚠️  Slug clash — ${warning}`);
   for (const warning of nameWarnings) console.warn(`⚠️  ${warning}`);
   await saveAutoSlugs(newSlugs);
+  const tocManifests = await buildTocManifests(catalogFiles, booksManifest); // also stamps tocHash on booksManifest
 
   console.log(`\n✅ Uploaded: ${uploaded}, unchanged (skipped): ${skipped}.`);
 
@@ -218,6 +220,7 @@ async function main() {
   const keysToTrash: string[] = [];
   for (const remoteKey of remoteObjects.keys()) {
     if (remoteKey === BOOKS_MANIFEST_KEY || remoteKey === ITEMS_MANIFEST_KEY || remoteKey === SLUGS_MANIFEST_KEY) continue;
+    if (remoteKey.startsWith(TOC_MANIFEST_PREFIX)) continue; // generated, like the manifests above
     if (remoteKey.startsWith(TRASH_PREFIX)) continue;
     if (NOT_FOR_BUCKET_PREFIXES.some((prefix) => remoteKey.startsWith(prefix))) continue; // left as it is
     if (!localKeys.has(remoteKey)) keysToTrash.push(remoteKey);
@@ -280,9 +283,17 @@ async function main() {
   // Step 4: Upload both manifests
   // ==========================================
   if (DRY_RUN) {
-    console.log(`\n📝 Would write manifests — ${booksManifest.length} books, ${itemsManifest.length} items, ${slugCount} slugs. Dry run finished, nothing changed.`);
+    console.log(`\n📝 Would write manifests — ${booksManifest.length} books (${tocManifests.size} tocs), ${itemsManifest.length} items, ${slugCount} slugs. Dry run finished, nothing changed.`);
     return;
   }
+
+  // The tocs go first: the books manifest carries their hash, and it is what tells the page cache that something changed
+  for (const [tocKey, tocJson] of tocManifests) {
+    await s3.send(
+      new PutObjectCommand({ Bucket: BUCKET, Key: tocKey, Body: Buffer.from(tocJson), ContentType: 'application/json' })
+    );
+  }
+  console.log(`\n✅ Table-of-contents manifests updated — ${tocManifests.size} books.`);
 
   await s3.send(
     new PutObjectCommand({

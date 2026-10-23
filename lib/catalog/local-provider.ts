@@ -5,12 +5,13 @@
 // NODE_ENV === 'development' and CONTENT_ROOT is set (see app/lib/books/r2.ts).
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { buildCatalogFromFiles, type CatalogFile } from './build';
+import { buildCatalogFromFiles, buildTocManifests, type CatalogFile } from './build';
 import { normalizeBn } from '../../app/lib/bn-text';
 
 const BOOKS_MANIFEST_KEY = '_manifest/books-index.json';
 const ITEMS_MANIFEST_KEY = '_manifest/items-index.json';
 const SLUGS_MANIFEST_KEY = '_manifest/slugs.json';
+const TOC_MANIFEST_PREFIX = '_manifest/toc/';
 const MANIFEST_TTL_MS = 3000;
 
 const contentRoot = () => path.resolve(process.env.CONTENT_ROOT || '');
@@ -86,12 +87,14 @@ async function rebuildManifests(): Promise<void> {
   const files: CatalogFile[] = mdFiles.map((file, i) => ({ key: toKey(root, file), body: bodies[i] }));
   const { booksManifest, itemsManifest, slugsManifest, nameWarnings } = buildCatalogFromFiles(files);
   for (const warning of nameWarnings) console.warn(`[catalog] ${warning}`);
+  const tocManifests = await buildTocManifests(files, booksManifest);
   manifestCache = {
     at: Date.now(),
     files: new Map([
       [BOOKS_MANIFEST_KEY, JSON.stringify(booksManifest)],
       [ITEMS_MANIFEST_KEY, JSON.stringify(itemsManifest)],
       [SLUGS_MANIFEST_KEY, JSON.stringify(slugsManifest)],
+      ...tocManifests,
     ]),
   };
 }
@@ -122,6 +125,11 @@ export function getLocalBucket(): R2Bucket {
       if (key === BOOKS_MANIFEST_KEY || key === ITEMS_MANIFEST_KEY || key === SLUGS_MANIFEST_KEY) {
         const text = await getManifestJson(key);
         return { text: async () => text, json: async () => JSON.parse(text) };
+      }
+      if (key.startsWith(TOC_MANIFEST_PREFIX)) {
+        await getManifestJson(BOOKS_MANIFEST_KEY); // makes sure the manifests are built
+        const text = manifestCache?.files.get(key);
+        return text === undefined ? null : { text: async () => text, json: async () => JSON.parse(text) };
       }
       const file = resolveKey(key);
       if (!file) return null;
