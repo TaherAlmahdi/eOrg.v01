@@ -14,7 +14,9 @@ interface CustomLink {
 }
 
 export interface StoryDetailsProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- story shape varies across sources
   story: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- series may be a string or an object
   series?: any; // অভিভাবক ফাইল থেকে এক্সপ্লিসিটলি পাস করলেও যেন TypeScript এরর না দেয়
 }
 
@@ -257,11 +259,11 @@ export default function StoryDetails({ story, series: explicitSeries }: StoryDet
               <span className="text-gray-400">:</span>
               <span className="flex flex-wrap gap-x-1">
                 {Array.isArray(story.item) ? (
-                  story.item.map((itemVal: any, index: number) => {
+                  story.item.map((itemVal: string | { name?: string; link?: string }, index: number) => {
                     const itemName = typeof itemVal === 'object' && itemVal !== null ? itemVal.name : itemVal;
                     const itemLink = typeof itemVal === 'object' && itemVal !== null ? itemVal.link : story.item_links?.find((l: CustomLink) => l.name === itemName)?.link;
                     
-                    const isLast = index === (story.item as any[]).length - 1;
+                    const isLast = index === (story.item as unknown[]).length - 1;
 
                     return (
                       <span key={index}>

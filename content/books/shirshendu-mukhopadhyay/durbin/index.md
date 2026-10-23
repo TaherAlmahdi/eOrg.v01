@@ -5,8 +5,8 @@ type: "book_index"
 slug: "durbin"
 subdomain: "library"
 
-first_published: 1960
-order: 196001
+first_published: 1980
+order: 198001
 published: "2026-10-20"
 pub_medium: "সাপ্তাহিক 'দেশ' পত্রিকায় ধারাবাহিকভাবে প্রকাশিত হয়।"
 genre:

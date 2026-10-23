@@ -3,6 +3,7 @@
 import React, { useState, useCallback, memo } from 'react';
 import Link from 'next/link';
 import { ChevronRight, ChevronDown, FileText, List, X } from 'lucide-react';
+import { useScrollActiveToTop } from './useScrollActiveToTop';
 
 export interface TOCItemProps {
   structure?: {
@@ -123,6 +124,8 @@ export default function TOCItem({
     setIsMobileOpen(false);
   }, []);
 
+  const tocScrollRef = useScrollActiveToTop(`${activeItemSlug}|${currentPageNum}`);
+
   if (!allItemsList || allItemsList.length === 0) return null;
   if (!currentItem) return null;
 
@@ -196,7 +199,7 @@ export default function TOCItem({
 
   // ৭. মূল সূচিপত্র রেন্ডার করার ফাংশন
   const renderTocContent = () => (
-    <div className="space-y-1 font-tarunima overflow-y-auto max-h-[65vh] lg:max-h-[75vh] relative pr-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+    <div ref={tocScrollRef} className="space-y-1 font-tarunima overflow-y-auto max-h-[65vh] lg:max-h-[75vh] relative pr-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
       {slicedList.map((item, idx) => {
         const itemSlug = item.slug || slugify(item.title);
         const isCurrentItem = itemSlug === activeItemSlug;
@@ -210,7 +213,7 @@ export default function TOCItem({
         const itemDisplayTitle = item.title;
 
         return (
-          <div key={idx} className="space-y-0.5">
+          <div key={idx} data-toc-active={isCurrentItem} className="space-y-0.5">
             <div className="flex items-center justify-between w-full">
               <Link
                 href={itemUrl}

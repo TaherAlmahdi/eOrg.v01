@@ -3,6 +3,7 @@
 import { useState, useCallback, memo } from 'react';
 import Link from 'next/link';
 import { ChevronDown, ChevronRight, FileText, Folder, List, X } from 'lucide-react';
+import { useScrollActiveToTop } from './useScrollActiveToTop';
 
 // --- Type Definitions ---
 interface SubPageItem {
@@ -130,13 +131,15 @@ export default function TableOfContents({
     setIsMobileOpen(false);
   }, []);
 
+  const tocScrollRef = useScrollActiveToTop(`${currentChapter ?? ''}|${currentPageNum}`);
+
   // বুক ফোল্ডারের ফাইল এবং সাবফোল্ডার আলাদা করার লজিক
   const directFiles = structure?.items?.filter((item) => item.type !== 'volume') || [];
   const volumes = structure?.items?.filter((item) => item.type === 'volume') || [];
 
   // সূচিপত্রের মূল তালিকা
   const renderTocContent = () => (
-    <div className="space-y-1 font-tarunima overflow-y-auto max-h-[65vh] lg:max-h-[75vh] relative pr-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+    <div ref={tocScrollRef} className="space-y-1 font-tarunima overflow-y-auto max-h-[65vh] lg:max-h-[75vh] relative pr-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
       
       {/* ১. মেটা ফাইলসমূহ (যদি থাকে) */}
       {structure?.metaFiles && structure.metaFiles.length > 0 && (
@@ -149,7 +152,7 @@ export default function TableOfContents({
             const metaDisplayTitle = meta.subtitle ? `${meta.title} : ${meta.subtitle}` : meta.title;
 
             return (
-              <div key={meta.slug} className="space-y-0.5">
+              <div key={meta.slug} data-toc-active={isActive} className="space-y-0.5">
                 <div className="flex items-center justify-between w-full">
                   <Link
                     href={metaBasePath}
@@ -202,7 +205,7 @@ export default function TableOfContents({
             const fileDisplayTitle = file.subtitle ? `${file.title} : ${file.subtitle}` : file.title;
 
             return (
-              <div key={chapSlug} className="space-y-0.5">
+              <div key={chapSlug} data-toc-active={isChapActive} className="space-y-0.5">
                 <div className="flex items-center justify-between w-full">
                   <Link
                     href={chapBasePath}
@@ -253,7 +256,7 @@ export default function TableOfContents({
             const volDisplayTitle = vol.subtitle ? `${vol.title} : ${vol.subtitle}` : vol.title;
 
             return (
-              <div key={vol.id} className="pb-1 border-b border-gray-100 last:border-0">
+              <div key={vol.id} data-toc-active={isVolumeActive} className="pb-1 border-b border-gray-100 last:border-0">
                 <div className="flex items-center justify-between w-full px-0 py-0 text-sm font-medium text-red-900 transition-all hover:bg-orange-50 group">
                   <Link
                     href={volBasePath}
@@ -304,7 +307,7 @@ export default function TableOfContents({
                       const chapDisplayTitle = chap.subtitle ? `${chap.title} : ${chap.subtitle}` : chap.title;
 
                       return (
-                        <div key={chapSlug} className="space-y-0.5">
+                        <div key={chapSlug} data-toc-active={isChapActive} className="space-y-0.5">
                           <div className="flex items-center justify-between w-full">
                             <Link
                               href={chapBasePath}

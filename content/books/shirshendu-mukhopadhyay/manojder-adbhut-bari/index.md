@@ -11,18 +11,18 @@ published: "2026-10-21"
 pub_medium: "আনন্দমেলা পত্রিকায় ধারাবাহিক প্রকাশিত।"
 
 genre:
-  - "উপন্যাস"
+  - "কিশোর উপন্যাস"
 
 genre_links:
-  - name: "উপন্যাস"
-    link: "/genre/novel"
+  - name: "কিশোর উপন্যাস"
+    link: "/genre/teenage-novel"
 
 series:
-  - name: "অদ্ভুতুড়ে সিরিজ"
+  - name: "অদ্ভূতুড়ে সিরিজ"
     order: 01
 
 series_links:
-  - { name: "অদ্ভুতুড়ে সিরিজ", link: "/series/adbhuturhe-series" }
+  - { name: "অদ্ভূতুড়ে সিরিজ", link: "/series/adbhuturhe-series" }
 
 cover_image: "/cover/manojder-adbhut-bari.webp"
 

@@ -99,6 +99,7 @@ export const SLUG_DATA: Record<SlugCategory, Record<string, string>> = {
     "কবিতা সঙ্কলন": "poetry-collection",
     "কাব্য": "poetry",
     "কারা কাহিনী": "prison-story",
+    "কিশোর উপন্যাস": "teenage-novel",
     "গবেষণা": "research",
     "গল্পগ্রন্থ": "stories",
     "গুপ্তচর উপন্যাস": "detective-novel",
@@ -177,6 +178,7 @@ export const SLUG_DATA: Record<SlugCategory, Record<string, string>> = {
     "সুকান্ত সমগ্র": "sukanta-samagra",
     "হিমু সমগ্র": "himu-samagra",
     "অদ্ভূতুড়ে সিরিজ": "adbhuturhe-series",
+    "ভৌতিক সমগ্র": "horror-samagra",
   },
 
   tags: {

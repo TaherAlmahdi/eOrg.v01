@@ -1,7 +1,7 @@
 'use client';
 
 import Breadcrumb from '@/app/components/Breadcrumb';
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import { Home, Search, BookOpen, Layers } from "lucide-react";
 import { buildTabTitle } from '@/app/lib/get-site-data';
@@ -48,6 +48,15 @@ const getAuthorText = (author?: string | string[]): string => {
   return Array.isArray(author) ? author.join(', ') : author;
 };
 
+// 🔹 ডেস্কটপ (≥1024px) কিনা — SSR-এ false ধরা হয়
+const DESKTOP_QUERY = '(min-width: 1024px)';
+const subscribeDesktop = (onChange: () => void) => {
+  const mql = window.matchMedia(DESKTOP_QUERY);
+  mql.addEventListener('change', onChange);
+  return () => mql.removeEventListener('change', onChange);
+};
+const getIsDesktop = () => window.matchMedia(DESKTOP_QUERY).matches;
+
 interface StoriesPageClientProps {
   initialStories: Story[];
   siteTitle: string;
@@ -57,22 +66,15 @@ export default function StoriesPageClient({
   initialStories = [],
   siteTitle,
 }: StoriesPageClientProps) {
-  const [limit, setLimit] = useState(25);
+  const isDesktop = useSyncExternalStore(subscribeDesktop, getIsDesktop, () => false);
+  const limit = isDesktop ? 60 : 25;
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLetter, setSelectedLetter] = useState('সব');
-  const [visibleCount, setVisibleCount] = useState(limit);
 
-  useEffect(() => {
-    if (window.innerWidth >= 1024) {
-      setLimit(60);
-    } else {
-      setLimit(25);
-    }
-  }, []);
-
-  useEffect(() => {
-    setVisibleCount(limit);
-  }, [limit]);
+  // Visible count resets whenever the filters or page size change (no effect needed)
+  const resetKey = `${searchQuery}|${selectedLetter}|${limit}`;
+  const [loaded, setLoaded] = useState({ key: resetKey, count: limit });
+  const visibleCount = loaded.key === resetKey ? loaded.count : limit;
 
   // ১. সর্টিং
   const sortedStories = useMemo(() => {
@@ -127,10 +129,6 @@ export default function StoriesPageClient({
       return matchesSearch && matchesLetter;
     });
   }, [sortedStories, searchQuery, selectedLetter]);
-
-  useEffect(() => {
-    setVisibleCount(limit);
-  }, [searchQuery, selectedLetter, limit]);
 
   const currentStories = useMemo(() => {
     return filteredStories.slice(0, visibleCount);
@@ -258,7 +256,7 @@ export default function StoriesPageClient({
             <div className="py-6 flex justify-center items-center">
               {hasMore && (
                 <button
-                  onClick={() => setVisibleCount((prev) => prev + limit)}
+                  onClick={() => setLoaded({ key: resetKey, count: visibleCount + limit })}
                   className="px-6 py-2 bg-[#996633] text-white rounded font-tarunima text-sm hover:bg-[#805326] shadow-sm transition-all cursor-pointer"
                 >
                   আরও দেখুন

@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { List, X, BookOpen, ChevronRight } from 'lucide-react';
+import { useScrollActiveToTop } from './useScrollActiveToTop';
 
 // --- Utility: ইংরেজি সংখ্যাকে বাংলায় রূপান্তরের ফাংশন ---
 const toBengaliNumber = (num: number | string): string => {
@@ -62,6 +63,8 @@ export default function TableOfContents({
   const handleClose = useCallback(() => {
     setIsOpen(false);
   }, []);
+
+  const listScrollRef = useScrollActiveToTop(currentPageNum);
 
   // ড্রপডাউনের বাইরে ক্লিক করলে মেনু বন্ধ হওয়ার হ্যান্ডলার
   useEffect(() => {
@@ -130,7 +133,7 @@ export default function TableOfContents({
           </div>
 
           {/* সাব-পেজগুলোর তালিকা */}
-          <div className="p-0 space-y-1 max-h-80 overflow-y-auto [scrollbar-width:thin]">
+          <div ref={listScrollRef} className="p-0 space-y-1 max-h-80 overflow-y-auto [scrollbar-width:thin]">
             {subPages.map((page) => {
               const isActive = page.pageNumber === currentPageNum;
 
@@ -148,6 +151,7 @@ export default function TableOfContents({
                 <Link
                   key={page.pageNumber}
                   href={pagePath}
+                  data-toc-active={isActive}
                   onClick={handleClose}
                   className={`group flex items-center justify-between gap-0 text-sm py-1 px-2 transition-colors ${isActive
                       ? 'bg-orange-100 text-red-900 group-hover:bg-orange-100 group-hover:text-red-900'
