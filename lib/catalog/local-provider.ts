@@ -84,7 +84,8 @@ async function rebuildManifests(): Promise<void> {
   const mdFiles = (await walk(path.join(root, 'books'))).filter((f) => f.endsWith('.md'));
   const bodies = await mapLimit(mdFiles, 4, loadBody);
   const files: CatalogFile[] = mdFiles.map((file, i) => ({ key: toKey(root, file), body: bodies[i] }));
-  const { booksManifest, itemsManifest, slugsManifest } = buildCatalogFromFiles(files);
+  const { booksManifest, itemsManifest, slugsManifest, nameWarnings } = buildCatalogFromFiles(files);
+  for (const warning of nameWarnings) console.warn(`[catalog] ${warning}`);
   manifestCache = {
     at: Date.now(),
     files: new Map([

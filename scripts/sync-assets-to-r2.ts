@@ -28,7 +28,9 @@ const BUCKET = 'eduliture-assets';
 
 // --dry-run : report only, upload/move/write nothing
 // --yes     : skip the confirmation when many files are about to move to the trash
-// Files removed locally are never deleted from R2: they are moved to _trash/<timestamp>/<original key>
+// Files removed locally are never deleted from R2: they are moved to _trash/<original key>
+// (same folders as content/, so a file is easy to find and restore; if that trash key is already taken,
+// the new copy gets a .<timestamp> suffix, so nothing in the trash is overwritten)
 // (the site never reads _trash/; restore or delete it manually from the Cloudflare dashboard).
 const DRY_RUN = process.argv.includes('--dry-run');
 const ASSUME_YES = process.argv.includes('--yes');
@@ -181,9 +183,10 @@ async function main() {
   }
 
   // Same builder the local dev server uses, so local and live agree
-  const { booksManifest, itemsManifest, slugsManifest, slugWarnings } = buildCatalogFromFiles(catalogFiles);
+  const { booksManifest, itemsManifest, slugsManifest, slugWarnings, nameWarnings } = buildCatalogFromFiles(catalogFiles);
   const slugCount = Object.values(slugsManifest).reduce((n, table) => n + Object.keys(table).length, 0);
   for (const warning of slugWarnings) console.warn(`⚠️  Slug clash — ${warning}`);
+  for (const warning of nameWarnings) console.warn(`⚠️  ${warning}`);
 
   console.log(`\n✅ Uploaded: ${uploaded}, unchanged (skipped): ${skipped}.`);
 
@@ -228,7 +231,8 @@ async function main() {
         const stamp = new Date().toISOString().replace(/[:.]/g, '-');
         const moved: string[] = [];
         for (const key of keysToTrash) {
-          const trashKey = `${TRASH_PREFIX}${stamp}/${key}`;
+          const plainTrashKey = `${TRASH_PREFIX}${key}`;
+          const trashKey = remoteObjects.has(plainTrashKey) ? `${plainTrashKey}.${stamp}` : plainTrashKey;
           const copySource = `${BUCKET}/${key.split('/').map(encodeURIComponent).join('/')}`;
           try {
             await s3.send(new CopyObjectCommand({ Bucket: BUCKET, Key: trashKey, CopySource: copySource }));
@@ -245,7 +249,7 @@ async function main() {
             new DeleteObjectsCommand({ Bucket: BUCKET, Delete: { Objects: batch.map((k) => ({ Key: k })) } })
           );
         }
-        console.log(`   Moved ${moved.length}/${keysToTrash.length} file(s) to ${TRASH_PREFIX}${stamp}/`);
+        console.log(`   Moved ${moved.length}/${keysToTrash.length} file(s) to ${TRASH_PREFIX}`);
       }
     }
   }

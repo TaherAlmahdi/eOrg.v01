@@ -1,11 +1,25 @@
 import { EventEmitter } from 'events';
 import path from 'path';
+import { writeFileSync } from 'node:fs';
 import type { NextConfig } from "next";
 import withPWAInit from "@ducanh2912/next-pwa";
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 
 // ইভেন্ট লিসেনার লিমিট বাড়িয়ে MaxListenersExceededWarning দূর করা হলো
 EventEmitter.defaultMaxListeners = 25;
+
+// On the build server (Cloudflare Workers Builds / any CI) every production build stamps the page cache
+// (worker/build-stamp.ts), so pages cached by older code are never served after a deploy.
+// Local builds leave the file alone; `npm run preview` / `deploy` stamp it through scripts/stamp-build.mjs.
+if (process.argv.includes('build') && (process.env.CI || process.env.WORKERS_CI)) {
+  const stamp = (process.env.WORKERS_CI_COMMIT_SHA || new Date().toISOString()).replace(/[^A-Za-z0-9-]/g, '-');
+  writeFileSync(
+    new URL('./worker/build-stamp.ts', import.meta.url),
+    `// Rewritten at build time (next.config.ts), so a new deploy never serves pages cached by older code.
+export const BUILD_STAMP = '${stamp}';
+`
+  );
+}
 
 // লোকাল dev সার্ভারে Cloudflare bindings (R2 ইত্যাদি) অ্যাক্সেস করার জন্য।
 // eOrg.v01-এ dev সম্পূর্ণ লোকাল (নিচে CONTENT_ROOT), তাই সেখানে R2/D1 binding-এ সংযোগ করা হয় না।

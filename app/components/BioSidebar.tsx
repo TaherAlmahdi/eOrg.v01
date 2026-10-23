@@ -70,6 +70,7 @@ export default function BioSidebar({ image, name, infoFields, children }: BioSid
                   <img
                     src={image}
                     alt={name || 'Profile Image'}
+                    decoding="async"
                     className="w-full h-auto object-cover block"
                   />
                 </div>
@@ -151,6 +152,8 @@ function renderFieldValue(field: InfoField) {
       <img 
         src={field.value} 
         alt={field.label} 
+        loading="lazy"
+        decoding="async"
         className="max-h-10 object-contain dark:invert mt-1"
       />
     );

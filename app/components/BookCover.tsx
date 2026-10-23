@@ -57,6 +57,7 @@ export default function BookCover({ coverImage, title }: BookCoverProps) {
           <img
             src={formattedCoverUrl}
             alt={title}
+            decoding="async"
             className="w-full h-auto block object-cover"
           />
         </div>

@@ -79,6 +79,10 @@ export async function generateMetadata(): Promise<Metadata> {
 
   const siteData = getSubdomainData(host);
   const siteUrl = host ? `https://${host}` : process.env.NEXT_PUBLIC_SITE_URL || 'https://eduliture.org';
+  // Canonical of the page being visited (set by proxy.ts). Pages with their own `alternates` override it;
+  // the rest used to inherit the home URL here, which told search engines every page was a copy of the home page.
+  const requestPath = headersList.get('x-pathname') || '';
+  const canonicalUrl = requestPath.startsWith('/') && requestPath !== '/' ? `${siteUrl}${requestPath}` : siteUrl;
 
   const defaultTitle = siteData?.title || 'এডুলিচার';
   const mainDomainTitle = 'এডুলিচার';
@@ -98,7 +102,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: siteDescription,
     metadataBase: new URL(siteUrl),
     alternates: {
-      canonical: siteUrl,
+      canonical: canonicalUrl,
     },
     robots: {
       index: true,
@@ -119,7 +123,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title: dynamicTitle,
       description: siteDescription,
-      url: siteUrl,
+      url: canonicalUrl,
       siteName: mainDomainTitle,
       locale: 'bn_BD',
       type: 'website',

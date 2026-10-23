@@ -7,6 +7,9 @@ import type { FrontmatterData, FrontmatterValue } from '../../app/lib/frontmatte
 import { getItemSlug } from '../../app/lib/content/core/registry/items';
 import { buildSlugManifest, type SlugCategory, type SlugTable } from '../../app/lib/content/core/registry/slug-store';
 import { normalizeBn } from '../../app/lib/bn-text';
+import { SLUG_DATA } from '../../app/lib/content/core/registry/slug-data';
+import { closestName, splitNames } from '../../app/lib/content/core/registry/names';
+import { normalizeBanglaText } from '../../app/lib/content/core/registry/slug';
 
 export interface BookManifestEntry {
   authorFolder: string;
@@ -47,23 +50,8 @@ function slugify(text: string): string {
     .replace(/--+/g, '-');
 }
 
-function parseItemName(itemVal: FrontmatterValue): string {
-  if (!itemVal) return '';
-  if (typeof itemVal === 'string') return itemVal.trim();
-  if (typeof itemVal === 'object') {
-    return (itemVal.name || itemVal.title || itemVal.label || '').trim();
-  }
-  return String(itemVal).trim();
-}
-
 function extractItemTypesFromData(data: FrontmatterData): string[] {
-  const rawItem = data.item || data.items;
-  if (!rawItem) return [];
-  if (Array.isArray(rawItem)) {
-    return rawItem.map(parseItemName).filter(Boolean);
-  }
-  const parsed = parseItemName(rawItem);
-  return parsed ? [parsed] : [];
+  return splitNames(data.item || data.items);
 }
 
 type FoundNames = Record<SlugCategory, Set<string>>;
@@ -90,14 +78,42 @@ function collectNames(value: unknown, into: Set<string>, splitList = false): voi
   }
 }
 
-/** Authors (also translators and editors), genres and series named by one book/item frontmatter. */
-function collectFromFrontmatter(data: FrontmatterData, found: FoundNames): void {
+/** Where a genre / series / item name was first written: "genres:উপন্যাস" -> "books/a/b/index.md". */
+type NameSources = Map<string, string>;
+
+/** Authors (also translators and editors), genres, series and items named by one book/item frontmatter. */
+function collectFromFrontmatter(data: FrontmatterData, found: FoundNames, sources: NameSources, fileKey: string): void {
   for (const field of ['author', 'translator', 'editor']) collectNames(data[field], found.authors, true);
-  collectNames(data.genre, found.genres);
-  collectNames(data.genres, found.genres);
-  collectNames(data.series, found.series);
-  collectNames(data.series_list, found.series);
-  collectNames(data.series_info, found.series);
+  const collect = (category: 'genres' | 'series' | 'items', value: unknown) => {
+    for (const raw of splitNames(value)) {
+      const name = raw.trim();
+      found[category].add(name);
+      if (!sources.has(`${category}:${name}`)) sources.set(`${category}:${name}`, fileKey);
+    }
+  };
+  collect('genres', data.genre || data.genres);
+  collect('series', data.series_list || data.series_info || data.series);
+  collect('items', data.item || data.items);
+}
+
+const nameKey = (name: string): string => normalizeBanglaText(name).trim().toLowerCase();
+
+/**
+ * Genre, series and item names that are not in slug-data.ts. Each is probably a typo of a listed name
+ * (the closest one is suggested) or a new name that needs an English slug in slug-data.ts.
+ */
+function findUnlistedNames(found: FoundNames, sources: NameSources): string[] {
+  const warnings: string[] = [];
+  for (const category of ['genres', 'series', 'items'] as const) {
+    const listed = new Map(Object.keys(SLUG_DATA[category]).map((name) => [nameKey(name), name]));
+    for (const name of found[category]) {
+      if (listed.has(nameKey(name))) continue;
+      const suggestion = closestName(nameKey(name), listed.keys());
+      const hint = suggestion ? ` — did you mean "${listed.get(suggestion)}"?` : ' — add it to slug-data.ts';
+      warnings.push(`${category}: "${name}" is not in slug-data.ts${hint} (${sources.get(`${category}:${name}`)})`);
+    }
+  }
+  return warnings;
 }
 
 /**
@@ -109,6 +125,7 @@ export function buildCatalogFromFiles(files: CatalogFile[]): {
   itemsManifest: ItemManifestEntry[];
   slugsManifest: SlugTable;
   slugWarnings: string[];
+  nameWarnings: string[];
 } {
   const found: FoundNames = {
     authors: new Set(),
@@ -118,6 +135,7 @@ export function buildCatalogFromFiles(files: CatalogFile[]): {
     books: new Set(),
     items: new Set(),
   };
+  const sources: NameSources = new Map();
   const mdFiles = files.filter((f) => f.key.startsWith('books/') && f.key.endsWith('.md'));
 
   const booksManifest: BookManifestEntry[] = [];
@@ -137,7 +155,7 @@ export function buildCatalogFromFiles(files: CatalogFile[]): {
     const { data } = matter(normalizeBn(file.body));
 
     booksManifest.push({ authorFolder, bookFolder, bookPrefix, data });
-    collectFromFrontmatter(data, found);
+    collectFromFrontmatter(data, found, sources, file.key);
     bookMetaByPrefix.set(bookPrefix, {
       bookTitle: data.title || bookFolder,
       bookSlug: data.slug ? String(data.slug).trim() : bookFolder,
@@ -160,8 +178,7 @@ export function buildCatalogFromFiles(files: CatalogFile[]): {
     const { data: fileData } = matter(normalizeBn(file.body));
     const itemTypes = extractItemTypesFromData(fileData);
     if (itemTypes.length === 0) continue;
-    collectFromFrontmatter(fileData, found);
-    itemTypes.forEach((t) => found.items.add(t));
+    collectFromFrontmatter(fileData, found, sources, file.key);
 
     const fileName = parts[parts.length - 1].replace(/\.md$/, '');
     const itemTitle = fileData.item_title || fileData.title || fileName;
@@ -189,5 +206,5 @@ export function buildCatalogFromFiles(files: CatalogFile[]): {
 
   itemsManifest.sort((a, b) => a.title.localeCompare(b.title, 'bn'));
   const { manifest: slugsManifest, warnings: slugWarnings } = buildSlugManifest(found);
-  return { booksManifest, itemsManifest, slugsManifest, slugWarnings };
+  return { booksManifest, itemsManifest, slugsManifest, slugWarnings, nameWarnings: findUnlistedNames(found, sources) };
 }

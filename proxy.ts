@@ -48,6 +48,10 @@ export default function proxy(request: NextRequest) {
 
   const pathname = url.pathname;
 
+  // The URL path as the visitor typed it (before any rewrite); the layout builds the canonical link from it
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-pathname', pathname);
+
   // স্ট্যাটিক ফাইল বাইপাস
   if (
     pathname === '/sitemap.xml' ||
@@ -67,15 +71,14 @@ export default function proxy(request: NextRequest) {
       url.pathname = '/404'; // মেইন ডোমেনে কল করলে 404 দেখাবে
       return NextResponse.rewrite(url);
     }
-    return NextResponse.next();
+    return NextResponse.next({ request: { headers: requestHeaders } });
   }
 
   if (!ALLOWED_SUBDOMAINS.has(subdomain)) {
     const protocol = request.headers.get('x-forwarded-proto') || 'https';
-    return NextResponse.redirect(`${protocol}://www.eduliture.org/`, 307);
+    return NextResponse.redirect(`${protocol}://eduliture.org/`, 307);
   }
 
-  const requestHeaders = new Headers(request.headers);
   requestHeaders.set('x-subdomain', subdomain);
   url.searchParams.set('subdomain', subdomain);
 

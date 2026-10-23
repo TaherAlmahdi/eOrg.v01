@@ -1,5 +1,6 @@
 import type { FrontmatterData } from '@/app/lib/frontmatter';
 import { getSlug } from '@/app/lib/content/core/registry';
+import { splitNames } from '@/app/lib/content/core/registry/names';
 import { SeriesItem, Book } from './types';
 
 /**
@@ -60,122 +61,64 @@ export function parseSubdomains(subdomainRaw: unknown, defaultAuthorFolder: stri
   return [defaultAuthorFolder, 'library'];
 }
 
-export function extractGenresFromData(data: Record<string, unknown> | null | undefined): string[] {
-  if (!data) return [];
-  const genresSet = new Set<string>();
-  const rawGenre = data.genre || data.genres;
-
-  if (typeof rawGenre === 'string' && rawGenre.trim()) {
-    genresSet.add(normalizeBanglaText(rawGenre.trim()));
-  } else if (Array.isArray(rawGenre)) {
-    rawGenre.forEach((g) => {
-      if (typeof g === 'string' && g.trim()) {
-        genresSet.add(normalizeBanglaText(g.trim()));
-      }
-    });
-  }
-
-  return Array.from(genresSet);
+/** Genre, series and item names are read from the Bengali names only; links come from the slug registry. */
+function uniqueNames(value: unknown): string[] {
+  return Array.from(new Set(splitNames(value).map(normalizeBanglaText).filter(Boolean)));
 }
 
-export function generateSeriesLink(
-  explicitLink: string | undefined,
-  seriesName: string,
-  customSlug?: string
-): string | undefined {
-  if (explicitLink) return explicitLink;
-  if (!seriesName) return undefined;
+export function extractGenresFromData(data: Record<string, unknown> | null | undefined): string[] {
+  if (!data) return [];
+  return uniqueNames(data.genre || data.genres);
+}
 
+export function generateSeriesLink(seriesName: string): string | undefined {
+  if (!seriesName) return undefined;
   const normalizedName = normalizeBanglaText(seriesName);
-  const targetSlug = customSlug || getSlug('series', normalizedName) || slugify(normalizedName);
-  return `/series/${targetSlug}`;
+  return `/series/${getSlug('series', normalizedName) || slugify(normalizedName)}`;
 }
 
 export function extractSeriesFromData(data: Record<string, unknown> | null | undefined): SeriesItem[] {
   if (!data) return [];
   const seriesList: SeriesItem[] = [];
+  const seen = new Set<string>();
 
-  const rawSeriesList =
-    data.series_list ||
-    data.series_info ||
-    (Array.isArray(data.series) && typeof data.series[0] === 'object' ? data.series : null);
+  const add = (rawName: unknown, order: unknown, title: unknown) => {
+    const name = normalizeBanglaText(rawName);
+    if (!name || seen.has(name)) return;
+    seen.add(name);
+    seriesList.push({
+      name,
+      slug: getSlug('series', name) || slugify(name),
+      link: generateSeriesLink(name),
+      order: String(order || ''),
+      title: normalizeBanglaText(title),
+    });
+  };
 
-  if (Array.isArray(rawSeriesList)) {
-    for (const item of rawSeriesList) {
-      if (typeof item === 'object' && item !== null && 'name' in item) {
-        const itemObj = item as Record<string, unknown>;
-        const sName = normalizeBanglaText(itemObj.name);
-        const sSlug = itemObj.slug
-          ? String(itemObj.slug).trim()
-          : getSlug('series', sName) || slugify(sName);
-        const sLink = generateSeriesLink(
-          typeof itemObj.link === 'string' ? itemObj.link : undefined,
-          sName,
-          sSlug
-        );
+  const raw = data.series_list || data.series_info || data.series;
+  const entries = Array.isArray(raw) ? raw : raw ? [raw] : [];
 
-        seriesList.push({
-          name: sName,
-          slug: sSlug,
-          link: sLink,
-          order: String(itemObj.order || itemObj.series_order || ''),
-          title: normalizeBanglaText(itemObj.title),
-        });
-      }
-    }
-    if (seriesList.length > 0) return seriesList;
-  }
-
-  if (data.series) {
-    const rawSeries = data.series;
-    if (typeof rawSeries === 'string' && rawSeries.trim()) {
-      const sName = normalizeBanglaText(rawSeries);
-      const sSlug = data.seriesSlug
-        ? String(data.seriesSlug).trim()
-        : getSlug('series', sName) || slugify(sName);
-
-      seriesList.push({
-        name: sName,
-        slug: sSlug,
-        link: generateSeriesLink(
-          typeof data.series_link === 'string' ? data.series_link : undefined,
-          sName,
-          sSlug
-        ),
-        order: String(data.series_order || data.series_index || ''),
-        title: normalizeBanglaText(data.series_title),
-      });
-    } else if (Array.isArray(rawSeries)) {
-      rawSeries.forEach((s) => {
-        if (typeof s === 'string' && s.trim()) {
-          const sName = normalizeBanglaText(s);
-          const sSlug = getSlug('series', sName) || slugify(sName);
-          seriesList.push({
-            name: sName,
-            slug: sSlug,
-            link: generateSeriesLink(undefined, sName, sSlug),
-            order: '',
-            title: '',
-          });
-        }
-      });
+  for (const entry of entries) {
+    if (typeof entry === 'object' && entry !== null) {
+      const obj = entry as Record<string, unknown>;
+      splitNames(obj.name).forEach((n) => add(n, obj.order || obj.series_order, obj.title));
+    } else {
+      // "A, B": no order of its own; a single name takes the legacy series_order / series_title fields
+      const names = splitNames(entry);
+      names.forEach((n) =>
+        add(
+          n,
+          names.length === 1 && entries.length === 1 ? data.series_order || data.series_index : '',
+          names.length === 1 && entries.length === 1 ? data.series_title : ''
+        )
+      );
     }
   }
 
   return seriesList;
 }
 
-export function generateGenreLinks(
-  explicitLinks: Array<{ name: string; link: string }> | undefined,
-  genresList: string[]
-): Array<{ name: string; link: string }> {
-  if (explicitLinks && explicitLinks.length > 0) {
-    return explicitLinks.map((g) => ({
-      name: normalizeBanglaText(g.name),
-      link: g.link,
-    }));
-  }
-
+export function generateGenreLinks(genresList: string[]): Array<{ name: string; link: string }> {
   return genresList.map((gName) => {
     const normName = normalizeBanglaText(gName);
     return {
@@ -187,20 +130,7 @@ export function generateGenreLinks(
 
 export function extractItemsFromData(data: Record<string, unknown> | null | undefined): string[] {
   if (!data) return [];
-  const itemsSet = new Set<string>();
-  const rawItem = data.item || data.items;
-
-  if (typeof rawItem === 'string' && rawItem.trim()) {
-    itemsSet.add(normalizeBanglaText(rawItem.trim()));
-  } else if (Array.isArray(rawItem)) {
-    rawItem.forEach((i) => {
-      if (typeof i === 'string' && i.trim()) {
-        itemsSet.add(normalizeBanglaText(i.trim()));
-      }
-    });
-  }
-
-  return Array.from(itemsSet);
+  return uniqueNames(data.item || data.items);
 }
 
 /**

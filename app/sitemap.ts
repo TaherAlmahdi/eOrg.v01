@@ -7,6 +7,7 @@ import { getChapterPathSegments } from '@/lib/catalog/chapter-paths';
 import { listKeysUnderPrefix } from '@/app/lib/books/r2';
 import { getSubdomainData } from '@/app/lib/get-site-data';
 import { getSlug } from '@/app/lib/content/core/registry';
+import { splitNames } from '@/app/lib/content/core/registry/names';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,9 +36,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     slugByPrefix.set(book.bookPrefix, slug);
     paths.add(asPath('book', slug));
 
-    const genres = book.data?.genre ?? book.data?.genres;
-    for (const genre of ([] as unknown[]).concat(genres ?? [])) {
-      if (typeof genre === 'string' && genre.trim()) paths.add(asPath('genre', getSlug('genres', genre)));
+    for (const genre of splitNames(book.data?.genre ?? book.data?.genres)) {
+      paths.add(asPath('genre', getSlug('genres', genre)));
     }
     if (isLibrary && typeof book.data?.author === 'string' && book.data.author.trim()) {
       paths.add(asPath('author', getSlug('authors', book.data.author)));

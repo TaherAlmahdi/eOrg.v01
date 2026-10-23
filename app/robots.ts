@@ -3,7 +3,7 @@ import { headers } from 'next/headers';
 import type { MetadataRoute } from 'next';
 
 export default async function robots(): Promise<MetadataRoute.Robots> {
-  const host = (await headers()).get('host') || 'www.eduliture.org';
+  const host = (await headers()).get('host') || 'eduliture.org';
   const isLocal = host.includes('localhost') || /^\d{1,3}(\.\d{1,3}){3}/.test(host);
 
   return {

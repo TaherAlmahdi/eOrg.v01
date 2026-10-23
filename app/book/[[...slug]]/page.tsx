@@ -565,10 +565,25 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
     bookCrumbs.push({ label: getSubPageLabel(currentSubPageData) });
   }
 
+  // Same trail as the visible breadcrumb, for search results (only steps whose label is plain text)
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: bookCrumbs
+      .filter((crumb) => typeof crumb.label === 'string')
+      .map((crumb, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: crumb.label as string,
+        item: crumb.href ? `${domainUrl}${crumb.href}` : currentFullUrl,
+      })),
+  };
+
   return (
     <main className="bg-[#fdfcf8] min-h-screen">
       <ViewTracker slug={book.slug} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       {/* ব্রেডক্রাম্ব নেভিগেশন */}
       <Breadcrumb items={bookCrumbs} />

@@ -70,7 +70,7 @@ function mapBookData(
   const extractedSeriesList = extractSeriesFromData(data);
   const seriesNames = extractedSeriesList.map((s) => s.name);
   const primarySeries = extractedSeriesList[0];
-  const genreLinksVal = generateGenreLinks(data.genre_links, bookGenres);
+  const genreLinksVal = generateGenreLinks(bookGenres);
 
   // 🔹 cover/cover_image এখন getCoverUrl() দিয়ে পূর্ণ URL-এ রূপান্তর করা হচ্ছে
   const resolvedCover = getCoverUrl(data.cover || data.cover_image || '');
@@ -90,7 +90,7 @@ function mapBookData(
     editorSlug: data.editorSlug || '',
     subdomains: bookSubdomains,
     genres: bookGenres,
-    genre: data.genre || bookGenres,
+    genre: bookGenres,
     genre_links: genreLinksVal,
     items: extractedItems,
     item: extractedItems,
@@ -98,6 +98,7 @@ function mapBookData(
     seriesList: extractedSeriesList,
     seriesSlug: primarySeries?.slug || '',
     series_link: primarySeries?.link || '',
+    series_links: extractedSeriesList.map((s) => ({ name: s.name, link: s.link || '' })),
     series_order: primarySeries?.order || '',
     series_title: primarySeries?.title || data.series_title || '',
     series_info: extractedSeriesList.length > 1 ? extractedSeriesList : primarySeries,
