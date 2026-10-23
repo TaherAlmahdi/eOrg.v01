@@ -3,7 +3,9 @@
 // THE slug registry. Write "Bengali name": "english slug" pairs here, nothing else is needed.
 // - The slug may be written any way ("Kazi Nazrul Islam", "kazi-nazrul-islam"); it is turned into a
 //   lower-case, URL-friendly slug automatically.
-// - A name that is not listed here uses its own Bengali name as the slug.
+// - A genre, series or item type that is not listed here gets a slug by transliteration ("উপন্যাস" -> "uponyas"),
+//   which `npm run sync-assets` saves in slug-auto.json; this file always wins over slug-auto.json.
+//   Other names (authors, tags, books) use their own Bengali name as the slug.
 // - `npm run sync-assets` copies all of this (plus every name found in the books) into
 //   _manifest/slugs.json on R2, and the site reads slugs from there, so no redeploy is needed.
 // - authors: authors, translators and editors share one list.

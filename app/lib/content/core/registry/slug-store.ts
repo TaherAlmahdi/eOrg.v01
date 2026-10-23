@@ -7,12 +7,32 @@
 
 import { SLUG_DATA, type SlugCategory } from "./slug-data";
 import { normalizeBanglaText, toUrlSlug } from "./slug";
+import { transliterateToSlug } from "./transliterate";
+import autoSlugData from "./slug-auto.json";
 
 export type { SlugCategory };
 /** Display name -> slug, per category (the shape of slug-data.ts and of _manifest/slugs.json). */
 export type SlugTable = Record<SlugCategory, Record<string, string>>;
 
 const CATEGORIES: SlugCategory[] = ["authors", "genres", "series", "tags", "books", "items"];
+
+/** Categories whose unlisted names get a transliterated slug (the others keep their Bengali name as slug). */
+const TRANSLITERATED: ReadonlySet<SlugCategory> = new Set<SlugCategory>(["genres", "series", "items"]);
+
+/** Slugs made by transliteration and saved by sync-assets (slug-auto.json); slug-data.ts wins over them. */
+const AUTO_SLUGS = autoSlugData as Partial<SlugTable>;
+
+/** slug-data.ts plus slug-auto.json: every name that has a slug already. */
+export function registryTable(): SlugTable {
+  const table = {} as SlugTable;
+  for (const cat of CATEGORIES) table[cat] = { ...(AUTO_SLUGS[cat] || {}), ...SLUG_DATA[cat] };
+  return table;
+}
+
+/** Slug for a name without a hand-written one: transliterated for genres, series and items, else its Bengali name. */
+export function fallbackSlug(category: SlugCategory, name: string): string {
+  return (TRANSLITERATED.has(category) ? transliterateToSlug(name) : "") || toUrlSlug(name);
+}
 
 interface Lookup {
   slugByName: Map<string, string>; // normalised name -> slug
@@ -43,7 +63,7 @@ const buildAll = (table: Partial<SlugTable>): Record<SlugCategory, Lookup> => {
   return out;
 };
 
-let lookups = buildAll(SLUG_DATA);
+let lookups = buildAll(registryTable());
 
 /**
  * Replaces the lookups with registry + manifest. The manifest wins on conflicts,
@@ -52,7 +72,8 @@ let lookups = buildAll(SLUG_DATA);
 export function setSlugManifest(manifest: Partial<SlugTable> | null | undefined): void {
   if (!manifest) return;
   const merged: Partial<SlugTable> = {};
-  for (const cat of CATEGORIES) merged[cat] = { ...SLUG_DATA[cat], ...(manifest[cat] || {}) };
+  const registry = registryTable();
+  for (const cat of CATEGORIES) merged[cat] = { ...registry[cat], ...(manifest[cat] || {}) };
   lookups = buildAll(merged);
 }
 
@@ -81,7 +102,7 @@ export function hasSlug(category: SlugCategory, slug: string): boolean {
 
 /** The slug of a name: the written one, or the slugified Bengali name when none is written. */
 export function slugOf(category: SlugCategory, name: string): string {
-  return findSlug(category, name) ?? toUrlSlug(name);
+  return findSlug(category, name) ?? fallbackSlug(category, name);
 }
 
 /**
@@ -89,7 +110,10 @@ export function slugOf(category: SlugCategory, name: string): string {
  * Names that are not in the registry get their own slugified name as slug.
  * `warnings` lists names that share a slug with a different name.
  */
-export function buildSlugManifest(found: Partial<Record<SlugCategory, Iterable<string>>>): {
+export function buildSlugManifest(
+  found: Partial<Record<SlugCategory, Iterable<string>>>,
+  extra: Partial<SlugTable> = {}
+): {
   manifest: SlugTable;
   warnings: string[];
 } {
@@ -109,8 +133,11 @@ export function buildSlugManifest(found: Partial<Record<SlugCategory, Iterable<s
       else owners.set(slug, display);
       table[display] = slug;
     };
-    for (const [name, rawSlug] of Object.entries(SLUG_DATA[cat])) add(name, toUrlSlug(rawSlug) || toUrlSlug(name));
-    for (const name of found[cat] || []) add(name, toUrlSlug(name));
+    const listed = registryTable()[cat];
+    for (const [name, rawSlug] of Object.entries(listed)) add(name, toUrlSlug(rawSlug) || toUrlSlug(name));
+    // `extra`: slugs decided in this run (sync-assets saves them to slug-auto.json)
+    for (const [name, rawSlug] of Object.entries(extra[cat] || {})) add(name, toUrlSlug(rawSlug));
+    for (const name of found[cat] || []) add(name, fallbackSlug(cat, name));
     manifest[cat] = table;
   }
   return { manifest, warnings };

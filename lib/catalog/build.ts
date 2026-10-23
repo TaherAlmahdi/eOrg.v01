@@ -3,13 +3,12 @@
 // Used by scripts/sync-assets-to-r2.ts (uploads them to R2) and by the local provider
 // (serves them from disk in `next dev`), so what you see locally is what goes live.
 import matter from 'gray-matter';
-import type { FrontmatterData, FrontmatterValue } from '../../app/lib/frontmatter';
+import type { FrontmatterData } from '../../app/lib/frontmatter';
 import { getItemSlug } from '../../app/lib/content/core/registry/items';
-import { buildSlugManifest, type SlugCategory, type SlugTable } from '../../app/lib/content/core/registry/slug-store';
+import { buildSlugManifest, fallbackSlug, registryTable, type SlugCategory, type SlugTable } from '../../app/lib/content/core/registry/slug-store';
 import { normalizeBn } from '../../app/lib/bn-text';
-import { SLUG_DATA } from '../../app/lib/content/core/registry/slug-data';
 import { closestName, splitNames } from '../../app/lib/content/core/registry/names';
-import { normalizeBanglaText } from '../../app/lib/content/core/registry/slug';
+import { normalizeBanglaText, toUrlSlug } from '../../app/lib/content/core/registry/slug';
 
 export interface BookManifestEntry {
   authorFolder: string;
@@ -99,21 +98,37 @@ function collectFromFrontmatter(data: FrontmatterData, found: FoundNames, source
 const nameKey = (name: string): string => normalizeBanglaText(name).trim().toLowerCase();
 
 /**
- * Genre, series and item names that are not in slug-data.ts. Each is probably a typo of a listed name
- * (the closest one is suggested) or a new name that needs an English slug in slug-data.ts.
+ * Genre, series and item names that have no slug yet (not in slug-data.ts or slug-auto.json).
+ * A name close to a listed one is probably a typo: it is only reported ("did you mean ...?").
+ * Any other name is new: it gets a transliterated slug, returned in `newSlugs` for sync-assets to save.
  */
-function findUnlistedNames(found: FoundNames, sources: NameSources): string[] {
+function findUnlistedNames(
+  found: FoundNames,
+  sources: NameSources
+): { warnings: string[]; newSlugs: Partial<SlugTable> } {
   const warnings: string[] = [];
+  const newSlugs: Partial<SlugTable> = {};
+  const registry = registryTable();
   for (const category of ['genres', 'series', 'items'] as const) {
-    const listed = new Map(Object.keys(SLUG_DATA[category]).map((name) => [nameKey(name), name]));
+    const listed = new Map(Object.keys(registry[category]).map((name) => [nameKey(name), name]));
+    const usedSlugs = new Set(Object.values(registry[category]).map((slug) => toUrlSlug(slug)));
     for (const name of found[category]) {
       if (listed.has(nameKey(name))) continue;
+      const where = sources.get(`${category}:${name}`);
       const suggestion = closestName(nameKey(name), listed.keys());
-      const hint = suggestion ? ` — did you mean "${listed.get(suggestion)}"?` : ' — add it to slug-data.ts';
-      warnings.push(`${category}: "${name}" is not in slug-data.ts${hint} (${sources.get(`${category}:${name}`)})`);
+      if (suggestion) {
+        warnings.push(`${category}: "${name}" is not listed — did you mean "${listed.get(suggestion)}"? (${where})`);
+        continue;
+      }
+      const base = fallbackSlug(category, name);
+      let slug = base;
+      for (let n = 2; usedSlugs.has(slug); n++) slug = `${base}-${n}`;
+      usedSlugs.add(slug);
+      (newSlugs[category] ??= {})[name] = slug;
+      warnings.push(`${category}: "${name}" is new — slug "${slug}" made by transliteration, saved in slug-auto.json by sync-assets (${where})`);
     }
   }
-  return warnings;
+  return { warnings, newSlugs };
 }
 
 /**
@@ -126,6 +141,7 @@ export function buildCatalogFromFiles(files: CatalogFile[]): {
   slugsManifest: SlugTable;
   slugWarnings: string[];
   nameWarnings: string[];
+  newSlugs: Partial<SlugTable>;
 } {
   const found: FoundNames = {
     authors: new Set(),
@@ -205,6 +221,7 @@ export function buildCatalogFromFiles(files: CatalogFile[]): {
   }
 
   itemsManifest.sort((a, b) => a.title.localeCompare(b.title, 'bn'));
-  const { manifest: slugsManifest, warnings: slugWarnings } = buildSlugManifest(found);
-  return { booksManifest, itemsManifest, slugsManifest, slugWarnings, nameWarnings: findUnlistedNames(found, sources) };
+  const { warnings: nameWarnings, newSlugs } = findUnlistedNames(found, sources);
+  const { manifest: slugsManifest, warnings: slugWarnings } = buildSlugManifest(found, newSlugs);
+  return { booksManifest, itemsManifest, slugsManifest, slugWarnings, nameWarnings, newSlugs };
 }

@@ -25,6 +25,7 @@ const COVER_ROOT = process.env.COVER_ROOT
   ? path.resolve(process.env.COVER_ROOT)
   : path.join(process.cwd(), 'public', 'cover');
 const BUCKET = 'eduliture-assets';
+const AUTO_SLUG_FILE = path.join(process.cwd(), 'app', 'lib', 'content', 'core', 'registry', 'slug-auto.json');
 
 // --dry-run : report only, upload/move/write nothing
 // --yes     : skip the confirmation when many files are about to move to the trash
@@ -122,6 +123,26 @@ async function uploadIfChanged(
   return { status: 'uploaded', body };
 }
 
+/**
+ * Saves the slugs that were just made by transliteration into slug-auto.json (names already there are kept
+ * as they are, so a slug never changes by itself; edit the file by hand to change one).
+ */
+async function saveAutoSlugs(newSlugs: Record<string, Record<string, string> | undefined>): Promise<void> {
+  const added = Object.values(newSlugs).reduce((n, table) => n + Object.keys(table || {}).length, 0);
+  if (added === 0) return;
+  if (DRY_RUN) {
+    console.log(`   Dry run: ${added} new slug(s) would be saved in slug-auto.json.`);
+    return;
+  }
+  const current = JSON.parse(await fs.readFile(AUTO_SLUG_FILE, 'utf8')) as Record<string, Record<string, string>>;
+  for (const [category, table] of Object.entries(newSlugs)) {
+    const merged = { ...(table || {}), ...(current[category] || {}) };
+    current[category] = Object.fromEntries(Object.entries(merged).sort(([a], [b]) => a.localeCompare(b, 'bn')));
+  }
+  await fs.writeFile(AUTO_SLUG_FILE, JSON.stringify(current, null, 2) + '\n');
+  console.log(`   Saved ${added} new slug(s) in slug-auto.json — commit it.`);
+}
+
 async function main() {
   console.log('🔍 Loading the current R2 status...');
   const remoteObjects = await listRemoteObjects();
@@ -183,10 +204,11 @@ async function main() {
   }
 
   // Same builder the local dev server uses, so local and live agree
-  const { booksManifest, itemsManifest, slugsManifest, slugWarnings, nameWarnings } = buildCatalogFromFiles(catalogFiles);
+  const { booksManifest, itemsManifest, slugsManifest, slugWarnings, nameWarnings, newSlugs } = buildCatalogFromFiles(catalogFiles);
   const slugCount = Object.values(slugsManifest).reduce((n, table) => n + Object.keys(table).length, 0);
   for (const warning of slugWarnings) console.warn(`⚠️  Slug clash — ${warning}`);
   for (const warning of nameWarnings) console.warn(`⚠️  ${warning}`);
+  await saveAutoSlugs(newSlugs);
 
   console.log(`\n✅ Uploaded: ${uploaded}, unchanged (skipped): ${skipped}.`);
 
