@@ -15,14 +15,14 @@ export interface LibraryItemEntry {
   author: string;
   authorSlug: string;
   href: string;
-  r2Key: string; // 🔹 content-এর বদলে এখন শুধু R2 key রাখা হয় — প্রয়োজনে on-demand fetch হবে
+  r2Key: string; // 🔹 content-এর বদলে এখন শুধু R2 key রাখা হয় — প্রয়োজনে on-demand fetch হবে
   frontmatter: FrontmatterData;
 }
 
 let cachedItems: LibraryItemEntry[] | null = null;
 
 /**
- * প্রি-বিল্ট items manifest পড়ে (আগে fs দিয়ে প্রতিটা .md ফাইল রিকার্সিভ স্ক্যান হতো)
+ * প্রি-বিল্ট items manifest পড়ে (আগে fs দিয়ে প্রতিটা .md ফাইল রিকার্সিভ স্ক্যান হতো)
  */
 export async function getAllLibraryItems(forceRefresh = false): Promise<LibraryItemEntry[]> {
   await loadSlugManifest();
@@ -41,8 +41,8 @@ export async function getAllLibraryItems(forceRefresh = false): Promise<LibraryI
 }
 
 /**
- * নির্দিষ্ট Item Type এবং Title Slug দিয়ে সিঙ্গেল আইটেম ডাটা রিড করা
- * (এখন content আলাদা R2 কল দিয়ে on-demand fetch হয়)
+ * নির্দিষ্ট Item Type এবং Title Slug দিয়ে সিঙ্গেল আইটেম ডাটা রিড করা
+ * (এখন content আলাদা R2 কল দিয়ে on-demand fetch হয়)
  */
 export async function getItemByParams(itemSlug: string, titleSlug: string) {
   const allItems = await getAllLibraryItems();

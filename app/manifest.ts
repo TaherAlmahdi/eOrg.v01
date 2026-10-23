@@ -25,7 +25,7 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
   return {
     name: 'eLibrary',
     short_name: 'eLibrary',
-    description: 'বাংলা ভাষায় সর্বাধিক গ্রন্থের সমাহার',
+    description: 'বাংলা ভাষায় সর্বাধিক গ্রন্থের সমাহার',
     start_url: '/',
     scope: '/',
     display: 'standalone',

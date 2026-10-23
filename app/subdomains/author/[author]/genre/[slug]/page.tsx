@@ -9,7 +9,7 @@ import { getLibraryBooks } from '@/app/lib/books';
 import { getGenreTitle } from '@/app/lib/content/core/registry';
 import { getSubdomainData } from '@/app/lib/get-site-data';
 
-// ইংরেজি সংখ্যাকে বাংলায় রূপান্তর করার ফাংশন
+// ইংরেজি সংখ্যাকে বাংলায় রূপান্তর করার ফাংশন
 const toBengaliNumber = (num: number | string) => {
   const englishToBengali: Record<string, string> = {
     '0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪',
@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: Props) {
   await loadSlugManifest();
   const decodedSlug = slug.toLowerCase();
 
-  // রেজিস্ট্রি থেকেই সরাসরি টাইটেল ফেচিং (না পাওয়া গেলে স্লাগ ফলব্যাক)
+  // রেজিস্ট্রি থেকেই সরাসরি টাইটেল ফেচিং (না পাওয়া গেলে স্লাগ ফলব্যাক)
   const bengaliTitle = getGenreTitle(decodedSlug) || slug;
 
   const headersList = await headers();
@@ -43,7 +43,7 @@ export default async function GenrePage({ params }: Props) {
   await loadSlugManifest();
   const decodedSlug = slug.toLowerCase();
 
-  // মিডলওয়্যার থেকে সাবডোমেন রিসিভ করা
+  // মিডলওয়্যার থেকে সাবডোমেন রিসিভ করা
   const headerList = await headers();
   const subdomain = headerList.get('x-subdomain') || '';
 
@@ -51,7 +51,7 @@ export default async function GenrePage({ params }: Props) {
   const targetBengaliGenre = getGenreTitle(decodedSlug) || slug;
   const targetStr = String(targetBengaliGenre).trim().toLowerCase();
 
-  // কেন্দ্রীয় বই লোডার ব্যবহার করে কন্টেন্ট আনা
+  // কেন্দ্রীয় বই লোডার ব্যবহার করে কন্টেন্ট আনা
   const { latestBooks } = await getLibraryBooks();
 
   // ফিল্টারিং লজিক (১. ঘরানা এবং ২. লেখক সাবডোমেন ফিল্টার)
@@ -78,7 +78,7 @@ export default async function GenrePage({ params }: Props) {
     return false;
   });
 
-  // প্রকাশনার সাল ও নাম অনুযায়ী সর্টিং (প্রথমে সাল, সাল মিলে গেলে বাংলা বর্ণমালা অনুযায়ী)
+  // প্রকাশনার সাল ও নাম অনুযায়ী সর্টিং (প্রথমে সাল, সাল মিলে গেলে বাংলা বর্ণমালা অনুযায়ী)
   filteredBooks.sort((a, b) => {
     const rawA = (a as unknown as Record<string, unknown>).first_published || a.published;
     const rawB = (b as unknown as Record<string, unknown>).first_published || b.published;
@@ -105,8 +105,8 @@ export default async function GenrePage({ params }: Props) {
           </h2>
           <p className="text-gray-500 text-center mt-2 italic">
             {filteredBooks.length > 0
-              ? `এই ঘরানায় মোট ${toBengaliNumber(filteredBooks.length)}টি বই রয়েছে`
-              : "এই ঘরানায় বর্তমানে কোনও বই নেই"}
+              ? `এই ঘরানায় মোট ${toBengaliNumber(filteredBooks.length)}টি বই রয়েছে`
+              : "এই ঘরানায় বর্তমানে কোনও বই নেই"}
           </p>
         </header>
 
@@ -121,7 +121,7 @@ export default async function GenrePage({ params }: Props) {
                 <div className="relative aspect-2/3 overflow-hidden rounded shadow-sm bg-white border border-gray-100 transition-transform duration-300 group-hover:-translate-y-1.5 group-hover:shadow-md">
                   <Image
                     src={book.cover || '/cover/default-cover.webp'}
-                    alt={book.title || 'বইয়ের প্রচ্ছদ'}
+                    alt={book.title || 'বইয়ের প্রচ্ছদ'}
                     fill
                     sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 16vw"
                     className="object-cover"
@@ -143,7 +143,7 @@ export default async function GenrePage({ params }: Props) {
         ) : (
           <div className="text-center py-24 border-2 border-dashed border-orange-100 rounded-2xl">
             <BookOpen size={48} className="mx-auto text-orange-200 mb-4" />
-            <p className="text-gray-400 text-lg italic">দুঃখিত, এই বিভাগে কোনো বই খুঁজে পাওয়া যায়নি।</p>
+            <p className="text-gray-400 text-lg italic">দুঃখিত, এই বিভাগে কোনো বই খুঁজে পাওয়া যায়নি।</p>
             <Link href="/books" className="mt-6 inline-block text-emerald-600 hover:underline font-medium">
               সকল বই দেখুন
             </Link>

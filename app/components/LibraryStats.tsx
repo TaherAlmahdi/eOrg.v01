@@ -39,7 +39,7 @@ export const LibraryStats: FC<LibraryStatsProps> = async ({ subdomain }) => {
       countColor: "text-[#008080]",
     },
     {
-      title: "এডুলিচার পাঠশালায়",
+      title: "এডুলিচার পাঠশালায়",
       subtitle: "পুস্তক",
       count: libraryStats.totalBooks,
       unit: "টি",
@@ -50,7 +50,7 @@ export const LibraryStats: FC<LibraryStatsProps> = async ({ subdomain }) => {
       countColor: "text-[#cc7a00]",
     },
     {
-      title: "বিশেষ আয়োজন",
+      title: "বিশেষ আয়োজন",
       subtitle: "সিরিজ",
       count: libraryStats.totalSeries,
       unit: "টি",
@@ -61,7 +61,7 @@ export const LibraryStats: FC<LibraryStatsProps> = async ({ subdomain }) => {
       countColor: "text-[#4f46e5]",
     },
     {
-      title: "বিষয় ও ভাবধারা",
+      title: "বিষয় ও ভাবধারা",
       subtitle: "ঘরানা",
       count: libraryStats.totalGenres,
       unit: "টি",

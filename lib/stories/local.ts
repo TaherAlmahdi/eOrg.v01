@@ -6,6 +6,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import matter from 'gray-matter';
 import { customAuthorSlugs } from '@/scripts/stories-slug-map';
+import { normalizeBn } from '@/app/lib/bn-text';
 
 export type PersonRole = 'author' | 'translator' | 'editor';
 
@@ -36,11 +37,10 @@ export interface StoryRow {
 const storiesRoot = () => path.resolve(process.env.STORIES_ROOT || 'content/stories');
 
 const normalizeBengali = (text: string): string =>
-  text
-    .normalize('NFC')
-    .replace(/ড়/g, 'ড়')
-    .replace(/ঢ়/g, 'ঢ়')
-    .replace(/য়/g, 'য়');
+  normalizeBn(text)
+    .replace(/ড়/g, 'ড়')
+    .replace(/ঢ়/g, 'ঢ়')
+    .replace(/য়/g, 'য়');
 
 /** Lower-case URL slug; Bengali letters are kept ("মেঘ বৃষ্টি" -> "মেঘ-বৃষ্টি"). */
 function toSlug(text: string): string {
@@ -140,7 +140,7 @@ async function readAll(): Promise<StoryRow[]> {
     const { mtimeMs } = await fs.stat(file);
     let cached = fileCache.get(file);
     if (!cached || cached.mtimeMs !== mtimeMs) {
-      cached = { mtimeMs, row: parseStory(name, await fs.readFile(file, 'utf8')) };
+      cached = { mtimeMs, row: parseStory(name, normalizeBn(await fs.readFile(file, 'utf8'))) };
       fileCache.set(file, cached);
     }
     if (cached.row) rows.push(cached.row);

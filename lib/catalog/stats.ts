@@ -2,6 +2,7 @@
 import { getItemMeta } from '@/app/lib/content/core/registry/items';
 import { getBookEntries } from './entries';
 import { getItemTypeSummaries } from './items';
+import { normalizeBn } from '../../app/lib/bn-text';
 
 export interface LibraryStatsData {
   totalAuthors: number;
@@ -12,7 +13,7 @@ export interface LibraryStatsData {
 }
 
 const normalizeText = (text: unknown): string =>
-  String(text ?? '').normalize('NFC').replace(/\s+/g, ' ').trim();
+  normalizeBn(String(text ?? '')).replace(/\s+/g, ' ').trim();
 
 /** Adds every name found in a string / array / {name,title,label} value to the set. */
 const addValues = (target: Set<string>, raw: unknown): void => {

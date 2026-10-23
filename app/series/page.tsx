@@ -4,7 +4,7 @@ import type { Metadata } from 'next';
 import SeriesList from '@/app/components/SeriesList';
 import { getSubdomainData, buildTabTitle } from '@/app/lib/get-site-data';
 
-// 🔹 ডায়নামিক মেটাডেটা
+// 🔹 ডায়নামিক মেটাডেটা
 export async function generateMetadata(): Promise<Metadata> {
   const headersList = await headers();
   const host = headersList.get('host') || '';

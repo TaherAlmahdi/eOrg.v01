@@ -63,7 +63,7 @@ export default async function PopularBooks({ books }: PopularBooksProps) {
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <Flame size={22} className="shrink-0 animate-pulse text-emerald-600 sm:w-6 sm:h-6" />
           <h2 id="popular-books-heading" className="text-base sm:text-lg md:text-xl font-black text-slate-800 font-tarunima truncate">
-            <span className="text-[#008080]">পাঠকপ্রিয়</span> <span className="text-[#cc7a00]">বই</span>
+            <span className="text-[#008080]">পাঠকপ্রিয়</span> <span className="text-[#cc7a00]">বই</span>
           </h2>
         </div>
         <Link
@@ -89,7 +89,7 @@ export default async function PopularBooks({ books }: PopularBooksProps) {
               <Link href={`/book/${encodeURIComponent(bookSlug)}`} className="relative block w-full overflow-hidden rounded-t aspect-2/3 bg-slate-100">
                 <Image
                   src={getCoverImageUrl(book.cover)}
-                  alt={book.title || 'বইয়ের প্রচ্ছদ'}
+                  alt={book.title || 'বইয়ের প্রচ্ছদ'}
                   fill
                   sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 16vw"
                   className="object-cover group-hover:scale-[1.03] transition-transform duration-300"

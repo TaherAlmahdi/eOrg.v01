@@ -4,6 +4,7 @@ import type { FrontmatterValue } from '@/app/lib/frontmatter';
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import matter from "gray-matter";
 import { setSlugManifest, type SlugTable } from "@/app/lib/content/core/registry/slug-store";
+import { normalizeBn } from '@/app/lib/bn-text';
 
 const MANIFEST_KEY = '_manifest/books-index.json';
 const SLUGS_MANIFEST_KEY = '_manifest/slugs.json';
@@ -23,7 +24,7 @@ export async function getAssetsBucket() {
 }
 
 /**
- * ASSETS_BUCKET থেকে একটা key-এর টেক্সট কনটেন্ট পড়ে।
+ * ASSETS_BUCKET থেকে একটা key-এর টেক্সট কনটেন্ট পড়ে।
  * 🌟 মনে রাখবেন: TOC এবং ফ্রন্টম্যাটার রিডিংয়ের জন্য র টেক্সট (Frontmatter সহ) প্রয়োজন হয়, 
  * তাই শুধু বডি আলাদা না করে পুরো টেক্সট রিটার্ন করা নিরাপদ। কন্টেন্ট রেন্ডার করার সময় 
  * আলাদাভাবে matter() দিয়ে বডি বের করে নেওয়া ভালো।
@@ -32,7 +33,7 @@ export async function readTextFromR2(key: string): Promise<string | null> {
   const bucket = await getAssetsBucket();
   const obj = await bucket.get(key);
   if (!obj) return null;
-  return await obj.text();
+  return normalizeBn(await obj.text());
 }
 
 /**
@@ -64,9 +65,9 @@ export async function listKeysUnderPrefix(prefix: string): Promise<string[]> {
 }
 
 /**
- * প্রি-বিল্ট manifest ফাইল পড়ে। 
+ * প্রি-বিল্ট manifest ফাইল পড়ে। 
  * 🌟 ক্যাশ সমস্যা দূর করতে ডাইনামিক ফেচিং এবং নো-ক্যাশ অপশন নিশ্চিত করা হয়েছে,
- * যাতে নতুন বই বা কভার আপলোড করলেই তা রিয়েল-টাইমে পাওয়া যায়।
+ * যাতে নতুন বই বা কভার আপলোড করলেই তা রিয়েল-টাইমে পাওয়া যায়।
  */
 let cachedManifest: FrontmatterValue[] | null = null;
 let lastManifestFetchTime = 0;
@@ -124,13 +125,13 @@ export async function loadSlugManifest(): Promise<void> {
 }
 
 /**
- * কভার ছবির পাবলিক URL বানায় — eduliture-assets bucket-এর cover/ প্রিফিক্স ধরে।
+ * কভার ছবির পাবলিক URL বানায় — eduliture-assets bucket-এর cover/ প্রিফিক্স ধরে।
  * 🌟 ব্রাউজার ক্যাশ বাইপাস করতে চাইলে ডেভেলপমেন্ট বা রিমোট ইউআরএলের সাথে টাইমস্ট্যাম্প বা ভার্সন যুক্ত করা যেতে পারে।
  */
 export function getCoverUrl(coverName?: string | null): string {
   if (!coverName) return `${COVER_BASE}/cover/default-cover.webp`;
 
-  // ১. যদি ইতোমধ্যে সম্পূর্ণ URL (http/https) হয়ে থাকে
+  // ১. যদি ইতোমধ্যে সম্পূর্ণ URL (http/https) হয়ে থাকে
   if (coverName.startsWith('http://') || coverName.startsWith('https://') || coverName.startsWith(`${COVER_BASE}/`)) {
     return coverName;
   }
@@ -160,6 +161,6 @@ export function getCoverUrl(coverName?: string | null): string {
     return `${COVER_BASE}/${cleanPath}`;
   }
 
-  // ৬. অন্যথায় সামনে 'cover/' ফোল্ডার যুক্ত করা
+  // ৬. অন্যথায় সামনে 'cover/' ফোল্ডার যুক্ত করা
   return `${COVER_BASE}/cover/${cleanPath}`;
 }

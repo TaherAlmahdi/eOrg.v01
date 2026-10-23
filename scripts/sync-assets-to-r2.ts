@@ -15,6 +15,7 @@ import {
   DeleteObjectsCommand,
   type ListObjectsV2CommandOutput,
 } from '@aws-sdk/client-s3';
+import { normalizeBn } from '../app/lib/bn-text';
 
 // Content may live in a separate repo: point these at its folders with env vars.
 const CONTENT_ROOT = process.env.CONTENT_ROOT
@@ -98,7 +99,9 @@ async function uploadIfChanged(
   r2Key: string,
   remoteObjects: Map<string, string>
 ): Promise<{ status: 'uploaded' | 'skipped'; body: Buffer }> {
-  const body = await fs.readFile(localPath);
+  let body = await fs.readFile(localPath);
+  // keep R2 text files in one canonical Bengali spelling (য় ড় ঢ় as single letters)
+  if (localPath.endsWith('.md')) body = Buffer.from(normalizeBn(body.toString('utf8')), 'utf8');
   const localHash = md5(body);
   const remoteHash = remoteObjects.get(r2Key);
 

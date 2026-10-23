@@ -4,11 +4,11 @@ import type { NextConfig } from "next";
 import withPWAInit from "@ducanh2912/next-pwa";
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 
-// ইভেন্ট লিসেনার লিমিট বাড়িয়ে MaxListenersExceededWarning দূর করা হলো
+// ইভেন্ট লিসেনার লিমিট বাড়িয়ে MaxListenersExceededWarning দূর করা হলো
 EventEmitter.defaultMaxListeners = 25;
 
 // লোকাল dev সার্ভারে Cloudflare bindings (R2 ইত্যাদি) অ্যাক্সেস করার জন্য।
-// eOrg.v01-এ dev সম্পূর্ণ লোকাল (নিচে CONTENT_ROOT), তাই সেখানে R2/D1 binding-এ সংযোগ করা হয় না।
+// eOrg.v01-এ dev সম্পূর্ণ লোকাল (নিচে CONTENT_ROOT), তাই সেখানে R2/D1 binding-এ সংযোগ করা হয় না।
 if (process.env.NODE_ENV !== "development") {
   initOpenNextCloudflareForDev();
 }
@@ -46,7 +46,7 @@ const nextConfig: NextConfig = {
       port: "",
       pathname: "/cover/**",
     },
-    // 🔹 R2 পাবলিক dev এন্ডপয়েন্ট (ব্যাকআপ/টেস্টিং-এর জন্য)
+    // 🔹 R2 পাবলিক dev এন্ডপয়েন্ট (ব্যাকআপ/টেস্টিং-এর জন্য)
     {
       protocol: "https",
       hostname: "pub-cef6873f84f54698814b950ea14df38f.r2.dev",

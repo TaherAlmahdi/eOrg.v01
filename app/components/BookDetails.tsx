@@ -4,7 +4,7 @@ import type { FrontmatterValue } from '@/app/lib/frontmatter';
 import Link from 'next/link';
 import BookCover from '@/app/components/BookCover';
 
-// সংখ্যা বাংলায় রূপান্তরের হেল্পার
+// সংখ্যা বাংলায় রূপান্তরের হেল্পার
 const toBengaliNumber = (num?: number | string): string =>
   num !== undefined && num !== null && num !== ''
     ? num.toString().replace(/\d/g, (d) => '০১২৩৪৫৬৭৮৯'[parseInt(d, 10)])
@@ -17,7 +17,7 @@ interface CustomLink {
 
 export interface BookDetailsProps {
   book: FrontmatterValue;
-  series?: FrontmatterValue; // অভিভাবক ফাইল থেকে এক্সপ্লিসিটলি পাস করলেও যেন যেন TypeScript এরর না দেয়
+  series?: FrontmatterValue; // অভিভাবক ফাইল থেকে এক্সপ্লিসিটলি পাস করলেও যেন যেন TypeScript এরর না দেয়
 }
 
 export default function BookDetails({ book, series: explicitSeries }: BookDetailsProps) {
@@ -26,7 +26,7 @@ export default function BookDetails({ book, series: explicitSeries }: BookDetail
   // book.series, book.series_name অথবা প্রপস থেকে আসা explicitSeries গ্রহণ
   const seriesData = book.series || book.series_name || explicitSeries;
 
-  // সিরিজের লিঙ্ক পাওয়ার জন্য হেল্পার ফাংশন
+  // সিরিজের লিঙ্ক পাওয়ার জন্য হেল্পার ফাংশন
   const getSeriesLink = (seriesName: string): string => {
     // ১. যদি series_links এ্যারে থেকে নাম ম্যাচ করে
     const matchedLink = book.series_links?.find(
@@ -37,7 +37,7 @@ export default function BookDetails({ book, series: explicitSeries }: BookDetail
     // ২. যদি সরাসরি book.series_link থাকে
     if (book.series_link) return book.series_link;
 
-    // ৩. কোনো নির্দিষ্ট লিঙ্ক না থাকলে ডায়নামিক স্লাগ রুট ফলব্যাক
+    // ৩. কোনো নির্দিষ্ট লিঙ্ক না থাকলে ডায়নামিক স্লাগ রুট ফলব্যাক
     return `/series/${encodeURIComponent(seriesName)}`;
   };
 
@@ -49,7 +49,7 @@ export default function BookDetails({ book, series: explicitSeries }: BookDetail
       {/* ২. পুস্তক বিবরণীর বিস্তারিত তথ্যের মূল কার্ড (নিচে থাকবে) */}
       <div className="p-2 bg-white border border-gray-100 rounded shadow-sm">
         <div className="space-y-2 text-sm text-gray-800">
-          {/* বইয়ের নাম */}
+          {/* বইয়ের নাম */}
           {book.title && (
             <div className="grid grid-cols-[70px_10px_1fr] items-baseline">
               <span className="font-bold">বই</span>

@@ -30,7 +30,7 @@ function isSubdomainAllowed(bookSubdomains: string[], currentSubdomain?: string)
 }
 
 /**
- * registry-ভিত্তিক কাস্টম স্লাগ (থাকলে) অগ্রাধিকার দিয়ে বইয়ের চূড়ান্ত slug বের করে,
+ * registry-ভিত্তিক কাস্টম স্লাগ (থাকলে) অগ্রাধিকার দিয়ে বইয়ের চূড়ান্ত slug বের করে,
  * না থাকলে frontmatter-এর slug, তাও না থাকলে title থেকে slugify, শেষে ফোল্ডার-নাম fallback
  */
 function resolveBookSlug(data: FrontmatterData, bookFolderName: string): string {
@@ -38,8 +38,8 @@ function resolveBookSlug(data: FrontmatterData, bookFolderName: string): string 
 }
 
 /**
- * manifest থেকে প্রতিটা বইয়ের entry রিটার্ন করে
- * (আগে fs.readdir দিয়ে ডিরেক্টরি স্ক্যান হতো, এখন R2-তে রাখা একটা প্রি-বিল্ট manifest পড়া হয়)
+ * manifest থেকে প্রতিটা বইয়ের entry রিটার্ন করে
+ * (আগে fs.readdir দিয়ে ডিরেক্টরি স্ক্যান হতো, এখন R2-তে রাখা একটা প্রি-বিল্ট manifest পড়া হয়)
  */
 async function getAllBookEntries(): Promise<
   Array<{ authorFolder: string; bookFolder: string; bookPrefix: string; data: FrontmatterData }>
@@ -72,7 +72,7 @@ function mapBookData(
   const primarySeries = extractedSeriesList[0];
   const genreLinksVal = generateGenreLinks(data.genre_links, bookGenres);
 
-  // 🔹 cover/cover_image এখন getCoverUrl() দিয়ে পূর্ণ URL-এ রূপান্তর করা হচ্ছে
+  // 🔹 cover/cover_image এখন getCoverUrl() দিয়ে পূর্ণ URL-এ রূপান্তর করা হচ্ছে
   const resolvedCover = getCoverUrl(data.cover || data.cover_image || '');
 
   return {

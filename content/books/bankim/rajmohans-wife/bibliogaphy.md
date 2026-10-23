@@ -1,10 +1,10 @@
 ---
 title: "BIBLIOGRAPHY"
 book: "Rajmohan's Wife"
-author: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়"
+author: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়"
 
-meta_description: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়ের প্রথম উপন্যাস 'Rajmohan's Wife'। ১৮৬৪ সালে প্রকাশিত এই কালজয়ী ইংরেজি উপন্যাসের সারসংক্ষেপ ও ঐতিহাসিক গুরুত্ব জানুন।"
-tags: ["বঙ্কিমচন্দ্র চট্টোপাধ্যায়", "Rajmohan's Wife", "মাতঙ্গিনী", "ইংরেজি উপন্যাস", "ভারতীয় সাহিত্য", "বঙ্কিমচন্দ্রের প্রথম উপন্যাস"]
+meta_description: "বঙ্কিমচন্দ্র চট্টোপাধ্যায়ের প্রথম উপন্যাস 'Rajmohan's Wife'। ১৮৬৪ সালে প্রকাশিত এই কালজয়ী ইংরেজি উপন্যাসের সারসংক্ষেপ ও ঐতিহাসিক গুরুত্ব জানুন।"
+tags: ["বঙ্কিমচন্দ্র চট্টোপাধ্যায়", "Rajmohan's Wife", "মাতঙ্গিনী", "ইংরেজি উপন্যাস", "ভারতীয় সাহিত্য", "বঙ্কিমচন্দ্রের প্রথম উপন্যাস"]
 ---
 
 <p class="dcap">“Rajmohan’s Wife” by Bankimchandra Chattopadhyay is the author’s only English novel as well as he went on to write Bengali novels and poetry including India’s national song Vande Mataram. Here is the brief from the book jacket –</p>

@@ -50,7 +50,7 @@ export async function generateMetadata({ params }: AuthorHomePageProps): Promise
     tagline: currentConfig.tagline,
   });
 
-  const description = `${fullTitle}-এর জীবন, সাহিত্য ও সমস্ত রচনার ডিজিটাল নির্ঘণ্ট দেখুন এডুলিচার পাঠশালায়।`;
+  const description = `${fullTitle}-এর জীবন, সাহিত্য ও সমস্ত রচনার ডিজিটাল নির্ঘণ্ট দেখুন এডুলিচার পাঠশালায়।`;
   const ogImageUrl = `https://eduliture.org/api/og?title=${encodeURIComponent(fullTitle)}&tagline=${encodeURIComponent('লেখক ও সাহিত্যিক সংকলন')}`;
 
   return {
@@ -93,11 +93,11 @@ export default async function AuthorHomePage({ params }: AuthorHomePageProps) {
         pageTitle = data.title;
       }
     } else {
-      mdHtmlContent = `<div class="text-sm text-slate-500 italic py-4">${author} সংক্রান্ত কোনো কন্টেন্ট ফাইল পাওয়া যায়নি।</div>`;
+      mdHtmlContent = `<div class="text-sm text-slate-500 italic py-4">${author} সংক্রান্ত কোনো কন্টেন্ট ফাইল পাওয়া যায়নি।</div>`;
     }
   } catch (err) {
     console.error('R2 MD parsing error:', err);
-    mdHtmlContent = '<div class="text-sm text-red-500">পরিচিতি কন্টেন্ট লোড করার সময় সমস্যা হয়েছে।</div>';
+    mdHtmlContent = '<div class="text-sm text-red-500">পরিচিতি কন্টেন্ট লোড করার সময় সমস্যা হয়েছে।</div>';
   }
 
   // ইমেজের পাথ (fs ছাড়া সরাসরি পাবলিক পাথ ব্যবহার)
@@ -177,7 +177,7 @@ export default async function AuthorHomePage({ params }: AuthorHomePageProps) {
           {extractedGenres.length === 0 ? (
             <div className="inline-flex items-center justify-center gap-4 px-5 py-2 rounded bg-teal-50 text-[#008080] mb-8 animate-pulse border border-teal-100 shadow-sm text-center">
               <p className="text-lg text-slate-500 py-4 font-tarunima font-medium italic text-center">
-                <span className="text-[#008080]">এডুলিচার</span> বিশুদ্ধজ্ঞান প্রকল্প <span className="text-[#cc7a00]">{fullTitle}</span>র নির্মাণের কাজ চলমান রয়েছে, অনুগ্রহ করে পরে আবার চেষ্টা করুন। আমাদের প্রকল্প উন্নয়ন কর্মীগণ চেষ্টা করছেন যতদূর সম্ভব দ্রুত আপনাদের সম্পূর্ণ <span className="text-[#cc7a00]">{fullTitle}</span> উপহার দেওয়ার জন্য। সাথে থাকার জন্য ধন্যবাদ।
+                <span className="text-[#008080]">এডুলিচার</span> বিশুদ্ধজ্ঞান প্রকল্প <span className="text-[#cc7a00]">{fullTitle}</span>র নির্মাণের কাজ চলমান রয়েছে, অনুগ্রহ করে পরে আবার চেষ্টা করুন। আমাদের প্রকল্প উন্নয়ন কর্মীগণ চেষ্টা করছেন যতদূর সম্ভব দ্রুত আপনাদের সম্পূর্ণ <span className="text-[#cc7a00]">{fullTitle}</span> উপহার দেওয়ার জন্য। সাথে থাকার জন্য ধন্যবাদ।
               </p>
             </div>
           ) : (

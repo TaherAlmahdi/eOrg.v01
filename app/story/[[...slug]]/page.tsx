@@ -155,12 +155,12 @@ export async function generateMetadata({ params, searchParams }: StoryPageProps)
   const resolvedSearchParams = await searchParams;
   const rawSegments = resolvedParams.slug || [];
 
-  if (rawSegments.length === 0) return { title: `গল্প পাওয়া যায়নি ❀ ${SITE_NAME}` };
+  if (rawSegments.length === 0) return { title: `গল্প পাওয়া যায়নি ❀ ${SITE_NAME}` };
 
   const { storySlug, pageNumFromPath } = resolveRouteSegments(rawSegments);
   const story = await getStoryBySlug(storySlug);
 
-  if (!story) return { title: `গল্প পাওয়া যায়নি ❀ ${SITE_NAME}` };
+  if (!story) return { title: `গল্প পাওয়া যায়নি ❀ ${SITE_NAME}` };
 
   const splitPages = parseStorySubPages(story.content || '');
   const activePageIndex = resolveActivePageIndex(splitPages, pageNumFromPath, resolvedSearchParams.page);
@@ -492,7 +492,7 @@ export default async function StoryPage({ params, searchParams }: StoryPageProps
                         <a
                           href={`#fnref-${note.id}`}
                           className="shrink-0 w-3 h-5 flex items-center justify-center text-blue-600 hover:text-red-700 hover:bg-red-50 rounded transition-all text-base font-bold"
-                          title="উপরে পাঠ্যের টিকায় ফিরে যান"
+                          title="উপরে পাঠ্যের টিকায় ফিরে যান"
                         >
                           ↑
                         </a>
@@ -529,7 +529,7 @@ export default async function StoryPage({ params, searchParams }: StoryPageProps
           </div>
         </section>
 
-        {/* সাইডবার: বড় পর্দায় বামে, মোবাইলে নিচে-বামের ভাসমান বাটনে খোলে */}
+        {/* সাইডবার: বড় পর্দায় বামে, মোবাইলে নিচে-বামের ভাসমান বাটনে খোলে */}
         <SidebarShell>
           <BookDetails story={story} />
           <StorySidebarLists storyUuid={story.uuid} />

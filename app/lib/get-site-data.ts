@@ -18,7 +18,7 @@ export const siteMap: Record<string, SiteConfig> = {
   bankim: {
     title: 'বঙ্কিম রচনাবলী',
     image: 'bankim.jpg',
-    description: 'বঙ্কিমচন্দ্র চট্টোপাধ্যায়ের কালজয়ী উপন্যাস, প্রবন্ধ ও সাহিত্য সম্ভার।',
+    description: 'বঙ্কিমচন্দ্র চট্টোপাধ্যায়ের কালজয়ী উপন্যাস, প্রবন্ধ ও সাহিত্য সম্ভার।',
   },
   rabindra: {
     title: 'রবীন্দ্র রচনাবলী',
@@ -28,7 +28,7 @@ export const siteMap: Record<string, SiteConfig> = {
   sarat: {
     title: 'শরৎ রচনাবলী',
     image: 'bankim.jpg',
-    description: 'শরৎচন্দ্র চট্টোপাধ্যায়ের সকল জনপ্রিয় উপন্যাস ও গল্প সংগ্রহ।',
+    description: 'শরৎচন্দ্র চট্টোপাধ্যায়ের সকল জনপ্রিয় উপন্যাস ও গল্প সংগ্রহ।',
   },
   nazrul: {
     title: 'নজরুল রচনাবলী',
@@ -38,7 +38,7 @@ export const siteMap: Record<string, SiteConfig> = {
   jibanananda: {
     title: 'জীবনানন্দ রচনাবলী',
     image: 'bankim.jpg',
-    description: 'জীবনানন্দ দাশের রূপসী বাংলা ও রূপময় কাব্যগ্রন্থ ও সাহিত্যিক সংগ্রহ।',
+    description: 'জীবনানন্দ দাশের রূপসী বাংলা ও রূপময় কাব্যগ্রন্থ ও সাহিত্যিক সংগ্রহ।',
   },
 };
 
@@ -51,9 +51,9 @@ export interface SubdomainData {
 
 export function getSubdomainData(host: string | null): SubdomainData {
   const mainDomainTitle = 'এডুলিচার';
-  const defaultTitle = 'বিশুদ্ধজ্ঞানের শিক্ষা বিষয়ক প্রতিষ্ঠান';
+  const defaultTitle = 'বিশুদ্ধজ্ঞানের শিক্ষা বিষয়ক প্রতিষ্ঠান';
   const defaultImage = 'default.png';
-  const defaultDescription = 'শিক্ষা, সাহিত্য ও সংস্কৃতি বিষয়ক বিশুদ্ধজ্ঞান প্ল্যাটফর্ম।';
+  const defaultDescription = 'শিক্ষা, সাহিত্য ও সংস্কৃতি বিষয়ক বিশুদ্ধজ্ঞান প্ল্যাটফর্ম।';
 
   if (!host) {
     return {

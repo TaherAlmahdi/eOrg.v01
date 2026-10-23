@@ -3,7 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Calendar, ChevronRight } from 'lucide-react';
-import { getSlug, getAuthorSlugFromTitle } from '@/app/lib/content/core/registry'; // আপনার প্রজেক্টের পাথ অনুযায়ী অ্যাডজাস্ট করে নিন
+import { getSlug, getAuthorSlugFromTitle } from '@/app/lib/content/core/registry'; // আপনার প্রজেক্টের পাথ অনুযায়ী অ্যাডজাস্ট করে নিন
 
 interface BookItem {
   id?: string;
@@ -25,7 +25,7 @@ interface LatestBooksProps {
 const getCoverImageUrl = (coverPath?: string | null): string => {
   if (!coverPath) return `${COVER_BASE}/cover/default-cover.webp`;
 
-  // ১. যদি ইতোমধ্যে সম্পূর্ণ URL (http/https) হয়ে থাকে
+  // ১. যদি ইতোমধ্যে সম্পূর্ণ URL (http/https) হয়ে থাকে
   if (coverPath.startsWith('http://') || coverPath.startsWith('https://') || coverPath.startsWith(`${COVER_BASE}/`)) {
     return coverPath;
   }
@@ -73,7 +73,7 @@ const getAuthorSlug = (bookItem: BookItem): string => {
 };
 
 export default function LatestBooks({ books = [], limit = 16 }: LatestBooksProps) {
-  // বইগুলোকে প্রকাশের তারিখ অনুযায়ী লেটেস্ট সর্ট করে নেওয়া
+  // বইগুলোকে প্রকাশের তারিখ অনুযায়ী লেটেস্ট সর্ট করে নেওয়া
   const sortedLatestBooks = [...books]
     .sort((a, b) => {
       const pubA = a.published;
@@ -112,7 +112,7 @@ export default function LatestBooks({ books = [], limit = 16 }: LatestBooksProps
       </div>
 
       {sortedLatestBooks.length === 0 ? (
-        <p className="py-6 text-sm text-slate-500">কোনো নতুন বই পাওয়া যায়নি।</p>
+        <p className="py-6 text-sm text-slate-500">কোনো নতুন বই পাওয়া যায়নি।</p>
       ) : (
         <div className="grid grid-cols-2 gap-1.5 md:gap-2 lg:gap-2 p-0 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-8 bg-gray-200/50">
           {sortedLatestBooks.map((book, index) => {
@@ -130,7 +130,7 @@ export default function LatestBooks({ books = [], limit = 16 }: LatestBooksProps
                 <Link href={`/book/${encodeURIComponent(bookSlug)}`} className="relative block w-full overflow-hidden rounded-t aspect-2/3 bg-slate-100">
                   <Image
                     src={getCoverImageUrl(book.cover)}
-                    alt={book.title || 'বইয়ের প্রচ্ছদ'}
+                    alt={book.title || 'বইয়ের প্রচ্ছদ'}
                     fill
                     sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 16vw"
                     className="object-cover group-hover:scale-[1.03] transition-transform duration-300"

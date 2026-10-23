@@ -3,15 +3,15 @@ import { getSlug } from '@/app/lib/content/core/registry';
 import { SeriesItem, Book } from './types';
 
 /**
- * বাংলা ইউনিকোড এনকোডিং নরম্যালাইজার (য়, ড়, ঢ়, ব় এনকোডিং ফিক্স সহ)
+ * বাংলা ইউনিকোড এনকোডিং নরম্যালাইজার (য়, ড়, ঢ়, ব় এনকোডিং ফিক্স সহ)
  */
 export function normalizeBanglaText(text: unknown): string {
   if (typeof text !== 'string' || !text) return '';
   return text
     .normalize('NFC')
-    .replace(/\u09AF\u09BC/g, '\u09DF') // য + ় = য়
-    .replace(/\u09A1\u09BC/g, '\u09DC') // ড + ় = ড়
-    .replace(/\u09A2\u09BC/g, '\u09DD') // ঢ + ় = ঢ়
+    .replace(/\u09AF\u09BC/g, '\u09DF') // য + ় = য়
+    .replace(/\u09A1\u09BC/g, '\u09DC') // ড + ় = ড়
+    .replace(/\u09A2\u09BC/g, '\u09DD') // ঢ + ় = ঢ়
     .replace(/\u09AC\u09BC/g, '\u09E0'); // ব + ় = ব়
 }
 
@@ -21,7 +21,7 @@ export const naturalSort = (a: string, b: string): number => {
   return normA.localeCompare(normB, undefined, { numeric: true, sensitivity: 'base' });
 };
 
-// বাংলা সংখ্যাকে ইংরেজি সংখ্যায় রূপান্তর করার হেলপার
+// বাংলা সংখ্যাকে ইংরেজি সংখ্যায় রূপান্তর করার হেলপার
 function normalizeDigits(val: unknown): string {
   if (val === null || val === undefined || val === '') return '';
   return String(val)
@@ -204,7 +204,7 @@ export function extractItemsFromData(data: Record<string, unknown> | null | unde
 }
 
 /**
- * টার্গেট সিরিজের সাপেক্ষে একটি বইয়ের অর্ডার খোঁজার হেলপার
+ * টার্গেট সিরিজের সাপেক্ষে একটি বইয়ের অর্ডার খোঁজার হেলপার
  */
 function getTargetSeriesOrder(book: FrontmatterData, targetSeries?: string): string | null {
   if (targetSeries) {
@@ -263,7 +263,7 @@ export function sortSeriesBooks<T extends Partial<Book> & FrontmatterData>(
       return 1;
     }
 
-    // ২. Order না থাকলে first_published তারিখ অনুযায়ী সর্ট হবে
+    // ২. Order না থাকলে first_published তারিখ অনুযায়ী সর্ট হবে
     const firstPubA = a.first_published ?? a.firstPublished ?? a.year;
     const firstPubB = b.first_published ?? b.firstPublished ?? b.year;
 

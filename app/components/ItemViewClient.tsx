@@ -5,6 +5,7 @@ import type { FrontmatterValue } from '@/app/lib/frontmatter';
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { Search, Layers } from "lucide-react";
+import { normalizeBn } from '@/app/lib/bn-text';
 
 /**
  * বাংলা টেক্সট সার্চের জন্য Normalize
@@ -12,16 +13,15 @@ import { Search, Layers } from "lucide-react";
 const normalizeBengaliText = (text: string = ''): string => {
   if (!text) return '';
 
-  return text
-    .normalize('NFC')
+  return normalizeBn(text)
     .toLowerCase()
-    .replace(/\u09af\u09bc/g, 'য়')
-    .replace(/\u09a1\u09bc/g, 'ড়')
-    .replace(/\u09a2\u09bc/g, 'ঢ়')
+    .replace(/\u09af\u09bc/g, 'য়')
+    .replace(/\u09a1\u09bc/g, 'ড়')
+    .replace(/\u09a2\u09bc/g, 'ঢ়')
     .replace(/\u09b0\u09bc/g, 'র')
-    .replace(/য়/g, 'য')
-    .replace(/ড়/g, 'র')
-    .replace(/ঢ়/g, 'র')
+    .replace(/য়/g, 'য')
+    .replace(/ড়/g, 'র')
+    .replace(/ঢ়/g, 'র')
     .replace(/ব়/g, 'র')
     .replace(/়/g, '')
     .replace(/[\u200B-\u200D\uFEFF]/g, '')
@@ -66,7 +66,7 @@ const extractFieldText = (
 };
 
 /**
- * ইংরেজি সংখ্যাকে বাংলা সংখ্যায় রূপান্তর
+ * ইংরেজি সংখ্যাকে বাংলা সংখ্যায় রূপান্তর
  */
 const toBengaliNumber = (num: number | string): string =>
   num
@@ -80,7 +80,7 @@ const toBengaliNumber = (num: number | string): string =>
  * ============================================================
  */
 const getBengaliInitial = (text: string = ''): string => {
-  const value = text.normalize('NFC').trim();
+  const value = normalizeBn(text).trim();
 
   if (!value) return '';
 
@@ -123,7 +123,7 @@ export default function ItemViewClient({
 
 
   /**
-   * স্ক্রিন সাইজ অনুযায়ী pagination size
+   * স্ক্রিন সাইজ অনুযায়ী pagination size
    */
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
@@ -174,11 +174,9 @@ export default function ItemViewClient({
 
     return [...initialItems].sort((a: FrontmatterValue, b: FrontmatterValue) => {
 
-      const titleA = extractFieldText(a.title, "")
-        .normalize('NFC');
+      const titleA = normalizeBn(extractFieldText(a.title, ""));
 
-      const titleB = extractFieldText(b.title, "")
-        .normalize('NFC');
+      const titleB = normalizeBn(extractFieldText(b.title, ""));
 
       return titleA.localeCompare(
         titleB,
@@ -390,7 +388,7 @@ export default function ItemViewClient({
                   {toBengaliNumber(filtered.length)}
                   টি{" "}
                   {displayTitle || 'নির্বাচিত প্রকরণ'}
-                  {" "}রয়েছে
+                  {" "}রয়েছে
 
                 </span>
 
@@ -466,7 +464,7 @@ export default function ItemViewClient({
 
         <div className="p-8 text-center text-gray-500 rounded bg-white border border-dashed border-gray-300">
 
-          কোনো পাতা পাওয়া যায়নি।
+          কোনো পাতা পাওয়া যায়নি।
 
         </div>
 

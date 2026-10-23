@@ -34,7 +34,7 @@ const AuthorList: FC<AuthorListProps> = async ({ sortBy, limit }) => {
       ...normalizeNames(book.editor),
     ];
 
-    // ২. একটি বইয়ে একাধিক ভূমিকায় একই ব্যক্তির নাম থাকলে তা ফিল্টার করে ইউনিক রাখা
+    // ২. একটি বইয়ে একাধিক ভূমিকায় একই ব্যক্তির নাম থাকলে তা ফিল্টার করে ইউনিক রাখা
     const uniqueContributors = Array.from(new Set(rawAuthors));
 
     // ৩. প্রতিটি ব্যক্তির জন্য কাউন্ট ও ডেটা আপডেট করা

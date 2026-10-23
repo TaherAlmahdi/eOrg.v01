@@ -1,7 +1,7 @@
 import Breadcrumb from '@/app/components/Breadcrumb';
 import { headers } from 'next/headers';
 import type { Metadata } from 'next';
-import GenreList from "@/app/components/GenreList"; // আপনার প্রজেক্টের সঠিক পাথ অনুযায়ী ইমপোর্ট করুন
+import GenreList from "@/app/components/GenreList"; // আপনার প্রজেক্টের সঠিক পাথ অনুযায়ী ইমপোর্ট করুন
 import { getSubdomainData } from '@/app/lib/get-site-data';
 
 // 🔹 ডাইনামিক মেটাডেটা ফাংশন (প্রথম পেজের আদলে আপডেট করা)
@@ -33,7 +33,7 @@ export default async function GenresPage() {
       </header>
       {/* জনরা সেকশন */}
       <div className="flex w-full items-center justify-between mt-0 px-3 sm:px-4 py-2 mb-4">
-        {/* GenreList কম্পোনেন্ট: কোনো limit না দেওয়ায় সব জনরা শো করবে */}
+        {/* GenreList কম্পোনেন্ট: কোনো limit না দেওয়ায় সব জনরা শো করবে */}
         <GenreList sortBy="alphabetical" />
       </div>
     </main>

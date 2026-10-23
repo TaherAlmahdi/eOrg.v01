@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { List, X, BookOpen, ChevronRight } from 'lucide-react';
 import { useScrollActiveToTop } from './useScrollActiveToTop';
 
-// --- Utility: ইংরেজি সংখ্যাকে বাংলায় রূপান্তরের ফাংশন ---
+// --- Utility: ইংরেজি সংখ্যাকে বাংলায় রূপান্তরের ফাংশন ---
 const toBengaliNumber = (num: number | string): string => {
   const englishToBengaliMap: Record<string, string> = {
     '0': '০',
@@ -20,7 +20,7 @@ const toBengaliNumber = (num: number | string): string => {
     '9': '৯',
   };
 
-  // সংখ্যাকে অন্তত ২ অঙ্কের স্ট্রিংয়ে রূপান্তর (যেমন: 1 -> "01")
+  // সংখ্যাকে অন্তত ২ অঙ্কের স্ট্রিংয়ে রূপান্তর (যেমন: 1 -> "01")
   const paddedNum = String(num).padStart(2, '0');
 
   return paddedNum.replace(/[0-9]/g, (digit) => englishToBengaliMap[digit] || digit);
@@ -66,7 +66,7 @@ export default function TableOfContents({
 
   const listScrollRef = useScrollActiveToTop(currentPageNum);
 
-  // ড্রপডাউনের বাইরে ক্লিক করলে মেনু বন্ধ হওয়ার হ্যান্ডলার
+  // ড্রপডাউনের বাইরে ক্লিক করলে মেনু বন্ধ হওয়ার হ্যান্ডলার
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (

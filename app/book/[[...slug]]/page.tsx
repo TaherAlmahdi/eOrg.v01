@@ -56,7 +56,7 @@ interface SplitPage {
 // 🛠️ Helper Functions
 // ==========================================
 
-// সংখ্যা বাংলায় রূপান্তরের হেল্পার
+// সংখ্যা বাংলায় রূপান্তরের হেল্পার
 const toBengaliNumber = (num?: number | string): string =>
   num !== undefined && num !== null && num !== ''
     ? num.toString().replace(/\d/g, (d) => '০১২৩৪৫৬৭৮৯'[parseInt(d, 10)])
@@ -105,7 +105,7 @@ function resolveRouteSegments(rawSegments: string[]) {
 
   const lastSegment = rawSegments[rawSegments.length - 1];
 
-  // যদি শেষ সেগমেন্টটি সংখ্যা হয়, তবে সেটি পেজ নম্বর হিসেবে আলাদা হবে
+  // যদি শেষ সেগমেন্টটি সংখ্যা হয়, তবে সেটি পেজ নম্বর হিসেবে আলাদা হবে
   if (/^\d+$/.test(lastSegment) && rawSegments.length > 1) {
     pageNumFromPath = parseInt(lastSegment, 10);
     cleanSegments = rawSegments.slice(0, -1);
@@ -134,7 +134,7 @@ function resolveRouteSegments(rawSegments: string[]) {
   };
 }
 
-// সক্রিয় পেজ ইনডেক্স নির্ধারণ করার হেল্পার
+// সক্রিয় পেজ ইনডেক্স নির্ধারণ করার হেল্পার
 function resolveActivePageIndex(
   splitPages: SplitPage[],
   pageNumFromPath: number | null,
@@ -161,7 +161,7 @@ export async function generateMetadata({ params, searchParams }: UnifiedPageProp
   const resolvedSearchParams = await searchParams;
   const rawSegments = resolvedParams.slug || [];
 
-  if (rawSegments.length === 0) return { title: 'বই পাওয়া যায়নি ❀ এডুলিচার' };
+  if (rawSegments.length === 0) return { title: 'বই পাওয়া যায়নি ❀ এডুলিচার' };
 
   const { bookSlug, volumeOrChapterSlug, chapterSlug, pageNumFromPath } = resolveRouteSegments(rawSegments);
 
@@ -176,7 +176,7 @@ export async function generateMetadata({ params, searchParams }: UnifiedPageProp
     chapterSlug
   );
 
-  if (!book) return { title: `বই পাওয়া যায়নি ❀ ${siteData?.title || 'এডুলিচার'}` };
+  if (!book) return { title: `বই পাওয়া যায়নি ❀ ${siteData?.title || 'এডুলিচার'}` };
 
   const splitPages = parseBookSubPages(book.content || '');
   const activePageIndex = resolveActivePageIndex(splitPages, pageNumFromPath, resolvedSearchParams.page);
@@ -295,7 +295,7 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
   const directChapters: ChapterItem[] = (book.directChapters as ChapterItem[]) || [];
   const metaFiles = (book.metaFiles || []) as { slug: string; title: string }[];
 
-  // 🔍 metaFile কি না তা নির্ণয়
+  // 🔍 metaFile কি না তা নির্ণয়
   const currentMetaIndex = metaFiles.findIndex((m) => m.slug === volumeOrChapterSlug);
   const isMetaFile = currentMetaIndex !== -1;
 
@@ -349,7 +349,7 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
   };
 
   // ---------------------------------------------------------
-  // 👈 ১. পূর্ববর্তী (Previous) বাটনের সিকোয়েন্স লজিক
+  // 👈 ১. পূর্ববর্তী (Previous) বাটনের সিকোয়েন্স লজিক
   // ---------------------------------------------------------
   let prevActionLink = book.prevLink || '/books';
   let prevActionLabel = book.prevLabel || 'গ্রন্থাগার';
@@ -379,7 +379,7 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
   }
 
   // ---------------------------------------------------------
-  // 👉 ২. পরবর্তী (Next) বাটনের সিকোয়েন্স লজিক
+  // 👉 ২. পরবর্তী (Next) বাটনের সিকোয়েন্স লজিক
   // ---------------------------------------------------------
   let nextActionLink = book.nextLink || '/books';
   let nextActionLabel = book.nextLabel || 'গ্রন্থাগার';
@@ -399,7 +399,7 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
         nextActionLabel = volumes[0].title || volumes[0].volume_title || 'প্রথম খণ্ড';
       } else if (directChapters.length > 0) {
         nextActionLink = `/book/${bookSlug}/${directChapters[0].slug}`;
-        nextActionLabel = directChapters[0].title || 'প্রথম অধ্যায়';
+        nextActionLabel = directChapters[0].title || 'প্রথম অধ্যায়';
       }
     } else if (isMetaFile) {
       if (currentMetaIndex < metaFiles.length - 1) {
@@ -412,7 +412,7 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
           nextActionLabel = volumes[0].title || volumes[0].volume_title || 'প্রথম খণ্ড';
         } else if (directChapters.length > 0) {
           nextActionLink = `/book/${bookSlug}/${directChapters[0].slug}`;
-          nextActionLabel = directChapters[0].title || 'প্রথম অধ্যায়';
+          nextActionLabel = directChapters[0].title || 'প্রথম অধ্যায়';
         }
       }
     } else if (book.nextLink) {
@@ -679,7 +679,7 @@ export default async function UnifiedBookPage({ params, searchParams }: UnifiedP
                         <a
                           href={`#fnref-${note.id}`}
                           className="shrink-0 w-3 h-5 flex items-center justify-center text-blue-600 hover:text-red-700 hover:bg-red-50 rounded transition-all text-base font-bold"
-                          title="উপরে পাঠ্যের টিকায় ফিরে যান"
+                          title="উপরে পাঠ্যের টিকায় ফিরে যান"
                         >
                           ↑
                         </a>

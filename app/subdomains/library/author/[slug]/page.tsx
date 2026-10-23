@@ -7,6 +7,7 @@ import { getLibraryBooks } from '../../../../lib/books';
 import { getSlug, getAuthorSlugFromTitle } from '../../../../lib/content/core/registry';
 import AuthorBookSearchGrid from '@/app/components/AuthorBookSearchGrid';
 import { buildTabTitle, getSubdomainData } from '@/app/lib/get-site-data';
+import { normalizeBn } from '@/app/lib/bn-text';
 
 interface PageProps {
   params: Promise<{
@@ -14,18 +15,17 @@ interface PageProps {
   }>;
 }
 
-// 🔹 ইউনিকোড ও বানানগত ভিন্নতা (ই/ঈ, উ/ঊ, য়/য়, ড়/ড়) দূর করার নরমালাইজেশন ফাংশন
+// 🔹 ইউনিকোড ও বানানগত ভিন্নতা (ই/ঈ, উ/ঊ, য়/য়, ড়/ড়) দূর করার নরমালাইজেশন ফাংশন
 function normalizeBengaliSlug(text: string): string {
   if (!text) return '';
-  return text
-    .normalize('NFC') // ইউনিকোড প্রি-কম্পোজড ফর্ম নিশ্চিত করা
+  return normalizeBn(text) // ইউনিকোড প্রি-কম্পোজড ফর্ম নিশ্চিত করা
     .toLowerCase()
     // ই/ঈ, উ/ঊ এবং বর্ণগুলোর ভিন্ন রূপগুলো একীভূত করা যাতে বানান ভুল বা ভিন্নতা থাকলেও ম্যাচ করে
     .replace(/[ঈই]/g, 'ই')
     .replace(/[ঊউ]/g, 'উ')
-    .replace(/য়/g, 'য়')
-    .replace(/ড়/g, 'ড়')
-    .replace(/ঢ়/g, 'ঢ়')
+    .replace(/য়/g, 'য়')
+    .replace(/ড়/g, 'ড়')
+    .replace(/ঢ়/g, 'ঢ়')
     .replace(/\s+/g, '-')
     .replace(/[^\w\u0980-\u09FF-]+/g, '') // ইংরেজি, বাংলা ইউনিকোড এবং হাইফেন রাখা
     .replace(/--+/g, '-');
@@ -72,7 +72,7 @@ function resolveContributorRoles(fieldVal: unknown, slugVal: unknown): Array<{ n
   });
 }
 
-// 🔹 হেলপার ফাংশন: বাংলা/ইংরেজি উভয় স্লাগ, বানান ভুল বা ভিন্ন রূপ মিলিয়ে বই ফিল্টার ও সর্ট করা
+// 🔹 হেলপার ফাংশন: বাংলা/ইংরেজি উভয় স্লাগ, বানান ভুল বা ভিন্ন রূপ মিলিয়ে বই ফিল্টার ও সর্ট করা
 async function getAuthorDataAndBooks(rawSlug: string) {
   await loadSlugManifest();
   const libraryData = await getLibraryBooks();

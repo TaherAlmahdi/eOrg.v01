@@ -4,7 +4,7 @@ slug: eduliture-shabdakosh
 
 image: eduliture-shabdakosh.png
 featured_image: "/images/projects/project-dummy.webp"
-excerpt: "বাংলা ও বঙ্গীয় ভাষার অভিধান"
+excerpt: "বাংলা ও বঙ্গীয় ভাষার অভিধান"
 category: "অভিধান"
 externalLink: "https://shabdakosh.org"
 

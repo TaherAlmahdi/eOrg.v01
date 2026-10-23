@@ -6,6 +6,7 @@ import matter from 'gray-matter';
 import type { FrontmatterData, FrontmatterValue } from '../../app/lib/frontmatter';
 import { getItemSlug } from '../../app/lib/content/core/registry/items';
 import { buildSlugManifest, type SlugCategory, type SlugTable } from '../../app/lib/content/core/registry/slug-store';
+import { normalizeBn } from '../../app/lib/bn-text';
 
 export interface BookManifestEntry {
   authorFolder: string;
@@ -133,7 +134,7 @@ export function buildCatalogFromFiles(files: CatalogFile[]): {
     const authorFolder = parts[1];
     const bookFolder = parts[2];
     const bookPrefix = `books/${authorFolder}/${bookFolder}/`;
-    const { data } = matter(file.body);
+    const { data } = matter(normalizeBn(file.body));
 
     booksManifest.push({ authorFolder, bookFolder, bookPrefix, data });
     collectFromFrontmatter(data, found);
@@ -156,7 +157,7 @@ export function buildCatalogFromFiles(files: CatalogFile[]): {
     const bookMeta = bookMetaByPrefix.get(bookPrefix);
     if (!bookMeta) continue; // this book's index.md wasn't found
 
-    const { data: fileData } = matter(file.body);
+    const { data: fileData } = matter(normalizeBn(file.body));
     const itemTypes = extractItemTypesFromData(fileData);
     if (itemTypes.length === 0) continue;
     collectFromFrontmatter(fileData, found);

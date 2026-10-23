@@ -108,7 +108,7 @@ export default function TOCAbout({ items }: TOCAboutProps) {
         </button>
       </div>
 
-      {/* 📱 মোবাইল ভার্সন: ড্রয়ার প্যানেল */}
+      {/* 📱 মোবাইল ভার্সন: ড্রয়ার প্যানেল */}
       {isOpen && (
         <div className="lg:hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-2xl border border-gray-200 dark:border-gray-800 animate-in fade-in slide-in-from-bottom-4 duration-200">

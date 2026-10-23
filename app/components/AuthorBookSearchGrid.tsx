@@ -6,6 +6,7 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Search, Book, X, User } from 'lucide-react';
+import { normalizeBn } from '@/app/lib/bn-text';
 
 const toBengaliNumber = (num: number | string): string =>
   num.toString().replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[parseInt(d, 10)]);
@@ -70,12 +71,12 @@ interface AuthorBookSearchGridProps {
 
 const isFieldMatch = (field: unknown, targetName: string): boolean => {
   if (!field) return false;
-  const target = targetName.trim().toLowerCase();
+  const target = normalizeBn(targetName).trim().toLowerCase();
 
   if (Array.isArray(field)) {
     return field.some((item) => {
       if (typeof item === 'string') {
-        const val = item.trim().toLowerCase();
+        const val = normalizeBn(item).trim().toLowerCase();
         return val === target || val.includes(target);
       }
       return false;
@@ -83,7 +84,7 @@ const isFieldMatch = (field: unknown, targetName: string): boolean => {
   }
 
   if (typeof field === 'string') {
-    const val = field.trim().toLowerCase();
+    const val = normalizeBn(field).trim().toLowerCase();
     return val === target || val.includes(target);
   }
 
@@ -129,7 +130,7 @@ export default function AuthorBookSearchGrid({
     );
   }, [books, personName]);
 
-  // 🔹 টাইটেলের ১ম অক্ষর নিয়ে ডায়নামিক লেটার বাটন তৈরি
+  // 🔹 টাইটেলের ১ম অক্ষর নিয়ে ডায়নামিক লেটার বাটন তৈরি
   const dynamicLetters = useMemo(() => {
     const lettersSet = new Set<string>();
 
@@ -149,7 +150,7 @@ export default function AuthorBookSearchGrid({
     return ['সব', ...sortedLetters];
   }, [personBooks]);
 
-  // 🔹 সিলেক্ট করা অক্ষর এবং সার্চ কোয়েরি অনুযায়ী ফিল্টারকৃত বই
+  // 🔹 সিলেক্ট করা অক্ষর এবং সার্চ কোয়েরি অনুযায়ী ফিল্টারকৃত বই
   const filteredBooks = useMemo(() => {
     return personBooks.filter((book) => {
       if (!book || !book.title) return false;
@@ -160,8 +161,8 @@ export default function AuthorBookSearchGrid({
       const matchesLetter =
         selectedLetter === 'সব' || firstChar === selectedLetter;
 
-      const query = searchQuery.toLowerCase().trim();
-      const matchesSearch = title.toLowerCase().includes(query);
+      const query = normalizeBn(searchQuery).toLowerCase().trim();
+      const matchesSearch = normalizeBn(title).toLowerCase().includes(query);
 
       return matchesLetter && matchesSearch;
     });
@@ -188,19 +189,19 @@ export default function AuthorBookSearchGrid({
               <p className="text-xs md:text-sm text-gray-500 mt-1">
                 <span className="w-full text-xs md:text-sm font-normal text-teal-700 bg-teal-100/70 px-2 py-1 border-t border-teal-200 inline-block">
                   {personBooks.length > 0
-                    ? `${siteName ? `${siteName}য় ` : ''}প্রকাশিত মোট ${toBengaliNumber(personBooks.length)}টি বই রয়েছে`
-                    : "বর্তমানে কোনো বই পাওয়া যায়নি"}
+                    ? `${siteName ? `${siteName}য় ` : ''}প্রকাশিত মোট ${toBengaliNumber(personBooks.length)}টি বই রয়েছে`
+                    : "বর্তমানে কোনো বই পাওয়া যায়নি"}
                 </span>
               </p>
             </div>
 
-            {/* ডানপাশে সার্চবার (মোবাইলে নিচে ফুল-ওয়াইড) */}
+            {/* ডানপাশে সার্চবার (মোবাইলে নিচে ফুল-ওয়াইড) */}
             {personBooks.length > 0 && (
               <div className="relative w-full md:w-80 shrink-0">
                 <Search className="absolute w-4 h-4 text-teal-600 -translate-y-1/2 left-3 top-1/2 pointer-events-none" />
                 <input
                   type="text"
-                  placeholder="বইয়ের নাম দিয়ে খুঁজুন..."
+                  placeholder="বইয়ের নাম দিয়ে খুঁজুন..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-9 pr-8 py-2 border border-teal-200 rounded focus:outline-none focus:ring-1 focus:ring-[#008080] text-sm bg-teal-50/30 text-gray-800 shadow-xs placeholder-gray-400"
@@ -217,7 +218,7 @@ export default function AuthorBookSearchGrid({
             )}
           </div>
 
-          {/* ফুল-ওয়াইড ও সেন্টারাইজড আদ্যক্ষর ফিল্টারিং */}
+          {/* ফুল-ওয়াইড ও সেন্টারাইজড আদ্যক্ষর ফিল্টারিং */}
           {personBooks.length > 0 && dynamicLetters.length > 1 && (
             <div className="p-2 border border-teal-100 rounded bg-teal-50/90 backdrop-blur-md shadow-xs">
               <div className="flex flex-wrap items-center justify-center gap-1">
@@ -289,10 +290,10 @@ export default function AuthorBookSearchGrid({
             <Book size={48} className="mx-auto mb-4 text-orange-200" />
             <p className="text-lg italic text-gray-400">
               {searchQuery.trim() !== ''
-                ? `"${searchQuery}" নামে কোনো বই পাওয়া যায়নি।`
+                ? `"${searchQuery}" নামে কোনো বই পাওয়া যায়নি।`
                 : selectedLetter !== 'সব'
-                  ? `"${selectedLetter}" অক্ষর দিয়ে কোনো বই পাওয়া যায়নি।`
-                  : `${personName}-এর কোনো বই পাওয়া যায়নি।`}
+                  ? `"${selectedLetter}" অক্ষর দিয়ে কোনো বই পাওয়া যায়নি।`
+                  : `${personName}-এর কোনো বই পাওয়া যায়নি।`}
             </p>
             {(selectedLetter !== 'সব' || searchQuery.trim() !== '') && (
               <button

@@ -150,13 +150,13 @@ export const GenreListView: FC<GenreListViewProps> = ({
               <div className="p-2.5 inline-flex items-center gap-2">
                 <Tags size={22} className="shrink-0 animate-pulse text-[#008080]" />
                 <h1 className="text-xl md:text-2xl font-bold text-gray-950 leading-none">
-                  <span className="text-[#008080]">বিষয়</span> <span className="text-[#cc7a00]">নির্ঘণ্ট</span>
+                  <span className="text-[#008080]">বিষয়</span> <span className="text-[#cc7a00]">নির্ঘণ্ট</span>
                 </h1>
               </div>
               <p className="text-xs md:text-sm text-gray-500 mt-1">
                 {displayTotalCount > 0 && (
                   <span className="w-full text-xs md:text-sm font-normal text-teal-700 bg-teal-100/70 px-2 py-1 border-t border-teal-200 inline-block">
-                    বিষয় সংখ্যা সর্বমোট {toBengaliNumber(displayTotalCount)} টি
+                    বিষয় সংখ্যা সর্বমোট {toBengaliNumber(displayTotalCount)} টি
                   </span>
                 )}
               </p>
@@ -167,7 +167,7 @@ export const GenreListView: FC<GenreListViewProps> = ({
               <Search className="absolute w-4 h-4 text-teal-600 -translate-y-1/2 left-3 top-1/2 pointer-events-none" />
               <input
                 type="text"
-                placeholder="ঘরানার নাম দিয়ে খুঁজুন..."
+                placeholder="ঘরানার নাম দিয়ে খুঁজুন..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-9 pr-4 py-2 border border-teal-200 rounded focus:outline-none focus:ring-1 focus:ring-[#008080] text-sm bg-teal-50/30 text-gray-800 shadow-xs placeholder-gray-400"
@@ -202,7 +202,7 @@ export const GenreListView: FC<GenreListViewProps> = ({
       {/* ঘরানা তালিকা */}
       {filteredGenres.length === 0 ? (
         <div className="p-8 text-center text-gray-500 rounded bg-white border border-dashed border-gray-300">
-          কোনো ঘরানার তথ্য পাওয়া যায়নি।
+          কোনো ঘরানার তথ্য পাওয়া যায়নি।
         </div>
       ) : (
         <div className="flex flex-wrap gap-1.5">

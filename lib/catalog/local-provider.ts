@@ -6,6 +6,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { buildCatalogFromFiles, type CatalogFile } from './build';
+import { normalizeBn } from '../../app/lib/bn-text';
 
 const BOOKS_MANIFEST_KEY = '_manifest/books-index.json';
 const ITEMS_MANIFEST_KEY = '_manifest/items-index.json';
@@ -126,8 +127,8 @@ export function getLocalBucket(): R2Bucket {
       try {
         const buf = await fs.readFile(file);
         return {
-          text: async () => buf.toString('utf8'),
-          json: async () => JSON.parse(buf.toString('utf8')),
+          text: async () => normalizeBn(buf.toString('utf8')),
+          json: async () => JSON.parse(normalizeBn(buf.toString('utf8'))),
           arrayBuffer: async () => buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength),
         };
       } catch {

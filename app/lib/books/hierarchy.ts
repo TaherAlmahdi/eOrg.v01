@@ -26,7 +26,7 @@ async function listKeysUnderPrefix(prefix: string): Promise<string[]> {
 
 export async function getBookHierarchy(
   bookPrefix: string, // যেমন: "books/bankim/durgeshnandini/"
-  bookSlug: string // URL-এ ব্যবহৃত বইয়ের slug (href বানাতে লাগে)
+  bookSlug: string // URL-এ ব্যবহৃত বইয়ের slug (href বানাতে লাগে)
 ): Promise<{
   nodes: BookNode[];
   bookTitle: string;
@@ -56,13 +56,13 @@ export async function getBookHierarchy(
     }
   }
 
-  // bookPrefix বাদ দিয়ে প্রতিটা key-এর রিলেটিভ অংশ বের করা
+  // bookPrefix বাদ দিয়ে প্রতিটা key-এর রিলেটিভ অংশ বের করা
   // যেমন: "chapter1.md" বা "vol1/index.md" বা "vol1/chapters/ch1.md"
   const relativeKeys = allKeys
     .filter((k) => k !== indexMdKey)
     .map((k) => k.slice(bookPrefix.length));
 
-  // '/' থাকলেই বোঝা যাবে ভলিউম-সাবফোল্ডার আছে (আগে fs-এ directory চেক হতো, এখানে key প্যাটার্ন দিয়ে)
+  // '/' থাকলেই বোঝা যাবে ভলিউম-সাবফোল্ডার আছে (আগে fs-এ directory চেক হতো, এখানে key প্যাটার্ন দিয়ে)
   const hasSubVolumes = relativeKeys.some((k) => k.includes('/'));
 
   if (!hasSubVolumes) {
@@ -127,7 +127,7 @@ export async function getBookHierarchy(
         });
       }
 
-      // chapters/ সাবফোল্ডার আছে কিনা — key প্যাটার্ন দিয়ে চেক
+      // chapters/ সাবফোল্ডার আছে কিনা — key প্যাটার্ন দিয়ে চেক
       const chaptersPrefix = `${volPrefix}chapters/`;
       const hasChaptersFolder = allKeys.some((k) => k.startsWith(chaptersPrefix));
       const targetPrefix = hasChaptersFolder ? chaptersPrefix : volPrefix;

@@ -61,7 +61,7 @@ export default function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // ৩. মূল ডোমেনে (মেইন ডোমেন) যদি /items কল করা হয় এবং আপনি সেখানে দেখাইতে না চান
+  // ৩. মূল ডোমেনে (মেইন ডোমেন) যদি /items কল করা হয় এবং আপনি সেখানে দেখাইতে না চান
   if (!subdomain) {
     if (pathname.startsWith('/items') || pathname.startsWith('/item')) {
       url.pathname = '/404'; // মেইন ডোমেনে কল করলে 404 দেখাবে
@@ -115,7 +115,7 @@ export default function proxy(request: NextRequest) {
     });
   }
 
-  // 🟢 ৪. সাবডোমেন অনুযায়ী /items বা অন্যান্য রিরাইট লজিক
+  // 🟢 ৪. সাবডোমেন অনুযায়ী /items বা অন্যান্য রিরাইট লজিক
   if (subdomain === 'library') {
     if (pathname.startsWith('/authors')) {
       return NextResponse.next({ request: { headers: requestHeaders } });

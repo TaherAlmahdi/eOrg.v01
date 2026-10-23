@@ -64,7 +64,7 @@ export default async function SeriesPage({ params, searchParams }: PageProps) {
       }
     }
 
-    // ২. সিরিজ ফিল্টারিং (স্ট্রিং ও অবজেক্ট উভয় স্ট্রাকচার সাপোর্ট সহ)
+    // ২. সিরিজ ফিল্টারিং (স্ট্রিং ও অবজেক্ট উভয় স্ট্রাকচার সাপোর্ট সহ)
     const rawSeries = book.Series || book.series || book.series_list || book.series_info;
     if (!rawSeries) return false;
 

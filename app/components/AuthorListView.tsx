@@ -123,7 +123,7 @@ export const AuthorListView: FC<AuthorListViewProps> = ({
               <Search className="absolute w-4 h-4 text-teal-600 -translate-y-1/2 left-3 top-1/2 pointer-events-none" />
               <input
                 type="text"
-                placeholder="লেখকের নাম দিয়ে খুঁজুন..."
+                placeholder="লেখকের নাম দিয়ে খুঁজুন..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-9 pr-4 py-2 border border-teal-200 rounded focus:outline-none focus:ring-1 focus:ring-[#008080] text-sm bg-teal-50/30 text-gray-800 shadow-xs placeholder-gray-400"
@@ -158,7 +158,7 @@ export const AuthorListView: FC<AuthorListViewProps> = ({
       {/* লেখক তালিকা */}
       {filteredAuthors.length === 0 ? (
         <div className="p-8 text-center text-gray-500 rounded bg-white border border-dashed border-gray-300">
-          কোনো লেখকের তথ্য পাওয়া যায়নি।
+          কোনো লেখকের তথ্য পাওয়া যায়নি।
         </div>
       ) : (
         <div className="flex flex-wrap gap-1.5">

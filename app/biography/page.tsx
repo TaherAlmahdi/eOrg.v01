@@ -56,7 +56,7 @@ async function getOnlySubdomain(): Promise<string | null> {
   return null;
 }
 
-// ২. R2 থেকে বায়োগ্রাফি ডাটা লোড করা (Async)
+// ২. R2 থেকে বায়োগ্রাফি ডাটা লোড করা (Async)
 async function getBioData(subdomain: string | null) {
   if (!subdomain) return null;
 
@@ -89,7 +89,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   if (!bioData) {
     return {
-      title: 'জীবনী খুঁজে পাওয়া যায়নি',
+      title: 'জীবনী খুঁজে পাওয়া যায়নি',
     };
   }
 
@@ -161,16 +161,16 @@ function BiographyContent({
     { label: 'জন্ম', value: birthInfo },
     { label: 'মৃত্যু', value: deathInfo },
     { label: 'পেশা', value: frontmatter.occupation },
-    { label: 'জাতীয়তা', value: frontmatter.nationality },
+    { label: 'জাতীয়তা', value: frontmatter.nationality },
     { label: 'নাগরিকত্ব', value: frontmatter.citizenship },
     { label: 'ধরণ', value: frontmatter.genre },
     { label: 'কর্ম', value: frontmatter.notable_works },
     { label: 'পুরস্কার', value: frontmatter.awards },
     { label: 'দাম্পত্যসঙ্গী', value: frontmatter.spouse },
     { label: 'সন্তান', value: frontmatter.children },
-    { label: 'আত্মীয়', value: frontmatter.relatives },
+    { label: 'আত্মীয়', value: frontmatter.relatives },
     { label: 'স্বাক্ষর', value: frontmatter.signature, type: 'image' },
-    { label: 'ওয়েবসাইট', value: websiteValue },
+    { label: 'ওয়েবসাইট', value: websiteValue },
   ];
 
   const infoFields = rawFields.filter((item) => Boolean(item.value));

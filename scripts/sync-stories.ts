@@ -20,6 +20,7 @@ import crypto from 'node:crypto';
 import matter from 'gray-matter';
 import { createClient } from '@supabase/supabase-js';
 import { customAuthorSlugs } from './stories-slug-map';
+import { normalizeBn } from '../app/lib/bn-text';
 
 try {
   process.loadEnvFile('.env.local');
@@ -51,11 +52,10 @@ function fail(message: string): never {
 }
 
 function normalizeBengali(text: string): string {
-  return text
-    .normalize('NFC')
-    .replace(/ড়/g, 'ড়')
-    .replace(/ঢ়/g, 'ঢ়')
-    .replace(/য়/g, 'য়');
+  return normalizeBn(text)
+    .replace(/ড়/g, 'ড়')
+    .replace(/ঢ়/g, 'ঢ়')
+    .replace(/য়/g, 'য়');
 }
 
 /** Lower-case URL slug; Bengali letters are kept ("মেঘ বৃষ্টি" -> "মেঘ-বৃষ্টি"). */
@@ -69,7 +69,7 @@ function toSlug(text: string): string {
     .replace(/^-+|-+$/g, '');
 }
 
-/** Same name, same spelling: composed Bengali letters (য + ় = য়) and single spaces. */
+/** Same name, same spelling: composed Bengali letters (য + ় = য়) and single spaces. */
 const cleanName = (name: string): string => normalizeBengali(name).replace(/s+/g, ' ').trim();
 
 function toList(value: unknown): string[] {
@@ -101,7 +101,7 @@ function readStoryFiles(): StoryFile[] {
   if (names.length === 0) fail(`No .md files in ${STORIES_ROOT}`);
 
   return names.map((sourcePath) => {
-    const raw = fs.readFileSync(path.join(STORIES_ROOT, sourcePath), 'utf8');
+    const raw = normalizeBn(fs.readFileSync(path.join(STORIES_ROOT, sourcePath), 'utf8'));
     const { data: fm, content } = matter(raw);
     const fileSlug = sourcePath.replace(/\.md$/i, '');
     const title = String(fm.title || '').trim();

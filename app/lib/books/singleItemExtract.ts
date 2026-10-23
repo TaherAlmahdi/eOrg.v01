@@ -71,7 +71,7 @@ export async function getItemsByItemType(targetItemType?: string) {
 }
 
 /**
- * যেকোনো স্লাগ দিয়ে সিঙ্গেল আইটেম খোঁজা
+ * যেকোনো স্লাগ দিয়ে সিঙ্গেল আইটেম খোঁজা
  */
 export async function getBookBySlug(slug: string | string[]): Promise<SingleBookItem | null> {
   const rawSlug = Array.isArray(slug) ? slug.join('/') : slug;
@@ -81,7 +81,7 @@ export async function getBookBySlug(slug: string | string[]): Promise<SingleBook
   const slugSegments = decodedSlug.split('/').filter(Boolean);
   const allItems = await getAllLibraryItems();
 
-  // প্রথমে সম্পূর্ণ পাথ দিয়ে নিখুঁত (Exact) ম্যাচ খোঁজা
+  // প্রথমে সম্পূর্ণ পাথ দিয়ে নিখুঁত (Exact) ম্যাচ খোঁজা
   let matchedItem = allItems.find((entry) => {
     const href = entry.href ? entry.href.toLowerCase().replace(/^\/+|\/+$/g, '') : '';
     const cleanHref = href.replace(/^book\//, '');
@@ -89,7 +89,7 @@ export async function getBookBySlug(slug: string | string[]): Promise<SingleBook
     return cleanHref === lowerDecodedSlug || cleanHref.endsWith(`/${lowerDecodedSlug}`);
   });
 
-  // যদি নিখুঁত পাথ ম্যাচ না মেলে এবং এটি একটিমাত্র সেগমেন্ট হয়, তবে সাধারণ স্লাগ বা ফাইল স্লাগ দিয়ে খুঁজি
+  // যদি নিখুঁত পাথ ম্যাচ না মেলে এবং এটি একটিমাত্র সেগমেন্ট হয়, তবে সাধারণ স্লাগ বা ফাইল স্লাগ দিয়ে খুঁজি
   if (!matchedItem && slugSegments.length === 1) {
     const singleSlug = slugSegments[0].toLowerCase();
     matchedItem = allItems.find((entry) => {
@@ -99,7 +99,7 @@ export async function getBookBySlug(slug: string | string[]): Promise<SingleBook
     });
   }
 
-  // যদি তখনও না মেলে, তবে শেষের অংশ দিয়ে ফ্লেক্সিবল ম্যাচ
+  // যদি তখনও না মেলে, তবে শেষের অংশ দিয়ে ফ্লেক্সিবল ম্যাচ
   if (!matchedItem && slugSegments.length > 1) {
     const lastSegment = slugSegments[slugSegments.length - 1].toLowerCase();
     matchedItem = allItems.find((entry) => {

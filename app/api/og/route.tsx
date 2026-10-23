@@ -6,14 +6,14 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
 
-    // ১. ইউআরএল থেকে ডাইনামিক ডেটা নেওয়া (Query Parameters)
+    // ১. ইউআরএল থেকে ডাইনামিক ডেটা নেওয়া (Query Parameters)
     const title = searchParams.get('title') || 'এডুলিচার – অনলাইন জ্ঞানকোষ ও লাইব্রেরি';
     const subtitle = searchParams.get('subtitle') || 'অনলাইন বই ও সাহিত্য সংকলন';
-    const tagline = searchParams.get('tagline') || 'সহজ ভাষায় সকল বই ও অনুচ্ছেদ পড়ুন';
+    const tagline = searchParams.get('tagline') || 'সহজ ভাষায় সকল বই ও অনুচ্ছেদ পড়ুন';
 
-    // ২. Tarunima ফন্ট লোড করা — fs.readFile()-এর বদলে fetch() দিয়ে,
+    // ২. Tarunima ফন্ট লোড করা — fs.readFile()-এর বদলে fetch() দিয়ে,
     // কারণ Cloudflare Workers-এ public/ ফোল্ডারের ফাইল ডিস্কে থাকে না,
-    // ASSETS binding-এর মাধ্যমে URL দিয়ে সার্ভ হয়
+    // ASSETS binding-এর মাধ্যমে URL দিয়ে সার্ভ হয়
     let fontData: ArrayBuffer | null = null;
     try {
       const fontUrl = new URL('/fonts/tarunima.ttf', request.url).toString();

@@ -82,15 +82,15 @@ export async function generateMetadata(): Promise<Metadata> {
 
   const defaultTitle = siteData?.title || 'এডুলিচার';
   const mainDomainTitle = 'এডুলিচার';
-  const dynamicTitle = subdomain ? defaultTitle : `${mainDomainTitle} ❀ বিশুদ্ধজ্ঞানের প্রত্যয়`;
+  const dynamicTitle = subdomain ? defaultTitle : `${mainDomainTitle} ❀ বিশুদ্ধজ্ঞানের প্রত্যয়`;
 
   // Dynamic OG Image Fallback
   const ogTitleParam = encodeURIComponent(defaultTitle);
-  const ogTaglineParam = encodeURIComponent('শিক্ষা, সাহিত্য ও সংস্কৃতি বিষয়ক বিশুদ্ধজ্ঞান প্ল্যাটফর্ম');
+  const ogTaglineParam = encodeURIComponent('শিক্ষা, সাহিত্য ও সংস্কৃতি বিষয়ক বিশুদ্ধজ্ঞান প্ল্যাটফর্ম');
   const dynamicGeneratedOg = `${siteUrl}/api/og?title=${ogTitleParam}&tagline=${ogTaglineParam}`;
 
   const ogImageUrl = siteData?.ogImage || dynamicGeneratedOg;
-  const siteDescription = siteData?.description || `${defaultTitle} ❀ শিক্ষা, সাহিত্য ও সংস্কৃতি বিষয়ক বিশুদ্ধজ্ঞান প্ল্যাটফর্ম`;
+  const siteDescription = siteData?.description || `${defaultTitle} ❀ শিক্ষা, সাহিত্য ও সংস্কৃতি বিষয়ক বিশুদ্ধজ্ঞান প্ল্যাটফর্ম`;
 
   return {
     // টেমপ্লেট সরিয়ে সরাসরি টাইটেল সেট করা হলো, যাতে ট্যাবে অতিরিক্ত নাম না আসে

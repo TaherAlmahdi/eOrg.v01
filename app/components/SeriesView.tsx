@@ -6,6 +6,7 @@ import { useState, useMemo, FC } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { BookOpen, Search, X, Layers } from "lucide-react";
+import { normalizeBn } from '@/app/lib/bn-text';
 
 export interface SeriesBook {
   id?: string;
@@ -72,8 +73,7 @@ const toBengaliNumber = (num: number | string): string =>
 
 const normalizeText = (str: string): string => {
   if (!str) return "";
-  return str
-    .normalize("NFC")
+  return normalizeBn(str)
     .toLowerCase()
     .replace(/[ঈী]/g, "ই")
     .replace(/[ঊূ]/g, "উ")
@@ -85,7 +85,7 @@ const normalizeText = (str: string): string => {
 
 const getUniversalFirstLetter = (str: string): string => {
   if (!str) return "";
-  const cleaned = str.normalize("NFC").trim();
+  const cleaned = normalizeBn(str).trim();
   if (!cleaned) return "";
 
   const firstChar = cleaned.charAt(0);
@@ -93,7 +93,7 @@ const getUniversalFirstLetter = (str: string): string => {
     return firstChar.toUpperCase();
   }
 
-  const match = cleaned.match(/^([অআইঈউঊঋএঐওঔকখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহড়ঢ়য়])/);
+  const match = cleaned.match(/^([অআইঈউঊঋএঐওঔকখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহড়ঢ়য়])/);
   if (match && match[1]) {
     return match[1];
   }
@@ -166,7 +166,7 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
               <p className="text-xs md:text-sm text-gray-500 mt-1">
                 <span className="w-full text-xs md:text-sm font-normal text-teal-700 bg-teal-100/70 px-2 py-1 border-t border-teal-200 inline-block">
                   {books.length > 0
-                    ? `এই সিরিজে মোট ${toBengaliNumber(books.length)}টি বই রয়েছে`
+                    ? `এই সিরিজে মোট ${toBengaliNumber(books.length)}টি বই রয়েছে`
                     : "এই সিরিজে বর্তমানে কোনো বই নেই"}
                 </span>
               </p>
@@ -177,7 +177,7 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
                 <Search className="absolute w-4 h-4 text-teal-600 -translate-y-1/2 left-3 top-1/2 pointer-events-none" />
                 <input
                   type="text"
-                  placeholder="বই বা লেখকের নাম দিয়ে খুঁজুন..."
+                  placeholder="বই বা লেখকের নাম দিয়ে খুঁজুন..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-9 pr-8 py-2 border border-teal-200 rounded focus:outline-none focus:ring-1 focus:ring-[#008080] text-sm bg-teal-50/30 text-gray-800 shadow-xs placeholder-gray-400"
@@ -240,7 +240,7 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
                   <div className="relative aspect-[2/3] overflow-hidden rounded-t border-b border-gray-200/50 bg-gray-50">
                     <Image
                       src={getCoverImageUrl(book.cover)}
-                      alt={book.title || "বইয়ের প্রচ্ছদ"}
+                      alt={book.title || "বইয়ের প্রচ্ছদ"}
                       fill
                       sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 16vw"
                       className="object-cover"
@@ -265,8 +265,8 @@ export const SeriesView: FC<SeriesViewProps> = ({ seriesTitle, books = [] }) => 
             <BookOpen size={48} className="mx-auto mb-4 text-orange-200" />
             <p className="text-lg italic text-gray-400">
               {books.length === 0
-                ? "দুঃখিত, এই বিভাগে কোনো বই খুঁজে পাওয়া যায়নি।"
-                : "আপনার অনুসন্ধানের সাথে মিল রেখে কোনো বই পাওয়া যায়নি।"}
+                ? "দুঃখিত, এই বিভাগে কোনো বই খুঁজে পাওয়া যায়নি।"
+                : "আপনার অনুসন্ধানের সাথে মিল রেখে কোনো বই পাওয়া যায়নি।"}
             </p>
             {(searchQuery || selectedLetter) && (
               <button

@@ -58,7 +58,7 @@ export interface StoryDetail {
   peopleSlugs?: Record<string, string>;
 }
 
-// তালিকা/কার্ড ভিউয়ের জন্য গল্পের সংক্ষিপ্ত রূপ
+// তালিকা/কার্ড ভিউয়ের জন্য গল্পের সংক্ষিপ্ত রূপ
 export interface Story {
   id?: string | number;
   uuid: string;
@@ -106,7 +106,7 @@ function toStory(row: StoryRow): Story {
 }
 
 // ==========================================
-// 📖 মূল ফাংশন: স্লাগ দিয়ে একটি গল্প খোঁজা
+// 📖 মূল ফাংশন: স্লাগ দিয়ে একটি গল্প খোঁজা
 // ==========================================
 
 export async function getStoryBySlug(slug: string): Promise<StoryDetail | null> {
@@ -117,7 +117,7 @@ export async function getStoryBySlug(slug: string): Promise<StoryDetail | null> 
 
   const base = toStory(row);
 
-  // ➡️ পূর্ববর্তী/পরবর্তী গল্প বের করা (লিস্টের ক্রম অনুযায়ী)
+  // ➡️ পূর্ববর্তী/পরবর্তী গল্প বের করা (লিস্টের ক্রম অনুযায়ী)
   const list = await listStoryRows();
   const currentIdx = list.findIndex((item) => item.slug === row.slug);
 

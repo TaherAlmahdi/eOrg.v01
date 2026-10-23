@@ -31,7 +31,7 @@ interface HeaderConfigItem {
   menu: MenuItem[];
 }
 
-// সাবডোমেন রাউটিং ম্যানেজ করার জন্য একটি লাইটওয়েট ইনলাইন হেল্পার ফাংশন
+// সাবডোমেন রাউটিং ম্যানেজ করার জন্য একটি লাইটওয়েট ইনলাইন হেল্পার ফাংশন
 const createDynamicUrl = (targetUrl: string): string => {
   if (typeof window === 'undefined') return targetUrl.startsWith('goto:') ? '/' : targetUrl;
   if (!targetUrl.startsWith('goto:')) return targetUrl;
@@ -81,12 +81,12 @@ const Header = ({ domainKey }: HeaderProps) => {
   const currentHeader: HeaderConfigItem = (headerConfig as Record<string, HeaderConfigItem>)[domainKey] || 
     (headerConfig as Record<string, HeaderConfigItem>).main || {
     siteName: "এডুলিচার",
-    tagline: "বিশুদ্ধজ্ঞানের প্রত্যয়",
+    tagline: "বিশুদ্ধজ্ঞানের প্রত্যয়",
     logo: "/logo/logo.png",
     favicon: "/favicon.ico",
     bgColor: "bg-[#ffffff]",
     themeColor: "teal",
-    menu: [{ label: "আলয়", url: "/", icon: "BookOpen", desc: "প্রধান পাতা" }]
+    menu: [{ label: "আলয়", url: "/", icon: "BookOpen", desc: "প্রধান পাতা" }]
   };
 
   // স্ক্রোল লক
@@ -186,7 +186,7 @@ const Header = ({ domainKey }: HeaderProps) => {
 
               <div className="mt-8 pt-4 text-center border-t border-gray-100">
                 <p className="text-[10px] text-gray-400 uppercase tracking-widest font-tarunima">
-                  বিশুদ্ধজ্ঞানের শিক্ষা বিষয়ক প্রতিষ্ঠান
+                  বিশুদ্ধজ্ঞানের শিক্ষা বিষয়ক প্রতিষ্ঠান
                 </p>
               </div>
             </div>

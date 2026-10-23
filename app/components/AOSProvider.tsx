@@ -8,7 +8,7 @@ import 'aos/dist/aos.css';
 export default function AOSProvider() {
   useEffect(() => {
     AOS.init({
-      duration: 800, // অ্যানিমেশনের সময়কাল (মি.সে.)
+      duration: 800, // অ্যানিমেশনের সময়কাল (মি.সে.)
       once: true,    // স্ক্রল করে নিচে নামলে শুধু একবারই অ্যানিমেশন হবে
       easing: 'ease-out-cubic',
     });

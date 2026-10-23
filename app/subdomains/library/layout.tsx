@@ -39,7 +39,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const siteName = getDynamicSiteName(host);
 
   const title = `গ্রন্থাগার ❀ ${siteName}`;
-  const description = 'বাংলা ভাষায় সর্বাধিক গ্রন্থের সমাহার';
+  const description = 'বাংলা ভাষায় সর্বাধিক গ্রন্থের সমাহার';
 
   return {
     title,

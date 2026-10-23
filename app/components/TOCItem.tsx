@@ -141,7 +141,7 @@ export default function TOCItem({
 
   const currentType = getItemTypeName(currentItem);
 
-  // ৩. সমজাতীয় আইটেমগুলো ফিল্টার করা
+  // ৩. সমজাতীয় আইটেমগুলো ফিল্টার করা
   const filteredList = allItemsList.filter((item) => getItemTypeName(item) === currentType);
 
   // ৪. বর্তমান আইটেমের সঠিক ইনডেক্স বের করা
@@ -151,7 +151,7 @@ export default function TOCItem({
 
   if (currentIndex === -1) return null;
 
-  // ৫. সিকোয়েন্স অনুযায়ী আগের ১০টি এবং পরের ১০টি আইটেম কেটে নেওয়া (Slice)
+  // ৫. সিকোয়েন্স অনুযায়ী আগের ১০টি এবং পরের ১০টি আইটেম কেটে নেওয়া (Slice)
   const startIndex = Math.max(0, currentIndex - 10);
   const endIndex = Math.min(filteredList.length, currentIndex + 11);
   const slicedList = filteredList.slice(startIndex, endIndex);

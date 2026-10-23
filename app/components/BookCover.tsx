@@ -51,7 +51,7 @@ export default function BookCover({ coverImage, title }: BookCoverProps) {
 
   return (
     <div className="space-y-2 font-tarunima">
-      {/* ১. প্রচ্ছদ ছবির ফুল-ওয়াইড আলাদা বর্ডার কার্ড (উপরে থাকবে) */}
+      {/* ১. প্রচ্ছদ ছবির ফুল-ওয়াইড আলাদা বর্ডার কার্ড (উপরে থাকবে) */}
       {showCover && (
         <div className="p-0 border border-gray-100 rounded shadow-sm overflow-hidden bg-white transition-all duration-300 ease-in-out">
           <img

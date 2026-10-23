@@ -3,6 +3,7 @@ import { getAllLibraryItems, type LibraryItemEntry } from "@/app/lib/books";
 import { getItemMeta, getItemSlug } from "@/app/lib/content/core/registry/items";
 import { loadSlugManifest } from "@/app/lib/books/r2";
 import ItemViewClient from "./ItemViewClient";
+import { normalizeBn } from '@/app/lib/bn-text';
 
 export type LibraryItem = LibraryItemEntry & {
   category?: string | string[];
@@ -21,8 +22,7 @@ interface ItemViewProps {
 // বাংলা স্ট্রিং নরমালাইজেশন ও ক্লিনিং
 const normalizeText = (text: string = ""): string => {
   if (!text) return "";
-  return text
-    .normalize("NFC")
+  return normalizeBn(text)
     .replace(/[\u200B-\u200D\uFEFF]/g, "")
     .toLowerCase()
     .trim();
@@ -42,13 +42,13 @@ const extractFieldText = (field: unknown, fallback: string = ""): string => {
 const extractAuthorValue = (entry: LibraryItem): string => {
   const authorData = entry.author;
 
-  // ১. author যদি অবজেক্ট হয়
+  // ১. author যদি অবজেক্ট হয়
   if (typeof authorData === "object" && authorData !== null && !Array.isArray(authorData)) {
     const authorObj = authorData as Record<string, unknown>;
     return String(authorObj.slug || authorObj.name || "").trim();
   }
 
-  // ২. author যদি অ্যারে হয়
+  // ২. author যদি অ্যারে হয়
   if (Array.isArray(authorData) && authorData.length > 0) {
     const first = authorData[0];
     if (typeof first === "object" && first !== null) {
@@ -138,7 +138,7 @@ export default async function ItemView({
   const rawLibraryItems = await getAllLibraryItems();
   const allLibraryItems = (rawLibraryItems || []) as unknown as LibraryItem[];
 
-  // নির্দিষ্ট আইটেম ও প্রকরণ অনুযায়ী ফিল্টারিং
+  // নির্দিষ্ট আইটেম ও প্রকরণ অনুযায়ী ফিল্টারিং
   const filteredItems = allLibraryItems.filter((entry) => {
     // ১. লেখক ফিল্টার (যদি থাকে)
     if (authorSlug) {

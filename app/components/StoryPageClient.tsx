@@ -6,9 +6,10 @@ import Link from 'next/link';
 import { Home, Search, BookOpen, Layers } from "lucide-react";
 import { buildTabTitle } from '@/app/lib/get-site-data';
 import { Story } from '@/lib/stories/story';
+import { normalizeBn } from '@/app/lib/bn-text';
 import { PostCard } from '@/app/components/PostCard'; // পূর্বে প্রস্তুত করা PostCard কম্পোনেন্ট
 
-// 🔹 ইংরেজি সংখ্যাকে বাংলায় রূপান্তর করার ফাংশন
+// 🔹 ইংরেজি সংখ্যাকে বাংলায় রূপান্তর করার ফাংশন
 const toBengaliNumber = (num: number | string): string => {
   const englishToBengali: Record<string, string> = {
     '0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪',
@@ -19,11 +20,10 @@ const toBengaliNumber = (num: number | string): string => {
 
 // 🔹 বাংলা ক্যারেক্টার ও স্পেস নরমালাইজেশন
 const normalizeBengali = (text: string = ''): string => {
-  return text
-    .normalize('NFC')
-    .replace(/\u09af\u09bc/g, 'য়')
-    .replace(/\u09a1\u09bc/g, 'ড়')
-    .replace(/\u09a2\u09bc/g, 'ঢ়')
+  return normalizeBn(text)
+    .replace(/\u09af\u09bc/g, 'য়')
+    .replace(/\u09a1\u09bc/g, 'ড়')
+    .replace(/\u09a2\u09bc/g, 'ঢ়')
     .replace(/\u09b0\u09bc/g, 'র')
     .replace(/['"‘’“”]/g, '')
     .replace(/[\u200B-\u200D\uFEFF]/g, '')
@@ -48,7 +48,7 @@ const getAuthorText = (author?: string | string[]): string => {
   return Array.isArray(author) ? author.join(', ') : author;
 };
 
-// 🔹 ডেস্কটপ (≥1024px) কিনা — SSR-এ false ধরা হয়
+// 🔹 ডেস্কটপ (≥1024px) কিনা — SSR-এ false ধরা হয়
 const DESKTOP_QUERY = '(min-width: 1024px)';
 const subscribeDesktop = (onChange: () => void) => {
   const mql = window.matchMedia(DESKTOP_QUERY);
@@ -136,7 +136,7 @@ export default function StoriesPageClient({
 
   const hasMore = visibleCount < filteredStories.length;
 
-  // ৪. ডায়নামিক ব্রাউজার ট্যাব টাইটেল
+  // ৪. ডায়নামিক ব্রাউজার ট্যাব টাইটেল
   useEffect(() => {
     let currentPageTitle = 'কথা ভাণ্ডার';
 
@@ -157,7 +157,7 @@ export default function StoriesPageClient({
       {/* নেভিগেশন বার */}
       <Breadcrumb items={[{ label: 'কথা ভাণ্ডার' }]} />
 
-      {/* মূল কনটেন্ট এরিয়া */}
+      {/* মূল কনটেন্ট এরিয়া */}
       <div className="w-full mx-auto px-4 py-4">
         {/* হেডার ও ফিল্টার */}
         <div className="mb-4 border-b border-orange-200 pb-3">
@@ -176,7 +176,7 @@ export default function StoriesPageClient({
                 <p className="text-gray-500 italic font-tarunima text-sm">
                   {filteredStories.length > 0
                     ? `মোট ${toBengaliNumber(filteredStories.length)}টি গল্প আছে`
-                    : "এই মুহূর্তে কোনো গল্প পাওয়া যায়নি"}
+                    : "এই মুহূর্তে কোনো গল্প পাওয়া যায়নি"}
                 </p>
               </div>
             </div>
@@ -185,7 +185,7 @@ export default function StoriesPageClient({
             <div className="w-full md:w-80 relative flex items-center">
               <input
                 type="text"
-                placeholder="গল্প, বই বা কথকের নাম দিয়ে খুঁজুন..."
+                placeholder="গল্প, বই বা কথকের নাম দিয়ে খুঁজুন..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full px-4 py-2 pl-10 text-sm bg-white border border-orange-200 rounded shadow-xs focus:outline-none focus:ring-1 focus:ring-[#996633] focus:border-[#996633] text-gray-800 placeholder-gray-400 font-tarunima"
@@ -221,11 +221,11 @@ export default function StoriesPageClient({
           )}
         </div>
 
-        {/* গল্পের গ্রিড (PostCard ব্যবহার করা হয়েছে) */}
+        {/* গল্পের গ্রিড (PostCard ব্যবহার করা হয়েছে) */}
         {currentStories.length === 0 ? (
           <div className="text-center py-12 font-tarunima text-gray-600">
             <BookOpen className="w-12 h-12 mx-auto text-orange-200 mb-2" />
-            <p>আপনার অনুসন্ধান অনুযায়ী কোনো গল্প পাওয়া যায়নি।</p>
+            <p>আপনার অনুসন্ধান অনুযায়ী কোনো গল্প পাওয়া যায়নি।</p>
           </div>
         ) : (
           <>

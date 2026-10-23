@@ -218,14 +218,14 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
   const siteName = siteData?.title || 'এডুলিচার';
 
   if (rawSegments.length === 0) {
-    return { title: `প্রকরণ পাওয়া যায়নি ❀ ${siteName}` };
+    return { title: `প্রকরণ পাওয়া যায়নি ❀ ${siteName}` };
   }
 
   const { fullItemSlug, pageNumFromPath } = resolveRouteSegments(rawSegments);
   const item = await getItemData(fullItemSlug);
 
   if (!item) {
-    return { title: `প্রকরণ পাওয়া যায়নি ❀ ${siteName}` };
+    return { title: `প্রকরণ পাওয়া যায়নি ❀ ${siteName}` };
   }
 
   const effectiveSlug = resolveItemSlug(item, fullItemSlug);
@@ -495,7 +495,7 @@ export default async function SingleItemPage({ params, searchParams }: PageProps
                           <a
                             href={`#fnref-${note.id}`}
                             className="shrink-0 w-3 h-5 flex items-center justify-center text-blue-600 hover:text-red-700 hover:bg-red-50 rounded transition-all text-base font-bold"
-                            title="উপরে পাঠ্যের টিকায় ফিরে যান"
+                            title="উপরে পাঠ্যের টিকায় ফিরে যান"
                           >
                             ↑
                           </a>

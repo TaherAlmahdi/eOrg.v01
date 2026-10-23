@@ -1,4 +1,4 @@
--- D1 migration: per-book view counter for the "পাঠকপ্রিয় বই" section.
+-- D1 migration: per-book view counter for the "পাঠকপ্রিয় বই" section.
 -- Run once (you, not Claude): wrangler d1 execute eorg-db --remote --file=migrations/0001_book_views.sql
 CREATE TABLE IF NOT EXISTS book_views (
   slug       TEXT PRIMARY KEY,           -- book folder slug, e.g. "durgeshnandini"

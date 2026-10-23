@@ -16,7 +16,7 @@ export const CONTENT_REGISTRY = {
     genre: "ঘরানা",
     tags: "শ্রেণী",
     volume: "গ্রন্থখণ্ড",
-    chapter: "অধ্যায় বা পরিচ্ছেদ",
+    chapter: "অধ্যায় বা পরিচ্ছেদ",
     series: "সিরিজ",
     books: "বই",
   } as Record<string, string>,

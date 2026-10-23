@@ -7,6 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Search, BookOpen } from "lucide-react";
 import { buildTabTitle } from '@/app/lib/get-site-data';
+import { normalizeBn } from '@/app/lib/bn-text';
 
 // 🔹 Cloudflare R2 Media Base URL ফরম্যাটিং হেল্পার (আপডেটেড)
 const getCoverImageUrl = (coverPath?: string | null): string => {
@@ -41,7 +42,7 @@ const getCoverImageUrl = (coverPath?: string | null): string => {
   return `${COVER_BASE}/cover/${cleanPath}`;
 };
 
-// 🔹 ইংরেজি সংখ্যাকে বাংলায় রূপান্তর করার ফাংশন
+// 🔹 ইংরেজি সংখ্যাকে বাংলায় রূপান্তর করার ফাংশন
 const toBengaliNumber = (num: number | string): string => {
   const englishToBengali: Record<string, string> = {
     '0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪',
@@ -52,11 +53,10 @@ const toBengaliNumber = (num: number | string): string => {
 
 // 🔹 বাংলা ক্যারেক্টার নরমালাইজেশন
 const normalizeBengali = (text: string = ''): string => {
-  return text
-    .normalize('NFC')
-    .replace(/\u09af\u09bc/g, 'য়')
-    .replace(/\u09a1\u09bc/g, 'ড়')
-    .replace(/\u09a2\u09bc/g, 'ঢ়')
+  return normalizeBn(text)
+    .replace(/\u09af\u09bc/g, 'য়')
+    .replace(/\u09a1\u09bc/g, 'ড়')
+    .replace(/\u09a2\u09bc/g, 'ঢ়')
     .replace(/\u09b0\u09bc/g, 'র')
     .replace(/[\u200B-\u200D\uFEFF]/g, '')
     .toLowerCase()
@@ -105,7 +105,7 @@ export default function BooksPageClient({
   const [selectedLetter, setSelectedLetter] = useState('সব');
   const [visibleCount, setVisibleCount] = useState(limit);
 
-  // স্ক্রিন সাইজ অনুযায়ী ইনিশিয়াল লিমিট নির্ধারণ (হাইড্রেশন মিসম্যাচ এড়াতে)
+  // স্ক্রিন সাইজ অনুযায়ী ইনিশিয়াল লিমিট নির্ধারণ (হাইড্রেশন মিসম্যাচ এড়াতে)
 
   // ১. প্রাথমিক বইগুলো সর্ট করা
   const sortedBooks = useMemo(() => {
@@ -115,7 +115,7 @@ export default function BooksPageClient({
     );
   }, [initialBooks]);
 
-  // ২. ডায়নামিক বর্ণ তালিকা তৈরি
+  // ২. ডায়নামিক বর্ণ তালিকা তৈরি
   const availableAlphabets = useMemo(() => {
     const lettersSet = new Set<string>();
     sortedBooks.forEach((book) => {
@@ -134,7 +134,7 @@ export default function BooksPageClient({
     return ['সব', ...sortedLetters];
   }, [sortedBooks]);
 
-  // ৩. সার্চ ও লেটার অনুযায়ী রিয়েল-টাইম ফিল্টারিং লজিক
+  // ৩. সার্চ ও লেটার অনুযায়ী রিয়েল-টাইম ফিল্টারিং লজিক
   const filteredBooks = useMemo(() => {
     const normalizedQuery = normalizeBengali(searchQuery);
     const compactQuery = normalizedQuery.replace(/\s+/g, '');
@@ -158,7 +158,7 @@ export default function BooksPageClient({
         if (!matchesGenre) return false;
       }
 
-      // সার্চ কুয়েরি ফিল্টার (টাইটেল বা লেখক)
+      // সার্চ কুয়েরি ফিল্টার (টাইটেল বা লেখক)
       const normalizedTitle = normalizeBengali(book.title || '');
       const normalizedAuthor = normalizeBengali(book.author || '');
       const compactTitle = normalizedTitle.replace(/\s+/g, '');
@@ -195,7 +195,7 @@ export default function BooksPageClient({
 
   const hasMore = visibleCount < filteredBooks.length;
 
-  // ৪. ডায়নামিক ব্রাউজার ট্যাবটাইটেল আপডেট (সেকেন্ডের মধ্যে বদলে যাওয়া রোধ করতে)
+  // ৪. ডায়নামিক ব্রাউজার ট্যাবটাইটেল আপডেট (সেকেন্ডের মধ্যে বদলে যাওয়া রোধ করতে)
   useEffect(() => {
     const baseTitle = genreTitle || 'গ্রন্থাগার';
     let currentPageTitle = baseTitle;
@@ -217,7 +217,7 @@ export default function BooksPageClient({
       {/* নেভিগেশন বার */}
       <Breadcrumb items={genreTitle ? [{ label: 'গ্রন্থাগার', href: '/books' }, { label: genreTitle }] : [{ label: 'গ্রন্থাগার' }]} />
 
-      {/* বইয়ের গ্রিড ও ফিল্টার হেডার */}
+      {/* বইয়ের গ্রিড ও ফিল্টার হেডার */}
       <div className="max-w-full mx-auto py-4 px-4">
         <div className="mb-2 border-b border-orange-200 pb-2">
 
@@ -230,8 +230,8 @@ export default function BooksPageClient({
               </h2>
               <p className="text-gray-500 mt-1 italic font-tarunima text-sm">
                 {filteredBooks.length > 0
-                  ? `প্রকাশিত বইয়ের সংখ্যা ${toBengaliNumber(filteredBooks.length)}টি।`
-                  : "এই মুহূর্তে কোন বই পাওয়া যায়নি"}
+                  ? `প্রকাশিত বইয়ের সংখ্যা ${toBengaliNumber(filteredBooks.length)}টি।`
+                  : "এই মুহূর্তে কোন বই পাওয়া যায়নি"}
               </p>
             </div>
 
@@ -239,7 +239,7 @@ export default function BooksPageClient({
             <div className="w-full md:w-80 relative flex items-center">
               <input
                 type="text"
-                placeholder="বই অথবা লেখকের নাম দিয়ে খুঁজুন..."
+                placeholder="বই অথবা লেখকের নাম দিয়ে খুঁজুন..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full px-4 py-2 pl-10 text-sm bg-white border border-orange-200 rounded shadow-xs focus:outline-hidden focus:ring-1 focus:ring-[#996633] focus:border-[#996633] text-gray-800 placeholder-gray-400"
@@ -275,11 +275,11 @@ export default function BooksPageClient({
           )}
         </div>
 
-        {/* বইয়ের গ্রিড */}
+        {/* বইয়ের গ্রিড */}
         {currentBooks.length === 0 ? (
           <div className="text-center py-12 font-tarunima text-gray-500">
             <BookOpen className="w-12 h-12 mx-auto text-orange-200 mb-2" />
-            <p>আপনার অনুসন্ধান অনুযায়ী কোনো বই পাওয়া যায়নি।</p>
+            <p>আপনার অনুসন্ধান অনুযায়ী কোনো বই পাওয়া যায়নি।</p>
           </div>
         ) : (
           <>
@@ -307,7 +307,7 @@ export default function BooksPageClient({
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
                     </div>
 
-                    {/* বইয়ের তথ্য */}
+                    {/* বইয়ের তথ্য */}
                     <div className="mt-2 flex flex-col grow font-tarunima">
                       <h3 className="text-xs md:text-sm text-center font-bold text-gray-900 group-hover:text-[#996633] transition-colors line-clamp-2">
                         {book.title}

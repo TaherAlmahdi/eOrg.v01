@@ -4,7 +4,7 @@ import type { FrontmatterValue } from '@/app/lib/frontmatter';
 import Link from 'next/link';
 import BookCover from '@/app/components/BookCover';
 
-// সংখ্যা বাংলায় রূপান্তরের হেল্পার
+// সংখ্যা বাংলায় রূপান্তরের হেল্পার
 const toBengaliNumber = (num?: number | string): string =>
   num !== undefined && num !== null && num !== ''
     ? num.toString().replace(/\d/g, (d) => '০১২৩৪৫৬৭৮৯'[parseInt(d, 10)])

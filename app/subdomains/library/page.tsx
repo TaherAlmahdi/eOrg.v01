@@ -53,7 +53,7 @@ export async function generateMetadata(): Promise<Metadata> {
     tagline: currentConfig.tagline,
   });
 
-  const description = `${currentConfig.siteName}-এর পাঠশালায় নতুন প্রকাশিত বই, লেখক এবং বিভিন্ন ঘরানার সমৃদ্ধ সংগ্রহ দেখুন।`;
+  const description = `${currentConfig.siteName}-এর পাঠশালায় নতুন প্রকাশিত বই, লেখক এবং বিভিন্ন ঘরানার সমৃদ্ধ সংগ্রহ দেখুন।`;
 
   const ogTitle = currentConfig.siteName || 'এডুলিচার পাঠশালা';
   const dynamicOgImage = `https://eduliture.org/api/og?title=${encodeURIComponent(ogTitle)}&tagline=${encodeURIComponent('অনলাইন লাইব্রেরি ও পাঠশালা')}`;
@@ -141,7 +141,7 @@ export default async function LibraryHomePage() {
 
   const allBooksList = Array.from(bookMap.values());
 
-  // 🔹 সেন্ট্রালাইজড হেল্পার দিয়ে সঠিক স্ট্যাটস বের করা
+  // 🔹 সেন্ট্রালাইজড হেল্পার দিয়ে সঠিক স্ট্যাটস বের করা
   const stats = getLibraryStats(allBooksList);
 
   // 🔹 মোট জঁরা (Genre) সংখ্যা গণনা
@@ -174,7 +174,7 @@ export default async function LibraryHomePage() {
       '@type': 'WebSite',
       'name': currentConfig.siteName || siteData.title || 'এডুলিচার',
       'url': currentUrl,
-      'description': `${currentConfig.siteName}-এর পাঠশালায় নতুন প্রকাশিত বই, লেখক এবং বিভিন্ন ঘরানার সমৃদ্ধ সংগ্রহ দেখুন।`,
+      'description': `${currentConfig.siteName}-এর পাঠশালায় নতুন প্রকাশিত বই, লেখক এবং বিভিন্ন ঘরানার সমৃদ্ধ সংগ্রহ দেখুন।`,
       'inLanguage': 'bn'
     },
     {
@@ -261,7 +261,7 @@ export default async function LibraryHomePage() {
           <LatestBooks books={sortedLatestBooks} limit={16} />
         </section>
 
-        {/* পাঠকপ্রিয় বই (D1-এ ভিউ জমলে দেখা যাবে) */}
+        {/* পাঠকপ্রিয় বই (D1-এ ভিউ জমলে দেখা যাবে) */}
         <PopularBooks books={allBooksList} />
 
         {/* ৩. ঘরানা নির্ঘণ্ট সেকশন */}

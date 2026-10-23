@@ -9,19 +9,19 @@ import { Metadata } from 'next';
 // 🌐 মেটাডেটা এবং সোশ্যাল শেয়ারিং (OG) কনফিগারেশন
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.eduliture.org'),
-  title: "এডুলিচার ❀ বিশুদ্ধজ্ঞানের প্রত্যয়",
+  title: "এডুলিচার ❀ বিশুদ্ধজ্ঞানের প্রত্যয়",
   description: "শিক্ষা, সাহিত্য, সংস্কৃতি–বিশুদ্ধজ্ঞান। জ্ঞান হোক উন্মুক্ত।",
   alternates: {
     canonical: 'https://www.eduliture.org',
   },
   openGraph: {
-    title: "এডুলিচার ❀ বিশুদ্ধজ্ঞানের প্রত্যয়",
+    title: "এডুলিচার ❀ বিশুদ্ধজ্ঞানের প্রত্যয়",
     description: "শিক্ষা, সাহিত্য, সংস্কৃতি–বিশুদ্ধজ্ঞান।",
     url: 'https://www.eduliture.org',
     siteName: 'এডুলিচার',
     images: [
       {
-        url: 'https://www.eduliture.org/api/og?title=এডুলিচার&tagline=বিশুদ্ধজ্ঞানের%20প্রত্যয়',
+        url: 'https://www.eduliture.org/api/og?title=এডুলিচার&tagline=বিশুদ্ধজ্ঞানের%20প্রত্যয়',
         width: 1200,
         height: 630,
         alt: 'এডুলিচার প্রবেশক',
@@ -32,9 +32,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: "এডুলিচার ❀ বিশুদ্ধজ্ঞানের প্রত্যয়",
+    title: "এডুলিচার ❀ বিশুদ্ধজ্ঞানের প্রত্যয়",
     description: "শিক্ষা, সাহিত্য, সংস্কৃতি–বিশুদ্ধজ্ঞান।",
-    images: ['https://www.eduliture.org/api/og?title=এডুলিচার&tagline=বিশুদ্ধজ্ঞানের%20প্রত্যয়'],
+    images: ['https://www.eduliture.org/api/og?title=এডুলিচার&tagline=বিশুদ্ধজ্ঞানের%20প্রত্যয়'],
   },
 };
 

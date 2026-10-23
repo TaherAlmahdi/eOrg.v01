@@ -6,7 +6,7 @@ export interface ParsedShortcodeResult {
   notes: Array<{ label: string; text: string; id: number }>;
 }
 
-// ইংরেজি সংখ্যাকে বাংলায় রূপান্তর করার হেল্পার
+// ইংরেজি সংখ্যাকে বাংলায় রূপান্তর করার হেল্পার
 const toBengaliNumber = (num: number | string): string =>
   num.toString().replace(/\d/g, (d) => "০১২৩৪৫৬৭৮৯"[parseInt(d, 10)]);
 
@@ -22,7 +22,7 @@ export function parseNoteShortcodes(content: string): ParsedShortcodeResult {
   // ১. Carriage Return (\r\n) নরমালাইজ করা
   const normalizedContent = content.replace(/\r\n/g, '\n');
 
-  // Regex দিয়ে অপশনাল কাস্টম মার্ক সহ [note] বা [note="..."] ক্যাপচার করা
+  // Regex দিয়ে অপশনাল কাস্টম মার্ক সহ [note] বা [note="..."] ক্যাপচার করা
   const regex = /\[note(?:=(?:&quot;|"|')?(.*?)(?:&quot;|"|')?)?\]([\s\S]*?)\[\/note\]/gi;
   
   const extractedNotes: Array<{ label: string; text: string; id: number }> = [];

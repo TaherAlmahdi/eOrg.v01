@@ -3,9 +3,10 @@ import type { FC } from "react";
 import { cache } from "react";
 import { getItemTypeSummaries } from "@/lib/catalog";
 import ItemListView from "./ItemListView";
+import { normalizeBn } from '@/app/lib/bn-text';
 
 const getBengaliInitial = (text: string = ''): string => {
-  const value = text.normalize('NFC').trim();
+  const value = normalizeBn(text).trim();
   if (!value) return '';
 
   const firstChar = value.charAt(0);
@@ -13,7 +14,7 @@ const getBengaliInitial = (text: string = ''): string => {
     return firstChar.toUpperCase();
   }
 
-  const match = value.match(/^([অআইঈউঊঋএঐওঔকখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহড়ঢ়য়])/);
+  const match = value.match(/^([অআইঈউঊঋএঐওঔকখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহড়ঢ়য়])/);
   if (match && match[1]) {
     return match[1];
   }

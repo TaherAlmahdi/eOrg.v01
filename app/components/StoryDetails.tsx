@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 
-// সংখ্যা বাংলায় রূপান্তরের হেল্পার
+// সংখ্যা বাংলায় রূপান্তরের হেল্পার
 const toBengaliNumber = (num?: number | string): string =>
   num !== undefined && num !== null && num !== ''
     ? num.toString().replace(/\d/g, (d) => '০১২৩৪৫৬৭৮৯'[parseInt(d, 10)])
@@ -17,7 +17,7 @@ export interface StoryDetailsProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- story shape varies across sources
   story: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- series may be a string or an object
-  series?: any; // অভিভাবক ফাইল থেকে এক্সপ্লিসিটলি পাস করলেও যেন TypeScript এরর না দেয়
+  series?: any; // অভিভাবক ফাইল থেকে এক্সপ্লিসিটলি পাস করলেও যেন TypeScript এরর না দেয়
 }
 
 export default function StoryDetails({ story, series: explicitSeries }: StoryDetailsProps) {
@@ -26,7 +26,7 @@ export default function StoryDetails({ story, series: explicitSeries }: StoryDet
   // story.series, story.series_name অথবা প্রপস থেকে আসা explicitSeries গ্রহণ
   const seriesData = story.series || story.series_name || explicitSeries;
 
-  // সিরিজের লিঙ্ক পাওয়ার জন্য হেল্পার ফাংশন
+  // সিরিজের লিঙ্ক পাওয়ার জন্য হেল্পার ফাংশন
   const getSeriesLink = (seriesName: string): string => {
     // ১. যদি series_links এ্যারে থেকে নাম ম্যাচ করে
     const matchedLink = story.series_links?.find(
@@ -37,7 +37,7 @@ export default function StoryDetails({ story, series: explicitSeries }: StoryDet
     // ২. যদি সরাসরি story.series_link থাকে
     if (story.series_link) return story.series_link;
 
-    // ৩. কোনো নির্দিষ্ট লিঙ্ক না থাকলে ডায়নামিক স্লাগ রুট ফলব্যাক
+    // ৩. কোনো নির্দিষ্ট লিঙ্ক না থাকলে ডায়নামিক স্লাগ রুট ফলব্যাক
     return `/series/${encodeURIComponent(seriesName)}`;
   };
 

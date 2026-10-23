@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Eye } from "lucide-react";
 import { customAuthorSlugs, customBookSlugs } from "@/scripts/stories-slug-map";
+import { normalizeBn } from '@/app/lib/bn-text';
 
 
 interface PostCardProps {
@@ -19,7 +20,7 @@ interface PostCardProps {
   };
 }
 
-// বাংলা সংখ্যায় রূপান্তর করার হেলপার
+// বাংলা সংখ্যায় রূপান্তর করার হেলপার
 const toBengaliNumber = (num?: number | string): string =>
   num !== undefined && num !== null && num !== ''
     ? num.toString().replace(/\d/g, (d) => '০১২৩৪৫৬৭৮৯'[parseInt(d, 10)])
@@ -31,8 +32,7 @@ function generateSlug(text: string, customMap?: Record<string, string>): string 
   if (customMap && customMap[trimmed]) {
     return customMap[trimmed];
   }
-  return trimmed
-    .normalize('NFC')
+  return normalizeBn(trimmed)
     .toLowerCase()
     .replace(/\s+/g, '-')
     .replace(/[^\p{L}\p{N}-]/gu, '');
@@ -49,10 +49,10 @@ export function PostCard({ post }: PostCardProps) {
         className="block aspect-video relative w-full flex flex-col justify-between p-2 bg-cover bg-center overflow-hidden border-b border-orange-100"
         style={{ backgroundImage: `url('/bg-01.webp')` }}
       >
-        {/* লেখার স্পষ্টতা বাড়াতে হালকা ওভারলে */}
+        {/* লেখার স্পষ্টতা বাড়াতে হালকা ওভারলে */}
         <div className="absolute inset-0 bg-white/70 group-hover:bg-white/60 transition-colors" />
 
-        {/* উপরে বইয়ের নাম */}
+        {/* উপরে বইয়ের নাম */}
         <div className="relative z-10 text-right">
           {post.book && (
             <span className="text-sm bg-white/90 text-orange-800 px-2.5 py-1 rounded border border-orange-200 line-clamp-1 inline-block shadow-xs">
@@ -83,7 +83,7 @@ export function PostCard({ post }: PostCardProps) {
         </div>
       </Link>
 
-      {/* কার্ডের নিচের ফুটার অংশ (একচুয়াল ভিউ সংখ্যা) */}
+      {/* কার্ডের নিচের ফুটার অংশ (একচুয়াল ভিউ সংখ্যা) */}
       <div className="p-3 flex items-center justify-between text-sm text-gray-600 bg-white">
         <div className="flex items-center gap-1.5 text-gray-700 font-medium">
           <Eye size={16} className="text-[#996633]" />
@@ -91,7 +91,7 @@ export function PostCard({ post }: PostCardProps) {
         </div>
 
         <Link href={`/story/${post.slug}`} className="text-[#996633] hover:underline font-medium">
-          পড়ুন →
+          পড়ুন →
         </Link>
       </div>
     </article>

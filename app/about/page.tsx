@@ -54,7 +54,7 @@ async function getAboutData(subdomain: string): Promise<AboutData> {
     if (raw === null) {
       return {
         frontmatter: { title: 'আমাদের সম্পর্কে' },
-        content: 'আমাদের সম্পর্কে কোনো তথ্য পাওয়া যায়নি।',
+        content: 'আমাদের সম্পর্কে কোনো তথ্য পাওয়া যায়নি।',
       };
     }
 
@@ -67,13 +67,13 @@ async function getAboutData(subdomain: string): Promise<AboutData> {
   } catch {
     return {
       frontmatter: { title: 'আমাদের সম্পর্কে' },
-      content: 'তথ্য লোড করতে সমস্যা হয়েছে।',
+      content: 'তথ্য লোড করতে সমস্যা হয়েছে।',
     };
   }
 }
 
 function extractToc(markdownContent: string): TocItem[] {
-  // মার্কডাউন (যেমন: ## Title) এবং HTML ট্যাগ (যেমন: <h2>Title</h2>) উভয়ই ম্যাচ করবে
+  // মার্কডাউন (যেমন: ## Title) এবং HTML ট্যাগ (যেমন: <h2>Title</h2>) উভয়ই ম্যাচ করবে
   const combinedRegex = /^(#{1,6})\s+(.+)$|<h([1-6])(?:\s+[^>]*)?>(.*?)<\/h\3>/gim;
 
   const toc: TocItem[] = [];

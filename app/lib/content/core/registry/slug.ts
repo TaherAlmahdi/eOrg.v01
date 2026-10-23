@@ -1,3 +1,4 @@
+import { normalizeBn } from '@/app/lib/bn-text';
 // src/app/lib/content/core/registry/slug.ts
 
 /**
@@ -24,15 +25,14 @@ export const generateRawSlug = (text: string): string => {
 };
 
 /**
- * Normalises Bengali text: composes nukta letters (ড়, ঢ়, য়) so equal names compare equal.
+ * Normalises Bengali text: composes nukta letters (ড়, ঢ়, য়) so equal names compare equal.
  */
 export function normalizeBanglaText(text: string): string {
   if (!text) return "";
-  return String(text)
-    .normalize("NFC")
-    .replace(/ড়/g, "ড়")
-    .replace(/ঢ়/g, "ঢ়")
-    .replace(/য়/g, "য়")
+  return normalizeBn(String(text))
+    .replace(/ড়/g, "ড়")
+    .replace(/ঢ়/g, "ঢ়")
+    .replace(/য়/g, "য়")
     .replace(/র/g, "র");
 }
 
