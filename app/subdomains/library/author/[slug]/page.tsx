@@ -214,16 +214,18 @@ export default async function SingleAuthorPage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }}
       />
-      <AuthorBioCard
-        slugs={[
-          rawSlug.toLowerCase(),
-          authorName ? getAuthorSlugFromTitle(authorName) || getSlug('authors', authorName) : '',
-        ]}
-      />
       <AuthorBookSearchGrid
         books={authorBooks as FrontmatterValue}
         personName={displayAuthorName}
         siteName={siteData?.title || 'এডুলিচার পাঠশালা'}
+        bioCard={
+          <AuthorBioCard
+            slugs={[
+              rawSlug.toLowerCase(),
+              authorName ? getAuthorSlugFromTitle(authorName) || getSlug('authors', authorName) : '',
+            ]}
+          />
+        }
       />
     </div>
   );

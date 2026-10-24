@@ -2,7 +2,7 @@
 
 import Breadcrumb from '@/app/components/Breadcrumb';
 import { COVER_BASE } from '@/app/lib/cover-base';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, type ReactNode } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Search, Book, X, User } from 'lucide-react';
@@ -16,7 +16,7 @@ const getCoverImageUrl = (coverPath?: string | null): string => {
   if (!coverPath) return `${COVER_BASE}/cover/default-cover.webp`;
 
   // ১. যদি ইতোমধ্যে সম্পূর্ণ URL (http/https) হয়ে থাকে
-  if (coverPath.startsWith('http://') || coverPath.startsWith('https://') || coverPath.startsWith(`${COVER_BASE}/`)) {
+  if (coverPath.startsWith('http://') || coverPath.startsWith('https://')) {
     return coverPath;
   }
 
@@ -67,6 +67,8 @@ interface AuthorBookSearchGridProps {
   books?: BookItem[];
   siteName?: string;
   personName: string;
+  /** Short introduction of the author (server-rendered AuthorBioCard), shown between the search bar and the letter filter */
+  bioCard?: ReactNode;
 }
 
 const isFieldMatch = (field: unknown, targetName: string): boolean => {
@@ -95,6 +97,7 @@ export default function AuthorBookSearchGrid({
   books = [],
   siteName = 'এডুলিচার পাঠশালা',
   personName = '',
+  bioCard,
 }: AuthorBookSearchGridProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLetter, setSelectedLetter] = useState('সব');
@@ -168,7 +171,7 @@ export default function AuthorBookSearchGrid({
     });
   }, [personBooks, selectedLetter, searchQuery]);
 
-  const displayTitle = personName ? `${personName} রচনাবলী` : 'গ্রন্থাবলী';
+  const displayTitle = personName || 'গ্রন্থাবলী';
 
   return (
     <main className="bg-[#fdfcf8] min-h-screen font-tarunima">
@@ -217,6 +220,8 @@ export default function AuthorBookSearchGrid({
               </div>
             )}
           </div>
+
+          {bioCard}
 
           {/* ফুল-ওয়াইড ও সেন্টারাইজড আদ্যক্ষর ফিল্টারিং */}
           {personBooks.length > 0 && dynamicLetters.length > 1 && (
