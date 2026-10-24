@@ -119,7 +119,10 @@ export default function proxy(request: NextRequest) {
   ];
 
   if (globalBypassRoutes.some(route => pathname.startsWith(route))) {
-    if (subdomain === 'library' && !pathname.startsWith('/subdomains/library')) {
+    // /about and /biography are shared pages (app/about, app/biography): they read pages/about|bio/<subdomain>.md,
+    // so library must not rewrite them into /subdomains/library (there is no such route there)
+    const isSharedPage = pathname === '/about' || pathname === '/biography';
+    if (subdomain === 'library' && !isSharedPage && !pathname.startsWith('/subdomains/library')) {
       url.pathname = `/subdomains/library${pathname}`;
       return NextResponse.rewrite(url, {
         request: { headers: requestHeaders },
