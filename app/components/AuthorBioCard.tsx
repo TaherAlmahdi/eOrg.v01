@@ -27,7 +27,7 @@ export default async function AuthorBioCard({ slugs }: { slugs: string[] }) {
         <AuthorPhoto
           src={authorImageUrl(image)}
           alt={name || 'লেখকের ছবি'}
-          className="float-left mr-3 mb-1 w-20 sm:w-28 aspect-[2/3] object-contain"
+          className="float-left mr-3 mb-1 w-20 aspect-[2/3] object-contain"
         />
       )}
       <p className="text-justify text-gray-800 leading-relaxed text-base md:text-lg">{summary}</p>

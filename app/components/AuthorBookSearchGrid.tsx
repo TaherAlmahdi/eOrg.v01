@@ -17,7 +17,7 @@ const getCoverImageUrl = (coverPath?: string | null): string => {
   if (!coverPath) return `${COVER_BASE}/cover/default-cover.webp`;
 
   // ১. যদি ইতোমধ্যে সম্পূর্ণ URL (http/https) হয়ে থাকে
-  if (coverPath.startsWith('http://') || coverPath.startsWith('https://')) {
+  if (coverPath.startsWith('http://') || coverPath.startsWith('https://') || coverPath.startsWith(`${COVER_BASE}/`)) {
     return coverPath;
   }
 
@@ -185,7 +185,7 @@ export default function AuthorBookSearchGrid({
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             {/* বামপাশে পেজ টাইটেল ও তথ্য */}
             <div className="rounded bg-teal-50/90 text-[#008080] border border-teal-200 shadow-xs backdrop-blur-md self-start md:self-auto w-full md:w-auto">
-              <div className="p-2.5 flex items-center gap-3">
+              <div className="p-2 flex items-center gap-3">
                 <div className="shrink-0">
                   {authorImage ? (
                     <AuthorPhoto
@@ -198,12 +198,12 @@ export default function AuthorBookSearchGrid({
                     <User size={22} className="animate-pulse text-[#008080]" />
                   )}
                 </div>
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <h1 className="text-xl md:text-2xl font-bold text-gray-950 leading-none">
                     <span className="text-[#008080]">{displayTitle}</span>
                   </h1>
                   <p className="mt-1.5 text-xs md:text-sm text-gray-500">
-                    <span className="text-xs md:text-sm font-normal text-teal-700 bg-teal-100/70 px-2 py-1 inline-block">
+                    <span className="text-xs md:text-sm font-normal text-teal-700 bg-teal-100/70 px-2 py-1 block w-full">
                       {personBooks.length > 0
                         ? `প্রকাশিত বইয়ের সংখ্যা ${toBengaliNumber(personBooks.length)} টি`
                         : "বর্তমানে কোনো বই পাওয়া যায়নি"}
