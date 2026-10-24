@@ -5,12 +5,13 @@
 // NODE_ENV === 'development' and CONTENT_ROOT is set (see app/lib/books/r2.ts).
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { buildCatalogFromFiles, buildTocManifests, type CatalogFile } from './build';
+import { buildBioIndex, buildCatalogFromFiles, buildTocManifests, type CatalogFile } from './build';
 import { normalizeBn } from '../../app/lib/bn-text';
 
 const BOOKS_MANIFEST_KEY = '_manifest/books-index.json';
 const ITEMS_MANIFEST_KEY = '_manifest/items-index.json';
 const SLUGS_MANIFEST_KEY = '_manifest/slugs.json';
+const BIO_INDEX_KEY = '_manifest/bio-index.json';
 const TOC_MANIFEST_PREFIX = '_manifest/toc/';
 const MANIFEST_TTL_MS = 3000;
 
@@ -82,7 +83,9 @@ async function mapLimit<T, R>(items: T[], limit: number, fn: (item: T) => Promis
 
 async function rebuildManifests(): Promise<void> {
   const root = contentRoot();
-  const mdFiles = (await walk(path.join(root, 'books'))).filter((f) => f.endsWith('.md'));
+  const mdFiles = [...(await walk(path.join(root, 'books'))), ...(await walk(path.join(root, 'pages', 'bio')))].filter((f) =>
+    f.endsWith('.md')
+  );
   const bodies = await mapLimit(mdFiles, 4, loadBody);
   const files: CatalogFile[] = mdFiles.map((file, i) => ({ key: toKey(root, file), body: bodies[i] }));
   const { booksManifest, itemsManifest, slugsManifest, nameWarnings } = buildCatalogFromFiles(files);
@@ -94,6 +97,7 @@ async function rebuildManifests(): Promise<void> {
       [BOOKS_MANIFEST_KEY, JSON.stringify(booksManifest)],
       [ITEMS_MANIFEST_KEY, JSON.stringify(itemsManifest)],
       [SLUGS_MANIFEST_KEY, JSON.stringify(slugsManifest)],
+      [BIO_INDEX_KEY, JSON.stringify(buildBioIndex(files))],
       ...tocManifests,
     ]),
   };
@@ -126,7 +130,7 @@ export function getLocalBucket(): R2Bucket {
         const text = await getManifestJson(key);
         return { text: async () => text, json: async () => JSON.parse(text) };
       }
-      if (key.startsWith(TOC_MANIFEST_PREFIX)) {
+      if (key.startsWith(TOC_MANIFEST_PREFIX) || key === BIO_INDEX_KEY) {
         await getManifestJson(BOOKS_MANIFEST_KEY); // makes sure the manifests are built
         const text = manifestCache?.files.get(key);
         return text === undefined ? null : { text: async () => text, json: async () => JSON.parse(text) };

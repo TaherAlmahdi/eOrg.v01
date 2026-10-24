@@ -1,5 +1,7 @@
 import type { FC } from "react";
-import { getAllBooks, type Book } from "@/app/lib/books"; 
+import { headers } from "next/headers";
+import { getAllBooks, type Book } from "@/app/lib/books";
+import { getSubdomainData } from "@/app/lib/get-site-data";
 import { getSlug, getAuthorSlugFromTitle, findName } from "@/app/lib/content/core/registry";
 import { AuthorListView } from "./AuthorListView";
 
@@ -66,6 +68,10 @@ const AuthorList: FC<AuthorListProps> = async ({ sortBy, limit }) => {
 
   const authors = limit ? sortedAuthors.slice(0, limit) : sortedAuthors;
 
+  // The main domain links to the biography of an author, library (and the other sites) to the author's books
+  const host = (await headers()).get("host");
+  const basePath = getSubdomainData(host).subdomain ? "/author" : "/bio";
+
   return (
     <div className="relative w-full h-auto">
       <div className="relative z-20 w-full max-w-none mx-auto">
@@ -73,6 +79,7 @@ const AuthorList: FC<AuthorListProps> = async ({ sortBy, limit }) => {
           authors={authors}
           isHomePage={!!limit}
           totalAuthorsCount={authorMap.size}
+          basePath={basePath}
         />
       </div>
     </div>

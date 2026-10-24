@@ -260,3 +260,29 @@ export async function buildTocManifests(
   }
   return tocs;
 }
+
+export interface BioIndexEntry {
+  name?: string;
+  image?: string;
+  summary?: string;
+}
+
+/**
+ * Index of the biographies (content/pages/bio/<slug>.md): name, image and `summary` of each, keyed by file slug.
+ * The library author page shows the summary without reading the biography files, and the page cache watches this
+ * manifest, so an edited summary shows up without waiting for the 7-day cache to run out.
+ */
+export function buildBioIndex(files: CatalogFile[]): Record<string, BioIndexEntry> {
+  const index: Record<string, BioIndexEntry> = {};
+  for (const file of files) {
+    const match = /^pages\/bio\/([^/]+)\.md$/.exec(file.key);
+    if (!match) continue;
+    const { data } = matter(normalizeBn(file.body));
+    const entry: BioIndexEntry = {};
+    if (data.name || data.title) entry.name = String(data.name || data.title).trim();
+    if (data.image) entry.image = String(data.image).trim();
+    if (data.summary) entry.summary = String(data.summary).trim();
+    index[match[1].toLowerCase()] = entry;
+  }
+  return index;
+}

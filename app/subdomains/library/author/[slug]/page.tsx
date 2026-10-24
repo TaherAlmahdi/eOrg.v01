@@ -6,6 +6,7 @@ import { headers } from 'next/headers';
 import { getLibraryBooks } from '../../../../lib/books';
 import { getSlug, getAuthorSlugFromTitle } from '../../../../lib/content/core/registry';
 import AuthorBookSearchGrid from '@/app/components/AuthorBookSearchGrid';
+import AuthorBioCard from '@/app/components/AuthorBioCard';
 import { buildTabTitle, getSubdomainData } from '@/app/lib/get-site-data';
 import { normalizeBn } from '@/app/lib/bn-text';
 
@@ -212,6 +213,12 @@ export default async function SingleAuthorPage({ params }: PageProps) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }}
+      />
+      <AuthorBioCard
+        slugs={[
+          rawSlug.toLowerCase(),
+          authorName ? getAuthorSlugFromTitle(authorName) || getSlug('authors', authorName) : '',
+        ]}
       />
       <AuthorBookSearchGrid
         books={authorBooks as FrontmatterValue}

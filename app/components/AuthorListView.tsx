@@ -19,12 +19,15 @@ interface AuthorListViewProps {
   authors?: AuthorItem[];
   isHomePage?: boolean;
   totalAuthorsCount?: number;
+  /** Where a name links to: "/author" (books of the author, on library) or "/bio" (biography, on the main domain) */
+  basePath?: string;
 }
 
 export const AuthorListView: FC<AuthorListViewProps> = ({
   authors = [],
   isHomePage = false,
   totalAuthorsCount,
+  basePath = "/author",
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLetter, setSelectedLetter] = useState("সব");
@@ -165,7 +168,7 @@ export const AuthorListView: FC<AuthorListViewProps> = ({
           {filteredAuthors.map(({ slug, name, count }, index) => (
             <Link
               key={`${slug}-${index}`}
-              href={`/author/${slug}`}
+              href={`${basePath}/${slug}`}
               className="flex items-center justify-between gap-2 px-2.5 py-2 rounded bg-white text-[#008080] border border-teal-100 shadow-xs transition-all duration-200 hover:bg-teal-50/50 hover:shadow-md hover:border-teal-300 shrink-0 grow basis-full sm:basis-[calc(50%-0.35rem)] lg:basis-[calc(33.333%-0.45rem)] xl:basis-[calc(25%-0.5rem)] 2xl:basis-[calc(20%-0.5rem)] max-w-full group cursor-pointer"
             >
               <div className="flex items-center gap-2.5 min-w-0">

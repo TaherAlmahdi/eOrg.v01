@@ -19,6 +19,8 @@ interface Handler<Env> {
 }
 
 const MANIFEST_KEYS = ['_manifest/books-index.json', '_manifest/items-index.json', '_manifest/slugs.json'];
+// Part of the cache version when it exists (the library author page shows the biography summary from it)
+const OPTIONAL_MANIFEST_KEYS = ['_manifest/bio-index.json'];
 const MANIFEST_VERSION_TTL_MS = 15_000;
 const BROWSER_CACHE_CONTROL = 'public, max-age=0, must-revalidate';
 const CACHE_SECONDS = 7 * 24 * 60 * 60;
@@ -33,9 +35,9 @@ let versionCache: { value: string; at: number } | null = null;
 /** ETags of the manifests, joined; changes whenever sync-assets rewrites one of them. */
 async function manifestVersion(bucket: R2Bucket): Promise<string | null> {
   if (versionCache && Date.now() - versionCache.at < MANIFEST_VERSION_TTL_MS) return versionCache.value;
-  const heads = await Promise.all(MANIFEST_KEYS.map((key) => bucket.head(key)));
-  if (heads.some((head) => !head)) return null; // a manifest is missing: do not cache
-  const value = heads.map((head) => head!.etag).join('.');
+  const heads = await Promise.all([...MANIFEST_KEYS, ...OPTIONAL_MANIFEST_KEYS].map((key) => bucket.head(key)));
+  if (heads.slice(0, MANIFEST_KEYS.length).some((head) => !head)) return null; // a manifest is missing: do not cache
+  const value = heads.map((head) => head?.etag ?? '-').join('.');
   versionCache = { value, at: Date.now() };
   return value;
 }

@@ -6,7 +6,7 @@ import { config } from 'dotenv';
 config({ path: '.env.local' });
 import mime from 'mime-types';
 import readline from 'readline/promises';
-import { buildCatalogFromFiles, buildTocManifests, type CatalogFile } from '../lib/catalog/build';
+import { buildBioIndex, buildCatalogFromFiles, buildTocManifests, type CatalogFile } from '../lib/catalog/build';
 import {
   S3Client,
   ListObjectsV2Command,
@@ -24,6 +24,10 @@ const CONTENT_ROOT = process.env.CONTENT_ROOT
 const COVER_ROOT = process.env.COVER_ROOT
   ? path.resolve(process.env.COVER_ROOT)
   : path.join(process.cwd(), 'public', 'cover');
+// Author pictures (public/authors in the books repo) go to the bucket under authors/
+const AUTHORS_ROOT = process.env.AUTHORS_ROOT
+  ? path.resolve(process.env.AUTHORS_ROOT)
+  : path.join(path.dirname(COVER_ROOT), 'authors');
 const BUCKET = 'eduliture-assets';
 const AUTO_SLUG_FILE = path.join(process.cwd(), 'app', 'lib', 'content', 'core', 'registry', 'slug-auto.json');
 
@@ -43,6 +47,7 @@ const BOOKS_MANIFEST_KEY = '_manifest/books-index.json';
 const ITEMS_MANIFEST_KEY = '_manifest/items-index.json';
 const SLUGS_MANIFEST_KEY = '_manifest/slugs.json';
 const TOC_MANIFEST_PREFIX = '_manifest/toc/';
+const BIO_INDEX_KEY = '_manifest/bio-index.json';
 
 const s3 = new S3Client({
   region: 'auto',
@@ -186,7 +191,7 @@ async function main() {
     if (status === 'uploaded') uploaded++;
     else skipped++;
 
-    if (r2Key.startsWith('books/') && r2Key.endsWith('.md')) {
+    if ((r2Key.startsWith('books/') || r2Key.startsWith('pages/bio/')) && r2Key.endsWith('.md')) {
       catalogFiles.push({ key: r2Key, body: body.toString('utf8') });
     }
   }
@@ -204,6 +209,19 @@ async function main() {
     else skipped++;
   }
 
+  // ==========================================
+  // Step 2b: Upload author pictures (public/authors -> authors/)
+  // ==========================================
+  for (const localPath of await walk(AUTHORS_ROOT)) {
+    const relativePath = path.relative(AUTHORS_ROOT, localPath).replace(/\\/g, '/');
+    const r2Key = `authors/${relativePath}`;
+    localKeys.add(r2Key);
+
+    const { status } = await uploadIfChanged(localPath, r2Key, remoteObjects);
+    if (status === 'uploaded') uploaded++;
+    else skipped++;
+  }
+
   // Same builder the local dev server uses, so local and live agree
   const { booksManifest, itemsManifest, slugsManifest, slugWarnings, nameWarnings, newSlugs } = buildCatalogFromFiles(catalogFiles);
   const slugCount = Object.values(slugsManifest).reduce((n, table) => n + Object.keys(table).length, 0);
@@ -211,6 +229,7 @@ async function main() {
   for (const warning of nameWarnings) console.warn(`⚠️  ${warning}`);
   await saveAutoSlugs(newSlugs);
   const tocManifests = await buildTocManifests(catalogFiles, booksManifest); // also stamps tocHash on booksManifest
+  const bioIndex = buildBioIndex(catalogFiles);
 
   console.log(`\n✅ Uploaded: ${uploaded}, unchanged (skipped): ${skipped}.`);
 
@@ -220,7 +239,7 @@ async function main() {
   const keysToTrash: string[] = [];
   for (const remoteKey of remoteObjects.keys()) {
     if (remoteKey === BOOKS_MANIFEST_KEY || remoteKey === ITEMS_MANIFEST_KEY || remoteKey === SLUGS_MANIFEST_KEY) continue;
-    if (remoteKey.startsWith(TOC_MANIFEST_PREFIX)) continue; // generated, like the manifests above
+    if (remoteKey.startsWith(TOC_MANIFEST_PREFIX) || remoteKey === BIO_INDEX_KEY) continue; // generated, like the manifests above
     if (remoteKey.startsWith(TRASH_PREFIX)) continue;
     if (NOT_FOR_BUCKET_PREFIXES.some((prefix) => remoteKey.startsWith(prefix))) continue; // left as it is
     if (!localKeys.has(remoteKey)) keysToTrash.push(remoteKey);
@@ -294,6 +313,16 @@ async function main() {
     );
   }
   console.log(`\n✅ Table-of-contents manifests updated — ${tocManifests.size} books.`);
+
+  await s3.send(
+    new PutObjectCommand({
+      Bucket: BUCKET,
+      Key: BIO_INDEX_KEY,
+      Body: Buffer.from(JSON.stringify(bioIndex)),
+      ContentType: 'application/json',
+    })
+  );
+  console.log(`✅ Bio index updated — ${Object.keys(bioIndex).length} biographies.`);
 
   await s3.send(
     new PutObjectCommand({

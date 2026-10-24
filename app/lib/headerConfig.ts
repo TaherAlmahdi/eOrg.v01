@@ -34,6 +34,7 @@ export const headerConfig: Record<string, DomainConfig> = {
     menu: [
       { label: "আলয়", url: "/", icon: "Home", desc: "প্রধান প্রবেশপথ" },
       { label: "এডুলিচার লাইব্রেরি", url: "goto:library:", icon: "Library", desc: "উন্মুক্ত গ্রন্থ সংগ্রহ" },
+      { label: "লেখক নির্ঘণ্ট", url: "/authors", icon: "Users", desc: "সম্মানিত লেখকমণ্ডলী" },
       {
         label: "রচনাবলী প্রকল্প",
         url: "#",

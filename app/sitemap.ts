@@ -6,6 +6,7 @@ import { getBookEntries } from '@/lib/catalog';
 import { getChapterPathSegments } from '@/lib/catalog/chapter-paths';
 import { listKeysUnderPrefix } from '@/app/lib/books/r2';
 import { getSubdomainData } from '@/app/lib/get-site-data';
+import { getBioIndex } from '@/app/lib/bio';
 import { getSlug } from '@/app/lib/content/core/registry';
 import { splitNames } from '@/app/lib/content/core/registry/names';
 
@@ -20,6 +21,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const subdomain = getSubdomainData(host).subdomain || '';
   const isLibrary = subdomain === 'library';
+
+  // The main domain does not serve books (proxy.ts redirects them to library), so its sitemap is just the site's own pages
+  if (!subdomain && !isLocal) {
+    const bioSlugs = Object.keys(await getBioIndex());
+    return ['/', '/about', '/authors', '/bio', ...bioSlugs.map((slug) => asPath('bio', slug))].map((p) => ({
+      url: `${origin}${p === '/' ? '' : p}`,
+      changeFrequency: p === '/' ? 'daily' : 'weekly',
+      priority: p === '/' ? 1 : 0.8,
+    }));
+  }
 
   const paths = new Set<string>(['/', '/about', '/books', '/genres']);
   if (isLibrary) {

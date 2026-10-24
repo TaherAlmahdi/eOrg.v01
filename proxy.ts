@@ -14,6 +14,13 @@ const ALLOWED_SUBDOMAINS = new Set([
   'sukanta',
 ]);
 
+const MAIN_HOSTS = new Set(['eduliture.org', 'www.eduliture.org']);
+// Pages of the book library: /book, /books, /genre(s), /series, /author (with or without a deeper path).
+// /authors, /about and /biography stay on the main domain.
+const BOOK_PATH_PATTERN = /^\/(book|books|genre|genres|series|author)(\/|$)/;
+const LIBRARY_ORIGIN = 'https://library.eduliture.org';
+const AUTHOR_IMAGE_PATTERN = /^\/authors\/.+\.(webp|png|jpe?g|gif|svg)$/i;
+
 export default function proxy(request: NextRequest) {
   const url = request.nextUrl.clone();
   const hostname = request.headers.get('host') || '';
@@ -60,7 +67,8 @@ export default function proxy(request: NextRequest) {
     pathname === '/manifest.webmanifest' ||
     pathname === '/sw.js' ||
     pathname.startsWith('/icons/') ||
-    pathname.startsWith('/cover/')
+    pathname.startsWith('/cover/') ||
+    AUTHOR_IMAGE_PATTERN.test(pathname) // author pictures (media host serves them from R2 through app/authors/[...path])
   ) {
     return NextResponse.next();
   }
@@ -70,6 +78,11 @@ export default function proxy(request: NextRequest) {
     if (pathname.startsWith('/items') || pathname.startsWith('/item')) {
       url.pathname = '/404'; // মেইন ডোমেনে কল করলে 404 দেখাবে
       return NextResponse.rewrite(url);
+    }
+    // Books are read only on library and the author subdomains: the real main domain sends the same path to library
+    // (localhost, IPs and *.workers.dev previews have no subdomain either and stay open for testing).
+    if (MAIN_HOSTS.has(hostWithoutPort) && BOOK_PATH_PATTERN.test(pathname)) {
+      return NextResponse.redirect(`${LIBRARY_ORIGIN}${pathname}${url.search}`, 301);
     }
     return NextResponse.next({ request: { headers: requestHeaders } });
   }
