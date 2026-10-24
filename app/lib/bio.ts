@@ -10,6 +10,23 @@ import { buildTabTitle, type SubdomainData } from '@/app/lib/get-site-data';
 
 export const BIO_INDEX_KEY = '_manifest/bio-index.json';
 
+/** One extra row of the info card, written in the frontmatter `fields:` list (no code change needed to add rows). */
+export interface BioExtraField {
+  label: string;
+  /** Text, or a list of texts shown on separate lines. */
+  value?: string | string[];
+  /** If set, `value` becomes a link to this address. */
+  link?: string;
+  /** "image" shows `value` as a picture. */
+  type?: 'image';
+}
+
+/** A website entry: `{ name, link }` (name is the visible text). */
+export interface BioWebsite {
+  name?: string;
+  link: string;
+}
+
 export interface BioFrontmatter {
   title?: string;
   name?: string;
@@ -31,8 +48,10 @@ export interface BioFrontmatter {
   children?: string;
   relatives?: string;
   signature?: string;
-  website?: string;
+  /** A plain address (with optional `website_name`), one `{ name, link }`, or a list of them. */
+  website?: string | BioWebsite | BioWebsite[];
   website_name?: string;
+  fields?: BioExtraField[];
   meta_title?: string;
   meta_description?: string;
   og_image?: string;

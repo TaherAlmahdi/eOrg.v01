@@ -13,132 +13,93 @@ interface BioSidebarProps {
   image?: string;
   name?: string;
   infoFields: InfoField[];
-  children: React.ReactNode;
+  className?: string;
 }
 
-export default function BioSidebar({ image, name, infoFields, children }: BioSidebarProps) {
-  const [showSidebar, setShowSidebar] = useState(true);
+// Left info card: on desktop it sticks while the text scrolls and stops at the end of the article (scrolls
+// inside itself, without a scrollbar, if it is taller than the screen); on mobile only the image shows,
+// with the "পরিচিতি" details behind a show/hide button.
+export default function BioSidebar({ image, name, infoFields, className = '' }: BioSidebarProps) {
+  const [showInfo, setShowInfo] = useState(false);
 
-  // শুধু যেসব ফিল্ডে মান (value) আছে সেগুলো ফিল্টার করা হচ্ছে
   const validFields = infoFields.filter(
     (field) => field.value !== undefined && field.value !== null && field.value !== ''
   );
 
   return (
-    <>
-      {/* মোবাইল টগল বাটন */}
-      <div className="mb-3 flex justify-between items-center border-b border-gray-200 dark:border-gray-700 pb-2 md:hidden">
-        <button
-          onClick={() => setShowSidebar(!showSidebar)}
-          className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium bg-teal-50 text-[#008080] border border-teal-100 hover:bg-teal-100 dark:bg-teal-950 dark:text-teal-300 dark:border-teal-800 dark:hover:bg-teal-900 rounded-md transition-all font-tarunima cursor-pointer"
-        >
-          {showSidebar ? (
-            <>
-              <EyeOff size={16} />
-              <span>সংক্ষিপ্ত তথ্য লুকান</span>
-            </>
-          ) : (
-            <>
-              <Eye size={16} />
-              <span>সংক্ষিপ্ত তথ্য দেখুন</span>
-            </>
-          )}
-        </button>
-      </div>
+    <aside
+      className={`w-full mb-4 md:mb-0 md:sticky md:top-6 md:self-start md:max-h-[calc(100vh-3rem)] md:overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${className}`}
+    >
+      <div className="bg-slate-80 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 rounded shadow-sm overflow-hidden">
+        {image && (
+          <div className="w-full overflow-hidden border-b border-slate-200/80 dark:border-slate-700/60">
+            <img
+              src={image}
+              alt={name || 'Profile Image'}
+              decoding="async"
+              className="w-full h-auto object-cover block"
+            />
+          </div>
+        )}
 
-      {/* প্যারেন্ট ফ্লেক্স কন্টেইনার থেকে items-start তুলে দেওয়া হয়েছে যাতে sticky সঠিকভাবে স্ক্রল হাইট পায় */}
-      <div className="flex flex-col md:flex-row gap-6 relative">
-        {/* সাইডবার (ডেস্কটপে sticky, মোবাইলে নরমাল flow) */}
-        {showSidebar && (
-          <aside className="w-full md:w-1/3 lg:w-1/4 shrink-0 transition-all duration-300 md:sticky md:top-6 self-start">
-            {/* ডেস্কটপ টগল বাটন: সাইডবারের ডানপাশে (EyeOff) */}
-            <button
-              onClick={() => setShowSidebar(false)}
-              className="hidden md:flex absolute -right-3 top-3 z-20 w-7 h-7 items-center justify-center bg-yellow-400 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full shadow-md text-slate-600 dark:text-slate-300 hover:text-teal-600 dark:hover:text-teal-400 cursor-pointer transition-transform hover:scale-110"
-              title="সংক্ষিপ্ত তথ্য লুকান"
-              aria-label="Hide Sidebar"
-            >
-              <EyeOff size={14} />
-            </button>
-
-            {/* মেইন কন্টেইনার */}
-            <div className="bg-slate-80 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 rounded shadow-sm overflow-hidden">
-              
-              {/* প্রধান ছবি */}
-              {image && (
-                <div className="w-full overflow-hidden border-b border-slate-200/80 dark:border-slate-700/60">
-                  <img
-                    src={image}
-                    alt={name || 'Profile Image'}
-                    decoding="async"
-                    className="w-full h-auto object-cover block"
-                  />
-                </div>
-              )}
-
-              {/* ইনফরমেশন এরিয়া */}
-              <div className="p-3 md:p-4">
-                <h2 className="text-lg font-bold mb-3 pb-1.5 border-b border-slate-200 dark:border-slate-700 text-gray-900 dark:text-white font-tarunima">
-                  সংক্ষিপ্ত তথ্য
-                </h2>
-
-                  <dl className="table w-full text-sm font-tarunima border-separate border-spacing-y-2.5">
-                    {validFields.map((field, index) => (
-                      <div 
-                        key={index} 
-                        className="table-row border-b border-slate-200/60 dark:border-slate-700/50"
-                      >
-                        {/* ১. লেবেল কলাম (সবচেয়ে বড় লেবেলের সাইজ অনুযায়ী সব রো সমান প্রস্থ পাবে) */}
-                        <dt className="table-cell whitespace-nowrap font-semibold text-gray-600 dark:text-gray-400 pr-2 pb-0">
-                          {field.label}
-                        </dt>
-
-                        {/* ২. আলাদা কোলন কলাম */}
-                        <span className="table-cell whitespace-nowrap text-gray-500 dark:text-gray-400 select-none pr-3 pb-0 align-top">
-                          :
-                        </span>
-
-                        {/* ৩. মান কলাম (বাকি পুরো উইডথ নিবে ও লেখা বড় হলে একাধিক লাইনে র‍্যাপ হবে) */}
-                        <dd className="table-cell w-full text-gray-900 dark:text-gray-100 font-medium break-word pb-0 align-top">
-                          {renderFieldValue(field)}
-                        </dd>
-                      </div>
-                    ))}
-                  </dl>
-              </div>
-
+        {validFields.length > 0 && (
+          <div className="p-3 md:p-4">
+            <div className="flex items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-700 pb-1.5 md:mb-3">
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white font-tarunima">
+                পরিচিতি
+              </h2>
+              <button
+                onClick={() => setShowInfo(!showInfo)}
+                aria-expanded={showInfo}
+                className="md:hidden flex items-center gap-1.5 px-2.5 py-1 text-sm font-medium bg-teal-50 text-[#008080] border border-teal-100 hover:bg-teal-100 dark:bg-teal-950 dark:text-teal-300 dark:border-teal-800 dark:hover:bg-teal-900 rounded-md transition-all font-tarunima cursor-pointer"
+              >
+                {showInfo ? (
+                  <>
+                    <EyeOff size={15} />
+                    <span>লুকান</span>
+                  </>
+                ) : (
+                  <>
+                    <Eye size={15} />
+                    <span>দেখুন</span>
+                  </>
+                )}
+              </button>
             </div>
-          </aside>
-        )}
 
-        {/* সাইডবার হাইড অবস্থায় ডেস্কটপ টগল বাটন */}
-        {!showSidebar && (
-          <button
-            onClick={() => setShowSidebar(true)}
-            className="hidden md:flex absolute left-0 top-3 z-20 w-7 h-7 items-center justify-center bg-amber-300 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full shadow-md text-slate-600 dark:text-slate-300 hover:text-teal-600 dark:hover:text-teal-400 cursor-pointer transition-transform hover:scale-110"
-            title="সংক্ষিপ্ত তথ্য দেখুন"
-            aria-label="Show Sidebar"
-          >
-            <Eye size={14} />
-          </button>
+            <dl
+              className={`${showInfo ? 'table' : 'hidden'} md:table w-full text-sm font-tarunima border-separate border-spacing-y-2.5`}
+            >
+              {validFields.map((field, index) => (
+                <div
+                  key={index}
+                  className="table-row border-b border-slate-200/60 dark:border-slate-700/50"
+                >
+                  <dt className="table-cell whitespace-nowrap font-semibold text-gray-600 dark:text-gray-400 pr-2 pb-0">
+                    {field.label}
+                  </dt>
+                  <span className="table-cell whitespace-nowrap text-gray-500 dark:text-gray-400 select-none pr-3 pb-0 align-top">
+                    :
+                  </span>
+                  <dd className="table-cell w-full text-gray-900 dark:text-gray-100 font-medium break-word pb-0 align-top">
+                    {renderFieldValue(field)}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
         )}
-
-        {/* প্রধান কন্টেন্ট */}
-        <article className={`w-full ${showSidebar ? 'md:w-2/3 lg:w-3/4 md:pl-0' : 'w-full md:pl-3'} grow transition-all duration-300`}>
-          {children}
-        </article>
       </div>
-    </>
+    </aside>
   );
 }
 
-// বিভিন্ন ডাটা টাইপ হ্যান্ডেল করার হেল্পার ফাংশন
 function renderFieldValue(field: InfoField) {
   if (field.type === 'link' && typeof field.value === 'string') {
     return (
-      <a 
-        href={field.value.startsWith('http') ? field.value : `https://${field.value}`} 
-        target="_blank" 
+      <a
+        href={field.value.startsWith('http') ? field.value : `https://${field.value}`}
+        target="_blank"
         rel="noopener noreferrer"
         className="text-teal-600 dark:text-teal-400 hover:underline break-all"
       >
@@ -149,9 +110,9 @@ function renderFieldValue(field: InfoField) {
 
   if (field.type === 'image' && typeof field.value === 'string') {
     return (
-      <img 
-        src={field.value} 
-        alt={field.label} 
+      <img
+        src={field.value}
+        alt={field.label}
         loading="lazy"
         decoding="async"
         className="max-h-10 object-contain dark:invert mt-1"
