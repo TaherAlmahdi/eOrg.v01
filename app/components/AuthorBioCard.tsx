@@ -30,15 +30,16 @@ export default async function AuthorBioCard({ slugs }: { slugs: string[] }) {
           className="[float:left] mr-3 mb-1 w-20 aspect-[2/3] object-contain"
         />
       )}
-      <p className="text-justify text-gray-800 leading-relaxed text-base md:text-lg">{summary}</p>
-      <div className="mt-2 flex justify-center sm:justify-end">
+      <p className="text-justify text-gray-800 leading-relaxed text-base md:text-lg">
+        {summary}
+        {/* inline at the end of the text, pushed to the right: on the last line if it fits, else on the next line */}
         <a
           href={detailsUrl}
-          className="px-4 py-1.5 text-sm font-semibold bg-[#008080] text-white hover:bg-teal-700 transition-colors"
+          className="[float:right] ml-2 mt-1 px-3 py-1 text-sm font-semibold leading-normal bg-[#008080] text-white hover:bg-teal-700 transition-colors"
         >
-          জীবনী
+          পূর্ণাঙ্গ জীবনী
         </a>
-      </div>
+      </p>
     </div>
   );
 }
