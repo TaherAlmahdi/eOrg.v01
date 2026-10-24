@@ -1,6 +1,7 @@
 'use client';
 
 import Breadcrumb from '@/app/components/Breadcrumb';
+import AuthorPhoto from '@/app/components/AuthorPhoto';
 import { COVER_BASE } from '@/app/lib/cover-base';
 import { useState, useMemo, type ReactNode } from 'react';
 import Link from 'next/link';
@@ -65,8 +66,9 @@ export interface BookItem {
 
 interface AuthorBookSearchGridProps {
   books?: BookItem[];
-  siteName?: string;
   personName: string;
+  /** URL of the author's picture for the title card (an icon is shown when there is none) */
+  authorImage?: string;
   /** Short introduction of the author (server-rendered AuthorBioCard), shown between the search bar and the letter filter */
   bioCard?: ReactNode;
 }
@@ -95,9 +97,9 @@ const isFieldMatch = (field: unknown, targetName: string): boolean => {
 
 export default function AuthorBookSearchGrid({
   books = [],
-  siteName = 'এডুলিচার পাঠশালা',
   personName = '',
   bioCard,
+  authorImage,
 }: AuthorBookSearchGridProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLetter, setSelectedLetter] = useState('সব');
@@ -183,19 +185,32 @@ export default function AuthorBookSearchGrid({
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             {/* বামপাশে পেজ টাইটেল ও তথ্য */}
             <div className="rounded bg-teal-50/90 text-[#008080] border border-teal-200 shadow-xs backdrop-blur-md self-start md:self-auto w-full md:w-auto">
-              <div className="p-2.5 inline-flex items-center gap-2">
-                <User size={22} className="shrink-0 animate-pulse text-[#008080]" />
-                <h1 className="text-xl md:text-2xl font-bold text-gray-950 leading-none">
-                  <span className="text-[#008080]">{displayTitle}</span>
-                </h1>
+              <div className="p-2.5 flex items-center gap-3">
+                <div className="shrink-0">
+                  {authorImage ? (
+                    <AuthorPhoto
+                      src={authorImage}
+                      alt={personName}
+                      className="w-12 aspect-[2/3] object-contain"
+                      fallback={<User size={22} className="animate-pulse text-[#008080]" />}
+                    />
+                  ) : (
+                    <User size={22} className="animate-pulse text-[#008080]" />
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <h1 className="text-xl md:text-2xl font-bold text-gray-950 leading-none">
+                    <span className="text-[#008080]">{displayTitle}</span>
+                  </h1>
+                  <p className="mt-1.5 text-xs md:text-sm text-gray-500">
+                    <span className="text-xs md:text-sm font-normal text-teal-700 bg-teal-100/70 px-2 py-1 inline-block">
+                      {personBooks.length > 0
+                        ? `প্রকাশিত বইয়ের সংখ্যা ${toBengaliNumber(personBooks.length)} টি`
+                        : "বর্তমানে কোনো বই পাওয়া যায়নি"}
+                    </span>
+                  </p>
+                </div>
               </div>
-              <p className="text-xs md:text-sm text-gray-500 mt-1">
-                <span className="w-full text-xs md:text-sm font-normal text-teal-700 bg-teal-100/70 px-2 py-1 border-t border-teal-200 inline-block">
-                  {personBooks.length > 0
-                    ? `${siteName ? `${siteName}য় ` : ''}প্রকাশিত মোট ${toBengaliNumber(personBooks.length)}টি বই রয়েছে`
-                    : "বর্তমানে কোনো বই পাওয়া যায়নি"}
-                </span>
-              </p>
             </div>
 
             {/* ডানপাশে সার্চবার (মোবাইলে নিচে ফুল-ওয়াইড) */}

@@ -7,6 +7,7 @@ import { getLibraryBooks } from '../../../../lib/books';
 import { getSlug, getAuthorSlugFromTitle } from '../../../../lib/content/core/registry';
 import AuthorBookSearchGrid from '@/app/components/AuthorBookSearchGrid';
 import AuthorBioCard from '@/app/components/AuthorBioCard';
+import { getBioIndex, authorImageUrl } from '@/app/lib/bio';
 import { buildTabTitle, getSubdomainData } from '@/app/lib/get-site-data';
 import { normalizeBn } from '@/app/lib/bn-text';
 
@@ -184,6 +185,14 @@ export default async function SingleAuthorPage({ params }: PageProps) {
 
   const { authorBooks, authorName } = await getAuthorDataAndBooks(rawSlug);
 
+  // picture for the title card (from the bio index; the card shows an icon when there is none)
+  const bioIndex = await getBioIndex();
+  const bioSlug = [
+    rawSlug.toLowerCase(),
+    authorName ? getAuthorSlugFromTitle(authorName) || getSlug('authors', authorName) : '',
+  ].find((s) => s && bioIndex[s]?.image);
+  const authorImage = bioSlug ? authorImageUrl(bioIndex[bioSlug].image!) : undefined;
+
   const fallbackName = rawSlug
     .replace(/-/g, ' ')
     .replace(/\b\w/g, (l) => l.toUpperCase());
@@ -217,7 +226,7 @@ export default async function SingleAuthorPage({ params }: PageProps) {
       <AuthorBookSearchGrid
         books={authorBooks as FrontmatterValue}
         personName={displayAuthorName}
-        siteName={siteData?.title || 'এডুলিচার পাঠশালা'}
+        authorImage={authorImage}
         bioCard={
           <AuthorBioCard
             slugs={[

@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 
-/** Author picture that disappears completely (no broken-image icon) when the file is missing or fails to load. */
-export default function AuthorPhoto({ src, alt, className }: { src: string; alt: string; className?: string }) {
+/** Author picture that disappears (no broken-image icon; `fallback` is shown instead, if given) when the file fails to load. */
+export default function AuthorPhoto({ src, alt, className, fallback = null }: { src: string; alt: string; className?: string; fallback?: ReactNode }) {
   const [failed, setFailed] = useState(false);
   const ref = useRef<HTMLImageElement>(null);
 
@@ -13,7 +13,7 @@ export default function AuthorPhoto({ src, alt, className }: { src: string; alt:
     if (img && img.complete && img.naturalWidth === 0) setFailed(true);
   }, []);
 
-  if (failed) return null;
+  if (failed) return <>{fallback}</>;
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img

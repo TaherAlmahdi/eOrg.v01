@@ -30,7 +30,7 @@ export default async function AuthorBioCard({ slugs }: { slugs: string[] }) {
           className="float-left mr-3 mb-1 w-20 sm:w-28 aspect-[2/3] object-contain"
         />
       )}
-      <p className="text-justify text-gray-800 leading-relaxed text-base">{summary}</p>
+      <p className="text-justify text-gray-800 leading-relaxed text-base md:text-lg">{summary}</p>
       <div className="mt-2 flex justify-center sm:justify-end">
         <a
           href={detailsUrl}
