@@ -113,17 +113,17 @@ export default function BiographyContent({
     <>
       <Breadcrumb items={[...parentCrumbs, { label: pageTitle || 'জীবনী' }]} />
 
-      <main className="max-w-full mx-auto px-2 py-4">
-        {/* Mobile: title, then the image/info card, then the text. Desktop: full-width title, then the card (left) and text (right) starting on the same line. */}
-        <div className="flex flex-col md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:grid-cols-[minmax(0,1fr)_minmax(0,3fr)] md:gap-x-6">
+      <main className="max-w-full mx-auto px-2 pt-2 pb-4">
+        {/* Mobile: title, then the image/info card, then the text. Desktop: card in the left column, title and text in the right. */}
+        <div className="flex flex-col md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:grid-cols-[minmax(0,1fr)_minmax(0,3fr)] md:grid-rows-[auto_1fr] md:gap-x-6">
           <BioSidebar
-            className="order-2 md:order-none md:col-start-1 md:row-start-2"
+            className="order-2 md:order-none md:col-start-1 md:row-start-1 md:row-span-2"
             image={frontmatter.image}
             name={frontmatter.name}
             infoFields={infoFields}
           />
 
-          <h1 className="order-1 md:order-none md:col-span-2 md:row-start-1 title mb-7 border-b border-slate-200 dark:border-slate-700 pb-3 font-tarunima text-gray-900 dark:text-gray-100">
+          <h1 className="order-1 md:order-none md:col-start-2 md:row-start-1 title mb-8 border-b border-slate-200 dark:border-slate-700 pb-3 font-tarunima text-gray-900 dark:text-gray-100">
             {pageTitle}
           </h1>
 
