@@ -86,13 +86,17 @@ export function authorImageUrl(image: string): string {
 }
 
 /** Metadata of a biography page (shared by /biography and /bio/<slug>). */
-export function bioMetadata(frontmatter: BioFrontmatter, siteData: SubdomainData): Metadata {
+export function bioMetadata(
+  frontmatter: BioFrontmatter,
+  siteData: SubdomainData,
+  siteName: string | undefined = siteData?.title
+): Metadata {
   const currentPageTitle = frontmatter.title || frontmatter.name || 'জীবনী';
 
   const dynamicMetaTitle = buildTabTitle({
     metaTitle: frontmatter.meta_title,
     currentPageTitle,
-    siteName: siteData?.title,
+    siteName,
   });
 
   const description =

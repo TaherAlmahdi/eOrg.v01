@@ -29,7 +29,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const host = (await headers()).get('host');
   const bio = await loadBio(slug);
   if (!bio) return { title: 'জীবনী খুঁজে পাওয়া যায়নি' };
-  return bioMetadata(bio.frontmatter, getSubdomainData(host));
+  // main domain: "<author> ❀ এডুলিচার", without the site tagline
+  return bioMetadata(bio.frontmatter, getSubdomainData(host), 'এডুলিচার');
 }
 
 export default async function AuthorBioPage({ params }: PageProps) {
