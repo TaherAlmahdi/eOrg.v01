@@ -38,5 +38,11 @@ export default async function AuthorBioPage({ params }: PageProps) {
   const bio = await loadBio(slug);
   if (!bio) notFound();
 
-  return <BiographyContent frontmatter={bio.frontmatter} content={bio.content} />;
+  return (
+    <BiographyContent
+      frontmatter={bio.frontmatter}
+      content={bio.content}
+      parentCrumbs={[{ label: 'লেখক নির্ঘণ্ট', href: '/authors' }]}
+    />
+  );
 }
