@@ -65,6 +65,7 @@ export const SLUG_DATA: Record<SlugCategory, Record<string, string>> = {
     "সঞ্জীব চট্টোপাধ্যায়": "sanjib-chatterjee",
     "সঞ্জীবচন্দ্র চট্টোপাধ্যায়": "sanjib-chandra-chattopadhyay",
     "সত্যজিৎ রায়": "satyajit-ray",
+    "সত্যভূষণ বন্দ্যোপাধ্যায়": "satya-bhushan-bandyopadhyay",
     "সত্যেন চক্রবর্তী": "satyen-chakraborty",
     "সমরেশ মজুমদার": "samaresh-majumdar",
     "সুকান্ত ভট্টাচার্য": "sukanta-bhattacharya",
