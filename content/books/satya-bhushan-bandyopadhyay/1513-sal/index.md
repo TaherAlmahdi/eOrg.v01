@@ -29,12 +29,17 @@ notice: "এই পাতাটি মূলগ্রন্থের অংশ �
 source_book: "দ্বিতীয় সংস্করণ; বোস লাইব্রেরী; ৫৭, কলেজ স্ট্রীট, কলিকাতা।"
 ---
 
-<p class="pcb">১৫১৩ সাল</p>
-<p class="pc">(বৈজ্ঞানিক উপন্যাস)</p>
-<p class="pc">(দ্বিতীয় সংস্করণ)</p>
-<p class="pcb">শ্রীসত্য ভূষণ বন্দ্যোপাধ্যায় প্রণীত</p>
+<h3 style="text-align: center;">১৫১৩ সাল</h3>
+<p class="pc ugap">(বৈজ্ঞানিক উপন্যাস)</p>
+
+<p class="pcb ugap">শ্রীসত্য ভূষণ বন্দ্যোপাধ্যায় প্রণীত</p>
+
+<p class="pc">সম্পাদনা</p>
+<p class="pcb">তাহের আলমাহদী</p>
+
 <p class="star"></p>
-<p class="pc">প্রকাশক<br/>
-বোস লাইব্রেরী<br/>
-৫৭, কলেজ ষ্ট্রীট, কলিকাতা।</p>
+
+<p class="pc">অনুস্মৃতি</p>
+<p class="pc">দ্বিতীয় সংস্করণ; প্রকাশক: বোস লাইব্রেরী; ৫৭, কলেজ ষ্ট্রীট,—কলিকাতা; মুদ্রাকর: Gosto Behary Kayari, at The Bani Press, 12, Chorebagan Lane, Calcutta.</p>
+
 <p class="star"></p>
